@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.9.37">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-17">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>Covariates in Difference-in-Differences</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -31,8 +28,74 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-4488a4dd4807c2c9a5603c247e31f6f3.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -139,28 +202,29 @@
   <p class="subtitle">The LaLonde test in Python — when do covariates rescue a DiD?</p>
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">3,621</span><span class="kr-cap">naive DiD · 2× too large</span></div>
-    <div class="kr"><span class="kr-num">1,711–1,993</span><span class="kr-cap">covariates in the trend</span></div>
+    <div class="kr"><span class="kr-num">1,711–1,993</span><span class="kr-cap">trend + propensity estimators</span></div>
     <div class="kr"><span class="kr-num">1,794</span><span class="kr-cap">experimental benchmark (ATT)</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 17, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section>
 <section id="the-puzzle" class="title-slide slide level1 divider center" data-background-color="#d97757">
 <h1>The Puzzle</h1>
 <p><span class="act">Act I</span></p>
 </section>
-<section id="the-same-job-training-program-two-very-different-answers" class="slide level2 center">
-<h2>The same job-training program, two very different answers</h2>
-<p>A program trained disadvantaged workers. A randomized trial found it raised earnings by about <strong>$1,794</strong>.</p>
+<section id="we-know-the-answer.-can-an-observational-estimator-find-it" class="slide level2 center">
+<h2>We know the answer. Can an observational estimator find it?</h2>
+<p>A randomized trial says job training raised earnings by <strong>$1,794</strong>.</p>
 <div class="fragment">
-<p>Throw away the randomized control group, swap in a survey of ordinary Americans, and run the usual difference-in-differences with covariates. Do you still recover <strong>$1,794</strong>?</p>
+<p>Now throw the control group away. Use a survey instead.</p>
 </div>
 <div class="fragment">
-<p><em>Robert LaLonde asked exactly this in 1986 — and launched the credibility revolution when the answer was “no.”</em></p>
+<p>Do you still find <strong>$1,794</strong>?</p>
 <aside class="notes">
-<p>The hook: we KNOW the answer because an RCT exists. The question is whether an observational estimator can find it, and whether the way we use covariates matters.</p>
+<p>Robert LaLonde asked exactly this in 1986. The answer was no, and that launched the credibility revolution. We swap in a survey of ordinary Americans and run the usual difference-in-differences with covariates.</p>
+<p>The hook: we KNOW the right answer because an RCT exists. The question is whether an observational estimator can find it, and whether the way we use covariates matters. The naive answer, which we will see in a few slides, is $3,621 — twice the truth.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -174,63 +238,111 @@
       }</style></aside>
 </div>
 </section>
-<section id="the-setup" class="slide level2 smaller center">
-<h2>The setup</h2>
+<section id="trainees-15992-survey-controls-one-known-answer" class="slide level2 smaller center">
+<h2>185 trainees, 15,992 survey controls, one known answer</h2>
 <p>Following <a href="https://causalinf.substack.com/p/covariates-diff-in-diff-and-lalonde">Scott Cunningham’s Mixtape Substack</a>, we reproduce the test in Python.</p>
 <ul>
 <li><strong>Data:</strong> Dehejia-Wahba subsample — 185 NSW trainees + 15,992 CPS controls.</li>
 <li><strong>Panel:</strong> two periods, pre = 1975, post = 1978. Outcome = real earnings.</li>
 <li><strong>Estimand:</strong> the <strong>ATT</strong> (effect on the treated). Design: observational.</li>
-<li><strong>Ground truth:</strong> the experimental ATT ≈ <strong>$1,794</strong>.</li>
+<li><strong>Ground truth:</strong> the experimental ATT <span class="math inline">\(\approx\)</span> <strong>$1,794</strong>.</li>
 </ul>
-<div class="fragment">
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Tip</strong></p>
-</div>
-<div class="callout-content">
-<p>Swapping the experimental control for CPS changes the ATE, but the treated group stays — so the <strong>ATT target is unchanged</strong> at $1,794.</p>
-</div>
-</div>
-</div>
-</div>
+<p><span class="takeaway fragment">The treated group never changes. So the <strong>ATT target stays $1,794</strong>, whatever control group we use.</span></p>
+<aside class="notes">
+<p><code>nsw_mixtape</code> is already the Dehejia-Wahba subsample: 185 treated plus 260 experimental controls. We keep the 185 treated, discard the experimental controls, and replace them with the 15,992 CPS controls from <code>cps_mixtape</code>. The experimental controls are set aside for one job only — computing the benchmark, $1,794 with a standard error of about $671.</p>
+<p>On the estimand: the ATT is the effect on the treated units, the ATE the effect on everyone; under randomization they coincide. Replacing the experimental control with a survey control changes who the comparison represents, but it leaves the treated group — and therefore the ATT — intact. Because randomization is gone, the identifying assumption is no longer plain parallel trends but <em>conditional</em> parallel trends.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II — diagnose the bias, then climb the spec ladder</span></p>
 </section>
 <section id="why-the-naive-did-fails-covariate-imbalance" class="slide level2 center">
 <h2>Why the naive DiD fails: covariate imbalance</h2>
 
-<img data-src="../did_covariates_lalonde_balance.png" class="r-stretch"><p>CPS controls differ from trainees by <strong>+2.3 SD</strong> on race and <strong>−1.6 SD</strong> on prior earnings. The randomized controls do not.</p>
+<img data-src="../did_covariates_lalonde_balance.png" alt="Standardized mean differences: trainees versus each control group" class="r-stretch quarto-figure-center"><p class="caption">Standardized mean differences: trainees versus each control group</p><p><span class="takeaway fragment">CPS controls differ from trainees by <strong>+2.3 SD</strong> on race and <strong>−1.6 SD</strong> on prior earnings. The randomized controls do not.</span></p>
+<aside class="notes">
+<p>The standardized mean difference is the gap in a covariate’s mean between treated and control, divided by the pooled standard deviation. A rule of thumb flags anything beyond 0.1 as imbalanced and beyond 0.25 as severe — these are many times that threshold, including −1.3 on marriage.</p>
+<p>Against the randomized experimental controls (blue), every difference collapses to essentially zero. That contrast is the whole problem in one figure: the CPS is a representative sample of America, so its members are older, better educated, more often married and far richer than a set of disadvantaged trainees. Imbalance this extreme is exactly the condition under which conditioning on covariates stops being optional.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="different-groups-different-trends" class="slide level2 center">
 <h2>Different groups, different trends</h2>
 
-<img data-src="../did_covariates_lalonde_trends.png" class="r-stretch"><p>The CPS control sits on a different level <em>and</em> slope. Assuming the trainees would have followed it is not credible — this is where covariates must work.</p>
+<img data-src="../did_covariates_lalonde_trends.png" alt="Raw earnings trends by group, 1974 to 1978" class="r-stretch quarto-figure-center"><p class="caption">Raw earnings trends by group, 1974 to 1978</p><p><span class="takeaway fragment">The CPS control sits on a different level <em>and</em> a different slope. Assuming the trainees would have followed it is not credible.</span></p>
+<aside class="notes">
+<p>The CPS controls (black) sit far above everyone else — about $14,017 in 1974 against the trainees’ $2,096 — and drift gently upward. The trainees (orange) and the experimental controls (blue) start together near the bottom and rise in tandem into 1978.</p>
+<p>Imbalance in levels is only half the story; it becomes a bias only if the imbalanced groups are also on different trends. They are. A DiD that uses the CPS as-is implicitly assumes the trainees, absent training, would have followed the CPS’s flat high-earning path. This is precisely where covariates must do work — not by shifting levels, but by modeling those divergent trends.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="four-regressions-one-number" class="slide level2 smaller center">
 <h2>Four regressions, one number</h2>
-<p>The 2×2 DiD ATT is computed identically by:</p>
+<p>The <span class="math inline">\(2 \times 2\)</span> DiD ATT is computed identically by:</p>
 <ol type="1">
-<li>Saturated dummies (treatment × post interaction)</li>
-<li>Two-way fixed effects + post × treatment</li>
+<li>Saturated dummies (treatment <span class="math inline">\(\times\)</span> post interaction)</li>
+<li>Two-way fixed effects + post <span class="math inline">\(\times\)</span> treatment</li>
 <li>First-difference regression on treatment</li>
 <li>Across-group regression on post</li>
 </ol>
 <div class="fragment">
-<p>We use the <strong>saturated form</strong> — it is the one that lets us add time-invariant covariates in different places and watch what happens.</p>
+<p>We use the <strong>saturated form</strong>. Only it lets us move covariates around and watch the estimate.</p>
+<p><span class="takeaway fragment">Same number, four ways — so the specification choice is about covariates, not about the DiD itself.</span></p>
+<aside class="notes">
+<p>The two-by-two DiD estimator of the ATT is the difference of two differences: the treated group’s post-minus-pre change minus the control group’s post-minus-pre change. As Cunningham emphasizes, four regressions compute this identical number. Throughout the deck, <code>post:ever_treated</code> is the interaction whose coefficient <em>is</em> the DiD estimate of the ATT.</p>
+<p>If the DiD mechanics are hazy, the introductory tutorial at carlos-mendez.org/post/python_did covers them properly; here we only fix notation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
-</section></section>
-<section>
-<section id="the-spec-ladder" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
-<h1>The Spec Ladder</h1>
-<p><span class="act">Act II — where does the covariate enter?</span></p>
 </section>
 <section id="three-ways-to-add-a-covariate" class="slide level2 smaller center">
 <h2>Three ways to add a covariate</h2>
 <p>A covariate <span class="math inline">\(X\)</span> can enter a DiD in three fundamentally different places:</p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Placement</th>
@@ -252,13 +364,59 @@
 <tr class="odd">
 <td><strong>Trend</strong></td>
 <td><span class="math inline">\(X \times \text{post}\)</span></td>
-<td>the counterfactual <strong>trend</strong></td>
+<td><span class="key">the counterfactual <strong>trend</strong></span></td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<p>Only the last one addresses why the naive estimate is wrong. Watch the estimate as we climb the ladder.</p>
-</div>
+<p><span class="takeaway fragment">Only the last placement addresses <em>why</em> the naive estimate is wrong.</span></p>
+<aside class="notes">
+<p>Every covariate in Scott’s canonical LaLonde set is a time-invariant baseline characteristic: age and its square and cube, education and its square, marriage, no-degree, race, ethnicity, 1974 earnings and an unemployment flag for 1974. None of them changes between our two periods — keep that in your pocket, because it is the reason the additive specification turns out to be completely inert.</p>
+<p>The analogy worth using aloud: where you attach a corrective lens matters. Over the eye it fixes your vision; in your pocket it does nothing. Now watch the estimate as we climb the ladder.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-whole-thesis-is-one-token-in-the-formula" class="slide level2 smaller center">
+<h2>The whole thesis is one token in the formula</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="spec-a-inert-3621">Spec A — inert ($3,621)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>XF <span class="op">=</span> <span class="st">" + "</span>.join(XVARS)</span>
+<span id="cb1-2"><a href=""></a></span>
+<span id="cb1-3"><a href=""></a>pf.feols(</span>
+<span id="cb1-4"><a href=""></a>  <span class="ss">f"re ~ post * ever_treated + </span><span class="sc">{</span>XF<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb1-5"><a href=""></a>  data<span class="op">=</span>panel, vcov<span class="op">=</span><span class="st">"HC1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div><div class="column" style="width:50%;">
+<h3 id="spec-b-corrected-1711">Spec B — corrected ($1,711)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>post_ints <span class="op">=</span> <span class="st">" + "</span>.join(<span class="ss">f"post:</span><span class="sc">{</span>x<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> x <span class="kw">in</span> XVARS)</span>
+<span id="cb2-2"><a href=""></a></span>
+<span id="cb2-3"><a href=""></a>pf.feols(</span>
+<span id="cb2-4"><a href=""></a>  <span class="ss">f"re ~ post * ever_treated + </span><span class="sc">{</span>XF<span class="sc">}</span><span class="ss"> + </span><span class="sc">{</span>post_ints<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb2-5"><a href=""></a>  data<span class="op">=</span>panel, vcov<span class="op">=</span><span class="st">"HC1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div></div>
+<p><span class="takeaway fragment">Same covariates, same data, same estimator. One extra term — and the answer halves.</span></p>
+<aside class="notes">
+<p>This is the entire post in one diff. <code>XF</code> puts the covariates in the level; <code>post_ints</code> multiplies each of them by the <code>post</code> indicator, so workers with different characteristics are allowed to be on different earnings trajectories over time.</p>
+<p>Spec A is the most common specification in the entire applied panel literature — two-way fixed effects with baseline controls. It returns $3,621. Spec B returns $1,711, a $1,910 move that lands within $83 of the benchmark. Nothing about the output of Spec A warns you that it is wrong.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-estimate-stays-inert" class="slide level2 center" data-auto-animate="true">
 <h2 data-id="quarto-animate-title">The estimate stays inert…</h2>
@@ -274,36 +432,119 @@
 <ul>
 <li>Spec BT — <span class="math inline">\(X \times\)</span> treatment (effect) → <strong>$3,621</strong> · inert</li>
 </ul>
-</div>
-<div class="fragment">
-<p><em>Time-invariant covariates in the level or the effect never touch the control’s trend. Nothing moves.</em></p>
+<p><span class="takeaway fragment">Time-invariant covariates in the level or the effect never touch the control’s trend. Nothing moves.</span></p>
+<aside class="notes">
+<p>Spec A is identical to Spec 0 to the dollar, and that is mechanical, not a coincidence: the covariates are time-invariant, so the within transformation that defines two-way fixed effects sweeps them out entirely. The DiD coefficient never depended on them in the first place. If you have ever added baseline controls to a DiD and reported that “the estimate is robust to covariates,” this is worth sitting with.</p>
+<p>Spec BT lets the treatment effect vary with covariates and recovers the ATT by g-computation. That saturates the model in <em>levels</em>, relaxing the constant-effects assumption — but it does nothing about conditional parallel trends. The problem was never that the treatment effect varies; it is that the control group’s counterfactual trend is mismodeled.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="until-covariates-touch-the-trend" class="slide level2 center" data-auto-animate="true">
 <h2 data-id="quarto-animate-title">…until covariates touch the trend</h2>
 <ul>
-<li>Spec B — <span class="math inline">\(X \times \text{post}\)</span> (trend) → <strong>$1,711</strong> ✅</li>
+<li>Spec B — <span class="math inline">\(X \times \text{post}\)</span> (trend) → <strong>$1,711</strong></li>
 </ul>
 <div class="fragment">
 <ul>
-<li>Spec C — saturated first differences = HIT (1997) → <strong>$1,770</strong> ✅</li>
+<li>Spec C — saturated first differences = HIT (1997) → <strong>$1,770</strong></li>
 </ul>
-</div>
-<div class="fragment">
-<ul>
-<li>IPW (Abadie 2005) → <strong>$1,861</strong> · DR (Sant’Anna-Zhao 2020) → <strong>$1,993</strong></li>
-</ul>
-</div>
-<div class="fragment">
-<p><em>The instant covariates bend the counterfactual trend, the estimate snaps to the benchmark.</em></p>
+<p><span class="takeaway fragment">The instant covariates bend the counterfactual trend, the estimate snaps to the benchmark.</span></p>
+<aside class="notes">
+<p>Spec B collapses the estimate from $3,621 to $1,711 — a $1,910 move that lands within $83 of the $1,794 benchmark. Same covariates as Spec A; the only change is that they now multiply <code>post</code> instead of sitting in the level.</p>
+<p>Spec C first-differences the outcome and saturates on the treatment interactions, giving $1,770 — within $24 of the truth. The subtlety worth savoring: because the outcome is now a <em>change</em>, a covariate’s own coefficient is no longer a level effect but its effect on the <em>trend</em>. So one regression does both jobs — bending the control’s counterfactual trend and relaxing the constant-effect assumption. It is also numerically identical, to the dollar, to the Heckman-Ichimura-Todd (1997) outcome-regression estimator fit on the controls alone and imputed to the treated.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
-<section id="the-cliff" class="slide level2 center">
-<h2>The cliff</h2>
+<section id="propensity-weighting-reaches-the-benchmark-by-a-different-route" class="slide level2 center">
+<h2>Propensity weighting reaches the benchmark by a different route</h2>
+<ul>
+<li>IPW (Abadie 2005) → <strong>$1,861</strong></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>DR (Sant’Anna-Zhao 2020) → <strong>$1,993</strong></li>
+</ul>
+</div>
+<div class="fragment">
+<p>These do <strong>not</strong> model the trend. They model <em>treatment</em> — how the probability of being a trainee depends on <span class="math inline">\(X\)</span> — and reweight the controls.</p>
+<p><span class="takeaway fragment">Outcome regression specifies the trend; propensity weighting specifies selection. Two philosophies, one answer near $1,794.</span></p>
+<aside class="notes">
+<p>Abadie (2005) weights the first-differenced outcome by (D − p̂(X)) / (1 − p̂(X)) / Pr(D = 1), reweighting the controls to resemble the treated. Instead of specifying how earnings trend with covariates, it specifies how treatment depends on them and lets the reweighting handle the rest.</p>
+<p>Sant’Anna-Zhao (2020) combines both: the outcome regression on the controls <em>and</em> the propensity reweighting. It is consistent if <em>either</em> model is correctly specified — two independent safety nets, and you fall through only if both fail. That is why it sits a little further from the benchmark here yet carries the strongest theoretical guarantee.</p>
+<p>The convergence is the point: two independent modeling strategies land near $1,800 from opposite directions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-estimate-is-flat-at-3621-until-covariates-enter-the-trend" class="slide level2 center">
+<h2>The estimate is flat at $3,621 until covariates enter the trend</h2>
 
-<img data-src="../did_covariates_lalonde_ladder.png" class="r-stretch"></section>
-<section id="the-decision-rule" class="slide level2 center">
-<h2>The decision rule</h2>
+<img data-src="../did_covariates_lalonde_ladder.png" alt="The ATT across the ordered specification sequence" class="r-stretch quarto-figure-center"><p class="caption">The ATT across the ordered specification sequence</p><p><span class="takeaway fragment">That cliff — between <span class="math inline">\(X \times\)</span> treatment and <span class="math inline">\(X \times\)</span> post — is the single most important feature of the analysis.</span></p>
+<aside class="notes">
+<p>Read the ladder left to right as an argument, not as a table. Flat at $3,621 across the first three specifications, then a drop off a cliff to $1,711 the instant covariates enter the trend, and it stays near the benchmark thereafter.</p>
+<p>The grouping is the thesis. No single number in this figure carries the finding; the <em>shape</em> does.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="independent-check-the-diff-diff-package" class="slide level2 center">
+<h2>Independent check: the diff-diff package</h2>
+
+<img data-src="../did_covariates_lalonde_crosscheck.png" alt="By-hand estimators versus the diff-diff package" class="r-stretch quarto-figure-center"><p class="caption">By-hand estimators versus the diff-diff package</p><p><span class="takeaway fragment">The transparent code and the battle-tested package tell the same story — within <strong>$14</strong>.</span></p>
+<aside class="notes">
+<p>Hand-coded estimators are pedagogically transparent, but a reader is entitled to ask whether we coded them correctly. The <code>diff-diff</code> package agrees exactly on the naive and additive designs ($3,621 vs $3,621) and lands within $14 of the by-hand doubly-robust estimate ($1,993 vs $1,979).</p>
+<p>The small remaining gap is expected, not an error: diff-diff’s Callaway-Sant’Anna implementation makes its own choices about propensity estimation and weight normalization — exactly the kind of default-level difference the reference flags between hand-coded and packaged estimators.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-x-enters-sorts-every-estimator-into-inert-or-corrected" class="slide level2 center">
+<h2>Where <span class="math inline">\(X\)</span> enters sorts every estimator into inert or corrected</h2>
 <div class="cell" data-reveal="true" data-layout-align="center">
 <div class="cell-output-display">
 <div>
@@ -320,21 +561,46 @@
 </div>
 </div>
 </div>
-<p>Covariates in DiD are <strong>not</strong> a robustness knob — they perform a function: satisfying conditional parallel trends and relaxing constant treatment effects.</p>
+<p>Covariates in DiD are <strong>not</strong> a robustness knob.</p>
+<p><span class="takeaway fragment">They have a job: make parallel trends hold, once you condition on X.</span></p>
+<aside class="notes">
+<p>One question organizes the entire analysis: where does the covariate enter? Level and effect leave the counterfactual trend untouched, so the estimate stays inert around $3,621. Trend placements and propensity reweighting both bend or reweight the control’s counterfactual, and both recover roughly $1,794.</p>
+<p>The second job — relaxing constant treatment effects — is what Spec C adds on top of Spec B, and it is worth attaching to Spec C when you say it aloud. But relaxing constant effects alone (Spec BT) buys nothing, because it never touches the trend.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
-<section id="the-payoff" class="title-slide slide level1 divider center" data-background-color="#00a89e">
+<section id="the-payoff" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
 <h1>The Payoff</h1>
 <p><span class="act">Act III</span></p>
 </section>
 <section id="covariates-rescue-lalonde-only-when-they-enter-the-trend" class="slide level2 center">
 <h2>Covariates rescue LaLonde only when they enter the trend</h2>
 
-<img data-src="../did_covariates_lalonde_forest.png" class="r-stretch"></section>
-<section id="independent-check-the-diff-diff-package" class="slide level2 center">
-<h2>Independent check: the diff-diff package</h2>
-
-<img data-src="../did_covariates_lalonde_crosscheck.png" class="r-stretch"><p>The <code>diff-diff</code> package matches the naive/additive numbers exactly and lands within <strong>$14</strong> of the by-hand doubly-robust estimate.</p>
+<img data-src="../did_covariates_lalonde_forest.png" alt="All eight estimators with 95% intervals against the RCT benchmark" class="r-stretch quarto-figure-center"><p class="caption">All eight estimators with 95% intervals against the RCT benchmark</p><p><span class="takeaway fragment">Three inert specifications cluster at <strong>$3,621</strong>; every trend and propensity estimator clusters on the <strong>$1,794</strong> line.</span></p>
+<aside class="notes">
+<p>Eight estimates, one picture. The grouping <em>is</em> the thesis — covariates are not a robustness knob, they are a correction, and only certain placements deliver it.</p>
+<p>Point estimates, for the record: Spec 0, A and BT at $3,621; Spec B $1,711; Spec C and HIT $1,770; IPW $1,861; DR $1,993; benchmark $1,794. Note also how wide every interval is — which is the next slide.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="how-much-should-we-trust-1770-over-1711" class="slide level2 smaller center">
 <h2>How much should we trust $1,770 over $1,711?</h2>
@@ -347,23 +613,52 @@
 <p><strong>Trust the pattern, not the decimal</strong></p>
 </div>
 <div class="callout-content">
-<p>Every corrected estimate’s 95% CI spans roughly <strong>$400 to $3,100</strong>; the benchmark itself has SE ≈ <strong>$671</strong>.</p>
+<p>Every corrected estimate’s 95% CI spans roughly <strong>$400 to $3,100</strong>; the benchmark itself has SE <span class="math inline">\(\approx\)</span> <strong>$671</strong>.</p>
 </div>
 </div>
 </div>
-<p>The <strong>$59</strong> gap between Spec B and Spec C is noise. What is trustworthy is the clean split: trend-ignoring specs are all wrong the same way; trend-modeling specs all move to the truth. Reliability comes from <strong>stability across specifications and across datasets</strong>, not one lucky hit.</p>
+<p>The <strong>$59</strong> gap between Spec B and Spec C is noise.</p>
+<p><span class="takeaway fragment">Trust the split, not the ranking: ignore the trend and you are wrong; model it and you are right.</span></p>
+<aside class="notes">
+<p>This caution comes from a comment by Alexis Diamond on Cunningham’s original post, and it deserves to be front and center. It is tempting to rank the corrected estimators — is $1,770 “better” than $1,711 because it is closer? Against this much noise, no.</p>
+<p>Reliability comes from stability across specifications and across datasets, not from one lucky hit. That is the point of the rctvsobs.org effort. It is also why we bootstrap the standard errors — 199 id-clustered resamples, seed 90210: the point estimates are only as informative as their uncertainty allows.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="takeaways" class="slide level2 smaller center">
-<h2>Takeaways</h2>
+<section id="placement-not-inclusion-is-what-moves-a-did" class="slide level2 smaller center">
+<h2>Placement, not inclusion, is what moves a DiD</h2>
 <ol type="1">
 <li><strong>Placement, not inclusion.</strong> Covariates in the level ($3,621) or the effect ($3,621) are inert; in the trend ($1,711 / $1,770) they correct.</li>
 <li><strong>The common spec fails.</strong> Two-way fixed effects with additive controls is exactly the one that cannot move.</li>
 <li><strong>Two philosophies agree.</strong> Outcome regression and propensity reweighting both land near the $1,794 truth.</li>
 <li><strong>Report uncertainty honestly.</strong> Wide CIs mean the pattern is the finding, not a ranking of corrected estimates.</li>
 </ol>
+<aside class="notes">
+<p>The one sentence to leave with: when you next see a DiD table where “we control for baseline covariates” is offered as reassurance, the right question is not <em>whether</em> covariates are included but <em>where</em> — in the level, the effect, or the trend.</p>
+<p>Limitation worth naming: this is one dataset with a small treated group and a famously thin covariate set. The natural next step is staggered timing with the Callaway-Sant’Anna estimator, where doubly-robust covariate adjustment is the default rather than an afterthought.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="resources" class="slide level2 center">
-<h2>Resources</h2>
+<section id="everything-here-is-reproducible" class="slide level2 center">
+<h2>Everything here is reproducible</h2>
 <ul>
 <li><strong>Full tutorial:</strong> <a href="https://carlos-mendez.org/post/python_did_covariates_lalonde/">carlos-mendez.org/post/python_did_covariates_lalonde</a></li>
 <li><strong>Intro to DiD:</strong> <a href="https://carlos-mendez.org/post/python_did/">carlos-mendez.org/post/python_did</a></li>
@@ -371,12 +666,37 @@
 <li><strong>RCT-vs-observational benchmarks:</strong> <a href="http://rctvsobs.org/">rctvsobs.org</a></li>
 </ul>
 <p><em>Packages: <code>pyfixest</code>, <code>diff-diff</code>, <code>causaldata</code>.</em></p>
-</section></section>
-<section id="thank-you" class="title-slide slide level1 divider center" data-background-color="#141413">
-<h1>Thank you</h1>
-<p><a href="https://carlos-mendez.org">carlos-mendez.org</a></p>
-
+<aside class="notes">
+<p>The post ships the Python script, a Jupyter notebook, a Colab link, a Quarto project bundle and a Stata do-file. The data comes from <code>causaldata</code>, so nothing needs to be downloaded by hand; the seed is 90210 and re-running reproduces the table exactly.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
+<section id="covariates-rescue-a-did-only-from-the-trend-never-from-the-level-or-the-effect." class="slide level2 divider center" data-background-color="#141413">
+<h2>Covariates rescue a DiD only from the trend — never from the level or the effect.</h2>
+<aside class="notes">
+<p>The single takeaway. Three specifications that keep covariates out of the counterfactual trend all return $3,621, roughly twice the truth; every specification that lets covariates bend the control group’s trend — or reweights the controls by propensity — recovers something near the $1,794 experimental benchmark. Covariates in a difference-in-differences are not a robustness knob to be twisted for reassurance. They perform a specific job, and the most common applied specification of all, two-way fixed effects with additive controls, does not do it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

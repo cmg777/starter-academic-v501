@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>Spatial Inequality and the Kuznets Curve</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,6 +28,72 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -133,12 +199,12 @@
   <p class="subtitle">Is there an inverted-U? A synthetic replication in R</p>
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">inverted-U</span><span class="kr-cap">development → spatial inequality</span></div>
-    <div class="kr"><span class="kr-num">$2.1k / $31k</span><span class="kr-cap">turning points</span></div>
+    <div class="kr"><span class="kr-num">$2,100 / $31,000</span><span class="kr-cap">turning points</span></div>
     <div class="kr"><span class="kr-num">cubic n.s.</span><span class="kr-cap">within countries (panel FE)</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -147,11 +213,12 @@
 </section>
 <section id="why-do-some-countries-have-huge-regional-gaps-and-others-almost-none" class="slide level2 center">
 <h2>Why do some countries have huge regional gaps and others almost none?</h2>
-<p>Kuznets (1955) and Williamson (1965) had an answer: as countries develop, spatial inequality first <strong>rises</strong>, then <strong>falls</strong> — an inverted-U.</p>
+<p>Kuznets and Williamson had an answer: <strong>rise, then fall</strong>.</p>
 <div class="fragment">
-<p>But the data to test it — regional accounts for poor <em>and</em> rich countries — barely exist. Lessmann (2014) assembled them. We rebuild the exercise on <strong>synthetic</strong> data so the whole pipeline is open.</p>
+<p>Nobody could test it — the regional data barely exist.</p>
+<p><span class="takeaway fragment">Lessmann (2014) built them. We rebuild the whole exercise on <strong>synthetic</strong> data.</span></p>
 <aside class="notes">
-<p>The hook: an old, intuitive hypothesis that was very hard to test because of data. We make it teachable by simulating a world calibrated to the paper.</p>
+<p>The hook: an old, intuitive hypothesis — Kuznets (1955) and Williamson (1965) — that was very hard to test, because testing it needs regional accounts for poor <em>and</em> rich countries, and those barely exist. Lessmann (2014) assembled them; the data are proprietary, so we rebuild the exercise on synthetic data calibrated to the paper. That keeps the whole pipeline open and reproducible, which is what makes it teachable.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -168,8 +235,9 @@
 <section id="two-pictures-of-the-same-question-and-they-disagree" class="slide level2 center">
 <h2>Two pictures of the same question — and they disagree</h2>
 
-<img data-src="../r_kuznets_04_crosssection_polys.png" class="r-stretch quarto-figure-center"><p class="caption">Cross-section: a line declines, a quadratic bends, a cubic adds a high-income upturn.</p><aside class="notes">
-<p>Plant the puzzle: the shape you see depends on the functional form. We earn each curve in Act II, then resolve the between-vs-within tension.</p>
+<img data-src="../r_kuznets_04_crosssection_polys.png" class="r-stretch quarto-figure-center"><p class="caption">Cross-section: a line declines, a quadratic bends, a cubic adds a high-income upturn.</p><p><span class="takeaway fragment">The shape you see depends on the functional form you assume.</span></p>
+<aside class="notes">
+<p>Plant the puzzle: the same scatter supports three different stories depending on the polynomial. We earn each curve in Act II, then resolve the between-vs-within tension.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -182,15 +250,27 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="where-were-going" class="slide level2 center">
-<h2>Where we’re going</h2>
+<section id="four-estimators-one-question-and-they-dont-all-agree" class="slide level2 center">
+<h2>Four estimators, one question — and they don’t all agree</h2>
 <ul>
-<li class="fragment"><strong>Measure</strong> spatial inequality: the weighted coefficient of variation (WCV)</li>
-<li class="fragment"><strong>Cross-section</strong> OLS — the inverted-U and a high-income upturn</li>
-<li class="fragment"><strong>Panel</strong> two-way fixed effects with <code>fixest</code> — a <em>clean</em> inverted-U</li>
-<li class="fragment"><strong>Semiparametric</strong> checks — Robinson and Baltagi–Li</li>
-<li class="fragment">The twist: the upturn is <strong>between</strong> countries, not <strong>within</strong> them</li>
+<li class="fragment"><strong>Measure</strong> it — the weighted coefficient of variation (WCV)</li>
+<li class="fragment"><strong>Estimate</strong> it — cross-section OLS, panel fixed effects, two semiparametric checks</li>
+<li class="fragment"><strong>The twist</strong> — the upturn is <strong>between</strong> countries, not <strong>within</strong> them</li>
 </ul>
+<p><span class="takeaway fragment">Same data, three shapes. Fixed effects settle which one is real.</span></p>
+<aside class="notes">
+<p>The roadmap. The four estimators are cross-section polynomial OLS, two-way fixed effects with fixest, Robinson (1988) and Baltagi–Li (2002). Each asks the same question with fewer shape assumptions than the last. The payoff is the between-vs-within contrast at the end — that is where the deck is going.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
 <section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
@@ -200,16 +280,31 @@
 <section id="we-compute-inequality-not-assume-it" class="slide level2 center">
 <h2>We <em>compute</em> inequality, not assume it</h2>
 <p><span class="math display">\[\mathrm{WCV} = \frac{1}{\bar{y}}\left[\sum_{j} p_j\,(\bar{y}-y_j)^2\right]^{1/2}\]</span></p>
-<p>Population-weighted spread of regional GDP per capita. A populous poor region counts; a tiny rich enclave barely moves it.</p>
+<p>Population-weighted spread of regional GDP per capita.</p>
 <div class="fragment">
-<p>We simulate regions for <strong>56 countries</strong>, 1980–2009, and compute the WCV from them — 890 annual observations.</p>
+<p><strong>56 countries · 1980–2009 · 890 annual observations</strong></p>
+<p><span class="takeaway fragment">A populous poor region counts; a tiny rich enclave barely moves it.</span></p>
+<aside class="notes">
+<p>We simulate regions inside each country and compute the WCV from them, rather than taking an inequality index off the shelf. Here p_j is region j’s share of the country’s population and ybar is the country’s population-weighted mean regional income; the index is scale-free, so it compares a $400 economy with an $80,000 one. The synthetic panel has 890 annual country-year observations over 56 countries, 1980–2009 — close to the paper’s 915 / 56. The worked two-region example in the post gives WCV = 0.434.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="spatial-inequality-is-related-to-personal-inequality-but-not-the-same" class="slide level2 center">
 <h2>Spatial inequality is related to personal inequality — but not the same</h2>
 
-<img data-src="../r_kuznets_03_gini_vs_wcv.png" class="r-stretch quarto-figure-center"><p class="caption">GINI = 0.31 + 0.21·WCV (t = 2.5, r = 0.32).</p><aside class="notes">
-<p>Motivates why we study the spatial dimension on its own: it explains a third of personal inequality, not all of it.</p>
+<img data-src="../r_kuznets_03_gini_vs_wcv.png" class="r-stretch quarto-figure-center"><p class="caption">GINI = 0.31 + 0.21·WCV (t = 2.5, r = 0.32).</p><p><span class="takeaway fragment">Regional gaps explain about a third of the cross-country variation in personal inequality — not all of it.</span></p>
+<aside class="notes">
+<p>Motivates why we study the spatial dimension in its own right: the correlation is 0.32, close to the paper’s 0.324, so spatial inequality explains a real but partial share of personal inequality. A country can have high personal inequality with low regional inequality, or the reverse.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -225,8 +320,9 @@
 <section id="cross-section-the-inverted-u-emerges-with-controls-and-a-cubic-adds-the-upturn" class="slide level2 center">
 <h2>Cross-section: the inverted-U emerges with controls, and a cubic adds the upturn</h2>
 
-<img data-src="../r_kuznets_table2_crosssection.png" style="width:62.0%" class="r-stretch quarto-figure-center"><p class="caption">Five specifications: bivariate → quadratic → +controls (inverted-U) → +cubic (N-shape).</p><aside class="notes">
-<p>Column 4: +0.34* / −0.02** — the inverted-U. Column 5: cubic significant — the N-shape upturn.</p>
+<img data-src="../r_kuznets_table2_crosssection.png" style="width:80.0%" class="r-stretch quarto-figure-center"><p class="caption">Five specifications: bivariate → quadratic → +controls (inverted-U) → +cubic (N-shape).</p><p><span class="takeaway fragment">With controls the inverted-U appears (+0.34* / −0.02**); the cubic term adds the high-income upturn.</span></p>
+<aside class="notes">
+<p>Column 1: the bivariate slope is negative (−0.092<strong><em>) — richer countries look more equal, but a straight line hides the structure. Column 4: +0.34</em> / −0.02</strong> — the inverted-U. Column 5: cubic significant on all three income terms (+4.40*** / −0.499*** / +0.0184***) — the N-shape upturn. Every control carries the paper’s sign: trade and the number of regions raise spatial inequality; federalism and urbanisation lower it.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -242,8 +338,9 @@
 <section id="where-does-the-curve-turn-set-the-derivative-to-zero" class="slide level2 center">
 <h2>Where does the curve turn? Set the derivative to zero</h2>
 
-<img data-src="../r_kuznets_07_turning_points.png" class="r-stretch quarto-figure-center"><p class="caption">∂WCV/∂ln(GDP) = β₁ + 2β₂Y + 3β₃Y² = 0 → peak ≈ $2,100, trough ≈ $31,000.</p><aside class="notes">
-<p>Three phases: rise during take-off, fall through convergence, rise again at the post-industrial top.</p>
+<img data-src="../r_kuznets_07_turning_points.png" class="r-stretch quarto-figure-center"><p class="caption">Solving <span class="math inline">\(\partial \mathrm{WCV}/\partial \ln(\mathrm{GDP}) = \beta_1 + 2\beta_2 Y + 3\beta_3 Y^2 = 0\)</span> gives a peak near $2,100 and a trough near $31,000.</p><p><span class="takeaway fragment">Three phases: gaps widen up to $2,100, close until $31,000, then widen again.</span></p>
+<aside class="notes">
+<p>Three phases: rise during the industrial take-off, fall through convergence, rise again at the post-industrial top. The roots come out in logs — ln(GDP) = 7.67 and 10.36 — so exponentiate to read them in dollars ($2,146 and $31,443). The paper reports ≈ $2,000 and ≈ $24,000.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -258,18 +355,32 @@
 </section>
 <section id="significant-a-genuine-bend-check-the-discriminant" class="slide level2 center">
 <h2>Significant ≠ a genuine bend — check the discriminant</h2>
-<p>All three cubic terms can be significant and the curve still <strong>not</strong> bend in range. The test is the discriminant <span class="math inline">\(D=\beta_2^2-3\beta_1\beta_3\)</span>:</p>
+<p>The test: <span class="math inline">\(D=\beta_2^2-3\beta_1\beta_3\)</span></p>
 <ul>
 <li class="fragment"><span class="math inline">\(D&gt;0\)</span> → two turning points · <span class="math inline">\(D=0\)</span> → inflection only · <span class="math inline">\(D&lt;0\)</span> → monotonic</li>
-<li class="fragment">Cross-section: <span class="math inline">\(D=+0.006&gt;0\)</span>, both turning points in range → <strong>genuine N-shape</strong></li>
+<li class="fragment">Cross-section: <span class="math inline">\(D=+0.0055&gt;0\)</span>, both turning points in range → <strong>genuine N-shape</strong></li>
 <li class="fragment">Panel cubic: insignificant, and a turning point falls far outside the data → <strong>no within-country bend</strong></li>
-<li class="fragment">Always also check the turning points lie inside the observed income range</li>
 </ul>
+<p><span class="takeaway fragment">Significance says keep the term; the discriminant says whether the curve bends.</span></p>
+<aside class="notes">
+<p>Say this aloud: all three cubic terms can be significant and the curve still not bend inside the observed range. Significance answers “does the data prefer keeping this term?”; the discriminant answers “does the fitted curve actually reverse?” — and a third check asks “does it reverse <em>inside</em> the data?” The cross-section passes all three (D = +0.0055, turning points $2,146 and $31,443 inside the observed $315–$82,653). The panel cubic fails on significance (t = −0.26) and, taken at face value, puts one turning point near $0.0003.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-discriminant-decides-the-shape" class="slide level2 center">
 <h2>The discriminant decides the shape</h2>
 
-<img data-src="../r_kuznets_14_discriminant_regimes.png" class="r-stretch quarto-figure-center"><p class="caption">Same significant terms, three shapes — only the discriminant tells them apart.</p><aside class="notes">
+<img data-src="../r_kuznets_14_discriminant_regimes.png" class="r-stretch quarto-figure-center"><p class="caption">Same significant terms, three shapes — only the discriminant tells them apart.</p><p><span class="takeaway fragment">One number — the sign of <span class="math inline">\(D\)</span> — separates a cubic that bends from one that merely curves.</span></p>
+<aside class="notes">
 <p>Same sign pattern, vary only the squared term: D&lt;0 monotonic, D=0 inflection, D&gt;0 genuine N. In BMA the same trap reads “high PIP ≠ a genuine bend.” See the companion note (Mendez 2026).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -285,22 +396,15 @@
 </section>
 <section id="fixed-effects-change-the-story-not-just-the-standard-errors" class="slide level2 center">
 <h2>Fixed effects change the story, not just the standard errors</h2>
-<p><code>feols(wcv ~ lnGDP + I(lnGDP^2) | country + year, vcov = "hetero")</code></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">feols</span>(wcv <span class="sc">~</span> lnGDP <span class="sc">+</span> <span class="fu">I</span>(lnGDP<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> trade_gdp <span class="sc">+</span> urbanization <span class="sc">|</span></span>
+<span id="cb1-2"><a href=""></a>            country <span class="sc">+</span> year, <span class="at">data =</span> annual, <span class="at">vcov =</span> <span class="st">"hetero"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
-<li class="fragment">Within-country quadratic: <strong>+0.39** / −0.021**</strong> — a clean inverted-U</li>
+<li class="fragment">Within-country quadratic, <strong>two-way fixed effects (TWFE)</strong>: <strong>+0.394** / −0.021**</strong> — a clean inverted-U</li>
 <li class="fragment">Cubic term: <strong>insignificant</strong> — <em>no</em> within-country upturn</li>
-<li class="fragment">The upturn was a <em>between</em>-country artefact all along</li>
 </ul>
-</section>
-<section id="the-within-country-inverted-u" class="slide level2 center">
-<h2>The within-country inverted-U</h2>
-
-<img data-src="../r_kuznets_06_twfe_fit.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">Fitted WCV from the two-way FE quadratic, peaking near $18,000.</p></section>
-<section id="semiparametric-no-polynomial-assumed-same-shape" class="slide level2 center">
-<h2>Semiparametric, no polynomial assumed — same shape</h2>
-
-<img data-src="../r_kuznets_08_robinson_partial.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Robinson (1988) partial fit with a 90% band: inverted-U with a high-income upturn.</p><aside class="notes">
-<p>Triangulation: a kernel-based estimator that never sees the word “cubic” recovers the same curve. Baltagi–Li (B-spline FE) agrees within countries.</p>
+<p><span class="takeaway fragment">The upturn was a <em>between</em>-country artefact all along.</span></p>
+<aside class="notes">
+<p>The vertical bar in fixest absorbs the country and year dummies; vcov = “hetero” reproduces the paper’s White standard errors (clustering by country is the modern alternative). Cross-section comparisons mix countries that sit at very different inequality levels for reasons unrelated to income; the panel compares each country with itself. The within-country cubic term is −0.0008 with t = −0.26 — no upturn. The 5-year averages give the same inverted-U, so this is not a business-cycle artefact.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -312,17 +416,97 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</section>
+<section id="within-a-country-inequality-peaks-near-18000-and-then-falls" class="slide level2 center">
+<h2>Within a country, inequality peaks near $18,000 and then falls</h2>
+
+<img data-src="../r_kuznets_06_twfe_fit.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">Fitted WCV from the TWFE quadratic, peaking near $18,000.</p><p><span class="takeaway fragment">Past the peak, a country’s regional gaps start to close as it keeps growing.</span></p>
+<aside class="notes">
+<p>The fitted two-way fixed-effects quadratic peaks at ln(GDP) ≈ 9.8, about $18,000 per capita. Read it as the within-country trajectory: below the peak, growth widens regional gaps; above it, growth narrows them. This is the panel counterpart of the cross-section peak at $2,100 — a different question, so a different number.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="semiparametric-no-polynomial-assumed-same-shape" class="slide level2 center">
+<h2>Semiparametric, no polynomial assumed — same shape</h2>
+
+<img data-src="../r_kuznets_08_robinson_partial.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Robinson (1988) partial fit with a 90% band: inverted-U with a high-income upturn.</p><p><span class="takeaway fragment">A curve that was never told to be a cubic traces the same shape.</span></p>
+<aside class="notes">
+<p>Triangulation: a kernel-based estimator that never sees the word “cubic” recovers the same curve, and the 90% band widens where the data are sparse. The linear-part coefficients match the parametric ones, and np::npplreg returns the same point estimates as the hand-built double-residual version. Baltagi–Li (B-spline FE) agrees within countries — inverted-U, no upturn.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="structural-change-tracks-the-curve" class="slide level2 center">
+<h2>Structural change tracks the curve</h2>
+
+<img data-src="../r_kuznets_11_sectoral.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Replace income with the non-agricultural share of output — the inverted-U returns.</p><p><span class="takeaway fragment">Swap income for the non-agricultural share and the same inverted-U appears (+0.0165*** / −0.00014***).</span></p>
+<aside class="notes">
+<p>Kuznets and Williamson argued that the real driver is structural change, with income only a proxy. As an economy industrialises a few regions capture the new activity and gaps widen; as the modern sector spreads, gaps close. Estimand note: this is an association, not identification — the whole study is descriptive, so “mechanism” here means a channel consistent with the data, not an estimated causal effect.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection">Objection.</span> The high-income upturn is a measurement artefact — it shows up with income in levels and disappears in logs — and the data are synthetic anyway.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Agreed on the upturn: we report it as fragile, not as a finding. The inverted-U itself survives logs, levels, fixed effects and both semiparametric estimators.</p>
+<aside class="notes">
+<p>Steelman the critique from §11.4 of the post: the existence of the upturn is partly a measurement choice, which is exactly why Lessmann hedges it and why we hedge it too. It also weakens when the poorest countries are dropped. On the data: the synthetic world is calibrated to the paper’s published estimates, so it demonstrates the estimators — it is not independent evidence for the hypothesis.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
 </section></section>
 <section>
 <section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
 <h1>The Resolution</h1>
 <p><span class="act">Act III</span></p>
 </section>
-<section id="structural-change-is-the-mechanism" class="slide level2 center">
-<h2>Structural change is the mechanism</h2>
-
-<img data-src="../r_kuznets_11_sectoral.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Replace income with the non-agricultural share of output — the inverted-U returns.</p><aside class="notes">
-<p>Development raises inequality because it reshuffles where output is made; as the modern sector spreads, gaps close.</p>
+<section id="four-estimators-agree-on-the-inverted-u-and-disagree-only-on-the-upturn" class="slide level2 center">
+<h2>Four estimators agree on the inverted-U — and disagree only on the upturn</h2>
+<ul>
+<li class="fragment"><strong>Inverted-U confirmed</strong> across cross-section OLS, panel TWFE, and two semiparametric estimators</li>
+<li class="fragment"><strong>Turning points</strong> at ~$2,100 and ~$31,000 of GDP per capita</li>
+<li class="fragment"><strong>The upturn is between-country, not within-country</strong> — fixed effects reveal it</li>
+</ul>
+<p>All of it on <strong>synthetic</strong> data calibrated to Lessmann (2014) — a method demo, not new evidence.</p>
+<p><span class="takeaway fragment">The shape is robust; only the upturn depends on whether you look between or within countries.</span></p>
+<aside class="notes">
+<p>The scorecard. Four estimators, one shape: the inverted-U appears in the cross-section with controls, within countries under two-way fixed effects, and in both semiparametric fits. They part company only on the high-income upturn, which the cross-section shows and the panel does not. Keep the caveat audible: these are engineered numbers that reproduce the paper’s estimates, so the exercise teaches the estimators rather than testing the hypothesis afresh.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -338,21 +522,27 @@
 <section id="the-high-income-upturn-is-real-but-fragile" class="slide level2 center">
 <h2>The high-income upturn is real but fragile</h2>
 
-<img data-src="../r_kuznets_12_log_vs_level.png" style="width:85.0%" class="r-stretch quarto-figure-center"><p class="caption">It appears in income levels, vanishes in logs (and within countries).</p></section>
-<section id="what-we-learned" class="slide level2 center">
-<h2>What we learned</h2>
-<ul>
-<li class="fragment"><strong>Inverted-U confirmed</strong> across OLS, fixest TWFE, and two semiparametric estimators</li>
-<li class="fragment"><strong>Turning points</strong> at ~$2,100 and ~$31,000 of GDP per capita</li>
-<li class="fragment"><strong>The upturn is between-country, not within-country</strong> — fixed effects reveal it</li>
-<li class="fragment">Wide regional gaps are largely a <strong>transitional</strong> feature of development</li>
-</ul>
+<img data-src="../r_kuznets_12_log_vs_level.png" style="width:85.0%" class="r-stretch quarto-figure-center"><p class="caption">It appears in income levels, vanishes in logs (and within countries).</p><p><span class="takeaway fragment">Report the inverted-U with confidence; report the upturn with a caveat.</span></p>
+<aside class="notes">
+<p>The post’s most important caveat (§11.4): with income in logs there is no high-income upturn; with income in levels a slight upturn reappears. So the existence of the upturn is partly a measurement choice. The robust finding is the inverted-U; the N-shape is real but fragile — which is why Lessmann hedges it and why we should too.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="thank-you" class="slide level2 center">
-<h2>Thank you</h2>
+<section id="wide-regional-gaps-are-a-transitional-stage-of-development-not-a-destination" class="slide level2 center">
+<h2>Wide regional gaps are a transitional stage of development — not a destination</h2>
+<p>The high-income upturn lives <strong>between</strong> countries, not <strong>within</strong> them.</p>
 <p>Full tutorial, code, data and web app: <strong>carlos-mendez.org/post/r_kuznets</strong></p>
 <aside class="notes">
-<p>Reference: Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? Journal of Development Economics 106, 35–51. Synthetic data; pedagogical replication.</p>
+<p>Reference: Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? Journal of Development Economics 106, 35–51. Synthetic data; pedagogical replication. The policy reading: gaps tend to widen during take-off and narrow as economies mature, but the transition can take decades, and the sectoral result points to the lever — human capital and connectivity in lagging regions.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

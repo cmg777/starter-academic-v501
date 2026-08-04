@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-31">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>Who Are My Neighbors?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,6 +28,72 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -138,15 +204,15 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 31, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section id="the-seating-chart-you-were-handed" class="slide level2 center" data-background-color="#0f1729">
 <h2>The seating chart you were handed</h2>
-<p>You have the full transcript of a conference dinner: who laughed at which joke, who fell silent when.</p>
+<p>You have the transcript of the dinner.</p>
 <p>You do <strong>not</strong> have the seating chart.</p>
-<p>Spatial econometrics hands you the chart first — drawn from shared borders or straight-line distance — and asks you to trust it.</p>
+<p><span class="takeaway fragment">Spatial econometrics hands you the chart first — and asks you to trust it.</span></p>
 <aside class="notes">
-<p>Open with the analogy, not the equation. The audience needs to feel the problem before seeing the machinery.</p>
+<p>Open with the analogy, not the equation. The transcript is who laughed at which joke and who fell silent when. Spatial econometrics hands you the chart first — drawn from shared borders or straight-line distance — and asks you to trust it. The audience needs to feel the problem before seeing the machinery.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -172,9 +238,9 @@
 <li><span class="math inline">\(\rho\)</span> says how strongly neighbours matter</li>
 <li><strong><span class="math inline">\(W\)</span> is normally assumed, never estimated</strong></li>
 </ul>
-<p>If the map is wrong, every number downstream is wrong.</p>
+<p><span class="takeaway fragment">If the map is wrong, every number downstream is wrong.</span></p>
 <aside class="notes">
-<p>Emphasise: this is not a small auxiliary choice. It is upstream of everything.</p>
+<p>Emphasise: this is not a small auxiliary choice. It sits upstream of everything — the impacts, the spillover ratio, and the policy number at the end of the talk.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -191,11 +257,12 @@
 <h2>On this data, contiguity needs ten arbitrary decisions</h2>
 <p>Ten of ninety European NUTS-1 regions have <strong>no queen-contiguity neighbour at all</strong>:</p>
 <div class="smaller">
-<p>Cyprus · Malta · Aegean islands · Canarias · Åland · Corse · Sicily &amp; Sardinia · Azores · Madeira · Ireland</p>
+<p>Cyprus · Malta · Aegean islands · the Canaries · Åland · Corsica · Sicily &amp; Sardinia · Azores · Madeira · Ireland</p>
 </div>
-<p>Each must be patched by hand before a contiguity model will even run — and those patches are invisible in the results table.</p>
+<p>You patch each one by hand before the model will run.</p>
+<p><span class="takeaway fragment">None of those patches appears in the results table.</span></p>
 <aside class="notes">
-<p>This is the single most persuasive slide for a sceptical audience. The “standard” approach already required ten undocumented judgement calls.</p>
+<p>This is the single most persuasive slide for a sceptical audience. The “standard” approach already required ten undocumented judgement calls — attach each isolate to its nearest centroid by distance — before a single parameter was estimated. A contiguity matrix otherwise leaves all ten rows empty, which breaks row-standardization and effectively deletes those regions from the model.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -237,7 +304,7 @@
 <tr class="odd">
 <td>Off-diagonal cells</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;"><strong>8,010</strong></td>
+<td style="text-align: right;"><span class="key">8,010</span></td>
 </tr>
 <tr class="even">
 <td><strong>Total unknowns</strong></td>
@@ -252,20 +319,34 @@
 <tr class="even">
 <td>Obs per unknown</td>
 <td style="text-align: right;">285</td>
-<td style="text-align: right;"><strong>0.21</strong></td>
+<td style="text-align: right;"><span class="key">0.21</span></td>
 </tr>
 </tbody>
 </table>
-<p>4.7 parameters per observation. The likelihood alone cannot do this.</p>
+<p><span class="takeaway fragment">4.7 parameters per observation — the likelihood alone cannot do this.</span></p>
+<aside class="notes">
+<p>Read the last row aloud. An assumed map leaves 285 observations for every unknown; estimating the map leaves about one observation for every five unknowns. That gap is why the prior — the next two slides — is doing the real work.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-prior-is-not-a-technicality-it-is-the-method" class="slide level2 center">
 <h2>The prior is not a technicality — it <em>is</em> the method</h2>
 <p><span class="math display">\[p_{ij} \;\propto\; \omega_{ij} \;\times\; m(k_i)\]</span></p>
-<p><strong>Where</strong> links can be × <strong>how many</strong> there are.</p>
+<p><span class="comment"><strong>Where</strong> links can be <span class="math inline">\(\times\)</span> <strong>how many</strong> there are.</span></p>
 <div class="fragment">
-<p>The trap: a “non-informative” flat prior on the neighbour count implies an expectation of <strong>44.5 neighbours per region</strong> — every region wired to half of Europe.</p>
+<p>The trap: a “non-informative” flat prior expects <strong>44.5 neighbours per region</strong>.</p>
+<p><span class="takeaway fragment">Every region wired to half of Europe.</span></p>
 <aside class="notes">
-<p>The paper writes these hyperparameters with underbars. Dropped here for legibility; the two factors are what matter. Next slide shows what the “non-informative” choice actually asserts.</p>
+<p>The paper writes these hyperparameters with underbars; this deck drops them everywhere for legibility. The two factors are what matter — where a link may be, and how many links a region is expected to have. A flat weight is the natural thing to write if you want to impose nothing, but it implies a Binomial prior on the neighbour count centred at (n−1)/2. At n = 90 that is 44.5. The next slide shows what that choice actually asserts.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -282,8 +363,10 @@
 <section id="non-informative-means-half-of-europe" class="slide level2 center">
 <h2>“Non-informative” means half of Europe</h2>
 
-<img data-src="../r_estimateW_04_prior_k_n90.png" style="width:74.0%" class="r-stretch"><aside class="notes">
-<p>Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one. Same word, opposite belief.</p>
+<img data-src="../r_estimateW_04_prior_k_n90.png" style="width:70.0%" alt="The implied prior distribution over the neighbour count at n = 90 for all three priors, showing the flat and default priors centred at 44.5 neighbours and the shrinkage prior concentrated near 7." class="r-stretch"><p><span class="comment">At n = 90 the flat and default priors expect 44.5 neighbours per region; only the shrinkage prior expects a sparse network.</span></p>
+<p><span class="takeaway fragment">The word “non-informative” describes the weight you type, not the belief you assert.</span></p>
+<aside class="notes">
+<p>Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one. Same word, opposite belief. With only 19 time periods a prior centred on 44.5 would dominate the likelihood rather than be updated by it — which is exactly why the published application uses shrinkage.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -301,9 +384,35 @@
 <p>A link is on or off, so conditional on everything else there are only two states to score:</p>
 <p><span class="math display">\[p(\omega_{ij} \mid \Omega_{-ij}, \cdot, \mathcal{D}) \sim \text{Bernoulli}\left(\frac{\bar{p}^{(1)}_{ij}}{\bar{p}^{(0)}_{ij} + \bar{p}^{(1)}_{ij}}\right)\]</span></p>
 <p>Score both, normalise, flip a weighted coin. Repeat 8,010 times per sweep.</p>
-<p>Sherman-Morrison rank-one updates make each flip cheap instead of an <span class="math inline">\(O(n^3)\)</span> determinant.</p>
+<p><span class="takeaway fragment">The network is never solved whole — only one link at a time, given all the others.</span></p>
 <aside class="notes">
-<p>Piano-tuning analogy: never solve the whole instrument, fix one string given the others.</p>
+<p>Piano-tuning analogy: never solve the whole instrument, fix one string given the others. Each flip changes W, which changes the determinant. Sherman-Morrison rank-one updates make that cheap instead of O(n cubed) — which is why 8,010 links take minutes, not weeks.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-whole-method-is-two-function-calls" class="slide level2 center">
+<h2>The whole method is two function calls</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-6|8-9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>kbar <span class="ot">&lt;-</span> <span class="dv">7</span>                                  <span class="co"># expected neighbours per region</span></span>
+<span id="cb1-2"><a href=""></a>b_pr <span class="ot">&lt;-</span> ((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">-</span> kbar) <span class="sc">/</span> kbar            <span class="co"># 11.714  -&gt;  link prob 7/89</span></span>
+<span id="cb1-3"><a href=""></a>AA   <span class="ot">&lt;-</span> <span class="fu">W_priors</span>(<span class="at">n =</span> n, <span class="at">W_prior =</span> Wprior,</span>
+<span id="cb1-4"><a href=""></a>                 <span class="at">nr_neighbors_prior =</span> <span class="fu">bbinompdf</span>(<span class="dv">0</span><span class="sc">:</span>(n <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb1-5"><a href=""></a>                                                <span class="at">nsize =</span> n <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb1-6"><a href=""></a>                                                <span class="at">a =</span> <span class="dv">1</span>, <span class="at">b =</span> b_pr))</span>
+<span id="cb1-7"><a href=""></a></span>
+<span id="cb1-8"><a href=""></a>res_sarw <span class="ot">&lt;-</span> <span class="fu">sarw</span>(<span class="at">Y =</span> Y, <span class="at">tt =</span> tt, <span class="at">Z =</span> Z,</span>
+<span id="cb1-9"><a href=""></a>                 <span class="at">niter =</span> <span class="dv">200</span>, <span class="at">nretain =</span> <span class="dv">100</span>, <span class="at">W_prior =</span> AA)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="takeaway fragment">Every modelling decision lives in the prior object; <code>sarw()</code> only runs it.</span></p>
+<aside class="notes">
+<p>The package is estimateW, on CRAN. W_priors() builds the beta-binomial sparsity prior anchored at seven expected neighbours; sarw() is the SAR panel sampler with W unknown. Two hundred iterations of which one hundred are retained is the paper’s own budget, reproduced deliberately — 350 seconds for the European panel. The full script ships with the post.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -319,9 +428,11 @@
 <section id="first-check-it-on-a-network-we-built-ourselves" class="slide level2 center">
 <h2>First, check it on a network we built ourselves</h2>
 
-<img data-src="../r_estimateW_18_sim_recovery.png" style="width:80.0%" class="r-stretch"><p><strong>AUC 0.976</strong> · 95.3% of 1,560 cells classified correctly</p>
+<img data-src="../r_estimateW_18_sim_recovery.png" style="width:76.0%" alt="Four panels: the true adjacency matrix, the estimated posterior link probabilities, a histogram separating true links from true non-links by their estimated probability, and posterior densities for each parameter against its true value." class="r-stretch"><p><span class="comment">True adjacency, estimated link probabilities, the separation of true links from non-links, and each parameter’s posterior against its true value.</span></p>
+<p><strong>AUC 0.976</strong> · 95.3% of 1,560 cells classified correctly</p>
+<p><span class="takeaway fragment">On a network whose answer we already knew, the sampler found it.</span></p>
 <aside class="notes">
-<p>Driving test where you placed the cones. Build trust before spending it on real data.</p>
+<p>A driving test where you placed the cones — 40 units, 20 periods, four true neighbours each. Build trust before spending it on real data. The sampler is conservative: recall at the 0.5 cut is only 0.600 and the estimated mean degree is 3.05 against a true 4. That is the sparsity prior doing exactly what we asked of it.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -353,32 +464,40 @@
 <td style="text-align: right;">0.600</td>
 <td style="text-align: right;">0.528</td>
 <td style="text-align: right;">[0.509, 0.542]</td>
-<td style="text-align: center;"><strong>no</strong></td>
+<td style="text-align: center;"><span class="key">no</span></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\sigma^2\)</span></td>
 <td style="text-align: right;">0.050</td>
 <td style="text-align: right;">0.064</td>
 <td style="text-align: right;">[0.056, 0.073]</td>
-<td style="text-align: center;"><strong>no</strong></td>
+<td style="text-align: center;"><span class="key">no</span></td>
 </tr>
 <tr class="odd">
 <td>slope</td>
 <td style="text-align: right;">−1.000</td>
 <td style="text-align: right;">−1.032</td>
 <td style="text-align: right;">[−1.053, −1.009]</td>
-<td style="text-align: center;"><strong>no</strong></td>
+<td style="text-align: center;"><span class="key">no</span></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Sparsity biases the network sparse, and <span class="math inline">\(\rho\)</span> down with it. Autocorrelation narrows the intervals.</p>
-<p><strong>Trust the structure. Hedge the intervals.</strong></p>
-</section></section>
-<section>
-<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
-<h1>The Resolution</h1>
-
+<p>The sparsity prior thins the network, and pulls <span class="math inline">\(\rho\)</span> down with it.</p>
+<p><span class="takeaway fragment">Trust the structure. Hedge the intervals.</span></p>
+<aside class="notes">
+<p>Two things compound. A sparser network has fewer channels for spatial transmission, so the model attributes less to rho — a real bias, not noise, and the price of the regularisation that made the problem estimable at all. On top of that an autocorrelated chain reports less uncertainty than it has earned, so the intervals are simply too narrow. One simulated dataset is not a Monte Carlo study; Krisztin and Piribauer run a proper one.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-published-table-reproduces-exactly" class="slide level2 center">
 <h2>The published table reproduces exactly</h2>
@@ -396,7 +515,7 @@
 <tr class="odd">
 <td><span class="math inline">\(\rho\)</span></td>
 <td style="text-align: right;">0.71322</td>
-<td style="text-align: right;">0.71322</td>
+<td style="text-align: right;"><span class="key">0.71322</span></td>
 <td style="text-align: left;">exact</td>
 </tr>
 <tr class="even">
@@ -420,18 +539,50 @@
 </tbody>
 </table>
 </div>
-<p><strong>12 of 12 quantities exact</strong> to the five decimals printed — same seed, same package version, same RNG, same BLAS.</p>
+<p><strong>12 of 12 quantities exact</strong> to the five decimals printed.</p>
+<p><span class="takeaway fragment">Reproducing the published numbers is the licence to reinterpret them.</span></p>
+<aside class="notes">
+<p>The exactness is conditional and worth naming: same seed, same package version, same RNG stream, same BLAS. Change any one of those and the fifth decimal moves. Everything after this slide is our own reading of the very same fitted object.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="the-model-reconstructed-national-borders" class="slide level2 center">
+<section id="the-model-reconstructed-national-borders" class="slide level2 smaller center">
 <h2>The model reconstructed national borders</h2>
 <div class="columns">
 <div class="column" style="width:46%;">
-<p><img data-src="../r_estimateW_09_W_pip_heatmap.png"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="../r_estimateW_09_W_pip_heatmap.png" style="width:84.0%" alt="A 90 by 90 heatmap of posterior link probabilities, with regions ordered by supranational group and then country, showing bright blocks along the diagonal where regions of the same country connect."></p>
+<figcaption>Posterior link probability, ordered by group then country.</figcaption>
+</figure>
+</div>
 </div><div class="column" style="width:54%;">
 <p>Regions place <strong>35.6%</strong> of their neighbourhood weight on compatriots.</p>
 <p>Chance would give <strong>7.1%</strong>.</p>
-<p>Nothing in the specification mentions countries — the model saw only growth rates, initial productivity and two education shares.</p>
+<p><span class="takeaway fragment">Nothing in the specification mentions countries — the model saw only growth, initial productivity and two education shares.</span></p>
 </div></div>
+<aside class="notes">
+<p>The bright blocks along the diagonal are the headline; the thin lines mark country borders. Five times more weight on compatriots than chance would predict, and twice as much on the supranational bloc. This turns the paper’s qualitative claim — that regions of the same country are more strongly interconnected — into a testable ratio.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="same-country-beats-shared-border" class="slide level2 center">
 <h2>Same country beats shared border</h2>
@@ -446,7 +597,7 @@
 <tbody>
 <tr class="odd">
 <td><strong>Same country</strong></td>
-<td style="text-align: right;"><strong>0.753</strong></td>
+<td style="text-align: right;"><span class="key">0.753</span></td>
 <td style="text-align: right;">30.2%</td>
 </tr>
 <tr class="even">
@@ -461,21 +612,56 @@
 </tr>
 </tbody>
 </table>
-<p>Strongest estimated links average 921 km, against 1,331 km for a random pair — geography still matters, just far less than nationality.</p>
+<p>The strongest links average 921 km; a random pair averages 1,331 km.</p>
+<div class="fragment">
+<p>Among the 33 links with probability <span class="math inline">\(\geq 0.5\)</span>: <strong>60.6%</strong> share a border (14.2× enrichment) against <strong>75.8%</strong> same-country (10.6×).</p>
+<p><span class="takeaway fragment">Nationality organises the whole ranking; geography owns the links the data are certain about.</span></p>
+<aside class="notes">
+<p>Two questions, two answers, and the post reports both rather than only the one that supports the headline. Across the full ranking of 8,010 pairs, “same country” discriminates better than “shares a border” — AUC 0.753 against 0.698. Restrict to the 33 pairs the model is most confident about and the picture tilts back toward geography: 60.6 per cent of them share a border, an enrichment of 14.2 times over a 4.3 per cent base rate, while 75.8 per cent are within a country, an enrichment of 10.6 times. “What organises this network?” and “what does the model know for sure?” are different questions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
 </section>
-<section id="look-at-the-map" class="slide level2 center">
-<h2>Look at the map</h2>
+<section id="long-arcs-not-short-ones-carry-the-network" class="slide level2 smaller center">
+<h2>Long arcs, not short ones, carry the network</h2>
 <div class="columns">
 <div class="column" style="width:47%;">
-<p><img data-src="../r_estimateW_17_map_arcs.png"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="../r_estimateW_17_map_arcs.png" alt="A map of Europe with the strongest ten percent of estimated links drawn as arcs between region centroids, coloured teal where the pair also shares a border and orange where it does not."></p>
+<figcaption>The strongest 10% of estimated links as arcs between region centroids: teal where the pair also shares a border, orange where it does not.</figcaption>
+</figure>
+</div>
 </div><div class="column" style="width:53%;">
 <div class="smaller">
 <p><strong><span style="color:#00d4c8">Teal</span></strong> — the pair also shares a border.</p>
 <p><strong><span style="color:#d97757">Orange</span></strong> — it does not.</p>
 <p>Long orange arcs dominate: Bulgaria to Czechia, Iberia to the Baltic, Greece to Ireland.</p>
-<p>If the estimated network were essentially contiguity, this would be a mesh of short teal arcs hugging borders.</p>
 </div>
+<p><span class="takeaway fragment">Were the estimated network essentially contiguity, this would be a mesh of short teal arcs hugging borders.</span></p>
 </div></div>
+<aside class="notes">
+<p>This figure makes the point better than any table — give the room a beat to look before you speak. Whether those long links represent trade, migration, shared exposure to European business cycles or common institutional shocks is a question this model cannot answer; the “what this cannot tell you” slide returns to it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="three-maps-three-answers" class="slide level2 center" data-background-color="#141413">
 <h2>Three maps, three answers</h2>
@@ -497,9 +683,9 @@
 </tr>
 <tr class="even">
 <td>High education, <strong>total</strong></td>
-<td style="text-align: right;"><strong>0.00153</strong></td>
-<td style="text-align: right;"><strong>0.00066</strong></td>
-<td style="text-align: right;"><strong>0.00074</strong></td>
+<td style="text-align: right;"><span class="key">0.00153</span></td>
+<td style="text-align: right;">0.00066</td>
+<td style="text-align: right;">0.00074</td>
 </tr>
 <tr class="odd">
 <td>Indirect ÷ direct</td>
@@ -510,24 +696,32 @@
 </tbody>
 </table>
 <p>Every <strong>sign</strong> survives. Every <strong>magnitude</strong> moves.</p>
-<p>The data-chosen map more than <strong>doubles</strong> the total education effect.</p>
+<p><span class="takeaway fragment">The data-chosen map more than doubles the total education effect.</span></p>
+<aside class="notes">
+<p>The same SAR specification, the same data, three neighbourhood maps — nothing changes but W. A referee asking “would your story change under a different W?” gets a reassuring answer on signs and an uncomfortable one on magnitudes. Note the mechanical pattern in rho: the sparsest map, queen contiguity at 3.8 neighbours, gives the lowest value; kNN-7 at exactly seven gives the highest; the estimated map at 6.47 lands between them.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+
 </section>
 <section id="why-that-matters-for-policy" class="slide level2 center">
 <h2>Why that matters for policy</h2>
-<p>A region raising tertiary attainment generates roughly <strong>twice as much growth outside its borders as inside them</strong>.</p>
-<p>Whoever funds the universities captures about a third of the return.</p>
-<div class="fragment">
-<p>Under contiguity that ratio is 1.20, not 2.11 — the difference between <em>“most of the return leaks away”</em> and <em>“about half does”</em>.</p>
-<p>Different co-funding decision.</p>
-</div>
-</section>
-<section id="what-this-cannot-tell-you" class="slide level2 center">
-<h2>What this cannot tell you</h2>
-<p>A posterior probability of 1.0 on Bulgaria → Czechia means residual co-movement is <strong>better explained with that link than without it</strong>, given a prior expecting seven neighbours.</p>
-<p>It does <strong>not</strong> mean trade, commuting, or FDI.</p>
-<p>With <span class="math inline">\(T = 19\)</span>, genuine transmission and shared exposure to common shocks are indistinguishable.</p>
+<p><strong>2.11</strong> under the estimated map. <strong>1.20</strong> under contiguity.</p>
+<p><span class="takeaway fragment">Most of the education return leaks across borders — or only about half does. Same data, different map.</span></p>
 <aside class="notes">
-<p>Do not let anyone leave the room thinking this is a causal network.</p>
+<p>A region that raises tertiary attainment is associated with about twice as much growth outside its borders as inside them. Whoever funds the universities captures roughly a third of the measured return. Under contiguity that ratio is 1.20, not 2.11 — a materially different co-funding decision for a ministry choosing how much of a regional skills programme to pay for from a national or European budget.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -540,24 +734,67 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="honest-limits" class="slide level2 center">
-<h2>Honest limits</h2>
+<section id="what-this-cannot-tell-you" class="slide level2 center">
+<h2>What this cannot tell you</h2>
+<p>Bulgaria → Czechia at probability 1.0 says one thing only: residual co-movement fits <strong>better with that link than without it</strong>.</p>
+<p>It does <strong>not</strong> mean trade, commuting, or FDI.</p>
+<p><span class="takeaway fragment">With <span class="math inline">\(T = 19\)</span>, genuine transmission and shared exposure to common shocks are indistinguishable.</span></p>
+<aside class="notes">
+<p>Do not let anyone leave the room thinking this is a causal network. That probability is also conditional on a prior that expected seven neighbours. Two regions responding identically to a common European shock look connected to this model even if nothing flows between them. Naming the mechanism requires data on the mechanism.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="effective-draws-bound-what-we-can-claim" class="slide level2 center">
+<h2>26.5 effective draws bound what we can claim</h2>
 <ul>
-<li><strong>ESS(<span class="math inline">\(\rho\)</span>) = 26.5</strong> out of 100 retained draws; Geweke <span class="math inline">\(z = -3.74\)</span></li>
-<li>Posterior <strong>means</strong> are stable across chains and budgets</li>
-<li>Posterior <strong>SDs, intervals and link rankings</strong> are not</li>
-<li>With 100 draws a link probability is quantized to 0.01</li>
+<li><strong>ESS(<span class="math inline">\(\rho\)</span>) = 26.5</strong> of 100 retained draws (Geweke <span class="math inline">\(z = -3.74\)</span>), so a link probability is quantized to 0.01</li>
+<li>Posterior <strong>means</strong> are stable across chains and budgets; <strong>SDs, intervals and link rankings</strong> are not</li>
 <li>Practical ceiling: about <strong>300</strong> regions</li>
-<li><span class="math inline">\(\underline{k} = 7\)</span> is a researcher choice — report a sweep, not a number</li>
+<li><span class="math inline">\(k = 7\)</span> is a researcher choice — report a sweep, not a number</li>
 </ul>
+<p><span class="takeaway fragment">Report the point estimates. Hedge everything that has a width.</span></p>
+<aside class="notes">
+<p>An effective sample size of 26 supports a mean; it does not support a credible interval you would defend in a referee report. With 100 retained draws a link seen three times is indistinguishable from one seen once, so the boundary of the “strongest 10 per cent” sits in the noisy region. The paper writes the prior anchor with an underbar; this deck drops it. Prior sensitivity here is the first thing a referee should ask about.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-map-is-a-parameter" class="slide level2 divider center" data-background-color="#141413">
 <h2>The map is a parameter</h2>
-<p>Every spatial result you have read is conditional on a neighbourhood map somebody chose before the analysis began.</p>
-<p>It does not have to be.</p>
+<p>Every spatial result you have read is conditional on a map somebody chose — and it does not have to be.</p>
 <div class="smaller">
 <p>Full tutorial, code and replication bundle: <a href="https://carlos-mendez.org/post/r_estimatew/" class="uri">https://carlos-mendez.org/post/r_estimatew/</a></p>
 </div>
+<aside class="notes">
+<p>Land on the thesis and stop. The invitation, if there is time for one, is the tutorial and the replication bundle — everything in this talk runs end to end from it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
 </section></section>
     </div>

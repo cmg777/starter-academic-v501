@@ -9,7 +9,7 @@ date-format: long
 key-results:
   - num: "0.927"
     cap: "system GMM persistence (SE 0.079)"
-  - num: "[0.63, 0.96]"
+  - num: "[0.626, 0.962]"
     cap: "the OLS–FE bias bracket"
   - num: "32"
     cap: "collapsed instruments · 140 firms"
@@ -53,14 +53,16 @@ How much of this year's employment shock is still visible *next* year?
 
 . . .
 
-The answer is one number: $\rho$, the coefficient on lagged employment. The estimators in this deck — run on the **same 140-firm UK panel** — will claim $\hat\rho = 0.626$, $0.927$, and $0.962$.
+One number answers it: $\rho$, the coefficient on lagged employment.
+
+Same 140-firm UK panel. Three answers: $0.626$, $0.927$, $0.962$.
 
 . . .
 
 *One of them is defensible. None of them announces which.*
 
 ::: {.notes}
-The hook: ρ is the echo strength of the labor market. At ρ = 0.6 a shock fades within a couple of years; at ρ = 0.95 a 1980 shock is still audible in 1988. The implied half-lives across our estimates run from 1.5 years (fixed effects) through 9 years (system GMM) to 18 years (pooled OLS). A policymaker evaluating a temporary employment subsidy gets completely different cost-benefit horizons depending on which estimate they believe — so the estimator choice IS the economics here.
+Say it aloud: the estimators in this deck — pooled OLS, fixed effects, Anderson-Hsiao IV, difference GMM and system GMM — all run on the SAME 140-firm UK panel, and they will claim ρ̂ = 0.626, 0.927 and 0.962. The hook: ρ is the echo strength of the labor market. At ρ = 0.6 a shock fades within a couple of years; at ρ = 0.95 a 1980 shock is still audible in 1988. The implied half-lives across our estimates run from 1.5 years (fixed effects) through 9 years (system GMM) to 18 years (pooled OLS). A policymaker evaluating a temporary employment subsidy gets completely different cost-benefit horizons depending on which estimate they believe — so the estimator choice IS the economics here.
 :::
 
 ## Firms orbit their own levels — a fixed effect and persistence at once
@@ -75,25 +77,23 @@ The Arellano-Bond (1991) panel: 140 UK manufacturing firms, 1,031 firm-years, un
 
 $$n_{it} = \rho\, n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}$$
 
-[A *lagged dependent variable* sits on the right while the firm effect $\alpha_i$ sits in the error. By construction $n_{i,t-1}$ depends on $\alpha_i$ — so the regressor is correlated with the error, no matter how many controls we add.]{.takeaway .fragment}
+[Last year's employment depends on $\alpha_i$ by construction — so the regressor is correlated with the error, and no control can fix it.]{.takeaway .fragment}
 
 ::: {.notes}
 Blundell and Bond's (1998) dynamic labor-demand equation on this very dataset: log employment n on its own lag, current and lagged log real wage w and log capital k, a firm effect α_i, year effects δ_t. A firm with a high permanent level had high employment last year too — so the endogeneity is mechanical, not an omitted-variable accident. Important framing: ρ is a descriptive/structural persistence parameter, not a causal effect — no treatment, no ATE/ATT. Identification will rest on sequential exogeneity and no serial correlation in ε, partially testable via AR(2) and Hansen.
 :::
 
-## Where we're going
+## Each estimator fails informatively — and hands off to the next
 
 ::: {.incremental}
-- Run pooled OLS and fixed effects — two *known-direction* failures that bracket the truth
-- Anderson-Hsiao IV: consistent in theory, useless in practice
-- Difference GMM: passes every printed test, hugs the wrong bound
-- System GMM: the defensible headline, $\hat\rho = 0.927$
-- The diagnostics decoder — AR(1), AR(2), Hansen, and why p $\approx$ 1 is a red flag
-- Instrument proliferation, collapsing, and a digit-for-digit replication check
+- OLS and fixed effects fail in known directions — and bracket the truth
+- Anderson-Hsiao IV: consistent, and useless
+- Difference GMM: passes every test, hugs the wrong bound
+- System GMM: the defensible $\hat\rho = 0.927$ — then we stress-test it
 :::
 
 ::: {.notes}
-The arc is an estimator ladder: each stage fails informatively and motivates the next. The meta-lesson to plant now: the winner will not be identified by any single printed statistic — only by the workflow (bracket, weak-instrument logic, proliferation experiment, replication).
+The arc is an estimator ladder: each stage fails informatively and motivates the next. "Then we stress-test it" is the last third of the talk: the diagnostics decoder (AR(1), AR(2), Hansen, and why p ≈ 1 is a red flag), the instrument-proliferation experiment, and a digit-for-digit replication check. The meta-lesson to plant now: the winner will not be identified by any single printed statistic — only by the workflow (bracket, weak-instrument logic, proliferation experiment, replication).
 :::
 
 # The Investigation {.divider background-color="#6a9bcc"}
@@ -145,14 +145,14 @@ First-difference away $\alpha_i$, then instrument $\Delta n_{i,t-1}$ with the le
 Anderson and Hsiao (1981): differencing kills α_i without touching future shocks, but Δn_{i,t-1} and Δε_it share ε_{i,t-1}, so we instrument with n_{i,t-2} — valid under sequential exogeneity. The point estimate is above the unit root, which nobody believes; the right reading is that ONE instrument extracts far too little information from a highly persistent series. The courtroom analogy: a single admissible witness whose testimony is valid but cannot convict. The fix is not a better witness but more of them — if n_{i,t-2} is valid, so is every deeper lag.
 :::
 
-## Arellano-Bond: every lag dated $t-2$ or earlier is a valid instrument
+## Under sequential exogeneity, every lag dated $t-2$ or earlier is a valid instrument
 
 $$E\big[\,n_{i,t-s}\,\Delta\varepsilon_{it}\,\big] = 0 \qquad \text{for all } s \ge 2$$
 
-[Employment two or more years ago carries no information about this year's *change* in shocks — and the same holds for lagged $w$ and $k$. Dozens of moment conditions, combined optimally by GMM.]{.takeaway .fragment}
+[Employment two or more years ago carries no information about this year's *change* in shocks — dozens of such moment conditions, combined optimally by GMM.]{.takeaway .fragment}
 
 ::: {.notes}
-This is difference GMM (Arellano-Bond 1991): generalize Anderson-Hsiao from one moment condition to a whole family, with the GMM weighting matrix listening more carefully to the informative ones. With T = 9 the count reaches 91 instruments. Two-step GMM re-weights using first-step residuals — more efficient, but its naive SEs are badly downward-biased, so we quote the Windmeijer (2005) correction throughout.
+This is difference GMM (Arellano-Bond 1991): generalize Anderson-Hsiao from one moment condition to a whole family, with the GMM weighting matrix listening more carefully to the informative ones. The same t−2 logic holds for lagged w and k. With T = 9 the count reaches 91 instruments. Two-step GMM re-weights using first-step residuals — more efficient, but its naive SEs are badly downward-biased, so we quote the Windmeijer (2005) correction throughout.
 :::
 
 ## Two command strings run the whole GMM ladder in pydynpd
@@ -170,7 +170,7 @@ sys = regression.abond(
 ```
 
 ::: {.notes}
-pydynpd (Wu, Hua and Xu 2023) takes a Stata-style command string deliberately close to xtabond2 — its published output is validated against xtabond2, which the replication check in Act III exploits. The spec: n on its first lag plus current and lagged w and k; gmm(·, 2:99) declares all lags from t−2 back as GMM-style instruments; timedumm adds year dummies; nolevel = differenced equation only (difference GMM); collapse combines each lag depth into one instrument column. The OLS/FE/IV benchmarks run in pyfixest. Full script in the post.
+pydynpd (Wu, Hua and Xu 2023) takes a Stata-style command string deliberately close to xtabond2 — its published output is validated against xtabond2, which the replication check later in this act exploits. The spec: n on its first lag plus current and lagged w and k; gmm(·, 2:99) declares all lags from t−2 back as GMM-style instruments; timedumm adds year dummies; nolevel = differenced equation only (difference GMM); collapse combines each lag depth into one instrument column. The OLS/FE/IV benchmarks run in pyfixest. Full script in the post.
 :::
 
 ## Difference GMM passes every printed test — and still gives a suspect 0.679
@@ -193,10 +193,10 @@ Every diagnostic passes: AR(1) rejects as it mechanically must, AR(2) is nowhere
 
 $$E\big[\,\Delta n_{i,t-1}\,(\alpha_i + \varepsilon_{it})\,\big] = 0$$
 
-[Even for a persistent series, last year's *change* is informative about this year's *level*. The price is one new assumption — **mean stationarity**: firms' initial deviations from their steady states must be unrelated to $\alpha_i$.]{.takeaway .fragment}
+[Even for a persistent series, last year's *change* is informative about this year's *level* — at the price of one new assumption, **mean stationarity**.]{.takeaway .fragment}
 
 ::: {.notes}
-System GMM stacks the differenced equation (keeping its Arellano-Bond instruments) with the original levels equation, instrumented by lagged differences. The lake analogy: learning a lake's depth from ripples alone (differences) vs also using waterline marks on the shore (levels) — when the lake is calm, the ripples carry almost no information. Mean stationarity is untestable directly, but the Hansen test gets indirect bite because the levels moments are overidentifying. We also collapse instruments to 32 — safely below Roodman's rule that instruments should not outnumber the 140 firms.
+Mean stationarity, stated plainly: firms' initial deviations from their steady states must be unrelated to α_i. System GMM stacks the differenced equation (keeping its Arellano-Bond instruments) with the original levels equation, instrumented by lagged differences. The lake analogy: learning a lake's depth from ripples alone (differences) vs also using waterline marks on the shore (levels) — when the lake is calm, the ripples carry almost no information. Mean stationarity is untestable directly, but the Hansen test gets indirect bite because the levels moments are overidentifying. We also collapse instruments to 32 — safely below Roodman's rule that instruments should not outnumber the 140 firms.
 :::
 
 ## Ninety-three percent of an employment shock survives into next year {background-color="#141413"}
@@ -220,21 +220,21 @@ The headline: ρ̂ = 0.927, a shock half-life of roughly nine years — 0.927^5 
 | AR(2) p | 0.994 — *clean* |
 | Hansen p | 0.462 — *comfortable middle* |
 
+[Every box is ticked — which is exactly why two of these three tests deserve a second look.]{.takeaway .fragment}
+
 ::: {.notes}
-Wage and capital elasticities also sharpen: short-run wage elasticity −0.816 (SE 0.276), capital 0.589 (SE 0.172). Resist reporting the implied long-run wage elasticity (β1+β2)/(1−ρ) ≈ −2.5 without a warning — its denominator 1−ρ ≈ 0.073 makes it explosively fragile. But why is AR(1) rejecting "as required"? And is a bigger Hansen p always better? That's Act III — two of these three tests are routinely read backwards.
+Wage and capital elasticities also sharpen: short-run wage elasticity −0.816 (SE 0.276), capital 0.589 (SE 0.172). Resist reporting the implied long-run wage elasticity (β1+β2)/(1−ρ) ≈ −2.5 without a warning — its denominator 1−ρ ≈ 0.073 makes it explosively fragile. But why is AR(1) rejecting "as required"? And is a bigger Hansen p always better? That is the next slide — two of these three tests are routinely read backwards.
 :::
 
-# Trust, But Verify {.divider background-color="#00d4c8"}
-
-[Act III]{.act}
-
-## The diagnostics decoder: two of the three tests are read backwards
+## The diagnostics decoder: two of the three tests are read backwards {.smaller}
 
 | Test | Correct reading | Headline value |
 |---|---|---:|
 | AR(1) in differences | **Must reject** — rejection is mechanical good news | p = 0.000 ✓ |
 | AR(2) in differences | **Must not reject** — this validates the $t-2$ instruments | [p = 0.994]{.key} |
 | Hansen J | **Two-tailed in spirit** — p < 0.05 is invalid; p near 1 is an overwhelmed test | p = 0.462 ✓ |
+
+[AR(1) rejecting is the model working, not failing; a Hansen p near 1 is the test overwhelmed, not the instruments vindicated.]{.takeaway .fragment}
 
 ::: {.notes}
 AR(1): differencing makes adjacent errors overlap — Δε_it and Δε_{i,t−1} share ε_{i,t−1}, like adjacent dominoes sharing an edge — so consecutive differenced errors are negatively correlated WHEN THE MODEL IS RIGHT. A beginner who sees p = 0.000 and concludes failure has it exactly backwards. AR(2) is the test that matters: if ε were serially correlated, the t−2 instruments would be contaminated — the witnesses tipped off. Hansen: reading it one-tailed is the classic trap; Roodman warns that values approaching 1.0 signal an overwhelmed test, not valid instruments. Our 0.462 with 32 instruments is comfortable — the same 0.462 with 130 instruments would be a warning.
@@ -250,7 +250,7 @@ AR(1): differencing makes adjacent errors overlap — Δε_it and Δε_{i,t−1}
 | 2:99 | no | 113 | 0.930 | 0.235 |
 | 2:99 | yes | 32 | 0.927 | 0.462 |
 
-[Same model six times; only the plumbing changes. Uncollapsed 2:3 is *rejected* (p = 0.035) while its collapsed twin *passes* — driven purely by instrument count.]{.takeaway .fragment}
+[Same model, six ways — five shown: uncollapsed 2:3 is *rejected* (p = 0.035) while its collapsed twin *passes*, driven purely by instrument count.]{.takeaway .fragment}
 
 ::: {.notes}
 The experiment: re-estimate the identical system-GMM model varying only the lag window and collapsing. Reassuring: ρ̂ barely moves — all six cells in [0.921, 0.956]. Unsettling: the test we would use to DEFEND it is not stable. Reading the uncollapsed rows, the count climbs 68 → 95 → 113 (approaching the 140-firm ceiling) and Hansen drifts 0.035 → 0.186 → 0.235 mechanically. The endpoint of that trajectory is the notorious "Hansen p = 1.000" red flag. (The full grid with SEs and AR(2) is in the post; the 2:5 collapsed row, 23 instruments, p = 0.255, is omitted here for space.)
@@ -282,9 +282,15 @@ Before trusting novel output from a patched package, replicate its published ben
 
 ![Every estimator with its 95% CI against the shaded OLS–FE bracket. Grey defines the band; blue (Anderson-Hsiao) straddles everything; orange (difference GMM) hugs the floor; teal (system GMM) lands in the upper half.](../python_dynamic_panel_estimates_forest.png)
 
+[Difference GMM's table looks as healthy as system GMM's — only the bracket tells them apart.]{.takeaway .fragment}
+
 ::: {.notes}
-The tutorial in one image. Nothing on any single printed line of output separates the winner from the losers — difference GMM's table looks as healthy as system GMM's. Only the bracket logic, the weak-instrument reasoning, the proliferation experiment, and the replication check identify 0.927 as the defensible answer. One-step vs two-step movements (0.708→0.679; 0.903→0.927) are small — the weighting scheme refines rather than drives the answer.
+The tutorial in one image. Nothing on any single printed line of output separates the winner from the losers — difference GMM's table looks as healthy as system GMM's. Only the bracket logic, the weak-instrument reasoning, the proliferation experiment, and the replication check identify 0.927 as the defensible answer. One-step vs two-step movements (0.708→0.679; 0.902→0.927) are small — the weighting scheme refines rather than drives the answer.
 :::
+
+# Trust, But Verify {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
 
 ## "Your own CI includes the unit root — why believe 0.927?"
 
@@ -292,18 +298,18 @@ The tutorial in one image. Nothing on any single printed line of output separate
 
 . . .
 
-[Response.]{.rebuttal} All true — which is why the claim is the *point estimate and its lower bound*, never "employment is stationary." The estimate survives the bracket check, a 6-cell proliferation grid (range 0.921–0.956), clean AR(2)/Hansen, and an exact replication — and the mean-stationarity price is stated out loud, not hidden.
+[Response.]{.rebuttal} All true. So the claim is the *point estimate and its lower bound* — never "employment is stationary." It survives four checks: the bracket, a 6-cell grid (0.921–0.956), clean AR(2)/Hansen, and an exact replication. The mean-stationarity price is stated out loud.
 
 ::: {.notes}
 Steelman the pushback honestly: this is 1970s–80s UK manufacturing, a methods showcase rather than a current estimate; the long-run elasticities are mechanically fragile (1−ρ ≈ 0.073); GMM tests have limited power with N = 140. The defense is not that the diagnostics are perfect, but that every weakness is bounded and disclosed — which is exactly the standard the deck argues a referee should apply to ANY dynamic-panel coefficient.
 :::
 
-## The dynamic-panel checklist you take home
+## Six habits that keep a dynamic-panel coefficient defensible
 
 ::: {.incremental}
 - **Run OLS and FE first** — record the bracket; they are the measuring stick
-- **A difference-GMM estimate hugging the FE bound is a weak-instrument symptom** — passing Hansen and AR(2) does not clear it
-- **Prefer system GMM when persistence is high** — and name the mean-stationarity assumption you are buying
+- **Diff GMM hugging the FE bound = weak instruments** — Hansen and AR(2) do not clear it
+- **Prefer system GMM when persistence is high** — and name the price: mean stationarity
 - **AR(1) must reject; AR(2) must not; read Hansen two-tailed**
 - **Collapse instruments and report the count** relative to the number of groups
 - **Replicate a published benchmark** before trusting novel numbers

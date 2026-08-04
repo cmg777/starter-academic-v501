@@ -7,9 +7,9 @@ institute: "Nagoya University (GSID)"
 date: today
 date-format: long
 key-results:
-  - num: "2.8%"
+  - num: "2.76%"
     cap: "UK GDP shortfall at end-2018 · SDID"
-  - num: "0.96"
+  - num: "96%"
     cap: "of the time weight on one quarter"
   - num: "23"
     cap: "donor countries in synthetic Britain"
@@ -52,6 +52,8 @@ To price that decision we need the UK that *stayed*. It does not exist in any da
 
 *Where do we get the counterfactual?*
 
+[No country is a twin of the UK, so the comparison has to be built, not picked.]{.takeaway .fragment}
+
 ::: {.notes}
 The fundamental problem of causal inference with a single treated unit. No country is a perfect twin of the UK, so we cannot pick a comparison — we have to build one.
 :::
@@ -67,11 +69,19 @@ The fundamental problem of causal inference with a single treated unit. No count
 
 . . .
 
-Give each donor a weight. Require the blend to track the real UK for twenty-one years. Read off the gap afterwards.
+Weight the donors. Match the UK for twenty-one years. Read the gap.
+
+[Eighty-six quarters of tracking are what license reading the post-2016 gap as an effect.]{.takeaway .fragment}
+
+::: {.notes}
+Give each donor a weight, require the blend to track the real UK quarter by quarter through the two decades before the referendum, and whatever gap opens after 2016 is the estimate.
+:::
 
 ## One line in a crowd
 
-![](../r_sc_dsc_sdid_01_gdp_paths.png)
+![Log real GDP for 24 OECD countries, 1995–2020: the UK in orange among 23 grey donor paths, dashed line at the 2016 referendum.](../r_sc_dsc_sdid_01_gdp_paths.png)
+
+[No single donor tracks the UK — which is exactly why we blend them rather than pick one.]{.takeaway .fragment}
 
 ::: {.notes}
 No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.
@@ -79,7 +89,7 @@ No single donor tracks the UK — which is why we blend them rather than pick on
 
 ## The previously published answer was 2.4%
 
-Born, Müller, Schularick and Sedláček (2019) estimated that the referendum had cost the UK about **2.4% of GDP** by the end of 2018.
+Born et al. (2019): the referendum cost the UK **2.4% of GDP** by end-2018.
 
 . . .
 
@@ -88,6 +98,12 @@ That number came from *one* estimator with *one* set of choices.
 . . .
 
 This deck climbs the whole ladder and asks whether 2.4% survives.
+
+[2.4% is one estimator's answer, not the dataset's answer.]{.takeaway .fragment}
+
+::: {.notes}
+The full citation is Born, Müller, Schularick and Sedláček (2019), using this same OECD panel. Their specification matches on six covariates — which, as we will see in the verdict, is the single choice that separates their number from everything on this ladder.
+:::
 
 # The Ladder {.divider background-color="#6a9bcc"}
 
@@ -100,6 +116,8 @@ $$\left(\hat{\tau}, \hat{\alpha}, \hat{\beta}\right) = \arg\min \sum_{j} \sum_{t
 . . .
 
 Outcome on a country effect, a quarter effect and a treatment dummy — weighted by $\hat{\omega}_j$ and $\hat{\lambda}_t$.
+
+[Every stage that follows is a choice of which weights to fix and which to estimate.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the only equation in the deck worth memorising. Everything that follows is a choice of which weights to fix and which to estimate.
@@ -118,9 +136,32 @@ This is the only equation in the deck worth memorising. Everything that follows 
 
 Two banks of faders. DiD leaves both flat, SC moves one, SDID moves both.
 
-## Stage 0 — Difference-in-differences
+[Turning $\lambda$ on is the only thing that separates DSC from SDID.]{.takeaway .fragment}
 
-Every donor counts the same.
+## One solver, used five times
+
+```r
+simplex_ls <- function(A, b, ridge = 1e-10) {
+  k <- ncol(A)
+  w <- solve.QP(Dmat = crossprod(A) + ridge * diag(k),
+                dvec = crossprod(A, b),
+                Amat = cbind(rep(1, k), diag(k)),   # sum(w) = 1; w >= 0
+                bvec = c(1, rep(0, k)),
+                meq  = 1)$solution
+  w[w < 1e-10] <- 0
+  w / sum(w)
+}
+```
+
+Hand it the donors' pre-treatment paths and it returns $\omega$. Hand it the transpose and it returns $\lambda$.
+
+[One quadratic program does five jobs: $\omega$, demeaned $\omega$, $\lambda$, and both halves of MASC's cross-validation.]{.takeaway .fragment}
+
+::: {.notes}
+Minimise a sum of squares over the simplex — non-negative shares that add to one. The 1e-10 on the diagonal is numerical hygiene so the Cholesky factorisation never fails; it is not the regularisation parameter of Arkhangelsky and coauthors.
+:::
+
+## Stage 0 — the ground floor: every donor counts the same
 
 ```r
 w_did <- rep(1/23, 23)
@@ -135,15 +176,23 @@ b_did <- mean(Z1 - Z0 %*% w_did)
 
 Its pre-treatment fit error is **0.0218**, four times synthetic control's.
 
+[DiD answers loudest and fits worst — which is the whole reason the ladder has more rungs.]{.takeaway .fragment}
+
+::: {.notes}
+The post numbers these estimators 1 through 6; the deck calls DiD Stage 0, the ground floor, because it turns none of the dials. Throughout, $T_0$ = 86 is the number of pre-treatment quarters, the synthdid convention; the papers write the same quantity as $T_0 - 1$.
+:::
+
 ## Parallel trends, failing in plain sight
 
-![](../r_sc_dsc_sdid_02_did_counterfactual.png)
+![The UK against the level-aligned equal-weighted average of the 23 donors, with the growing gap shaded in orange.](../r_sc_dsc_sdid_02_did_counterfactual.png)
 
-DiD is fitting a divergence that began in 2013 and calling it Brexit.
+[DiD is fitting a divergence that began in 2013 and calling it Brexit.]{.takeaway .fragment}
 
-## Stage 1 — Synthetic control
+## Stage 1 — letting the data pick the weights cuts the fit error four-fold
 
 $$\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^{2}$$
+
+[Here $T_0 = 86$, the *number* of pre-referendum quarters (the `synthdid` convention); the papers write the same sum as running to $T_0-1$.]{.comment}
 
 Weights that are non-negative and sum to one: the blend must stay inside the donors' **convex hull**.
 
@@ -155,9 +204,13 @@ Synthetic Britain is roughly one-fifth Hungary, one-fifth the US, one-fifth Japa
 
 **3.06%** at 2018Q4. Pre-treatment fit error **0.0057**.
 
-## The rubber band
+[0.0057 against DiD's 0.0218 — a quarter of the error, and the entire argument for the method.]{.takeaway .fragment}
 
-![](../r_sc_dsc_sdid_04_convex_hull.png)
+## Everything inside the rubber band is reachable; nothing outside it is
+
+![Donors plotted by average log GDP early and late in the pre-treatment window, with the convex hull shaded and the UK inside it.](../r_sc_dsc_sdid_04_convex_hull.png)
+
+[The UK sits comfortably inside the hull, which is why synthetic control works well here.]{.takeaway .fragment}
 
 ::: {.notes}
 Pins on a corkboard, a rubber band snapped around them. Everything inside is reachable by a non-negative blend; nothing outside is. If the UK's pin fell outside, you would need a negative amount of some country.
@@ -173,6 +226,10 @@ Demean first, then add the average pre-treatment gap back as a constant.
 
 $$b^{dsc} = \frac{1}{T_0} \sum_{t} \Big( y_{1,t} - \sum_j \hat{\omega}_j y_{j,t} \Big)$$
 
+[The average gap over the 86 pre-referendum quarters — the same $T_0$ convention as above.]{.comment}
+
+[Adding $b^{dsc}$ is algebraically identical to switching the unit fixed effect back on.]{.takeaway .fragment}
+
 ## The offset is tiny, and that is the finding
 
 Here $b^{dsc} = +0.0024$ — a quarter of one percent. The estimate moves 3.06% → **2.99%**.
@@ -180,6 +237,8 @@ Here $b^{dsc} = +0.0024$ — a quarter of one percent. The estimate moves 3.06% 
 . . .
 
 A small adjustment means the SC fit was *already* level-balanced. On a dataset where the treated unit sits awkwardly, this term does real work.
+
+[The anticlimax is the result: there was almost no level gap to correct.]{.takeaway .fragment}
 
 ## Stage 3 — SDID: choose which quarters to trust
 
@@ -196,15 +255,19 @@ DSC averages all 86 pre-treatment quarters equally. 1995 gets as much say as 201
 
 Same solver, transposed argument, and the cross-sectional mean removed instead of the time-series mean.
 
+[$\lambda$ is $\omega$'s problem run on the transpose — one solver, two directions.]{.takeaway .fragment}
+
 ## And the time weights collapse
 
-![](../r_sc_dsc_sdid_09_lambda_weights.png)
+![The estimated time weights as a stem plot, and donor log GDP at quarter $t$ against $t-1$ lying almost on the 45-degree line.](../r_sc_dsc_sdid_09_lambda_weights.png)
 
 **96%** of the weight lands on a single quarter, 2016Q2.
 
 . . .
 
 Log GDP is nearly a random walk, so the best blend of past quarters is the most recent one alone. **2.76%**.
+
+[The collapse is a property of the data, not a bug in the code.]{.takeaway .fragment}
 
 # The Pivot {.divider background-color="#141413"}
 
@@ -220,45 +283,55 @@ $$\text{Bias} = \underbrace{B^{ext}}_{\text{wrong place}} + \underbrace{B^{int}}
 
 **Extrapolation bias** — the blend's characteristics do not match the treated unit's.
 
-**Interpolation bias** — they do match, but the outcome bends, so the average of outcomes is not the outcome at the average.
+**Interpolation bias** — the blend matches, but the outcome curve bends.
+
+The average of outcomes is not the outcome at the average.
 
 . . .
 
 Neither name means what you would guess.
 
-## The turkey
+[Because the two pieces add up exactly, any estimator can be asked which half it attacks.]{.takeaway .fragment}
 
-You are roasting a 3.4 kg bird. The chart lists 3 kg and 4 kg.
+## A 3.4 kg bird, and two ways to get the roasting time wrong
 
-. . .
-
-**Extrapolation bias**: you misread the scale and look up 5 kg. Right chart, wrong row.
+A 3.4 kg bird. The chart lists 3 kg and 4 kg.
 
 . . .
 
-**Interpolation bias**: you read both rows correctly and average the times. Right rows — but roasting time bends with weight, so the average of two times is not the time for the average bird.
+**Extrapolation bias**: you look up 5 kg. Wrong row.
 
 . . .
 
-Two independent errors. Fixing one does nothing for the other.
+**Interpolation bias**: you average the two rows. Right rows, curved chart.
+
+[Fixing one does nothing for the other.]{.takeaway .fragment}
+
+::: {.notes}
+Roasting time bends with weight, so the average of the 3 kg and 4 kg times is not the time for a 3.4 kg bird. The two errors are independent — that is the whole point of the decomposition.
+:::
 
 ## Only one row is dark in both columns
 
-![](../r_sc_dsc_sdid_11_bias_targets.png)
+![Estimators as rows, bias types as columns: only the SDID row is dark in both the extrapolation and interpolation columns.](../r_sc_dsc_sdid_11_bias_targets.png)
 
-SC's unit weights kill extrapolation bias. Matching kills interpolation bias. **SDID's time weights let one estimator target both.**
+SC's unit weights kill extrapolation bias. Matching kills interpolation bias.
+
+[SDID's time weights are what let one estimator target both.]{.takeaway .fragment}
+
+::: {.notes}
+The counterweight the source paper supplies itself, and it belongs in the spoken version: SDID "targets" both biases, but it pays for the privilege by estimating 85 extra parameters, and the paper's own conclusion is that the gain over DSC is "marginal at best" for the kind of trend specification we have here. The decomposition is the durable idea; the recommendation that follows from it is much more fragile.
+:::
 
 ## Stages 4 and 5 — buy the trade-off, or drop the constraint
 
-**MASC** blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys **16% matching**. → **2.73%**
+**MASC** blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys **15.8% matching**. → **2.73%**
 
 . . .
 
 **ASCM** drops non-negativity and adds a ridge pull toward the SC weights. Eight donors go negative. → **3.04%**
 
-. . .
-
-Both land inside the range the simpler stages already covered.
+[Neither moves the answer. MASC sets the floor at 2.73%; ASCM sits on SC's 3.04%.]{.takeaway .fragment}
 
 # The Verdict {.divider background-color="#00d4c8"}
 
@@ -266,25 +339,31 @@ Both land inside the range the simpler stages already covered.
 
 ## Every stage beats 2.4%
 
-![](../r_sc_dsc_sdid_15_att_dotplot.png)
+![Every estimator's 2018Q4 and 2019Q4 estimate, with Born et al.'s 2.4% as a dashed reference line.](../r_sc_dsc_sdid_15_att_dotplot.png)
 
 **2.73% to 3.06%** at end-2018; **3.83% to 4.20%** at end-2019.
 
-## Which stage? A fire drill
+[Every stage of the ladder lands to the right of the published 2.4%.]{.takeaway .fragment}
 
-Move the treatment date back to twenty quarters when nothing happened. Every estimate is then pure error.
+## Which stage? A fire drill {.smaller}
+
+Re-date the treatment to each of twenty quarters when nothing happened. Every estimate is then pure error.
 
 | Method | RMSE | Median abs. error |
 |---|---|---|
 | SC | 0.0089 | 0.0055 |
 | DSC | 0.0087 | 0.0052 |
-| **SDID** | **0.0067** | **0.0016** |
+| **SDID (i)** | **0.0067** | **0.0016** |
 | MASC | 0.0080 | 0.0045 |
 | ASCM | 0.0086 | 0.0051 |
+| SDID (ii) | 0.0134 | 0.0103 |
+| SDID (iii) | 0.0134 | 0.0107 |
 
-. . .
+[SDID (i) wins on every measure — and, as published, variants (ii) and (iii) look worst of all. Hold that thought.]{.takeaway .fragment}
 
-The SDID family wins on every measure.
+::: {.notes}
+Read as published, SDID (i) wins comfortably — a median absolute error of 0.0016 against plain SC's 0.0055 — and variants (ii) and (iii) are twice as bad as plain SC. That is the basis for the source paper's recommendation to use variant (i) in practice. Every number here reproduces the published table exactly.
+:::
 
 ## But check the exam before trusting the ranking
 
@@ -298,47 +377,59 @@ Matched horizons, $h = 1$:
 |---|---|---|
 | 0.0067 | 0.0066 | 0.0066 |
 
-. . .
+[The three variants are **indistinguishable** — the published ranking among them is an artefact of the horizon, not a property of the estimators.]{.takeaway .fragment}
 
-The three variants are **indistinguishable**. The published ranking among them is an artefact of the horizon, not a property of the estimators.
+::: {.notes}
+What survives is the finding that matters more: at either horizon the whole SDID family beats every other stage, and the ordering below it is stable — SDID, then MASC, then ASCM, then DSC, then SC. Which variant supplies the time weights is simply not settled by this evidence; variant (i) remains the sensible default because it is the cheapest and needs no choice of post-treatment window.
+:::
 
 ## Covariates make it worse
 
-The dataset ships six covariates. Matching on them:
+The dataset ships six covariates. Matching on them raises the placebo error:
 
-- reproduces the published **2.43%** exactly, via the Born specification
-- raises the placebo error for SC (0.0089 → 0.0092) and DSC (0.0087 → 0.0106)
+- SC: 0.0089 → 0.0092
+- DSC: 0.0087 → 0.0106
 
 . . .
 
-With 86 pre-treatment outcomes already in the matching set, the covariates are redundant (Kaul et al. 2022) and add only noise.
+86 pre-treatment outcomes already encode the covariates (Kaul et al. 2022).
+
+The six extra predictors add noise, not information.
+
+[With a pre-period this long, covariates cost precision and buy no identification.]{.takeaway .fragment}
+
+::: {.notes}
+Two things for the spoken version. First, the reconciliation with the literature: SC(B) — the Born specification, which scores covariates in both optimisation loops — reproduces the published 2.43% at 2018Q4 exactly. So the gap between the earlier published figure and everything on this ladder is the choice of estimator, not the data. Second, the exception: MASC's placebo error clearly *benefits* from covariates, falling from 0.0080 to 0.0048; SDID and ASCM barely move. It is SC and DSC that are degraded.
+:::
 
 ## And the optimiser matters more than you would think
 
-![](../r_sc_dsc_sdid_07_solver_ladder.png)
+![Estimated 2018Q4 loss against the number of Frank–Wolfe iterations, converging toward the exact optimum; the package default is marked in orange.](../r_sc_dsc_sdid_07_solver_ladder.png)
 
 The published 3.06% is where Frank–Wolfe happens to be at 10,000 iterations. The true optimum is **3.04%**.
 
-## What to take away
+[A synthetic control estimate carries its solver's fingerprint.]{.takeaway .fragment}
+
+## The strongest objection — and the answer
+
+[Objection.]{.objection} A 0.03 percentage-point spread cannot possibly rank estimators.
+
+. . .
+
+[Response.]{.rebuttal} True — which is why the placebo tournament, not the point estimate, does the ranking.
+
+[Pre-treatment fit cannot arbitrate between methods that all achieve it. Twenty fake treatment dates can.]{.takeaway .fragment}
+
+## The decomposition is durable; the leaderboard is not
 
 1. **The bias decomposition is the durable idea.** The leaderboard is perishable.
 2. **Fit the ladder, not a stage.** Report the cloud.
 3. **Run a placebo tournament** — and check the horizons match.
 4. **Covariates are not free.** With a long pre-period they may be redundant.
 
-## And the answer, with its error bars
+[The rungs of this ladder are perishable; the question each rung answers is not.]{.takeaway .fragment}
 
-**Brexit cost the UK roughly 3% of GDP by end-2018**, 4% by end-2019 — more than previously published.
-
-. . .
-
-But the uncertainty is wide. The permutation p-value is 0.042, the smallest this design can produce, and a 95% interval spans roughly 1% to 4.6%.
-
-::: {.notes}
-Worth dwelling on. The point estimate is far better determined than the interval, which is normal with one treated unit and 23 donors. Anyone quoting "Brexit cost 2.8%" without that interval is overstating what this design delivers.
-:::
-
-## Materials
+## Everything here replicates from one script and one CSV
 
 **Post** · [carlos-mendez.org/post/r_sc_dsc_sdid](https://carlos-mendez.org/post/r_sc_dsc_sdid/)
 
@@ -349,3 +440,21 @@ Worth dwelling on. The point estimate is far better determined than the interval
 . . .
 
 Replicates de Brabander, Juodis & Miyazato Szini (2025), *Econometric Reviews* 44(10), 1617–1646.
+
+## And the answer, with its error bars
+
+**Brexit cost the UK roughly 3% of GDP by end-2018**, 4% by end-2019 — more than previously published.
+
+. . .
+
+The permutation p-value is **0.042** — the smallest 23 donors can produce.
+
+A conventional 95% interval spans roughly **0.9% to 4.6%**.
+
+[The point estimate is far better determined than the interval.]{.takeaway .fragment}
+
+::: {.notes}
+Those two lines answer different questions and should not be merged. The p-value is randomisation inference: how unusual is the United Kingdom among OECD countries. The interval comes from the synthdid placebo standard error of 0.0095 log points and speaks to sampling error. Only the first has a well-defined answer with one treated unit. Anyone quoting "Brexit cost 2.8%" without that interval is overstating what this design delivers.
+:::
+
+# Fit the ladder, not a stage — and publish the cloud, not the point. {.divider background-color="#1a3a8a"}

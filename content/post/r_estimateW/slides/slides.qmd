@@ -38,14 +38,17 @@ format:
 
 ## The seating chart you were handed {background-color="#0f1729"}
 
-You have the full transcript of a conference dinner: who laughed at which joke, who fell silent when.
+You have the transcript of the dinner.
 
 You do **not** have the seating chart.
 
-Spatial econometrics hands you the chart first — drawn from shared borders or straight-line distance — and asks you to trust it.
+[Spatial econometrics hands you the chart first — and asks you to trust it.]{.takeaway .fragment}
 
 ::: {.notes}
-Open with the analogy, not the equation. The audience needs to feel the problem before seeing the machinery.
+Open with the analogy, not the equation. The transcript is who laughed at which joke and
+who fell silent when. Spatial econometrics hands you the chart first — drawn from shared
+borders or straight-line distance — and asks you to trust it. The audience needs to feel
+the problem before seeing the machinery.
 :::
 
 # The Tension {.divider background-color="#d97757"}
@@ -58,10 +61,11 @@ $$y_t = \rho W y_t + Z_{t-1}\beta + \varepsilon_t$$
 - $\rho$ says how strongly neighbours matter
 - **$W$ is normally assumed, never estimated**
 
-If the map is wrong, every number downstream is wrong.
+[If the map is wrong, every number downstream is wrong.]{.takeaway .fragment}
 
 ::: {.notes}
-Emphasise: this is not a small auxiliary choice. It is upstream of everything.
+Emphasise: this is not a small auxiliary choice. It sits upstream of everything — the
+impacts, the spillover ratio, and the policy number at the end of the talk.
 :::
 
 ## On this data, contiguity needs ten arbitrary decisions
@@ -69,13 +73,19 @@ Emphasise: this is not a small auxiliary choice. It is upstream of everything.
 Ten of ninety European NUTS-1 regions have **no queen-contiguity neighbour at all**:
 
 ::: {.smaller}
-Cyprus · Malta · Aegean islands · Canarias · Åland · Corse · Sicily & Sardinia · Azores · Madeira · Ireland
+Cyprus · Malta · Aegean islands · the Canaries · Åland · Corsica · Sicily & Sardinia · Azores · Madeira · Ireland
 :::
 
-Each must be patched by hand before a contiguity model will even run — and those patches are invisible in the results table.
+You patch each one by hand before the model will run.
+
+[None of those patches appears in the results table.]{.takeaway .fragment}
 
 ::: {.notes}
-This is the single most persuasive slide for a sceptical audience. The "standard" approach already required ten undocumented judgement calls.
+This is the single most persuasive slide for a sceptical audience. The "standard" approach
+already required ten undocumented judgement calls — attach each isolate to its nearest
+centroid by distance — before a single parameter was estimated. A contiguity matrix
+otherwise leaves all ten rows empty, which breaks row-standardization and effectively
+deletes those regions from the model.
 :::
 
 # The Investigation {.divider background-color="#6a9bcc"}
@@ -86,36 +96,52 @@ This is the single most persuasive slide for a sceptical audience. The "standard
 |---|---:|---:|
 | $\rho$, $\sigma^2$ | 2 | 2 |
 | Slopes | 4 | 4 |
-| Off-diagonal cells | 0 | **8,010** |
+| Off-diagonal cells | 0 | [8,010]{.key} |
 | **Total unknowns** | **6** | **8,016** |
 | Observations | 1,710 | 1,710 |
-| Obs per unknown | 285 | **0.21** |
+| Obs per unknown | 285 | [0.21]{.key} |
 
-4.7 parameters per observation. The likelihood alone cannot do this.
+[4.7 parameters per observation — the likelihood alone cannot do this.]{.takeaway .fragment}
+
+::: {.notes}
+Read the last row aloud. An assumed map leaves 285 observations for every unknown;
+estimating the map leaves about one observation for every five unknowns. That gap is why
+the prior — the next two slides — is doing the real work.
+:::
 
 ## The prior is not a technicality — it *is* the method
 
 $$p_{ij} \;\propto\; \omega_{ij} \;\times\; m(k_i)$$
 
-**Where** links can be  ×  **how many** there are.
+[**Where** links can be $\times$ **how many** there are.]{.comment}
 
 . . .
 
-The trap: a "non-informative" flat prior on the neighbour count implies an expectation of **44.5 neighbours per region** — every region wired to half of Europe.
+The trap: a "non-informative" flat prior expects **44.5 neighbours per region**.
+
+[Every region wired to half of Europe.]{.takeaway .fragment}
 
 ::: {.notes}
-The paper writes these hyperparameters with underbars. Dropped here for legibility;
-the two factors are what matter. Next slide shows what the "non-informative" choice
-actually asserts.
+The paper writes these hyperparameters with underbars; this deck drops them everywhere for
+legibility. The two factors are what matter — where a link may be, and how many links a
+region is expected to have. A flat weight is the natural thing to write if you want to
+impose nothing, but it implies a Binomial prior on the neighbour count centred at (n−1)/2.
+At n = 90 that is 44.5. The next slide shows what that choice actually asserts.
 :::
 
 ## "Non-informative" means half of Europe
 
-![](../r_estimateW_04_prior_k_n90.png){width="74%"}
+![](../r_estimateW_04_prior_k_n90.png){width="70%" fig-alt="The implied prior distribution over the neighbour count at n = 90 for all three priors, showing the flat and default priors centred at 44.5 neighbours and the shrinkage prior concentrated near 7."}
+
+[At n = 90 the flat and default priors expect 44.5 neighbours per region; only the shrinkage prior expects a sparse network.]{.comment}
+
+[The word "non-informative" describes the weight you type, not the belief you assert.]{.takeaway .fragment}
 
 ::: {.notes}
-Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one.
-Same word, opposite belief.
+Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one. Same
+word, opposite belief. With only 19 time periods a prior centred on 44.5 would dominate
+the likelihood rather than be updated by it — which is exactly why the published
+application uses shrinkage.
 :::
 
 ## One link at a time
@@ -126,20 +152,53 @@ $$p(\omega_{ij} \mid \Omega_{-ij}, \cdot, \mathcal{D}) \sim \text{Bernoulli}\lef
 
 Score both, normalise, flip a weighted coin. Repeat 8,010 times per sweep.
 
-Sherman-Morrison rank-one updates make each flip cheap instead of an $O(n^3)$ determinant.
+[The network is never solved whole — only one link at a time, given all the others.]{.takeaway .fragment}
 
 ::: {.notes}
 Piano-tuning analogy: never solve the whole instrument, fix one string given the others.
+Each flip changes W, which changes the determinant. Sherman-Morrison rank-one updates make
+that cheap instead of O(n cubed) — which is why 8,010 links take minutes, not weeks.
+:::
+
+## The whole method is two function calls
+
+``` {.r code-line-numbers="1-6|8-9"}
+kbar <- 7                                  # expected neighbours per region
+b_pr <- ((n - 1) - kbar) / kbar            # 11.714  ->  link prob 7/89
+AA   <- W_priors(n = n, W_prior = Wprior,
+                 nr_neighbors_prior = bbinompdf(0:(n - 1),
+                                                nsize = n - 1,
+                                                a = 1, b = b_pr))
+
+res_sarw <- sarw(Y = Y, tt = tt, Z = Z,
+                 niter = 200, nretain = 100, W_prior = AA)
+```
+
+[Every modelling decision lives in the prior object; `sarw()` only runs it.]{.takeaway .fragment}
+
+::: {.notes}
+The package is estimateW, on CRAN. W_priors() builds the beta-binomial sparsity prior
+anchored at seven expected neighbours; sarw() is the SAR panel sampler with W unknown.
+Two hundred iterations of which one hundred are retained is the paper's own budget,
+reproduced deliberately — 350 seconds for the European panel. The full script ships with
+the post.
 :::
 
 ## First, check it on a network we built ourselves
 
-![](../r_estimateW_18_sim_recovery.png){width="80%"}
+![](../r_estimateW_18_sim_recovery.png){width="76%" fig-alt="Four panels: the true adjacency matrix, the estimated posterior link probabilities, a histogram separating true links from true non-links by their estimated probability, and posterior densities for each parameter against its true value."}
+
+[True adjacency, estimated link probabilities, the separation of true links from non-links, and each parameter's posterior against its true value.]{.comment}
 
 **AUC 0.976** · 95.3% of 1,560 cells classified correctly
 
+[On a network whose answer we already knew, the sampler found it.]{.takeaway .fragment}
+
 ::: {.notes}
-Driving test where you placed the cones. Build trust before spending it on real data.
+A driving test where you placed the cones — 40 units, 20 periods, four true neighbours
+each. Build trust before spending it on real data. The sampler is conservative: recall at
+the 0.5 cut is only 0.600 and the estimated mean degree is 3.05 against a true 4. That is
+the sparsity prior doing exactly what we asked of it.
 :::
 
 ## But the intervals are not calibrated
@@ -147,36 +206,50 @@ Driving test where you placed the cones. Build trust before spending it on real 
 ::: {.smaller}
 | | True | Estimate | 95% interval | Covered? |
 |---|---:|---:|---:|:--:|
-| $\rho$ | 0.600 | 0.528 | [0.509, 0.542] | **no** |
-| $\sigma^2$ | 0.050 | 0.064 | [0.056, 0.073] | **no** |
-| slope | −1.000 | −1.032 | [−1.053, −1.009] | **no** |
+| $\rho$ | 0.600 | 0.528 | [0.509, 0.542] | [no]{.key} |
+| $\sigma^2$ | 0.050 | 0.064 | [0.056, 0.073] | [no]{.key} |
+| slope | −1.000 | −1.032 | [−1.053, −1.009] | [no]{.key} |
 :::
 
-Sparsity biases the network sparse, and $\rho$ down with it. Autocorrelation narrows the intervals.
+The sparsity prior thins the network, and pulls $\rho$ down with it.
 
-**Trust the structure. Hedge the intervals.**
+[Trust the structure. Hedge the intervals.]{.takeaway .fragment}
 
-# The Resolution {.divider background-color="#00d4c8"}
+::: {.notes}
+Two things compound. A sparser network has fewer channels for spatial transmission, so the
+model attributes less to rho — a real bias, not noise, and the price of the regularisation
+that made the problem estimable at all. On top of that an autocorrelated chain reports less
+uncertainty than it has earned, so the intervals are simply too narrow. One simulated
+dataset is not a Monte Carlo study; Krisztin and Piribauer run a proper one.
+:::
 
 ## The published table reproduces exactly
 
 ::: {.smaller}
 | Quantity | Paper | Ours | Verdict |
 |---|---:|---:|:--|
-| $\rho$ | 0.71322 | 0.71322 | exact |
+| $\rho$ | 0.71322 | [0.71322]{.key} | exact |
 | log initial GVA | −0.01692 | −0.016922 | exact |
 | share high education | 0.00044 | 0.000441 | exact |
 | av. indirect, initial GVA | −0.03972 | −0.039723 | exact |
 :::
 
-**12 of 12 quantities exact** to the five decimals printed — same seed, same package version, same RNG, same BLAS.
+**12 of 12 quantities exact** to the five decimals printed.
 
-## The model reconstructed national borders
+[Reproducing the published numbers is the licence to reinterpret them.]{.takeaway .fragment}
+
+::: {.notes}
+The exactness is conditional and worth naming: same seed, same package version, same RNG
+stream, same BLAS. Change any one of those and the fifth decimal moves. Everything after
+this slide is our own reading of the very same fitted object.
+:::
+
+## The model reconstructed national borders {.smaller}
 
 :::: {.columns}
 
 ::: {.column width="46%"}
-![](../r_estimateW_09_W_pip_heatmap.png)
+![Posterior link probability, ordered by group then country.](../r_estimateW_09_W_pip_heatmap.png){width="84%" fig-alt="A 90 by 90 heatmap of posterior link probabilities, with regions ordered by supranational group and then country, showing bright blocks along the diagonal where regions of the same country connect."}
 :::
 
 ::: {.column width="54%"}
@@ -184,27 +257,50 @@ Regions place **35.6%** of their neighbourhood weight on compatriots.
 
 Chance would give **7.1%**.
 
-Nothing in the specification mentions countries — the model saw only growth rates, initial productivity and two education shares.
+[Nothing in the specification mentions countries — the model saw only growth, initial productivity and two education shares.]{.takeaway .fragment}
 :::
 
 ::::
+
+::: {.notes}
+The bright blocks along the diagonal are the headline; the thin lines mark country borders.
+Five times more weight on compatriots than chance would predict, and twice as much on the
+supranational bloc. This turns the paper's qualitative claim — that regions of the same
+country are more strongly interconnected — into a testable ratio.
+:::
 
 ## Same country beats shared border
 
 | Comparator | AUC | Share of top links |
 |---|---:|---:|
-| **Same country** | **0.753** | 30.2% |
+| **Same country** | [0.753]{.key} | 30.2% |
 | Queen contiguity | 0.698 | 17.2% |
 | 7-nearest neighbours | 0.631 | 23.9% |
 
-Strongest estimated links average 921 km, against 1,331 km for a random pair — geography still matters, just far less than nationality.
+The strongest links average 921 km; a random pair averages 1,331 km.
 
-## Look at the map
+. . .
+
+Among the 33 links with probability $\geq 0.5$: **60.6%** share a border (14.2× enrichment) against **75.8%** same-country (10.6×).
+
+[Nationality organises the whole ranking; geography owns the links the data are certain about.]{.takeaway .fragment}
+
+::: {.notes}
+Two questions, two answers, and the post reports both rather than only the one that
+supports the headline. Across the full ranking of 8,010 pairs, "same country" discriminates
+better than "shares a border" — AUC 0.753 against 0.698. Restrict to the 33 pairs the model
+is most confident about and the picture tilts back toward geography: 60.6 per cent of them
+share a border, an enrichment of 14.2 times over a 4.3 per cent base rate, while 75.8 per
+cent are within a country, an enrichment of 10.6 times. "What organises this network?" and
+"what does the model know for sure?" are different questions.
+:::
+
+## Long arcs, not short ones, carry the network {.smaller}
 
 :::: {.columns}
 
 ::: {.column width="47%"}
-![](../r_estimateW_17_map_arcs.png)
+![The strongest 10% of estimated links as arcs between region centroids: teal where the pair also shares a border, orange where it does not.](../r_estimateW_17_map_arcs.png){fig-alt="A map of Europe with the strongest ten percent of estimated links drawn as arcs between region centroids, coloured teal where the pair also shares a border and orange where it does not."}
 :::
 
 ::: {.column width="53%"}
@@ -214,64 +310,97 @@ Strongest estimated links average 921 km, against 1,331 km for a random pair —
 **[Orange]{style="color:#d97757"}** — it does not.
 
 Long orange arcs dominate: Bulgaria to Czechia, Iberia to the Baltic, Greece to Ireland.
-
-If the estimated network were essentially contiguity, this would be a mesh of short teal arcs hugging borders.
 :::
+
+[Were the estimated network essentially contiguity, this would be a mesh of short teal arcs hugging borders.]{.takeaway .fragment}
 :::
 
 ::::
+
+::: {.notes}
+This figure makes the point better than any table — give the room a beat to look before you
+speak. Whether those long links represent trade, migration, shared exposure to European
+business cycles or common institutional shocks is a question this model cannot answer; the
+"what this cannot tell you" slide returns to it.
+:::
 
 ## Three maps, three answers {background-color="#141413"}
 
 | | Estimated | Queen | 7-NN |
 |---|---:|---:|---:|
 | $\rho$ | 0.713 | 0.607 | 0.719 |
-| High education, **total** | **0.00153** | **0.00066** | **0.00074** |
+| High education, **total** | [0.00153]{.key} | 0.00066 | 0.00074 |
 | Indirect ÷ direct | 2.11 | 1.20 | 2.20 |
 
 Every **sign** survives. Every **magnitude** moves.
 
-The data-chosen map more than **doubles** the total education effect.
+[The data-chosen map more than doubles the total education effect.]{.takeaway .fragment}
+
+::: {.notes}
+The same SAR specification, the same data, three neighbourhood maps — nothing changes but W.
+A referee asking "would your story change under a different W?" gets a reassuring answer on
+signs and an uncomfortable one on magnitudes. Note the mechanical pattern in rho: the
+sparsest map, queen contiguity at 3.8 neighbours, gives the lowest value; kNN-7 at exactly
+seven gives the highest; the estimated map at 6.47 lands between them.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
 
 ## Why that matters for policy
 
-A region raising tertiary attainment generates roughly **twice as much growth outside its borders as inside them**.
+**2.11** under the estimated map.  **1.20** under contiguity.
 
-Whoever funds the universities captures about a third of the return.
+[Most of the education return leaks across borders — or only about half does. Same data, different map.]{.takeaway .fragment}
 
-. . .
-
-Under contiguity that ratio is 1.20, not 2.11 — the difference between *"most of the return leaks away"* and *"about half does"*.
-
-Different co-funding decision.
+::: {.notes}
+A region that raises tertiary attainment is associated with about twice as much growth
+outside its borders as inside them. Whoever funds the universities captures roughly a third
+of the measured return. Under contiguity that ratio is 1.20, not 2.11 — a materially
+different co-funding decision for a ministry choosing how much of a regional skills
+programme to pay for from a national or European budget.
+:::
 
 ## What this cannot tell you
 
-A posterior probability of 1.0 on Bulgaria → Czechia means residual co-movement is **better explained with that link than without it**, given a prior expecting seven neighbours.
+Bulgaria → Czechia at probability 1.0 says one thing only: residual co-movement fits **better with that link than without it**.
 
 It does **not** mean trade, commuting, or FDI.
 
-With $T = 19$, genuine transmission and shared exposure to common shocks are indistinguishable.
+[With $T = 19$, genuine transmission and shared exposure to common shocks are indistinguishable.]{.takeaway .fragment}
 
 ::: {.notes}
-Do not let anyone leave the room thinking this is a causal network.
+Do not let anyone leave the room thinking this is a causal network. That probability is
+also conditional on a prior that expected seven neighbours. Two regions responding
+identically to a common European shock look connected to this model even if nothing flows
+between them. Naming the mechanism requires data on the mechanism.
 :::
 
-## Honest limits
+## 26.5 effective draws bound what we can claim
 
-- **ESS($\rho$) = 26.5** out of 100 retained draws; Geweke $z = -3.74$
-- Posterior **means** are stable across chains and budgets
-- Posterior **SDs, intervals and link rankings** are not
-- With 100 draws a link probability is quantized to 0.01
+- **ESS($\rho$) = 26.5** of 100 retained draws (Geweke $z = -3.74$), so a link probability is quantized to 0.01
+- Posterior **means** are stable across chains and budgets; **SDs, intervals and link rankings** are not
 - Practical ceiling: about **300** regions
-- $\underline{k} = 7$ is a researcher choice — report a sweep, not a number
+- $k = 7$ is a researcher choice — report a sweep, not a number
+
+[Report the point estimates. Hedge everything that has a width.]{.takeaway .fragment}
+
+::: {.notes}
+An effective sample size of 26 supports a mean; it does not support a credible interval you
+would defend in a referee report. With 100 retained draws a link seen three times is
+indistinguishable from one seen once, so the boundary of the "strongest 10 per cent" sits in
+the noisy region. The paper writes the prior anchor with an underbar; this deck drops it.
+Prior sensitivity here is the first thing a referee should ask about.
+:::
 
 ## The map is a parameter {.divider background-color="#141413"}
 
-Every spatial result you have read is conditional on a neighbourhood map somebody chose before the analysis began.
-
-It does not have to be.
+Every spatial result you have read is conditional on a map somebody chose — and it does not have to be.
 
 ::: {.smaller}
 Full tutorial, code and replication bundle: <https://carlos-mendez.org/post/r_estimatew/>
+:::
+
+::: {.notes}
+Land on the thesis and stop. The invitation, if there is time for one, is the tutorial and
+the replication bundle — everything in this talk runs end to end from it.
 :::

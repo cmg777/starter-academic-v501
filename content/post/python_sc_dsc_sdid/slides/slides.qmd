@@ -6,6 +6,7 @@ deck-author-url: "https://carlos-mendez.org"
 institute: "Nagoya University (GSID)"
 date: today
 date-format: long
+audience: "seminar"
 key-results:
   - num: "1.76 pp"
     cap: "one default's covariate spread"
@@ -42,7 +43,7 @@ format:
 
 ## There is only one United Kingdom, and it voted to leave
 
-On 23 June 2016, 51.9% voted to leave the European Union.
+On 23 June 2016, the United Kingdom voted to leave the European Union.
 
 . . .
 
@@ -58,7 +59,7 @@ This is the fundamental problem of causal inference, stated as concretely as it 
 
 ## One line in a crowd
 
-![Log real GDP for 24 OECD economies, 1995-2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.](../python_sc_dsc_sdid_01_gdp_paths.png)
+![Log real GDP for 24 OECD economies, 1995–2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.](../python_sc_dsc_sdid_01_gdp_paths.png)
 
 [24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.]{.takeaway .fragment}
 
@@ -86,14 +87,13 @@ This is the pitch, and it is the reason a package-level reading is worth doing a
 The version warning is not pedantry. The release numbered 1.0.0 on PyPI is missing a config field this deck uses, and the version string does not distinguish it from git main. Pin the commit.
 :::
 
-## Where we're going
+## Four moves: read the API, climb the ladder, find the defaults, publish the cloud
 
 ::: {.incremental}
-- **Read** one config dict and one result object — the entire API surface.
-- **Map** each stage of the ladder onto a specific `mlsynth` class.
-- **Identify** the three defaults that change the answer materially.
-- **Compare** the stages on a placebo tournament, and read the ranking sceptically.
-- **Report** a cloud of estimates rather than a point.
+- **Read** one config dict and one result object — the whole API.
+- **Map** each stage of the ladder onto one `mlsynth` class.
+- **Identify** the three defaults that change the answer.
+- **Compare** the stages on a placebo tournament — then report a cloud, not a point.
 :::
 
 ::: {.notes}
@@ -145,6 +145,8 @@ def cfg(post, pre=T0, **extra):
 res = VanillaSC(cfg(96, inference=False)).fit()
 ```
 
+Estimand throughout: the ATT for the UK at one quarter, $\tau_t = Y_{\text{UK},t}(1) - Y_{\text{UK},t}(0)$.
+
 [`treat` means *under treatment right now*, not *ever treated*.]{.comment}
 
 [Every later code block is one line, because `cfg` already did the work.]{.takeaway .fragment}
@@ -164,10 +166,10 @@ The `window` helper does one more trick worth knowing: it keeps the 86 pre-treat
 | `.counterfactual` | `time_series.counterfactual_outcome` |
 | `.gap` | `time_series.estimated_gap` |
 | `.donor_weights` | `weights.donor_weights` |
-| `.weight_vector` | dense array over the donor pool |
+| `.weight_vector` | dense array of `donor_weights.values()` |
 | `.pre_rmse` | `fit_diagnostics.rmse_pre` |
 
-[Learn these seven and you can read the output of any effect estimator in the library without opening its documentation.]{.takeaway .fragment}
+[Learn these seven and you can read any estimator in the library — no docs needed.]{.takeaway .fragment}
 
 ::: {.notes}
 Two traps behind the convenience. `len(result.donor_weights)` is 9 here, not 23 — mlsynth returns only the non-zero weights, so do not treat that dictionary as a dense vector. And `method_details.method_name` reports which backend the "auto" setting actually resolved to, which is precisely the information you need when comparing against another implementation. Come back to that on the solver slide.
@@ -213,9 +215,11 @@ Note that the United States carries about a fifth of the counterfactual. We come
 
 ![UK log real GDP against its synthetic control (top) and the gap between them (bottom), shaded orange after the referendum.](../python_sc_dsc_sdid_04_sc_fit_gap.png)
 
-[The synthetic UK is roughly a fifth Hungary, a fifth the United States, a fifth Japan, a sixth Canada and an eighth Norway.]{.takeaway .fragment}
+[The synthetic UK: a fifth Hungary, a fifth the US, a fifth Japan — plus Canada and Norway.]{.takeaway .fragment}
 
 ::: {.notes}
+The two smaller shares are a sixth Canada and an eighth Norway; fourteen of the twenty-three donors get nothing at all.
+
 The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%.
 :::
 
@@ -247,6 +251,8 @@ sdid = SDID(cfg(96, zeta=0.0, vce="placebo", B=500)).fit()   # 2.80%
 
 [The gap at the evaluation quarter, minus the $\lambda$-weighted average gap before it.]{.comment}
 
+[DSC treats all 86 pre-treatment quarters alike. SDID does not.]{.takeaway .fragment}
+
 ::: {.notes}
 SDID solves the transposed version of the same problem: which blend of quarters, judged across all donors, best predicts the treatment quarter. DSC still treats all 86 pre-treatment quarters as equally informative; SDID does not.
 
@@ -271,7 +277,7 @@ Practical note: the time weights live on the cohort object, not on `weights`. `l
 
 ![SDID event study by quarters since the referendum, with a 95% placebo confidence band.](../python_sc_dsc_sdid_07_sdid_event_study.png)
 
-[Pre-treatment effects average $+0.0021$, post-treatment $-0.0281$ — a falsification test the single ATT number cannot give you, for the cost of one extra line.]{.takeaway .fragment}
+[Before: $+0.0021$. After: $-0.0281$. A falsification test for one extra line of code.]{.takeaway .fragment}
 
 ::: {.notes}
 `result.event_study` is aggregated alongside the headline ATT, which the R packages on this ladder do not do. The flat pre-treatment path is the part that matters: it is evidence about the design rather than about the effect, and it is the kind of thing a reader will ask for.
@@ -316,22 +322,12 @@ Two mlsynth gotchas here. MASC's tuned dials live in `weights.summary_stats`, no
 
 ![Donor weights under SC, DSC, SDID, MASC and augmented SC across the donor pool; the shaded region marks negative weights.](../python_sc_dsc_sdid_09_donor_weights.png)
 
-[Hungary, the United States, Japan, Canada and Norway carry 87-91% of the counterfactual under every method. Only ASCM ever goes negative.]{.takeaway .fragment}
+[Five countries carry 83–92% of the counterfactual under every method. Only ASCM ever goes negative.]{.takeaway .fragment}
 
 ::: {.notes}
 Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between stages is not a disagreement about which countries resemble the UK.
 
-MASC spreads a small uniform-looking 0.0158 across seven otherwise-zero donors — that is the matching component showing through.
-:::
-
-## The paths agree until the referendum, then fan apart
-
-![Six counterfactual paths for the United Kingdom alongside the observed series, 2014-2020.](../python_sc_dsc_sdid_10_all_counterfactuals.png)
-
-[Difference-in-differences is the clear outlier. The other five are hard to tell apart by eye — which is the point.]{.takeaway .fragment}
-
-::: {.notes}
-This is one call: fit each stage on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.
+MASC spreads a small uniform-looking 0.0158 across six otherwise-zero donors — Austria, Belgium, France, the Netherlands, Spain and Sweden. That is the matching component showing through.
 :::
 
 ## The whole ladder, side by side {.smaller}
@@ -345,7 +341,7 @@ This is one call: fit each stage on the untruncated panel and overlay the counte
 | MASC | `MASC(..., set_f=range(6, 87))` | 2.73 | 3.83 | 2.73 |
 | ASCM | `VanillaSC(..., augment="ridge")` | 3.04 | 4.19 | 3.04 |
 
-[The width of the cluster — 2.73-3.04% — not any point inside it, is the honest answer.]{.takeaway .fragment}
+[The width of the cluster — 2.73–3.04% — not any point inside it, is the honest answer.]{.takeaway .fragment}
 
 ::: {.notes}
 The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.
@@ -357,7 +353,7 @@ The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.7
 
 ![Every stage's estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.](../python_sc_dsc_sdid_11_att_dotplot.png)
 
-[**2.73-3.04%** at end-2018 and **3.83-4.19%** a year later — every stage above the 2.4% previously published for this same dataset.]{.takeaway .fragment}
+[**2.73–3.04%** at end-2018 and **3.83–4.19%** a year later — every stage above the 2.4% previously published for this same dataset.]{.takeaway .fragment}
 
 ::: {.notes}
 The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.
@@ -369,7 +365,7 @@ Also visible: the three SDID flavours sit almost on top of each other, within 0.
 
 [Act III]{.act}
 
-## Three defaults each move the answer more than the ladder does {.smaller}
+## Two of these three defaults outrun the whole ladder {.smaller}
 
 | Setting | At its default | Set deliberately | Moves the estimate by |
 |---|---:|---:|---:|
@@ -460,27 +456,11 @@ np.asarray(d18.gap)[-1]    # -0.0298873295228968  ->  2.9887%
 The fix is three lines: read the last element of the unrounded gap series instead of the scalar.
 :::
 
-## A name is a mnemonic, not a definition {.smaller}
-
-| Class | Is actually | Not to be confused with |
-|---|---|---|
-| `DSC` | **D**istributional SC (Gunsilius) | demeaned SC = `TSSC(method="MSCa")` |
-| `DSCAR` | **D**ynamic SC for **A**uto-**R**egressive processes | either of the above |
-| `SCD` | SC with **D**ifferencing | `DSC` |
-| `DRSC` | **D**istribution-**R**egression SC | `DSC` |
-| `MEDSC` | **Med**iation SC | demeaned SC |
-
-[`mlsynth.DSC` is not this deck's DSC — and importing it raises no error.]{.takeaway .fragment}
-
-::: {.notes}
-This is the failure mode a package with 92 estimators cannot fully design away, and it is the one worth flagging to students. Every one of these classes is correct and documented. The hazard is entirely in the reader's head — you go looking for demeaned synthetic control, you find a class called DSC, and it fits without complaint.
-:::
-
 ## A synthetic control estimate carries its solver's fingerprint
 
 ![Four mlsynth solver routes, all at 3.039%, against R's Frank-Wolfe implementation at 3.060%.](../python_sc_dsc_sdid_03_solver_comparison.png)
 
-[Three languages, two camps — split by optimiser, not by author. Replicate a published number and land 0.02 away? Suspect the optimiser before the data.]{.takeaway .fragment}
+[Three languages, two camps — split by optimiser, not by author. Land 0.02 away? Suspect the solver first.]{.takeaway .fragment}
 
 ::: {.notes}
 The synthetic-control objective on this panel has a condition number of roughly 7.5 times ten to the fifth: a long, narrow, nearly flat valley of near-optimal weight vectors. Any optimiser has to decide when to stop walking down it.
@@ -513,7 +493,7 @@ errors = [placebo_one(k, h) for k in FAKE_DATES for h in (1, 4)]   # 20 dates
 [`inference=False` and an explicit `m_grid` are what keep this to **13 seconds**.]{.takeaway .fragment}
 
 ::: {.notes}
-Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are `vce="noinference"` on SDID, `method="MSCa"` and `inference=False` on TSSC, and an explicit `m_grid` on MASC. With TSSC left to select its own variant, that step alone would be around forty minutes.
+Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are `vce="noinference"` on SDID, `method="MSCa"` and `inference=False` on TSSC, and an explicit `m_grid` on MASC. The post puts the cost of leaving those settings alone plainly: a two-minute loop becomes a two-hour one.
 
 This is the source paper's answer to "which stage", and it is a good one — but read the next slide before accepting the ranking it produces.
 :::
@@ -568,7 +548,7 @@ The UK is first, Belgium second at 3.52, Finland third at 3.29. First of 24 is t
 
 . . .
 
-[Response.]{.rebuttal} Five inference routes span $p = 0.006$ to $0.042$ and all reject at 5%. But the floor is real, and no estimator changes it.
+[Response.]{.rebuttal} Four p-values span $0.006$ to $0.042$; `scpi`'s interval stops short of zero. Five routes, all rejecting at 5%. But the floor is real, and no estimator changes it.
 
 . . .
 
@@ -582,9 +562,9 @@ Three further caveats belong with the number. It is a net gap between the UK and
 
 ## What the referendum cost {background-color="#1a3a8a"}
 
-[2.7 – 3.0%]{.bignum}
+[2.7–3.0%]{.bignum}
 
-[UK GDP shortfall at end-2018, at every stage of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published]{.bignum-label}
+[UK GDP shortfall at end-2018, at every fitted stage of the ladder · 3.8–4.2% a year later · against 2.4% previously published]{.bignum-label}
 
 ::: {.notes}
 That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.
@@ -601,7 +581,7 @@ That is the answer, and the range is the answer — not a rounding of some sharp
 If the audience remembers one thing, make it the second point. The econometrics on this ladder is settled and well documented. What is not documented anywhere except in source code is which knob your reference turned, and that turns out to matter more.
 :::
 
-## Materials {.smaller}
+## Everything here ships with the post {.smaller}
 
 - **Post, notebook, Colab** — [carlos-mendez.org/post/python_sc_dsc_sdid](/post/python_sc_dsc_sdid/)
 - **Three cheat sheets** — Python, R and Stata; each hard-codes the others' column.

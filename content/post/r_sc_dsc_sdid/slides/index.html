@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-08-02">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>From DiD to SDID</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -198,13 +198,13 @@
   <h1 class="title">From DiD to SDID</h1>
   <p class="subtitle">A ladder of synthetic control estimators, and what Brexit cost the UK</p>
   <div class="title-result-strip">
-    <div class="kr"><span class="kr-num">2.8%</span><span class="kr-cap">UK GDP shortfall at end-2018 · SDID</span></div>
-    <div class="kr"><span class="kr-num">0.96</span><span class="kr-cap">of the time weight on one quarter</span></div>
+    <div class="kr"><span class="kr-num">2.76%</span><span class="kr-cap">UK GDP shortfall at end-2018 · SDID</span></div>
+    <div class="kr"><span class="kr-num">96%</span><span class="kr-cap">of the time weight on one quarter</span></div>
     <div class="kr"><span class="kr-num">23</span><span class="kr-cap">donor countries in synthetic Britain</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">August 2, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section>
 <section id="the-problem" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -219,6 +219,7 @@
 </div>
 <div class="fragment">
 <p><em>Where do we get the counterfactual?</em></p>
+<p><span class="takeaway fragment">No country is a twin of the UK, so the comparison has to be built, not picked.</span></p>
 <aside class="notes">
 <p>The fundamental problem of causal inference with a single treated unit. No country is a perfect twin of the UK, so we cannot pick a comparison — we have to build one.</p>
 <style type="text/css">
@@ -244,13 +245,28 @@
 <li><strong>2</strong> evaluation dates: 2018Q4 and 2019Q4</li>
 </ul>
 <div class="fragment">
-<p>Give each donor a weight. Require the blend to track the real UK for twenty-one years. Read off the gap afterwards.</p>
+<p>Weight the donors. Match the UK for twenty-one years. Read the gap.</p>
+<p><span class="takeaway fragment">Eighty-six quarters of tracking are what license reading the post-2016 gap as an effect.</span></p>
+<aside class="notes">
+<p>Give each donor a weight, require the blend to track the real UK quarter by quarter through the two decades before the referendum, and whatever gap opens after 2016 is the estimate.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="one-line-in-a-crowd" class="slide level2 center">
 <h2>One line in a crowd</h2>
 
-<img data-src="../r_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch"><aside class="notes">
+<img data-src="../r_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD countries, 1995–2020: the UK in orange among 23 grey donor paths, dashed line at the 2016 referendum.</p><p><span class="takeaway fragment">No single donor tracks the UK — which is exactly why we blend them rather than pick one.</span></p>
+<aside class="notes">
 <p>No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -266,12 +282,26 @@
 </section>
 <section id="the-previously-published-answer-was-2.4" class="slide level2 center">
 <h2>The previously published answer was 2.4%</h2>
-<p>Born, Müller, Schularick and Sedláček (2019) estimated that the referendum had cost the UK about <strong>2.4% of GDP</strong> by the end of 2018.</p>
+<p>Born et al.&nbsp;(2019): the referendum cost the UK <strong>2.4% of GDP</strong> by end-2018.</p>
 <div class="fragment">
 <p>That number came from <em>one</em> estimator with <em>one</em> set of choices.</p>
 </div>
 <div class="fragment">
 <p>This deck climbs the whole ladder and asks whether 2.4% survives.</p>
+<p><span class="takeaway fragment">2.4% is one estimator’s answer, not the dataset’s answer.</span></p>
+<aside class="notes">
+<p>The full citation is Born, Müller, Schularick and Sedláček (2019), using this same OECD panel. Their specification matches on six covariates — which, as we will see in the verdict, is the single choice that separates their number from everything on this ladder.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section></section>
 <section>
@@ -284,6 +314,7 @@
 <p><span class="math display">\[\left(\hat{\tau}, \hat{\alpha}, \hat{\beta}\right) = \arg\min \sum_{j} \sum_{t} \left( y_{j,t} - \alpha_j - \beta_t - w_{j,t}\tau \right)^{2} \hat{\omega}_j \hat{\lambda}_t\]</span></p>
 <div class="fragment">
 <p>Outcome on a country effect, a quarter effect and a treatment dummy — weighted by <span class="math inline">\(\hat{\omega}_j\)</span> and <span class="math inline">\(\hat{\lambda}_t\)</span>.</p>
+<p><span class="takeaway fragment">Every stage that follows is a choice of which weights to fix and which to estimate.</span></p>
 <aside class="notes">
 <p>This is the only equation in the deck worth memorising. Everything that follows is a choice of which weights to fix and which to estimate.</p>
 <style type="text/css">
@@ -339,40 +370,85 @@
 </table>
 <div class="fragment">
 <p>Two banks of faders. DiD leaves both flat, SC moves one, SDID moves both.</p>
+<p><span class="takeaway fragment">Turning <span class="math inline">\(\lambda\)</span> on is the only thing that separates DSC from SDID.</span></p>
 </div>
 </section>
-<section id="stage-0-difference-in-differences" class="slide level2 center">
-<h2>Stage 0 — Difference-in-differences</h2>
-<p>Every donor counts the same.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>w_did <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">23</span>, <span class="dv">23</span>)</span>
-<span id="cb1-2"><a href=""></a>b_did <span class="ot">&lt;-</span> <span class="fu">mean</span>(Z1 <span class="sc">-</span> Z0 <span class="sc">%*%</span> w_did)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="one-solver-used-five-times" class="slide level2 center">
+<h2>One solver, used five times</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>simplex_ls <span class="ot">&lt;-</span> <span class="cf">function</span>(A, b, <span class="at">ridge =</span> <span class="fl">1e-10</span>) {</span>
+<span id="cb1-2"><a href=""></a>  k <span class="ot">&lt;-</span> <span class="fu">ncol</span>(A)</span>
+<span id="cb1-3"><a href=""></a>  w <span class="ot">&lt;-</span> <span class="fu">solve.QP</span>(<span class="at">Dmat =</span> <span class="fu">crossprod</span>(A) <span class="sc">+</span> ridge <span class="sc">*</span> <span class="fu">diag</span>(k),</span>
+<span id="cb1-4"><a href=""></a>                <span class="at">dvec =</span> <span class="fu">crossprod</span>(A, b),</span>
+<span id="cb1-5"><a href=""></a>                <span class="at">Amat =</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, k), <span class="fu">diag</span>(k)),   <span class="co"># sum(w) = 1; w &gt;= 0</span></span>
+<span id="cb1-6"><a href=""></a>                <span class="at">bvec =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">rep</span>(<span class="dv">0</span>, k)),</span>
+<span id="cb1-7"><a href=""></a>                <span class="at">meq  =</span> <span class="dv">1</span>)<span class="sc">$</span>solution</span>
+<span id="cb1-8"><a href=""></a>  w[w <span class="sc">&lt;</span> <span class="fl">1e-10</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-9"><a href=""></a>  w <span class="sc">/</span> <span class="fu">sum</span>(w)</span>
+<span id="cb1-10"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Hand it the donors’ pre-treatment paths and it returns <span class="math inline">\(\omega\)</span>. Hand it the transpose and it returns <span class="math inline">\(\lambda\)</span>.</p>
+<p><span class="takeaway fragment">One quadratic program does five jobs: <span class="math inline">\(\omega\)</span>, demeaned <span class="math inline">\(\omega\)</span>, <span class="math inline">\(\lambda\)</span>, and both halves of MASC’s cross-validation.</span></p>
+<aside class="notes">
+<p>Minimise a sum of squares over the simplex — non-negative shares that add to one. The 1e-10 on the diagonal is numerical hygiene so the Cholesky factorisation never fails; it is not the regularisation parameter of Arkhangelsky and coauthors.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="stage-0-the-ground-floor-every-donor-counts-the-same" class="slide level2 center">
+<h2>Stage 0 — the ground floor: every donor counts the same</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>w_did <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">23</span>, <span class="dv">23</span>)</span>
+<span id="cb2-2"><a href=""></a>b_did <span class="ot">&lt;-</span> <span class="fu">mean</span>(Z1 <span class="sc">-</span> Z0 <span class="sc">%*%</span> w_did)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment">
 <p><strong>4.98%</strong> at 2018Q4 — nearly double everything else.</p>
 </div>
 <div class="fragment">
 <p>Its pre-treatment fit error is <strong>0.0218</strong>, four times synthetic control’s.</p>
+<p><span class="takeaway fragment">DiD answers loudest and fits worst — which is the whole reason the ladder has more rungs.</span></p>
+<aside class="notes">
+<p>The post numbers these estimators 1 through 6; the deck calls DiD Stage 0, the ground floor, because it turns none of the dials. Throughout, <span class="math inline">\(T_0\)</span> = 86 is the number of pre-treatment quarters, the synthdid convention; the papers write the same quantity as <span class="math inline">\(T_0 - 1\)</span>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="parallel-trends-failing-in-plain-sight" class="slide level2 center">
 <h2>Parallel trends, failing in plain sight</h2>
 
-<img data-src="../r_sc_dsc_sdid_02_did_counterfactual.png" class="r-stretch"><p>DiD is fitting a divergence that began in 2013 and calling it Brexit.</p>
+<img data-src="../r_sc_dsc_sdid_02_did_counterfactual.png" class="r-stretch quarto-figure-center"><p class="caption">The UK against the level-aligned equal-weighted average of the 23 donors, with the growing gap shaded in orange.</p><p><span class="takeaway fragment">DiD is fitting a divergence that began in 2013 and calling it Brexit.</span></p>
 </section>
-<section id="stage-1-synthetic-control" class="slide level2 center">
-<h2>Stage 1 — Synthetic control</h2>
+<section id="stage-1-letting-the-data-pick-the-weights-cuts-the-fit-error-four-fold" class="slide level2 center">
+<h2>Stage 1 — letting the data pick the weights cuts the fit error four-fold</h2>
 <p><span class="math display">\[\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^{2}\]</span></p>
+<p><span class="comment">Here <span class="math inline">\(T_0 = 86\)</span>, the <em>number</em> of pre-referendum quarters (the <code>synthdid</code> convention); the papers write the same sum as running to <span class="math inline">\(T_0-1\)</span>.</span></p>
 <p>Weights that are non-negative and sum to one: the blend must stay inside the donors’ <strong>convex hull</strong>.</p>
 <div class="fragment">
 <p>Synthetic Britain is roughly one-fifth Hungary, one-fifth the US, one-fifth Japan, one-sixth Canada.</p>
 </div>
 <div class="fragment">
 <p><strong>3.06%</strong> at 2018Q4. Pre-treatment fit error <strong>0.0057</strong>.</p>
+<p><span class="takeaway fragment">0.0057 against DiD’s 0.0218 — a quarter of the error, and the entire argument for the method.</span></p>
 </div>
 </section>
-<section id="the-rubber-band" class="slide level2 center">
-<h2>The rubber band</h2>
+<section id="everything-inside-the-rubber-band-is-reachable-nothing-outside-it-is" class="slide level2 center">
+<h2>Everything inside the rubber band is reachable; nothing outside it is</h2>
 
-<img data-src="../r_sc_dsc_sdid_04_convex_hull.png" class="r-stretch"><aside class="notes">
+<img data-src="../r_sc_dsc_sdid_04_convex_hull.png" class="r-stretch quarto-figure-center"><p class="caption">Donors plotted by average log GDP early and late in the pre-treatment window, with the convex hull shaded and the UK inside it.</p><p><span class="takeaway fragment">The UK sits comfortably inside the hull, which is why synthetic control works well here.</span></p>
+<aside class="notes">
 <p>Pins on a corkboard, a rubber band snapped around them. Everything inside is reachable by a non-negative blend; nothing outside is. If the UK’s pin fell outside, you would need a negative amount of some country.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -392,6 +468,8 @@
 <div class="fragment">
 <p>Demean first, then add the average pre-treatment gap back as a constant.</p>
 <p><span class="math display">\[b^{dsc} = \frac{1}{T_0} \sum_{t} \Big( y_{1,t} - \sum_j \hat{\omega}_j y_{j,t} \Big)\]</span></p>
+<p><span class="comment">The average gap over the 86 pre-referendum quarters — the same <span class="math inline">\(T_0\)</span> convention as above.</span></p>
+<p><span class="takeaway fragment">Adding <span class="math inline">\(b^{dsc}\)</span> is algebraically identical to switching the unit fixed effect back on.</span></p>
 </div>
 </section>
 <section id="the-offset-is-tiny-and-that-is-the-finding" class="slide level2 center">
@@ -399,6 +477,7 @@
 <p>Here <span class="math inline">\(b^{dsc} = +0.0024\)</span> — a quarter of one percent. The estimate moves 3.06% → <strong>2.99%</strong>.</p>
 <div class="fragment">
 <p>A small adjustment means the SC fit was <em>already</em> level-balanced. On a dataset where the treated unit sits awkwardly, this term does real work.</p>
+<p><span class="takeaway fragment">The anticlimax is the result: there was almost no level gap to correct.</span></p>
 </div>
 </section>
 <section id="stage-3-sdid-choose-which-quarters-to-trust" class="slide level2 center">
@@ -413,14 +492,16 @@
 </div>
 <div class="fragment">
 <p>Same solver, transposed argument, and the cross-sectional mean removed instead of the time-series mean.</p>
+<p><span class="takeaway fragment"><span class="math inline">\(\lambda\)</span> is <span class="math inline">\(\omega\)</span>’s problem run on the transpose — one solver, two directions.</span></p>
 </div>
 </section>
 <section id="and-the-time-weights-collapse" class="slide level2 center">
 <h2>And the time weights collapse</h2>
 
-<img data-src="../r_sc_dsc_sdid_09_lambda_weights.png" class="r-stretch"><p><strong>96%</strong> of the weight lands on a single quarter, 2016Q2.</p>
+<img data-src="../r_sc_dsc_sdid_09_lambda_weights.png" class="r-stretch quarto-figure-center"><p class="caption">The estimated time weights as a stem plot, and donor log GDP at quarter <span class="math inline">\(t\)</span> against <span class="math inline">\(t-1\)</span> lying almost on the 45-degree line.</p><p><strong>96%</strong> of the weight lands on a single quarter, 2016Q2.</p>
 <div class="fragment">
 <p>Log GDP is nearly a random walk, so the best blend of past quarters is the most recent one alone. <strong>2.76%</strong>.</p>
+<p><span class="takeaway fragment">The collapse is a property of the data, not a bug in the code.</span></p>
 </div>
 </section></section>
 <section>
@@ -434,38 +515,63 @@
 <p><span class="math display">\[\text{Bias} = \underbrace{B^{ext}}_{\text{wrong place}} + \underbrace{B^{int}}_{\text{curved function}}\]</span></p>
 <div class="fragment">
 <p><strong>Extrapolation bias</strong> — the blend’s characteristics do not match the treated unit’s.</p>
-<p><strong>Interpolation bias</strong> — they do match, but the outcome bends, so the average of outcomes is not the outcome at the average.</p>
+<p><strong>Interpolation bias</strong> — the blend matches, but the outcome curve bends.</p>
+<p>The average of outcomes is not the outcome at the average.</p>
 </div>
 <div class="fragment">
 <p>Neither name means what you would guess.</p>
+<p><span class="takeaway fragment">Because the two pieces add up exactly, any estimator can be asked which half it attacks.</span></p>
 </div>
 </section>
-<section id="the-turkey" class="slide level2 center">
-<h2>The turkey</h2>
-<p>You are roasting a 3.4 kg bird. The chart lists 3 kg and 4 kg.</p>
+<section id="a-3.4-kg-bird-and-two-ways-to-get-the-roasting-time-wrong" class="slide level2 center">
+<h2>A 3.4 kg bird, and two ways to get the roasting time wrong</h2>
+<p>A 3.4 kg bird. The chart lists 3 kg and 4 kg.</p>
 <div class="fragment">
-<p><strong>Extrapolation bias</strong>: you misread the scale and look up 5 kg. Right chart, wrong row.</p>
+<p><strong>Extrapolation bias</strong>: you look up 5 kg. Wrong row.</p>
 </div>
 <div class="fragment">
-<p><strong>Interpolation bias</strong>: you read both rows correctly and average the times. Right rows — but roasting time bends with weight, so the average of two times is not the time for the average bird.</p>
-</div>
-<div class="fragment">
-<p>Two independent errors. Fixing one does nothing for the other.</p>
+<p><strong>Interpolation bias</strong>: you average the two rows. Right rows, curved chart.</p>
+<p><span class="takeaway fragment">Fixing one does nothing for the other.</span></p>
+<aside class="notes">
+<p>Roasting time bends with weight, so the average of the 3 kg and 4 kg times is not the time for a 3.4 kg bird. The two errors are independent — that is the whole point of the decomposition.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="only-one-row-is-dark-in-both-columns" class="slide level2 center">
 <h2>Only one row is dark in both columns</h2>
 
-<img data-src="../r_sc_dsc_sdid_11_bias_targets.png" class="r-stretch"><p>SC’s unit weights kill extrapolation bias. Matching kills interpolation bias. <strong>SDID’s time weights let one estimator target both.</strong></p>
+<img data-src="../r_sc_dsc_sdid_11_bias_targets.png" class="r-stretch quarto-figure-center"><p class="caption">Estimators as rows, bias types as columns: only the SDID row is dark in both the extrapolation and interpolation columns.</p><p>SC’s unit weights kill extrapolation bias. Matching kills interpolation bias.</p>
+<p><span class="takeaway fragment">SDID’s time weights are what let one estimator target both.</span></p>
+<aside class="notes">
+<p>The counterweight the source paper supplies itself, and it belongs in the spoken version: SDID “targets” both biases, but it pays for the privilege by estimating 85 extra parameters, and the paper’s own conclusion is that the gain over DSC is “marginal at best” for the kind of trend specification we have here. The decomposition is the durable idea; the recommendation that follows from it is much more fragile.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="stages-4-and-5-buy-the-trade-off-or-drop-the-constraint" class="slide level2 center">
 <h2>Stages 4 and 5 — buy the trade-off, or drop the constraint</h2>
-<p><strong>MASC</strong> blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys <strong>16% matching</strong>. → <strong>2.73%</strong></p>
+<p><strong>MASC</strong> blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys <strong>15.8% matching</strong>. → <strong>2.73%</strong></p>
 <div class="fragment">
 <p><strong>ASCM</strong> drops non-negativity and adds a ridge pull toward the SC weights. Eight donors go negative. → <strong>3.04%</strong></p>
-</div>
-<div class="fragment">
-<p>Both land inside the range the simpler stages already covered.</p>
+<p><span class="takeaway fragment">Neither moves the answer. MASC sets the floor at 2.73%; ASCM sits on SC’s 3.04%.</span></p>
 </div>
 </section></section>
 <section>
@@ -476,11 +582,12 @@
 <section id="every-stage-beats-2.4" class="slide level2 center">
 <h2>Every stage beats 2.4%</h2>
 
-<img data-src="../r_sc_dsc_sdid_15_att_dotplot.png" class="r-stretch"><p><strong>2.73% to 3.06%</strong> at end-2018; <strong>3.83% to 4.20%</strong> at end-2019.</p>
+<img data-src="../r_sc_dsc_sdid_15_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every estimator’s 2018Q4 and 2019Q4 estimate, with Born et al.’s 2.4% as a dashed reference line.</p><p><strong>2.73% to 3.06%</strong> at end-2018; <strong>3.83% to 4.20%</strong> at end-2019.</p>
+<p><span class="takeaway fragment">Every stage of the ladder lands to the right of the published 2.4%.</span></p>
 </section>
-<section id="which-stage-a-fire-drill" class="slide level2 center">
+<section id="which-stage-a-fire-drill" class="slide level2 smaller center">
 <h2>Which stage? A fire drill</h2>
-<p>Move the treatment date back to twenty quarters when nothing happened. Every estimate is then pure error.</p>
+<p>Re-date the treatment to each of twenty quarters when nothing happened. Every estimate is then pure error.</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -501,7 +608,7 @@
 <td>0.0052</td>
 </tr>
 <tr class="odd">
-<td><strong>SDID</strong></td>
+<td><strong>SDID (i)</strong></td>
 <td><strong>0.0067</strong></td>
 <td><strong>0.0016</strong></td>
 </tr>
@@ -515,11 +622,32 @@
 <td>0.0086</td>
 <td>0.0051</td>
 </tr>
+<tr class="even">
+<td>SDID (ii)</td>
+<td>0.0134</td>
+<td>0.0103</td>
+</tr>
+<tr class="odd">
+<td>SDID (iii)</td>
+<td>0.0134</td>
+<td>0.0107</td>
+</tr>
 </tbody>
 </table>
-<div class="fragment">
-<p>The SDID family wins on every measure.</p>
-</div>
+<p><span class="takeaway fragment">SDID (i) wins on every measure — and, as published, variants (ii) and (iii) look worst of all. Hold that thought.</span></p>
+<aside class="notes">
+<p>Read as published, SDID (i) wins comfortably — a median absolute error of 0.0016 against plain SC’s 0.0055 — and variants (ii) and (iii) are twice as bad as plain SC. That is the basis for the source paper’s recommendation to use variant (i) in practice. Every number here reproduces the published table exactly.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="but-check-the-exam-before-trusting-the-ranking" class="slide level2 center">
 <h2>But check the exam before trusting the ranking</h2>
@@ -542,43 +670,9 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="fragment">
-<p>The three variants are <strong>indistinguishable</strong>. The published ranking among them is an artefact of the horizon, not a property of the estimators.</p>
-</div>
-</section>
-<section id="covariates-make-it-worse" class="slide level2 center">
-<h2>Covariates make it worse</h2>
-<p>The dataset ships six covariates. Matching on them:</p>
-<ul>
-<li>reproduces the published <strong>2.43%</strong> exactly, via the Born specification</li>
-<li>raises the placebo error for SC (0.0089 → 0.0092) and DSC (0.0087 → 0.0106)</li>
-</ul>
-<div class="fragment">
-<p>With 86 pre-treatment outcomes already in the matching set, the covariates are redundant (Kaul et al.&nbsp;2022) and add only noise.</p>
-</div>
-</section>
-<section id="and-the-optimiser-matters-more-than-you-would-think" class="slide level2 center">
-<h2>And the optimiser matters more than you would think</h2>
-
-<img data-src="../r_sc_dsc_sdid_07_solver_ladder.png" class="r-stretch"><p>The published 3.06% is where Frank–Wolfe happens to be at 10,000 iterations. The true optimum is <strong>3.04%</strong>.</p>
-</section>
-<section id="what-to-take-away" class="slide level2 center">
-<h2>What to take away</h2>
-<ol type="1">
-<li><strong>The bias decomposition is the durable idea.</strong> The leaderboard is perishable.</li>
-<li><strong>Fit the ladder, not a stage.</strong> Report the cloud.</li>
-<li><strong>Run a placebo tournament</strong> — and check the horizons match.</li>
-<li><strong>Covariates are not free.</strong> With a long pre-period they may be redundant.</li>
-</ol>
-</section>
-<section id="and-the-answer-with-its-error-bars" class="slide level2 center">
-<h2>And the answer, with its error bars</h2>
-<p><strong>Brexit cost the UK roughly 3% of GDP by end-2018</strong>, 4% by end-2019 — more than previously published.</p>
-<div class="fragment">
-<p>But the uncertainty is wide. The permutation p-value is 0.042, the smallest this design can produce, and a 95% interval spans roughly 1% to 4.6%.</p>
+<p><span class="takeaway fragment">The three variants are <strong>indistinguishable</strong> — the published ranking among them is an artefact of the horizon, not a property of the estimators.</span></p>
 <aside class="notes">
-<p>Worth dwelling on. The point estimate is far better determined than the interval, which is normal with one treated unit and 23 donors. Anyone quoting “Brexit cost 2.8%” without that interval is overstating what this design delivers.</p>
+<p>What survives is the finding that matters more: at either horizon the whole SDID family beats every other stage, and the ordering below it is stable — SDID, then MASC, then ASCM, then DSC, then SC. Which variant supplies the time weights is simply not settled by this evidence; variant (i) remains the sensible default because it is the cheapest and needs no choice of post-treatment window.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -592,16 +686,91 @@
       }</style></aside>
 </div>
 </section>
-<section id="materials" class="slide level2 center">
-<h2>Materials</h2>
+<section id="covariates-make-it-worse" class="slide level2 center">
+<h2>Covariates make it worse</h2>
+<p>The dataset ships six covariates. Matching on them raises the placebo error:</p>
+<ul>
+<li>SC: 0.0089 → 0.0092</li>
+<li>DSC: 0.0087 → 0.0106</li>
+</ul>
+<div class="fragment">
+<p>86 pre-treatment outcomes already encode the covariates (Kaul et al.&nbsp;2022).</p>
+<p>The six extra predictors add noise, not information.</p>
+<p><span class="takeaway fragment">With a pre-period this long, covariates cost precision and buy no identification.</span></p>
+<aside class="notes">
+<p>Two things for the spoken version. First, the reconciliation with the literature: SC(B) — the Born specification, which scores covariates in both optimisation loops — reproduces the published 2.43% at 2018Q4 exactly. So the gap between the earlier published figure and everything on this ladder is the choice of estimator, not the data. Second, the exception: MASC’s placebo error clearly <em>benefits</em> from covariates, falling from 0.0080 to 0.0048; SDID and ASCM barely move. It is SC and DSC that are degraded.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="and-the-optimiser-matters-more-than-you-would-think" class="slide level2 center">
+<h2>And the optimiser matters more than you would think</h2>
+
+<img data-src="../r_sc_dsc_sdid_07_solver_ladder.png" class="r-stretch quarto-figure-center"><p class="caption">Estimated 2018Q4 loss against the number of Frank–Wolfe iterations, converging toward the exact optimum; the package default is marked in orange.</p><p>The published 3.06% is where Frank–Wolfe happens to be at 10,000 iterations. The true optimum is <strong>3.04%</strong>.</p>
+<p><span class="takeaway fragment">A synthetic control estimate carries its solver’s fingerprint.</span></p>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection">Objection.</span> A 0.03 percentage-point spread cannot possibly rank estimators.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> True — which is why the placebo tournament, not the point estimate, does the ranking.</p>
+<p><span class="takeaway fragment">Pre-treatment fit cannot arbitrate between methods that all achieve it. Twenty fake treatment dates can.</span></p>
+</div>
+</section>
+<section id="the-decomposition-is-durable-the-leaderboard-is-not" class="slide level2 center">
+<h2>The decomposition is durable; the leaderboard is not</h2>
+<ol type="1">
+<li><strong>The bias decomposition is the durable idea.</strong> The leaderboard is perishable.</li>
+<li><strong>Fit the ladder, not a stage.</strong> Report the cloud.</li>
+<li><strong>Run a placebo tournament</strong> — and check the horizons match.</li>
+<li><strong>Covariates are not free.</strong> With a long pre-period they may be redundant.</li>
+</ol>
+<p><span class="takeaway fragment">The rungs of this ladder are perishable; the question each rung answers is not.</span></p>
+</section>
+<section id="everything-here-replicates-from-one-script-and-one-csv" class="slide level2 center">
+<h2>Everything here replicates from one script and one CSV</h2>
 <p><strong>Post</strong> · <a href="https://carlos-mendez.org/post/r_sc_dsc_sdid/">carlos-mendez.org/post/r_sc_dsc_sdid</a></p>
 <p><strong>Code</strong> · <code>analysis.R</code> (18 figures, full replication) · <code>cheatsheet_R.R</code> / <code>cheatsheet_stata.do</code> / <code>cheatsheet_python.py</code> (every estimator, one package call each)</p>
 <p><strong>Data</strong> · <code>brexit_analysis.csv</code>, loadable straight from GitHub</p>
 <div class="fragment">
 <p>Replicates de Brabander, Juodis &amp; Miyazato Szini (2025), <em>Econometric Reviews</em> 44(10), 1617–1646.</p>
-
+</div>
+</section>
+<section id="and-the-answer-with-its-error-bars" class="slide level2 center">
+<h2>And the answer, with its error bars</h2>
+<p><strong>Brexit cost the UK roughly 3% of GDP by end-2018</strong>, 4% by end-2019 — more than previously published.</p>
+<div class="fragment">
+<p>The permutation p-value is <strong>0.042</strong> — the smallest 23 donors can produce.</p>
+<p>A conventional 95% interval spans roughly <strong>0.9% to 4.6%</strong>.</p>
+<p><span class="takeaway fragment">The point estimate is far better determined than the interval.</span></p>
+<aside class="notes">
+<p>Those two lines answer different questions and should not be merged. The p-value is randomisation inference: how unusual is the United Kingdom among OECD countries. The interval comes from the synthdid placebo standard error of 0.0095 log points and speaks to sampling error. Only the first has a well-defined answer with one treated unit. Anyone quoting “Brexit cost 2.8%” without that interval is overstating what this design delivers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section></section>
+<section id="fit-the-ladder-not-a-stage-and-publish-the-cloud-not-the-point." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Fit the ladder, not a stage — and publish the cloud, not the point.</h1>
+
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

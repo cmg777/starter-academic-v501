@@ -258,7 +258,21 @@
 </section>
 <section id="nevada-is-californias-only-neighbour-inside-the-donor-pool" class="slide level2 center">
 <h2>Nevada is California’s only neighbour inside the donor pool</h2>
-<p>Oregon and Arizona border California too — but both ran their own tobacco programmes, so <strong>neither is in the donor pool.</strong></p>
+<aside class="notes">
+<p>The exclusion list is doing quiet work here. Oregon and Arizona border California, but Abadie, Diamond and Hainmueller dropped both for having run their own tobacco-control programmes, which leaves Nevada as the only contiguous donor. Eleven states are absent from the panel for similar reasons. That is a gift and a limitation at once: the parameter is easy to interpret, and a single channel is thin evidence for a scalar.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<p>Oregon and Arizona border California too.</p>
+<p>Both ran their own tobacco programmes, so <strong>neither is a donor.</strong></p>
 <div class="fragment">
 <p>Eleven states are excluded altogether: AK, AZ, FL, HI, MD, MA, MI, NJ, NY, OR, WA.</p>
 </div>
@@ -269,6 +283,19 @@
 </section>
 <section id="the-simplex-and-sutva-written-down" class="slide level2 center">
 <h2>The simplex and SUTVA, written down</h2>
+<aside class="notes">
+<p>Read the first line as a sentence: find the mix of donor states whose weighted average tracks California over 1970 to 1987, subject to the mix being a genuine average — no negative weights, and the weights adding to one. The set delta is the simplex, and everything that distinguishes the three stages of this talk is a statement about delta. The second line is SUTVA. It throws away every argument of the potential outcome but one, which is why a classical synthetic control cannot report a spillover, cannot test for one, and cannot be wrong about one in a way you would notice.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <p><span class="math display">\[\widehat{\alpha} = \arg\min_{\alpha \in \Delta} \sum_{t \le T_0}\Big(Y_{1t} - \alpha^{\top}\mathbf{Y}^{c}_{t}\Big)^2,
 \qquad \Delta = \Big\{\alpha : \alpha_j \ge 0,\ \textstyle\sum_j \alpha_j = 1\Big\}\]</span></p>
 <div class="fragment">
@@ -299,14 +326,26 @@
 <p><span class="takeaway fragment">Both are young. Both are pinned — one to a release, one to a commit.</span></p>
 </div>
 </section>
-<section id="where-were-going" class="slide level2 center">
-<h2>Where we’re going</h2>
+<section id="three-relaxations-then-two-post-mortems" class="slide level2 center">
+<h2>Three relaxations, then two post-mortems</h2>
+<aside class="notes">
+<p>The three stages are nested: each keeps everything the previous stage assumed except one restriction, which it replaces with something weaker. That is what makes the comparison at the end meaningful — when the number moves, we know exactly which assumption moved it. The last two items are not relaxations but audits: why the R edition of this same analysis reports an interval 33 times narrower, and what an effective sample size of 3 actually means.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <ul>
-<li class="fragment"><strong>Stage 1</strong> — the simplex, as Abadie wrote it</li>
-<li class="fragment"><strong>Stage 2</strong> — the simplex replaced by a prior</li>
-<li class="fragment"><strong>Stage 3</strong> — SUTVA dropped, and a second estimand appears</li>
-<li class="fragment"><strong>Reconcile</strong> — why the R edition of this analysis reports a different interval</li>
-<li class="fragment"><strong>Diagnose</strong> — what an effective sample size of 3 actually means</li>
+<li><strong>Stage 1</strong> — the simplex, as Abadie wrote it</li>
+<li><strong>Stage 2</strong> — the simplex replaced by a prior</li>
+<li><strong>Stage 3</strong> — SUTVA dropped, and a second estimand appears</li>
+<li><strong>Reconcile and diagnose</strong> — why the R edition reports a very different interval, and what an effective sample size of 3 means</li>
 </ul>
 </section></section>
 <section>
@@ -342,7 +381,7 @@
 <section id="stage-1-the-simplex-picks-five-donors-and-stops" class="slide level2 center">
 <h2>Stage 1 — the simplex picks five donors and stops</h2>
 <aside class="notes">
-<p>Note Nevada is already in the blend, carrying a quarter of the counterfactual. The one state we have reason to suspect.</p>
+<p>Note Nevada is already in the blend, carrying a quarter of the counterfactual — the one state we have reason to suspect. Section 4.1 of the post showed that sparsity can come from the data: a donor that is useless gets zero weight without any constraint forbidding it. Here it can equally have come from the constraint, and from the outside the two look identical. That is the question Stage 2 exists to ask.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -354,7 +393,7 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1-2|4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>common <span class="op">=</span> <span class="bu">dict</span>(df<span class="op">=</span>df, outcome<span class="op">=</span><span class="st">"cigsale"</span>, treat<span class="op">=</span><span class="st">"treated"</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>common <span class="op">=</span> <span class="bu">dict</span>(df<span class="op">=</span>df, outcome<span class="op">=</span><span class="st">"cigsale"</span>, treat<span class="op">=</span><span class="st">"treated"</span>,</span>
 <span id="cb2-2"><a href=""></a>              unitid<span class="op">=</span><span class="st">"state"</span>, time<span class="op">=</span><span class="st">"year"</span>, display_graphs<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb2-3"><a href=""></a></span>
 <span id="cb2-4"><a href=""></a>sc <span class="op">=</span> mlsynth.VanillaSC(<span class="bu">dict</span>(common)).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -362,7 +401,7 @@
 <table class="caption-top">
 <tbody>
 <tr class="odd">
-<td>ATT</td>
+<td>ATT (effect on California)</td>
 <td style="text-align: right;"><strong>−18.43</strong></td>
 </tr>
 <tr class="even">
@@ -379,21 +418,43 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">Utah 0.343 · Montana 0.254 · <strong>Nevada 0.242</strong> · Connecticut 0.146</span></p>
+<p>Utah 0.343 · Montana 0.254 · <strong>Nevada 0.242</strong> · Connecticut 0.146 — and exactly <strong>zero</strong> for the other 33.</p>
+<p><span class="takeaway fragment">Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.</span></p>
 </div>
 </section>
 <section id="california-and-its-synthetic-are-indistinguishable-until-1988" class="slide level2 center">
 <h2>California and its synthetic are indistinguishable until 1988</h2>
+<aside class="notes">
+<p>The two series track closely until 1988 and separate steadily after it, reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise that any single year fits well. Worth saying out loud: this reproduces the R edition’s minus 18.46 to within 0.04 packs, from a different package and a different optimiser, which is the strongest evidence either implementation gets that it is correctly coded.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
-<img data-src="../python_sc_bayes_spatial_03_stage1_fit_gap.png" class="quarto-figure quarto-figure-center r-stretch" alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to −26.7 packs by 2000."><p><span class="takeaway fragment">Reproduces the R edition’s −18.46 to within 0.04 packs, from a different package and a different optimiser.</span></p>
-</section>
-<section id="thirty-three-donors-get-exactly-zero" class="slide level2 center">
-<h2>Thirty-three donors get exactly zero</h2>
-
-<img data-src="../python_sc_bayes_spatial_04_stage1_weights.png" class="quarto-figure quarto-figure-center r-stretch" alt="Simplex donor weights: Utah 0.34, Montana 0.25, Nevada 0.24, Connecticut 0.15, New Hampshire 0.01, and exactly zero for the other 33 states."><p><span class="takeaway fragment">Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.</span></p>
+<img data-src="../python_sc_bayes_spatial_03_stage1_fit_gap.png" class="quarto-figure quarto-figure-center r-stretch" alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to −26.7 packs by 2000."><p><span class="takeaway fragment">Zero gap before 1988; −26.7 packs by 2000.</span></p>
 </section>
 <section id="the-horseshoe-makes-zero-the-default-without-making-it-compulsory" class="slide level2 center">
 <h2>The horseshoe makes zero the default without making it compulsory</h2>
+<aside class="notes">
+<p>Two properties that pull in opposite directions: enormous mass at zero, so a donor with nothing to contribute gets nothing; and tails heavy enough that a donor with a great deal to contribute is not shrunk into irrelevance. The name comes from the shrinkage factor kappa, one over one plus lambda squared, whose implied prior is a Beta one-half one-half — a U shape with peaks at 0 and 1. The Makalic–Schmidt step is the practical one: every half-Cauchy is a scale mixture of inverse gammas, so one auxiliary variable per scale gives closed-form conditionals throughout. Nothing is approximated.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <p><span class="math display">\[\alpha_j \mid \lambda_j \sim \mathcal{N}\big(0, \lambda_j^2\big), \qquad
 \lambda_j \mid \tau \sim \mathcal{C}^{+}(0, \tau), \qquad
 \tau \sim \mathcal{C}^{+}(0, \sigma)\]</span></p>
@@ -407,8 +468,21 @@
 </section>
 <section id="relax-the-simplex-and-the-active-donor-pool-multiplies-by-five" class="slide level2 center">
 <h2>Relax the simplex and the active donor pool multiplies by five</h2>
+<aside class="notes">
+<p>Point at the intervals before the points. Most of them straddle zero comfortably — the model is willing to entertain a role for these donors, but the data do not insist on one. The horseshoe did exactly what it promised: it made zero the default without making it compulsory. Two consequences of dropping the simplex are visible at once — the active count goes from 5 to 26, and the weights no longer sum to one. Neither is a defect.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
-<img data-src="../python_sc_bayes_spatial_05_stage2_horseshoe_weights.png" class="quarto-figure quarto-figure-center r-stretch" alt="Posterior donor weights from mlsynth.BSCM with 95% credible intervals, the 24 largest by magnitude; 26 of the 38 donors exceed 0.01 in absolute value, and only Nevada's interval clears zero."><p><span class="takeaway fragment">5 → 26 active donors. Almost every credible interval straddles zero.</span></p>
+<img data-src="../python_sc_bayes_spatial_05_stage2_horseshoe_weights.png" class="quarto-figure quarto-figure-center r-stretch" alt="Posterior donor weights from mlsynth.BSCM with 95% credible intervals, the 24 largest by magnitude; 26 of the 38 donors exceed 0.01 in absolute value, and most credible intervals straddle zero."><p><span class="takeaway fragment">5 → 26 active donors. Almost every credible interval straddles zero.</span></p>
 </section>
 <section id="two-bayesian-synthetic-controls-one-intercept-apart" class="slide level2 smaller center">
 <h2>Two Bayesian synthetic controls, one intercept apart</h2>
@@ -462,13 +536,21 @@
 <p><span class="takeaway fragment">When two packages disagree about a model they both implement, check the equation before you check the sampler.</span></p>
 </div>
 </section>
-<section id="four-counterfactual-californias" class="slide level2 center">
-<h2>Four counterfactual Californias</h2>
-
-<img data-src="../python_sc_bayes_spatial_06_stage2_two_bayesian.png" class="quarto-figure quarto-figure-center r-stretch" alt="Four counterfactual paths for California and their ATTs, showing the BSCM path sitting apart from the other three because it fits an explicit intercept."><p><span class="takeaway fragment">Hollow diamonds are the R edition’s published values.</span></p>
-</section>
 <section id="drop-sutva-and-the-bias-has-a-closed-form" class="slide level2 center">
 <h2>Drop SUTVA and the bias has a closed form</h2>
+<aside class="notes">
+<p>Derive it out loud in one line: add and subtract the weighted sum of the donors’ no-treatment outcomes. What a classical synthetic control reports is the true effect on California minus a weighted sum of the spillovers that landed on the donors — with the same weights used to build the counterfactual. Two consequences worth stating. If every spillover is zero the bias vanishes and classical synthetic control is right, so SUTVA is not a technicality but the whole justification. And the sign of the bias is the opposite of the sign of the weighted spillover, which is the fact the Nevada result turns on.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <p><span class="math display">\[Y_{1t} - \sum_j \alpha_j Y_{jt} \;=\; \underbrace{\xi_{0t}}_{\text{what we want}}
 \;-\; \underbrace{\sum_j \alpha_j \xi^{c}_{jt}}_{\text{what we get for free}}\]</span></p>
 <div class="fragment">
@@ -476,10 +558,10 @@
 <p><span class="takeaway fragment">A filthy donor with zero weight is harmless. A slightly dirty one carrying half the counterfactual is not.</span></p>
 </div>
 </section>
-<section id="the-identifying-assumption-that-replaces-the-simplex" class="slide level2 center">
-<h2>The identifying assumption that replaces the simplex</h2>
+<section id="the-simplex-is-gone-something-took-its-place" class="slide level2 center">
+<h2>The simplex is gone; something took its place</h2>
 <aside class="notes">
-<p>Say plainly what has been traded. The simplex is gone, and something has taken its place: the assumption that some fixed alpha reproduces California’s untreated path exactly, in every pre-period. It is not weaker in some absolute sense — it is untestable in a way the simplex is not, because the simplex’s price shows up as pre-treatment RMSE and this one does not show up anywhere.</p>
+<p>Say plainly what has been traded. The simplex is gone, and something has taken its place: the assumption that some fixed alpha reproduces California’s untreated path exactly, in every pre-period. The weights may be negative and need not sum to one. It is not weaker in some absolute sense — it is untestable in a way the simplex is not, because the simplex’s price shows up as pre-treatment RMSE and this one does not show up anywhere.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -492,20 +574,12 @@
           display:block!important;
       }</style></aside>
 <p><span class="math display">\[\exists\, \alpha \in \mathbb{R}^{N} \;:\; Y_{1t}(\mathbf{0}) = \sum_j \alpha_j Y_{jt}(\mathbf{0}) \quad \forall t\]</span></p>
-<div class="fragment">
-<p>With <span class="math inline">\(A = W + \mathbf{w}\alpha^{\top}\)</span>, the donors’ untreated path solves in closed form:</p>
-<p><span class="math display">\[\mathbf{Y}^{c}_{t}(\mathbf{0}) = \big(I - \rho A\big)^{-1}\Big[\big(I - \rho W\big)\mathbf{Y}^{c}_{t} - \rho\,\mathbf{w}\,Y_{1t}\Big]\]</span></p>
-</div>
-<div class="fragment">
-<p><span class="math display">\[\xi_{0t} = Y_{1t} - \alpha^{\top}\mathbf{Y}^{c}_{t}(\mathbf{0}),
-\qquad \boldsymbol{\xi}^{c}_{t} = \mathbf{Y}^{c}_{t} - \mathbf{Y}^{c}_{t}(\mathbf{0})\]</span></p>
-<p><span class="takeaway fragment">No <span class="math inline">\(\beta\)</span>. No factors. No error variances. They <strong>cancel</strong>.</span></p>
-</div>
+<p><span class="takeaway fragment">Weaker than convexity, stronger than approximate fit — and untestable, because it leaves no RMSE behind.</span></p>
 </section>
-<section id="that-cancellation-is-what-makes-the-model-usable" class="slide level2 center">
-<h2>That cancellation is what makes the model usable</h2>
+<section id="the-donors-untreated-path-solves-in-closed-form-and-the-nuisance-block-cancels" class="slide level2 center">
+<h2>The donors’ untreated path solves in closed form, and the nuisance block cancels</h2>
 <aside class="notes">
-<p>This is the technical heart of the talk. Substituting the treated unit’s equation into the donor system eliminates beta, the latent factors and the error variances — they all cancel. What is left depends only on alpha, rho, w, W and observed outcomes. That is why a weakly-mixing nuisance block does not poison the answer: there is nowhere for it to enter. It also localises the whole identification problem onto one scalar, which is what Act III is about.</p>
+<p>This is the technical heart of the talk. Substituting the treated unit’s equation into the donor system eliminates beta, the latent factors and the error variances — they all cancel. What is left depends only on alpha, rho, w, W and observed outcomes. That is why a weakly-mixing nuisance block does not poison the answer: there is nowhere for it to enter. It also localises the whole identification problem onto one scalar, which is what the rest of this talk is about.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -517,17 +591,32 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<p>The effects depend on <span class="math inline">\((\alpha, \rho, \mathbf{w}, W)\)</span> and the observed data. <strong>Nothing else.</strong></p>
+<p>With <span class="math inline">\(A = W + \mathbf{w}\alpha^{\top}\)</span>:</p>
+<p><span class="math display">\[\mathbf{Y}^{c}_{t}(\mathbf{0}) = \big(I - \rho A\big)^{-1}\Big[\big(I - \rho W\big)\mathbf{Y}^{c}_{t} - \rho\,\mathbf{w}\,Y_{1t}\Big]\]</span></p>
 <div class="fragment">
-<p>A model this rich has many weakly identified parameters. If the effects depended on all of them, that weakness would poison everything.</p>
+<p>No <span class="math inline">\(\beta\)</span>. No factors. No error variances. They <strong>cancel</strong>.</p>
+<p>The effects depend on <span class="math inline">\((\alpha, \rho, \mathbf{w}, W)\)</span> and the observed data. <strong>Nothing else.</strong></p>
 </div>
 <div class="fragment">
-<p>Instead it is confined to one scalar — <span class="math inline">\(\rho\)</span> — where we can see it, measure it, and report it.</p>
+<p>So the model’s weak identification has exactly one address: <span class="math inline">\(\rho\)</span>.</p>
 <p><span class="takeaway fragment">Weak identification you can locate is a manageable problem. Weak identification spread across a nuisance block is not.</span></p>
 </div>
 </section>
 <section id="one-call-runs-both-samplers-and-post-processes-the-spillovers" class="slide level2 center">
 <h2>One call runs both samplers and post-processes the spillovers</h2>
+<aside class="notes">
+<p>Everything spatial — w, W, the covariates — comes off the bundled panel, so there is nothing to align by hand. Half a million iterations for a 13-year effect looks excessive, and the post spends a whole section justifying it: the ATT is stable from about 100,000 draws onward, but the spatial parameter needs roughly five times that before its effective sample size reaches anything reportable. The rho-equals-zero comparator falls out of the same fit, which is why Stage 2 costs no extra MCMC at all.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-code-line-numbers="1-6|8-11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>result <span class="op">=</span> SCSPILL({</span>
 <span id="cb3-2"><a href=""></a>    <span class="op">**</span>panel.config_kwargs(),</span>
 <span id="cb3-3"><a href=""></a>    <span class="st">"m_iter"</span>: <span class="dv">500_000</span>,</span>
@@ -562,7 +651,7 @@
 <section id="the-two-parameters-leaning-on-one-contiguity-channel-are-the-hard-ones" class="slide level2 smaller center">
 <h2>The two parameters leaning on one contiguity channel are the hard ones</h2>
 <aside class="notes">
-<p>Read the ESS column top to bottom. Sigma-squared has 204,000, the donor weights 10,000 to 26,000, rho has 137 and the price coefficient 388. Same chain. The point is not that the software is bad — it is that rho is the only parameter drawn by random-walk Metropolis rather than from a closed-form conditional, so its draws are heavily autocorrelated. Its posterior is actually tight: standard deviation 0.043 on a support 1.9 wide. Slow mixing is not the same thing as weak identification, and the distinction matters for what you tell a referee.</p>
+<p>Read the effective-sample-size column top to bottom. Sigma-squared has 204,000, the donor weights 10,000 to 26,000, rho has 137 and the price coefficient 388. Same chain. The point is not that the software is bad — it is that rho is the only parameter drawn by random-walk Metropolis rather than from a closed-form conditional, so its draws are heavily autocorrelated. Its posterior is actually tight: standard deviation 0.043 on a support 1.9 wide. Slow mixing is not the same thing as weak identification, and the distinction matters for what you tell a referee.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -578,7 +667,7 @@
 <thead>
 <tr class="header">
 <th>Parameter</th>
-<th style="text-align: right;">ESS (from 250,000 draws)</th>
+<th style="text-align: right;">Effective sample size (from 250,000 draws)</th>
 </tr>
 </thead>
 <tbody>
@@ -605,25 +694,46 @@
 <p><span class="takeaway fragment">Slow mixing is not weak identification, and neither is a defect in the software.</span></p>
 </div>
 </section>
-<section id="what-the-library-draws-for-you" class="slide level2 center">
-<h2>What the library draws for you</h2>
-
-<img data-src="../python_sc_bayes_spatial_07_stage3_panel.png" class="quarto-figure quarto-figure-center r-stretch" alt="The scspill package's own three-panel summary of the spatial fit: observed against counterfactual, the treatment effect on the treated, and the top eight spillover paths."><p><span class="takeaway fragment"><code>result.plot(kind="panel")</code> — observed vs counterfactual, the effect path, and the eight largest spillovers.</span></p>
-</section>
-<section id="almost-the-entire-spillover-lands-on-one-state" class="slide level2 center">
+<section id="almost-the-entire-spillover-lands-on-one-state" class="slide level2 smaller center">
 <h2>Almost the entire spillover lands on one state</h2>
-
-<img data-src="../python_sc_bayes_spatial_10_spillover_map.png" class="quarto-figure quarto-figure-center r-stretch" alt="A tile cartogram of the United States shaded by estimated spillover; Nevada is far darker than every other state and the field is otherwise pale."><p><span class="takeaway fragment">Linear colour scale. The concentration is the finding, not a rendering artefact.</span></p>
-</section>
-<section id="nevada-absorbs-eleven-times-the-next-largest-donor" class="slide level2 center">
-<h2>Nevada absorbs eleven times the next-largest donor</h2>
-
-<img data-src="../python_sc_bayes_spatial_11_spillover_bars.png" class="quarto-figure quarto-figure-center r-stretch" alt="Horizontal bars for the eight largest spillovers: Nevada at −5.50 packs, then Idaho and Utah near −0.49, then a steep drop to near zero."><p><span class="takeaway fragment">Nevada −5.50 · Idaho −0.49 · Utah −0.49 · everything else is noise.</span></p>
+<aside class="notes">
+<p>Walk the map first: on a linear colour scale almost every tile sits at the pale end, because one state absorbs an order of magnitude more than any other. The concentration is the finding, not a rendering artefact. Then the bars: Nevada at minus 5.50, then Idaho and Utah at about minus 0.49 — the two states that border Nevada, one ring further out — and everything beyond that second ring is two orders of magnitude smaller again. One limitation to state plainly rather than bury: scspill returns the effects panel as posterior means, so no donor-level spillover has a credible interval. “Noise” here means relative magnitude, not a tail probability. The interval evidence is on rho, not on Nevada. And slice from 1988 onward — the pre-treatment rows are fit residuals, not causal spillovers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p><img data-src="../python_sc_bayes_spatial_10_spillover_map.png" alt="A tile cartogram of the United States shaded by estimated spillover; Nevada is far darker than every other state and the field is otherwise pale."></p>
+</div><div class="column" style="width:48%;">
+<p><img data-src="../python_sc_bayes_spatial_11_spillover_bars.png" alt="Horizontal bars for the eight largest spillovers: Nevada at −5.50 packs, then Idaho and Utah near −0.49, then a steep drop to near zero."></p>
+</div></div>
+<p><span class="takeaway fragment">Nevada −5.50 · Idaho −0.49 · Utah −0.49 · every other donor under 0.06 packs.</span></p>
 </section>
 <section id="the-leak-runs-the-opposite-way-to-the-obvious-hypothesis" class="slide level2 center" data-background-color="#141413">
 <h2>The leak runs the <em>opposite</em> way to the obvious hypothesis</h2>
 <p><span class="bignum">−5.50</span></p>
-<p><span class="bignum-label">Nevada’s sales came in <strong>below</strong> its no-treatment path. Not cheap cigarettes crossing the border — the anti-smoking campaign crossing the same border.</span></p>
+<p><span class="bignum-label">Nevada’s sales came in <strong>below</strong> its no-treatment path. That looks like the campaign crossing the border, not the cigarettes — but the estimate cannot name the mechanism.</span></p>
+<aside class="notes">
+<p>This is the sign surprise, and it is worth pausing on. The prior expectation was cross-border shopping raising Nevada’s sales; the estimate says they came in below their no-treatment path. Be careful not to over-claim: the post explicitly declines to name the dominant channel — advertising, media, social norms crossing a border that tax arbitrage also crosses — because nothing in the estimate identifies which. What it does say is that the net effect on Nevada ran the same way as the effect on California, not against it. Remember too that this number is a posterior mean with no interval around it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="which-means-the-classical-estimate-was-biased-toward-zero" class="slide level2 smaller center">
 <h2>Which means the classical estimate was biased <em>toward zero</em></h2>
@@ -677,17 +787,26 @@
 </tbody>
 </table>
 <div class="fragment">
-<p>Purged minus contaminated: <strong>−1.186</strong>. The identity holds to 0.06 packs — the plug-in decomposition uses <span class="math inline">\(\widehat{\alpha}\)</span> alone, the purged ATT averages over paired <span class="math inline">\((\alpha, \rho)\)</span> draws.</p>
+<p>Purged minus contaminated: <strong>−1.186</strong>. The identity holds to 0.06 packs.</p>
+<p>The residual is bookkeeping: the plug-in uses <span class="math inline">\(\widehat{\alpha}\)</span>; the purged ATT averages over paired draws.</p>
 <p><span class="takeaway fragment">Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect <strong>larger</strong>.</span></p>
 </div>
-</section></section>
-<section>
-<section id="does-the-interval-mean-anything" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
-<h1>Does the Interval Mean Anything?</h1>
-<p><span class="act">Act III</span></p>
 </section>
-<section id="the-r-edition-of-this-analysis-reports-the-same-effect-and-a-very-different-interval" class="slide level2 smaller center">
-<h2>The R edition of this analysis reports the same effect and a very different interval</h2>
+<section id="the-r-editions-interval-is-33-times-too-narrow-and-the-r-specification-reproduces-that-exactly" class="slide level2 smaller center">
+<h2>The R edition’s interval is 33 times too narrow — and the R specification reproduces that exactly</h2>
+<aside class="notes">
+<p>The point estimates are close. The intervals are not remotely close, and “different language” does not explain a factor of 33. scspill documents six departures from the R replication code; three have escape hatches, so the Python can be put back into the R specification and run at the R edition’s own budget of 5,000 iterations. It reproduces rho to within 0.006 and the Nevada spillover to 0.03 packs — minus 3.750 against minus 3.778 — including an effective sample size of 3. That is not a coincidence to be explained away; it is the R sampler’s behaviour, faithfully reproduced. Which means the difference is a specification difference, not a porting error.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -713,55 +832,28 @@
 </tbody>
 </table>
 <div class="fragment">
-<p>A factor of <strong>33</strong>. “Different language” does not explain that.</p>
-<p><span class="takeaway fragment"><code>scspill</code> documents six departures from the authors’ R code. Three have escape hatches — so put the Python back into the R specification and look.</span></p>
-</div>
-</section>
-<section id="reproducing-the-r-specification-reproduces-its-pathology-exactly" class="slide level2 smaller center">
-<h2>Reproducing the R specification reproduces its pathology exactly</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>beta_prior<span class="op">=</span><span class="st">"ridge"</span>        <span class="co"># departure 2</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>beta_prior<span class="op">=</span><span class="st">"ridge"</span>        <span class="co"># departure 2</span></span>
 <span id="cb4-2"><a href=""></a>propagate_alpha<span class="op">=</span><span class="va">False</span>     <span class="co"># departure 3</span></span>
 <span id="cb4-3"><a href=""></a>adapt_rho<span class="op">=</span><span class="va">False</span>           <span class="co"># departure 4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>Quantity</th>
-<th style="text-align: right;">R edition</th>
-<th style="text-align: right;">scspill, R spec</th>
-<th style="text-align: right;">Difference</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>ATT</td>
-<td style="text-align: right;">−16.590</td>
-<td style="text-align: right;">−16.286</td>
-<td style="text-align: right;">0.304</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\widehat{\rho}\)</span></td>
-<td style="text-align: right;">0.2226</td>
-<td style="text-align: right;">0.2282</td>
-<td style="text-align: right;">0.0056</td>
-</tr>
-<tr class="odd">
-<td>ESS(<span class="math inline">\(\rho\)</span>)</td>
-<td style="text-align: right;">2.93</td>
-<td style="text-align: right;">3.27</td>
-<td style="text-align: right;">0.34</td>
-</tr>
-<tr class="even">
-<td>Nevada spillover</td>
-<td style="text-align: right;">−3.750</td>
-<td style="text-align: right;">−3.778</td>
-<td style="text-align: right;">0.028</td>
-</tr>
-</tbody>
-</table>
-<p><span class="takeaway fragment">Independent code, different language, reproducing <span class="math inline">\(\widehat{\rho}\)</span> to within 0.006 — <strong>including an effective sample size of 3</strong>.</span></p>
+<p>Back in the R specification: ATT −16.286 against −16.590, <span class="math inline">\(\widehat{\rho}\)</span> 0.2282 against 0.2226, <strong>effective sample size 3.27 against 2.93</strong>.</p>
+<p><span class="takeaway fragment">Independent code, different language, reproducing the pathology — including an effective sample size of 3.</span></p>
+</div>
 </section>
-<section id="chain-length-was-never-the-problem" class="slide level2 smaller center">
-<h2>Chain length was never the problem</h2>
+<section id="chain-length-was-never-the-problem-the-interval-was-incomplete" class="slide level2 smaller center">
+<h2>Chain length was never the problem — the interval was incomplete</h2>
+<aside class="notes">
+<p>Two separable failures, and the published interval failed both. Effective sample size asks: is the interval reliable — did the chain actually explore the posterior? At an ESS of 3, no. propagate_alpha asks a different question: is the interval complete — does it carry uncertainty about which states make up synthetic California? With alpha pinned at its posterior mean, no. Running the R specification a hundred times longer fixes the first and moves the width only from 0.48 to 0.70. The other factor of eighteen is the second. For the corrected run, adaptation lands acceptance at 0.444 against the 0.44 target and an effective sample size of 137.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -794,13 +886,16 @@
 </table>
 <div class="fragment">
 <p>A hundred times the iterations widens the interval by 45%. Propagating <span class="math inline">\(\alpha\)</span> widens it by <strong>1,700%</strong>.</p>
-<p><span class="takeaway fragment">Two different failures, and they need to be told apart.</span></p>
+</div>
+<div class="fragment">
+<p><strong>Effective sample size</strong> asks whether the interval is <em>reliable</em>. <strong><code>propagate_alpha</code></strong> asks whether it is <em>complete</em>. The published interval failed <strong>both</strong>.</p>
+<p><span class="takeaway fragment">Report the effective sample size beside every credible interval, or the interval is decoration.</span></p>
 </div>
 </section>
-<section id="ess-and-completeness-are-different-questions" class="slide level2 center">
-<h2>ESS and completeness are different questions</h2>
+<section id="a-memory-layout-was-doing-part-of-the-modelling" class="slide level2 center">
+<h2>A memory layout was doing part of the modelling</h2>
 <aside class="notes">
-<p>Two separable failures, and the published interval failed both. ESS asks: is the interval reliable — did the chain actually explore the posterior? At an ESS of 3, no. propagate_alpha asks a different question: is the interval complete — does it carry uncertainty about which states make up synthetic California? With alpha pinned at its posterior mean, no. Running the R specification a hundred times longer fixes the first and moves the width only from 0.48 to 0.70. The other factor of eighteen is the second.</p>
+<p>Departure 1 is the most instructive kind of bug: the estimate simply answers a slightly different question than the one asked. Nothing crashes and nothing looks wrong. Departures 5 and 6 are different in kind — an omega-k conditional treating omega as a variance while its neighbours treated it as a precision, and an FFBS initialisation inconsistent with its own conditionals. Neither changes the California answer much, but both mean the R sampler was not converging to any posterior at all. It was converging to something, and that something had no interpretation.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -812,35 +907,23 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<p><strong>Effective sample size</strong> asks whether the interval is <em>reliable</em> — did the chain visit enough of the posterior for its quantiles to mean anything? At ESS 3, no.</p>
-<div class="fragment">
-<p><strong><code>propagate_alpha</code></strong> asks whether the interval is <em>complete</em> — does it account for everything the model is uncertain about? With <span class="math inline">\(\alpha\)</span> pinned at its posterior mean, no.</p>
-</div>
-<div class="fragment">
-<p>The published interval failed <strong>both</strong>.</p>
-<p><span class="takeaway fragment">Report the effective sample size beside every credible interval, or the interval is decoration.</span></p>
-</div>
-</section>
-<section id="one-tuning-constant-three-specifications" class="slide level2 center">
-<h2>One tuning constant, three specifications</h2>
-
-<img data-src="../python_sc_bayes_spatial_12_r_reconciliation.png" class="quarto-figure quarto-figure-center r-stretch" alt="Left: the rho chain under three specifications. Right: effective sample size for rho as a bar chart — 3 for the R edition, 3 at the R specification, 67 at the headline budget, 137 with corrected defaults."><p><span class="takeaway fragment">Adaptation lands acceptance at 0.444 against a 0.44 target, and ESS at 137.</span></p>
-</section>
-<section id="a-memory-layout-was-doing-part-of-the-modelling" class="slide level2 center">
-<h2>A memory layout was doing part of the modelling</h2>
 <p>Departure 1: the covariate array was indexed as <span class="math inline">\((N, T, K)\)</span> when it was laid out as <span class="math inline">\((T, N, K)\)</span>.</p>
 <div class="fragment">
 <p>Nothing crashes. Nothing looks wrong. Each state’s price is silently matched to another state’s sales.</p>
 </div>
 <div class="fragment">
-<p>It is also the one departure with <strong>no escape hatch worth using</strong>: dropping the covariates entirely is the only way to sidestep it, and that trades one specification error for another.</p>
+<p>It is also the one departure with <strong>no escape hatch worth using</strong>.</p>
+<p>The only way out is to drop the covariates — one specification error for another.</p>
+</div>
+<div class="fragment">
+<p>Departures 5 and 6 were different: nobody spotted them. A <strong>Geweke joint-distribution test</strong> did.</p>
 <p><span class="takeaway fragment">The most dangerous bugs are the ones that return plausible numbers.</span></p>
 </div>
 </section>
-<section id="two-departures-were-found-by-a-test-not-by-inspection" class="slide level2 center">
-<h2>Two departures were found by a test, not by inspection</h2>
+<section id="artefacts-shrink-errors-do-not" class="slide level2 center">
+<h2>Artefacts shrink; errors do not</h2>
 <aside class="notes">
-<p>Neither departure 5 nor 6 changes the California answer much. Both mean the R sampler was not converging to any posterior at all.</p>
+<p>Explain the test before reading the figure. Draw parameters from the prior and simulate data from them: that is the marginal-conditional route to the joint distribution of parameters and data. Or simulate data once and then run one Gibbs sweep, repeatedly: that is the successive-conditional route. If every conditional in the sampler is correct the two routes target the same joint distribution, so any statistic’s mean must agree. The documentation’s rule for reading a failure is the one to quote: a genuine incoherence holds its position or grows as the chain lengthens, while a mixing artefact flips sign and shrinks. Here the maximum absolute z falls from 3.48 to 2.50, six of the eight statistics shrink, and the flag count goes from one to zero. A single Geweke run tells you almost nothing; two runs at different scales tell you which kind of failure you have.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -852,15 +935,6 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<p>Draw parameters from the prior, simulate data → the <em>marginal-conditional</em> joint distribution.</p>
-<p>Simulate data, then run one Gibbs sweep, repeatedly → the <em>successive-conditional</em> joint distribution.</p>
-<div class="fragment">
-<p>If every conditional is correct, these are the <strong>same distribution</strong>. Any statistic’s mean must agree.</p>
-<p><span class="takeaway fragment">That is how an <span class="math inline">\(\omega_k\)</span> conditional treating <span class="math inline">\(\omega\)</span> as a variance, while its neighbours treated it as a precision, came to light.</span></p>
-</div>
-</section>
-<section id="artefacts-shrink-errors-do-not" class="slide level2 center">
-<h2>Artefacts shrink; errors do not</h2>
 
 <img data-src="../python_sc_bayes_spatial_14_geweke.png" class="quarto-figure quarto-figure-center r-stretch" alt="Geweke joint-distribution test z-scores at two chain lengths, with the maximum falling from 3.48 to 2.50 as the chain grows tenfold."><p><span class="takeaway fragment">max <span class="math inline">\(|z|\)</span> falls 3.48 → 2.50 and rejections go 1 → 0 as the chain grows tenfold. That is slow mixing, not an incoherent conditional.</span></p>
 </section>
@@ -884,14 +958,45 @@
 </section>
 <section id="the-strongest-objection-and-the-answer" class="slide level2 center">
 <h2>The strongest objection — and the answer</h2>
+<aside class="notes">
+<p>Deliver the objection as the strongest version of itself, then concede the part that is true. The SAR layer is a model of how outcomes co-move across a fixed, researcher-supplied graph, and swapping contiguity for a different graph would produce different spillovers. The post says exactly that in its discussion. The response is not that the assumption is harmless — it is that the alternative is rho equals zero, imposed silently and never reported. Making the assumption a parameter is what lets the data reject it. If pressed further, the honest concession is the identifying assumption itself: that some fixed unconstrained combination of donors reproduces California exactly. It is strong, and it is untestable.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <p><span class="objection"><strong>Objection.</strong> The SAR layer does not make anything causal that was not causal before. You supplied the graph; a different graph gives different spillovers.</span></p>
 <div class="fragment">
 <p><span class="rebuttal"><strong>Response.</strong> Correct, and the post says so. But the alternative is not “no assumption” — it is <span class="math inline">\(\rho = 0\)</span>, imposed silently and never reported. Making the assumption a parameter is what lets the data reject it.</span></p>
 <p><span class="takeaway fragment">The choice is not between assuming and not assuming. It is between an assumption you can test and one you cannot.</span></p>
 </div>
+</section></section>
+<section>
+<section id="what-survives-every-relaxation" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>What Survives Every Relaxation</h1>
+<p><span class="act">Act III</span></p>
 </section>
-<section id="every-estimator-targeting-this-att-agrees-on-the-sign-and-the-scale" class="slide level2 center">
-<h2>Every estimator targeting this ATT agrees on the sign and the scale</h2>
+<section id="every-stage-of-the-ladder-agrees-on-the-sign-and-the-scale" class="slide level2 center">
+<h2>Every stage of the ladder agrees on the sign and the scale</h2>
+<aside class="notes">
+<p>Read the ladder from the bottom up, then look at the hollow diamonds. Every stage lands between minus 15.7 and minus 18.8 packs — two libraries, four prior structures, one spatial layer and an independent third implementation — and the maximum disagreement with the R edition is 0.278 packs across four comparable stages. Do not over-claim beyond the figure: widening to the six comparable benchmark estimators in the post’s catalogue section stretches the range to minus 16.3 and minus 26.3, a wider band than this ladder shows, though still without changing the sign.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
 <img data-src="../python_sc_bayes_spatial_18_att_ladder.png" class="quarto-figure quarto-figure-center r-stretch" alt="Point estimates and credible intervals for every stage of the ladder, with hollow diamonds marking the R edition's published values."><p><span class="takeaway fragment">Two libraries, four prior structures, one spatial layer, one independent third implementation.</span></p>
 </section>
@@ -899,17 +1004,8 @@
 <h2>What Proposition 99 cost, and who else paid</h2>
 <p><span class="bignum">−16.87</span></p>
 <p><span class="bignum-label">packs per capita per year for California — and −5.50 for a state that never voted on it</span></p>
-</section>
-<section id="what-to-take-away" class="slide level2 center">
-<h2>What to take away</h2>
-<ol type="1">
-<li><strong>The effect is robust.</strong> Every relaxation lands between −15.7 and −18.8 packs.</li>
-<li><strong>The donor pool is not.</strong> The same data support 5 active donors or 25–26, depending entirely on whether sparsity is a constraint or a prior.</li>
-<li><strong>SUTVA is false here</strong> — and the correction is only 1.19 packs for California (1.51 on the simplex weights). It is 5.50 for Nevada.</li>
-<li><strong>The interval was the real error</strong>, not the point estimate. Two distinct failures, one diagnosable by ESS and one by asking what the interval is conditioning on.</li>
-</ol>
 <aside class="notes">
-<p>Land these four and stop. The effect is robust and the classical estimate was fine for the headline number. The donor pool composition is not robust at all, and sentences of the form ‘synthetic California is mostly Utah and Nevada’ are closer to artefacts than findings. SUTVA is false here, but the correction is modest for California and large for Nevada — which is a different question, and the one classical synthetic control could not ask. And the interval, not the point estimate, was where the real error lived.</p>
+<p>Two numbers, one policy. Minus 16.87 packs per capita per year for California once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for how the policy gets described: reporting only California’s number understates Proposition 99’s total public-health footprint, because a neighbouring state also smoked less.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -922,8 +1018,43 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="materials" class="slide level2 smaller center">
-<h2>Materials</h2>
+<section id="four-things-survive-this-deck" class="slide level2 center">
+<h2>Four things survive this deck</h2>
+<ol type="1">
+<li><strong>The effect is robust</strong> — −15.7 to −18.8 packs, every relaxation.</li>
+<li><strong>The donor pool is not</strong> — 5 donors or 26, depending on the constraint.</li>
+<li><strong>SUTVA is false here</strong> — 1.19 packs for California, 5.50 for Nevada.</li>
+<li><strong>The interval was the real error</strong>, not the point estimate.</li>
+</ol>
+<aside class="notes">
+<p>Land these four and stop. The effect is robust and the classical estimate was fine for the headline number. The donor pool composition is not robust at all, and sentences of the form ‘synthetic California is mostly Utah and Nevada’ are closer to artefacts than findings. SUTVA is false here, but the correction is modest for California and large for Nevada — which is a different question, and the one classical synthetic control could not ask. On the simplex weights the California correction is 1.51 rather than 1.19, because the constraint pushed more weight onto the one leaking donor. And the interval, not the point estimate, was where the real error lived: two distinct failures, one diagnosable by effective sample size and one by asking what the interval is conditioning on.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="everything-here-is-runnable-today" class="slide level2 smaller center">
+<h2>Everything here is runnable today</h2>
+<aside class="notes">
+<p>Everything on this list ships with the post itself. The Colab notebook and the Quarto project reproduce every number in this deck; the web app lets you move rho by hand and watch the counterfactual respond; the data dictionary documents the panel and both spatial objects. Both packages are young, so both are pinned — one to a release, one to a commit — and the numbers are reproducible only under those pins.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <ul>
 <li><strong>Full tutorial</strong> — carlos-mendez.org/post/python_sc_bayes_spatial</li>
 <li><strong>R edition</strong> — carlos-mendez.org/post/r_sc_bayes_spatial</li>
@@ -934,8 +1065,8 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>pip install <span class="st">"scspill[numba]==0.2.1"</span></span>
 <span id="cb5-2"><a href=""></a>pip install <span class="st">"mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15f168bb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section></section>
-<section id="let-the-data-choose-the-donors-let-the-map-tell-you-who-else-was-treated-and-let-the-effective-sample-size-tell-you-whether-the-interval-means-anything." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
-<h1>Let the data choose the donors, let the map tell you who else was treated, and let the effective sample size tell you whether the interval means anything.</h1>
+<section id="let-the-data-choose-the-donors-let-the-map-say-who-else-was-treated-and-let-the-ess-say-whether-the-interval-means-anything." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Let the data choose the donors, let the map say who else was treated, and let the ESS say whether the interval means anything.</h1>
 
 </section>
     </div>

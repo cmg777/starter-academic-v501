@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>Regional Inequality from Outer Space</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,6 +28,72 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -138,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section>
 <section id="the-problem" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -147,10 +213,12 @@
 </section>
 <section id="almost-every-country-reports-one-gdp-number-and-nothing-about-its-insides" class="slide level2 center">
 <h2>Almost every country reports one GDP number — and nothing about its insides</h2>
-<p>A government can tell you its national GDP, but rarely the income of each province inside it.</p>
+<p>Every country reports one GDP number.</p>
+<p>Almost none report the income of each province inside it.</p>
 <div class="fragment">
-<p>Two countries with the <em>same</em> national income can look completely different on the inside — one a single booming capital ringed by poor hinterlands, the other broadly shared. <strong>Without subnational data, that gap is invisible.</strong></p>
+<p><strong>That gap is invisible without subnational data.</strong></p>
 <aside class="notes">
+<p>Two countries with the same national income can look completely different inside — one a booming capital ringed by poor hinterlands, the other broadly shared.</p>
 <p>The motivating tension. National accounts are universal; subnational accounts are a luxury most statistical offices cannot afford. So the question “is growth shared across a country’s territory?” is unanswerable for most of the world. The whole deck is about manufacturing the missing data from a source every country has — light at night.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -167,7 +235,8 @@
 </section>
 <section id="the-idea-let-satellites-do-the-accounting-brighter-places-are-on-average-richer" class="slide level2 center">
 <h2>The idea: let satellites do the accounting — brighter places are, on average, richer</h2>
-<p>Lessmann and Seidel (2017) use <strong>nighttime light</strong> as a stand-in for income: electricity, roads, and activity all glow, so brightness correlates with output where statistics do not exist.</p>
+<p>Lessmann and Seidel (2017) use <strong>nighttime light</strong> as a stand-in for income.</p>
+<p>Electricity, roads and activity all glow — so brightness tracks output where statistics do not.</p>
 <div class="fragment">
 <p>Their pipeline, rebuilt here in Python end to end:</p>
 <ul>
@@ -190,8 +259,8 @@
       }</style></aside>
 </div>
 </section>
-<section id="where-were-going" class="slide level2 center">
-<h2>Where we’re going</h2>
+<section id="four-steps-calibrate-construct-curve-drivers" class="slide level2 center">
+<h2>Four steps: calibrate, construct, curve, drivers</h2>
 <ul>
 <li class="fragment"><strong>Calibration</strong> — turn light into income; how good is the fit?</li>
 <li class="fragment"><strong>Construction</strong> — five inequality indices from scratch; why population weights matter</li>
@@ -211,7 +280,7 @@
 <li class="fragment"><strong>Country panel</strong> — 180 countries, 1992–2012, each carrying inequality indices built from its regions</li>
 <li class="fragment"><strong>Two units, kept straight</strong> — predict at the <em>region</em> level, measure inequality at the <em>country</em> level</li>
 </ul>
-<p><span class="takeaway fragment">Mean regional Gini <span class="math inline">\(= 0.064\)</span> (SD <span class="math inline">\(0.033\)</span>, max <span class="math inline">\(0.163\)</span>): most countries are internally fairly equal, with a long unequal tail.</span></p>
+<p><span class="takeaway fragment">Mean regional Gini <span class="math inline">\(= 0.064\)</span> (max <span class="math inline">\(0.163\)</span>): most countries are internally fairly equal, with a long unequal tail.</span></p>
 <aside class="notes">
 <p>Keeping the two units straight is the single most common source of confusion. The region-year files are the training set for the lights→income model; the country-year files are where the Kuznets and determinant regressions live. The wide income range across countries is what lets us see the whole curve.</p>
 <style type="text/css">
@@ -229,8 +298,9 @@
 <section id="light-becomes-income-through-a-calibrated-elasticity-net-of-national-income-and-geography" class="slide level2 center">
 <h2>Light becomes income through a calibrated elasticity, net of national income and geography</h2>
 <p><span class="math display">\[y_r = \beta_0 + \beta_1 \ell_r + \beta_2 g_c + \gamma' X_r + \mu_g + \tau_s + \varepsilon_r\]</span></p>
-<p><span class="takeaway fragment">A region’s log income <span class="math inline">\(y_r\)</span> = baseline, plus elasticity <span class="math inline">\(\beta_1\)</span> on its log light <span class="math inline">\(\ell_r\)</span>, plus a near-one-for-one adjustment <span class="math inline">\(\beta_2\)</span> for its country’s income <span class="math inline">\(g_c\)</span>, plus geography <span class="math inline">\(X_r\)</span>, world-region <span class="math inline">\(\mu_g\)</span> and satellite <span class="math inline">\(\tau_s\)</span> effects. The number we care about is <span class="math inline">\(\beta_1\)</span>.</span></p>
+<p><span class="takeaway fragment">Everything except light is a control. The number we care about is <span class="math inline">\(\beta_1\)</span>.</span></p>
 <aside class="notes">
+<p>Read the equation term by term: log regional income equals a baseline, plus the light elasticity β1 on log light, plus a near-one-for-one adjustment β2 for the country’s income, plus geography, world-region and satellite effects.</p>
 <p>Light is never credited with what national income, geography, satellite generation, or broad world region should explain — those are all controlled for. What’s left, beta-one, is the genuine subnational gradient: how much brighter maps to how much richer once scale is removed.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -244,8 +314,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-calibrated-light-elasticity-is-0.102-with-regional-income-tracking-national-income-one-for-one" class="slide level2 center" data-background-color="#141413">
-<h2>The calibrated light elasticity is 0.102, with regional income tracking national income one-for-one</h2>
+<section id="the-calibrated-light-elasticity-is-0.102-with-regional-income-tracking-national-income-almost-one-for-one" class="slide level2 center" data-background-color="#141413">
+<h2>The calibrated light elasticity is 0.102, with regional income tracking national income almost one-for-one</h2>
 <p><span class="bignum">0.102</span></p>
 <p><span class="bignum-label">random-effects light elasticity (col 7) · national-GDP elasticity <span class="math inline">\(= 0.889\)</span> · matches the paper exactly</span></p>
 <aside class="notes">
@@ -265,7 +335,8 @@
 <section id="the-predictions-hug-the-45-line-across-four-orders-of-magnitude-of-income" class="slide level2 center">
 <h2>The predictions hug the 45° line across four orders of magnitude of income</h2>
 
-<img data-src="../python_kuznets_dmsp_06_predicted_vs_observed.png" class="r-stretch quarto-figure-center"><p class="caption">Predicted vs observed log regional GDP per capita, 5,258 region-years. The scatter tracks the 45° line from the poorest regions to the richest — the calibration generalises rather than fitting one income band (<span class="math inline">\(r = 0.925\)</span>).</p><aside class="notes">
+<img data-src="../python_kuznets_dmsp_06_predicted_vs_observed.png" class="r-stretch quarto-figure-center"><p class="caption">Predicted vs observed log regional GDP per capita, 5,258 region-years (<span class="math inline">\(r = 0.925\)</span>). The fit holds from the poorest regions to the richest.</p><p><span class="takeaway fragment">The calibration generalises across the whole income range, not one band.</span></p>
+<aside class="notes">
 <p>This is the honest test of the calibration: reconstruct fitted income from the column-7 coefficients and compare to observed values. r = 0.925 across all 5,258 region-years, and crucially the fit holds across four orders of magnitude — it is not memorising one income band. That is what licenses applying these coefficients to every region on Earth, including the tens of thousands with no income statistics.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -289,9 +360,32 @@
 <p><span class="math display">\[\bar y = \frac{\sum_i w_i y_i}{\sum_i w_i}, \qquad
   p_i = \frac{w_i}{\sum_j w_j}, \qquad
   r_i = \frac{y_i}{\bar y}\]</span></p>
-<p><span class="takeaway fragment">Each country’s regional incomes <span class="math inline">\(y_i\)</span> and populations <span class="math inline">\(w_i\)</span> collapse to one number: the Gini, three generalized-entropy indices GE(<span class="math inline">\(-1\)</span>)/GE(<span class="math inline">\(0\)</span>)/GE(<span class="math inline">\(1\)</span>), and the coefficient of variation — every region counting in proportion to its people.</span></p>
+<p><span class="takeaway fragment">One function turns a country’s regions into five indices — each region counting its people.</span></p>
 <aside class="notes">
 <p>The whole measurement apparatus is one function: take a country-year’s regional incomes and populations, return all five indices. The crucial coding trap is the Gini’s absolute pairwise difference |y_i − y_j| summed over all pairs, not a product. Germany 2010 is the sanity check: 16 broadly-similar regions yield a population-weighted Gini of just 0.028 — low, as expected.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-whole-weighted-gini-is-one-line-and-np.abs-is-the-trap" class="slide level2 center">
+<h2>The whole weighted Gini is one line — and <code>np.abs</code> is the trap</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="|5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="co"># --- Step 3b: the Gini = population-weighted average gap between people --</span></span>
+<span id="cb1-2"><a href=""></a><span class="co"># y[:, None] - y[None, :] builds the full matrix of pairwise income gaps:</span></span>
+<span id="cb1-3"><a href=""></a><span class="co"># entry (i, j) is yᵢ - yⱼ. np.abs makes them |yᵢ - yⱼ|; np.outer(w, w)</span></span>
+<span id="cb1-4"><a href=""></a><span class="co"># weights each pair by both populations. Summing and normalising gives Gini.</span></span>
+<span id="cb1-5"><a href=""></a>gini <span class="op">=</span> (np.<span class="bu">abs</span>(y[:, <span class="va">None</span>] <span class="op">-</span> y[<span class="va">None</span>, :]) <span class="op">*</span> np.outer(w, w)).<span class="bu">sum</span>() <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> sw<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> mu)</span>
+<span id="cb1-6"><a href=""></a><span class="cf">return</span> <span class="bu">dict</span>(GINIW<span class="op">=</span>gini, GE_m1W<span class="op">=</span>ge_m1, GE_0W<span class="op">=</span>ge_0, GE_1W<span class="op">=</span>ge_1, COVW<span class="op">=</span>cv)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="takeaway fragment">Drop the absolute value and the Gini collapses to zero.</span></p>
+<aside class="notes">
+<p>Broadcasting does the heavy lifting: y[:, None] - y[None, :] turns a length-n vector into an n×n matrix of all pairwise differences with no Python loop, and np.outer(w, w) weights each pair by both populations. The classic hand-coded-Gini trap is forgetting np.abs — the Gini sums the <em>size</em> of each gap |y_i − y_j|, not the signed difference; without it the positive and negative gaps cancel and the index is zero.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -307,7 +401,7 @@
 <section id="population-weights-are-not-cosmetic-they-correlate-only-0.75-with-equal-weights" class="slide level2 center">
 <h2>Population weights are not cosmetic — they correlate only 0.75 with equal weights</h2>
 
-<img data-src="../python_kuznets_dmsp_07_population_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Population-weighted vs equal-weight Gini across country-years. Most points sit below the 45° line: weighting lowers measured inequality (mean gap <span class="math inline">\(-0.0034\)</span>) because tiny income-extreme regions lose influence (corr <span class="math inline">\(= 0.75\)</span>).</p><aside class="notes">
+<img data-src="../python_kuznets_dmsp_07_population_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Population-weighted vs equal-weight Gini across country-years (corr <span class="math inline">\(= 0.75\)</span>). Most points sit below the 45° line: weighting lowers measured inequality by <span class="math inline">\(0.0034\)</span> on average.</p><aside class="notes">
 <p>Equal weighting lets a tiny mining province or remote capital swing the index. Population weighting ties it to where people actually live — the policy-relevant quantity — and pulls the index down on average. The lesson is general: always report your weighting, because the same country looks more or less unequal depending on whether you count regions or people. Predicting income first also doubles how well the indices track observed inequality (Gini correlation 0.49 vs 0.21 for raw light).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -324,7 +418,7 @@
 <section>
 <section id="the-result" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
 <h1>The Result</h1>
-<p><span class="act">Act III</span></p>
+<p><span class="act">Act II</span></p>
 </section>
 <section id="with-country-and-period-fixed-effects-the-regional-kuznets-curve-is-an-n-not-a-single-hump" class="slide level2 center">
 <h2>With country and period fixed effects, the regional Kuznets curve is an N — not a single hump</h2>
@@ -379,6 +473,7 @@
 <li class="fragment"><strong>Middle income</strong> — lagging regions catch up; inequality <em>falls</em></li>
 <li class="fragment"><strong>The very richest</strong> — agglomeration re-concentrates; a faint <em>rise</em></li>
 </ul>
+<p><span class="takeaway fragment">Up, then down, then faintly up — a description, not a policy lever.</span></p>
 <aside class="notes">
 <p>The scatter is wide — development explains the shape but leaves plenty of country-specific variation, which the determinants try to name. The estimand is a within-country conditional association, not a causal effect: fixed effects strip time-invariant confounders, but there is no treatment and no exogenous variation in development. Read the curve as description, not a policy lever.</p>
 <style type="text/css">
@@ -396,14 +491,14 @@
 <section>
 <section id="the-drivers" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
 <h1>The Drivers</h1>
-<p><span class="act">Act III</span></p>
+<p><span class="act">Act II</span></p>
 </section>
-<section id="beyond-income-ethnic-inequality-is-the-strongest-driver-by-far" class="slide level2 center" data-background-color="#141413">
-<h2>Beyond income, ethnic inequality is the strongest driver — by far</h2>
+<section id="beyond-income-ethnic-inequality-is-the-strongest-correlate-by-far" class="slide level2 center" data-background-color="#141413">
+<h2>Beyond income, ethnic inequality is the strongest correlate — by far</h2>
 <p><span class="bignum">0.071</span></p>
-<p><span class="bignum-label">ethnic-Gini coefficient (<span class="math inline">\(p &lt; 0.001\)</span>, <span class="math inline">\(N = 844\)</span>) · vs a mean regional Gini of <span class="math inline">\(0.064\)</span></span></p>
+<p><span class="bignum-label">ethnic-Gini coefficient (<span class="math inline">\(p &lt; 0.001\)</span>, <span class="math inline">\(N = 844\)</span>) · a <span class="math inline">\(0.1\)</span> higher ethnic Gini implies <span class="math inline">\(+0.007\)</span> regional Gini — about 11% of the <span class="math inline">\(0.064\)</span> mean</span></p>
 <aside class="notes">
-<p>Adding structural controls on top of the cubic + FE: countries where income differs sharply across ethnic homelands also have sharply unequal regions — the internal economic geography is bound up with the human geography. Resource rents push inequality up (+0.018, the resource curse), trade openness +0.005, aid/GDP +0.015; arable-land share pulls it down (−0.053) because dispersed farming equalizes regions. The licensed-ICRG institutional-quality column cannot be reproduced and is omitted.</p>
+<p>Adding structural controls on top of the cubic + FE: countries where income differs sharply across ethnic homelands also have sharply unequal regions — the internal economic geography is bound up with the human geography. Resource rents push inequality up (+0.018, the resource curse), trade openness +0.005, aid/GDP +0.015; arable-land share pulls it down (−0.053) because dispersed farming equalises regions. The licensed-ICRG institutional-quality column cannot be reproduced and is omitted.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -418,9 +513,45 @@
 </section>
 <section id="ranked-side-by-side-ethnicity-towers-farmland-pulls-the-other-way" class="slide level2 center">
 <h2>Ranked side by side: ethnicity towers; farmland pulls the other way</h2>
-
-<img data-src="../python_kuznets_dmsp_11_table4.png" class="r-stretch quarto-figure-center"><p class="caption">Determinants of regional inequality. Ethnic inequality (0.071) dwarfs resource rents (+0.018), aid (+0.015), and trade (+0.005); arable land (−0.053) is the largest equalizing force.</p><aside class="notes">
-<p>The sample size drifts across columns (857 down to 585) as different controls go missing, so read the columns as separate windows, not one nested model. The policy reading: name the levers most associated with the gap — resource dependence and ethnic division concentrate inequality; broad-based farming and schooling spread it.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Determinant (on top of the cubic + FE)</th>
+<th style="text-align: right;">Coefficient</th>
+<th style="text-align: left;">Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ethnic inequality</td>
+<td style="text-align: right;"><span class="key"><span class="math inline">\(+0.071\)</span></span></td>
+<td style="text-align: left;">concentrates</td>
+</tr>
+<tr class="even">
+<td>Resource rents</td>
+<td style="text-align: right;"><span class="math inline">\(+0.018\)</span></td>
+<td style="text-align: left;">concentrates</td>
+</tr>
+<tr class="odd">
+<td>Aid / GDP</td>
+<td style="text-align: right;"><span class="math inline">\(+0.015\)</span></td>
+<td style="text-align: left;">concentrates</td>
+</tr>
+<tr class="even">
+<td>Trade openness</td>
+<td style="text-align: right;"><span class="math inline">\(+0.005\)</span></td>
+<td style="text-align: left;">concentrates</td>
+</tr>
+<tr class="odd">
+<td>Arable-land share</td>
+<td style="text-align: right;"><span class="math inline">\(-0.053\)</span></td>
+<td style="text-align: left;">equalises</td>
+</tr>
+</tbody>
+</table>
+<p><span class="takeaway fragment">Ethnic division concentrates; broad-based farming spreads.</span></p>
+<aside class="notes">
+<p>The sample size drifts across columns (879 down to 573) as different controls go missing, so read the columns as separate windows, not one nested model. The policy reading: name the levers most associated with the gap — resource dependence and ethnic division concentrate inequality; broad-based farming and schooling spread it.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -441,7 +572,7 @@
 <section id="allowing-neighbours-to-share-shocks-doubles-the-standard-error-the-elasticity-still-holds" class="slide level2 center">
 <h2>Allowing neighbours to share shocks doubles the standard error — the elasticity still holds</h2>
 
-<img data-src="../python_kuznets_dmsp_12_conley_se.png" class="r-stretch quarto-figure-center"><p class="caption">Conley spatial-HAC standard errors for the clean light elasticity (<span class="math inline">\(\beta = 0.190\)</span>). The confidence interval widens with the radius — SE rises from 0.013 (iid) to 0.026/0.034/0.037 at 1,000/2,500/5,000 km — while the point estimate stays fixed and far from zero.</p><table class="caption-top">
+<img data-src="../python_kuznets_dmsp_12_conley_se.png" class="r-stretch quarto-figure-center"><p class="caption">Conley spatial-HAC standard errors for the clean light elasticity (<span class="math inline">\(\beta = 0.190\)</span>). The interval widens with the radius; the estimate does not move.</p><table class="caption-top">
 <thead>
 <tr class="header">
 <th>Inference</th>
@@ -486,8 +617,10 @@
 <h2>Does machine-assembled satellite data make this causal? No</h2>
 <p><span class="objection">Objection.</span> You absorbed country and period effects and survived a spatial-HAC test — surely development <em>causes</em> this inequality path?</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> No.&nbsp;The lights→GDP step is a <em>prediction</em> model, not a structural relationship; the Kuznets and determinant regressions are within-country <strong>associations</strong> conditional on the FE, not causal effects. The income figures are predictions — accurate on average, wrong for any single unusual region.</p>
+<p><span class="rebuttal">Response.</span> No.&nbsp;Lights→GDP is a <strong>prediction</strong> model, not a structural one.</p>
+<p>The Kuznets and determinant results are <strong>associations</strong>, not causal effects.</p>
 <aside class="notes">
+<p>And every income figure here is a prediction — accurate on average, wrong for any single unusual region.</p>
 <p>Steelman, don’t strawman. Fixed effects remove time-invariant confounders and the Conley correction fixes inference, but neither manufactures exogeneity: time-varying confounders and reverse causality remain. And every income number is a prediction. Honesty about both is what keeps the method credible — and points the next step toward IV or shift-share designs.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {

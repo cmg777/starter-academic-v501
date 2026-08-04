@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-08-02">
+  <meta name="dcterms.date" content="2026-08-04">
   <title>The Ladder and the Defaults</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">August 2, 2026</p>
+  <p class="date">August 4, 2026</p>
 </section>
 <section>
 <section id="one-treated-unit" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -213,7 +213,7 @@
 </section>
 <section id="there-is-only-one-united-kingdom-and-it-voted-to-leave" class="slide level2 center">
 <h2>There is only one United Kingdom, and it voted to leave</h2>
-<p>On 23 June 2016, 51.9% voted to leave the European Union.</p>
+<p>On 23 June 2016, the United Kingdom voted to leave the European Union.</p>
 <div class="fragment">
 <p>To say what that decision cost, you need the United Kingdom that stayed.</p>
 </div>
@@ -237,7 +237,7 @@
 <section id="one-line-in-a-crowd" class="slide level2 center">
 <h2>One line in a crowd</h2>
 
-<img data-src="../python_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD economies, 1995-2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.</p><p><span class="takeaway fragment">24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.</span></p>
+<img data-src="../python_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD economies, 1995–2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.</p><p><span class="takeaway fragment">24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.</span></p>
 <aside class="notes">
 <p>No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.</p>
 <p>The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values.</p>
@@ -277,14 +277,13 @@
       }</style></aside>
 </div>
 </section>
-<section id="where-were-going" class="slide level2 center">
-<h2>Where we’re going</h2>
+<section id="four-moves-read-the-api-climb-the-ladder-find-the-defaults-publish-the-cloud" class="slide level2 center">
+<h2>Four moves: read the API, climb the ladder, find the defaults, publish the cloud</h2>
 <ul>
-<li class="fragment"><strong>Read</strong> one config dict and one result object — the entire API surface.</li>
-<li class="fragment"><strong>Map</strong> each stage of the ladder onto a specific <code>mlsynth</code> class.</li>
-<li class="fragment"><strong>Identify</strong> the three defaults that change the answer materially.</li>
-<li class="fragment"><strong>Compare</strong> the stages on a placebo tournament, and read the ranking sceptically.</li>
-<li class="fragment"><strong>Report</strong> a cloud of estimates rather than a point.</li>
+<li class="fragment"><strong>Read</strong> one config dict and one result object — the whole API.</li>
+<li class="fragment"><strong>Map</strong> each stage of the ladder onto one <code>mlsynth</code> class.</li>
+<li class="fragment"><strong>Identify</strong> the three defaults that change the answer.</li>
+<li class="fragment"><strong>Compare</strong> the stages on a placebo tournament — then report a cloud, not a point.</li>
 </ul>
 <aside class="notes">
 <p>Four acts. Act I is the problem. Act II climbs the ladder — this is the longest stretch and the most code. Act III is where the deck earns its title: the defaults. Act IV asks which stage to choose and how confident we are allowed to be about the answer.</p>
@@ -404,6 +403,7 @@
 <span id="cb1-3"><a href=""></a>                unitid<span class="op">=</span><span class="st">"country"</span>, time<span class="op">=</span><span class="st">"tt"</span>, display_graphs<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>extra)</span>
 <span id="cb1-4"><a href=""></a></span>
 <span id="cb1-5"><a href=""></a>res <span class="op">=</span> VanillaSC(cfg(<span class="dv">96</span>, inference<span class="op">=</span><span class="va">False</span>)).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Estimand throughout: the ATT for the UK at one quarter, <span class="math inline">\(\tau_t = Y_{\text{UK},t}(1) - Y_{\text{UK},t}(0)\)</span>.</p>
 <p><span class="comment"><code>treat</code> means <em>under treatment right now</em>, not <em>ever treated</em>.</span></p>
 <p><span class="takeaway fragment">Every later code block is one line, because <code>cfg</code> already did the work.</span></p>
 <aside class="notes">
@@ -453,7 +453,7 @@
 </tr>
 <tr class="even">
 <td><code>.weight_vector</code></td>
-<td>dense array over the donor pool</td>
+<td>dense array of <code>donor_weights.values()</code></td>
 </tr>
 <tr class="odd">
 <td><code>.pre_rmse</code></td>
@@ -461,7 +461,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">Learn these seven and you can read the output of any effect estimator in the library without opening its documentation.</span></p>
+<p><span class="takeaway fragment">Learn these seven and you can read any estimator in the library — no docs needed.</span></p>
 <aside class="notes">
 <p>Two traps behind the convenience. <code>len(result.donor_weights)</code> is 9 here, not 23 — mlsynth returns only the non-zero weights, so do not treat that dictionary as a dense vector. And <code>method_details.method_name</code> reports which backend the “auto” setting actually resolved to, which is precisely the information you need when comparing against another implementation. Come back to that on the solver slide.</p>
 <style type="text/css">
@@ -522,8 +522,9 @@
 <section id="indistinguishable-until-2016-then-persistently-below" class="slide level2 center">
 <h2>Indistinguishable until 2016, then persistently below</h2>
 
-<img data-src="../python_sc_dsc_sdid_04_sc_fit_gap.png" class="r-stretch quarto-figure-center"><p class="caption">UK log real GDP against its synthetic control (top) and the gap between them (bottom), shaded orange after the referendum.</p><p><span class="takeaway fragment">The synthetic UK is roughly a fifth Hungary, a fifth the United States, a fifth Japan, a sixth Canada and an eighth Norway.</span></p>
+<img data-src="../python_sc_dsc_sdid_04_sc_fit_gap.png" class="r-stretch quarto-figure-center"><p class="caption">UK log real GDP against its synthetic control (top) and the gap between them (bottom), shaded orange after the referendum.</p><p><span class="takeaway fragment">The synthetic UK: a fifth Hungary, a fifth the US, a fifth Japan — plus Canada and Norway.</span></p>
 <aside class="notes">
+<p>The two smaller shares are a sixth Canada and an eighth Norway; fourteen of the twenty-three donors get nothing at all.</p>
 <p>The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -563,6 +564,7 @@
 <p><span class="math display">\[\hat\tau_t = \Big( Y_{\text{UK},t} - \sum_j \hat\omega_j Y_{j,t} \Big) - \sum_{s \le T_0} \hat\lambda_s \Big( Y_{\text{UK},s} - \sum_j \hat\omega_j Y_{j,s} \Big)\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>sdid <span class="op">=</span> SDID(cfg(<span class="dv">96</span>, zeta<span class="op">=</span><span class="fl">0.0</span>, vce<span class="op">=</span><span class="st">"placebo"</span>, B<span class="op">=</span><span class="dv">500</span>)).fit()   <span class="co"># 2.80%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="comment">The gap at the evaluation quarter, minus the <span class="math inline">\(\lambda\)</span>-weighted average gap before it.</span></p>
+<p><span class="takeaway fragment">DSC treats all 86 pre-treatment quarters alike. SDID does not.</span></p>
 <aside class="notes">
 <p>SDID solves the transposed version of the same problem: which blend of quarters, judged across all donors, best predicts the treatment quarter. DSC still treats all 86 pre-treatment quarters as equally informative; SDID does not.</p>
 <p>Note the standard error already: 0.0264 against a point estimate of 0.0280, which gives a confidence interval that comfortably contains zero and a placebo p-value of 0.20. Hold that thought until the objection slide.</p>
@@ -601,7 +603,7 @@
 <section id="flat-before-negative-after" class="slide level2 center">
 <h2>Flat before, negative after</h2>
 
-<img data-src="../python_sc_dsc_sdid_07_sdid_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">SDID event study by quarters since the referendum, with a 95% placebo confidence band.</p><p><span class="takeaway fragment">Pre-treatment effects average <span class="math inline">\(+0.0021\)</span>, post-treatment <span class="math inline">\(-0.0281\)</span> — a falsification test the single ATT number cannot give you, for the cost of one extra line.</span></p>
+<img data-src="../python_sc_dsc_sdid_07_sdid_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">SDID event study by quarters since the referendum, with a 95% placebo confidence band.</p><p><span class="takeaway fragment">Before: <span class="math inline">\(+0.0021\)</span>. After: <span class="math inline">\(-0.0281\)</span>. A falsification test for one extra line of code.</span></p>
 <aside class="notes">
 <p><code>result.event_study</code> is aggregated alongside the headline ATT, which the R packages on this ladder do not do. The flat pre-treatment path is the part that matters: it is evidence about the design rather than about the effect, and it is the kind of thing a reader will ask for.</p>
 <style type="text/css">
@@ -651,28 +653,10 @@
 <section id="five-estimators-essentially-the-same-five-countries" class="slide level2 center">
 <h2>Five estimators, essentially the same five countries</h2>
 
-<img data-src="../python_sc_dsc_sdid_09_donor_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights under SC, DSC, SDID, MASC and augmented SC across the donor pool; the shaded region marks negative weights.</p><p><span class="takeaway fragment">Hungary, the United States, Japan, Canada and Norway carry 87-91% of the counterfactual under every method. Only ASCM ever goes negative.</span></p>
+<img data-src="../python_sc_dsc_sdid_09_donor_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights under SC, DSC, SDID, MASC and augmented SC across the donor pool; the shaded region marks negative weights.</p><p><span class="takeaway fragment">Five countries carry 83–92% of the counterfactual under every method. Only ASCM ever goes negative.</span></p>
 <aside class="notes">
 <p>Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between stages is not a disagreement about which countries resemble the UK.</p>
-<p>MASC spreads a small uniform-looking 0.0158 across seven otherwise-zero donors — that is the matching component showing through.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="the-paths-agree-until-the-referendum-then-fan-apart" class="slide level2 center">
-<h2>The paths agree until the referendum, then fan apart</h2>
-
-<img data-src="../python_sc_dsc_sdid_10_all_counterfactuals.png" class="r-stretch quarto-figure-center"><p class="caption">Six counterfactual paths for the United Kingdom alongside the observed series, 2014-2020.</p><p><span class="takeaway fragment">Difference-in-differences is the clear outlier. The other five are hard to tell apart by eye — which is the point.</span></p>
-<aside class="notes">
-<p>This is one call: fit each stage on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.</p>
+<p>MASC spreads a small uniform-looking 0.0158 across six otherwise-zero donors — Austria, Belgium, France, the Netherlands, Spain and Sweden. That is the matching component showing through.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -742,7 +726,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">The width of the cluster — 2.73-3.04% — not any point inside it, is the honest answer.</span></p>
+<p><span class="takeaway fragment">The width of the cluster — 2.73–3.04% — not any point inside it, is the honest answer.</span></p>
 <aside class="notes">
 <p>The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.</p>
 <p>The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79), and both differ in the same direction and for the same reason. That reason is the last slide of the next act.</p>
@@ -761,7 +745,7 @@
 <section id="every-stage-exceeds-the-published-2.4" class="slide level2 center">
 <h2>Every stage exceeds the published 2.4%</h2>
 
-<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every stage’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="takeaway fragment"><strong>2.73-3.04%</strong> at end-2018 and <strong>3.83-4.19%</strong> a year later — every stage above the 2.4% previously published for this same dataset.</span></p>
+<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every stage’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="takeaway fragment"><strong>2.73–3.04%</strong> at end-2018 and <strong>3.83–4.19%</strong> a year later — every stage above the 2.4% previously published for this same dataset.</span></p>
 <aside class="notes">
 <p>The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.</p>
 <p>Also visible: the three SDID flavours sit almost on top of each other, within 0.03 percentage points. The choice among SDID variants is not where the uncertainty lives — which is worth remembering when we reach the published placebo ranking.</p>
@@ -782,8 +766,8 @@
 <h1>The Defaults</h1>
 <p><span class="act">Act III</span></p>
 </section>
-<section id="three-defaults-each-move-the-answer-more-than-the-ladder-does" class="slide level2 smaller center">
-<h2>Three defaults each move the answer more than the ladder does</h2>
+<section id="two-of-these-three-defaults-outrun-the-whole-ladder" class="slide level2 smaller center">
+<h2>Two of these three defaults outrun the whole ladder</h2>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -965,68 +949,10 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="a-name-is-a-mnemonic-not-a-definition" class="slide level2 smaller center">
-<h2>A name is a mnemonic, not a definition</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Class</th>
-<th>Is actually</th>
-<th>Not to be confused with</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>DSC</code></td>
-<td><strong>D</strong>istributional SC (Gunsilius)</td>
-<td>demeaned SC = <code>TSSC(method="MSCa")</code></td>
-</tr>
-<tr class="even">
-<td><code>DSCAR</code></td>
-<td><strong>D</strong>ynamic SC for <strong>A</strong>uto-<strong>R</strong>egressive processes</td>
-<td>either of the above</td>
-</tr>
-<tr class="odd">
-<td><code>SCD</code></td>
-<td>SC with <strong>D</strong>ifferencing</td>
-<td><code>DSC</code></td>
-</tr>
-<tr class="even">
-<td><code>DRSC</code></td>
-<td><strong>D</strong>istribution-<strong>R</strong>egression SC</td>
-<td><code>DSC</code></td>
-</tr>
-<tr class="odd">
-<td><code>MEDSC</code></td>
-<td><strong>Med</strong>iation SC</td>
-<td>demeaned SC</td>
-</tr>
-</tbody>
-</table>
-<p><span class="takeaway fragment"><code>mlsynth.DSC</code> is not this deck’s DSC — and importing it raises no error.</span></p>
-<aside class="notes">
-<p>This is the failure mode a package with 92 estimators cannot fully design away, and it is the one worth flagging to students. Every one of these classes is correct and documented. The hazard is entirely in the reader’s head — you go looking for demeaned synthetic control, you find a class called DSC, and it fits without complaint.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="a-synthetic-control-estimate-carries-its-solvers-fingerprint" class="slide level2 center">
 <h2>A synthetic control estimate carries its solver’s fingerprint</h2>
 
-<img data-src="../python_sc_dsc_sdid_03_solver_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Four mlsynth solver routes, all at 3.039%, against R’s Frank-Wolfe implementation at 3.060%.</p><p><span class="takeaway fragment">Three languages, two camps — split by optimiser, not by author. Replicate a published number and land 0.02 away? Suspect the optimiser before the data.</span></p>
+<img data-src="../python_sc_dsc_sdid_03_solver_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Four mlsynth solver routes, all at 3.039%, against R’s Frank-Wolfe implementation at 3.060%.</p><p><span class="takeaway fragment">Three languages, two camps — split by optimiser, not by author. Land 0.02 away? Suspect the solver first.</span></p>
 <aside class="notes">
 <p>The synthetic-control objective on this panel has a condition number of roughly 7.5 times ten to the fifth: a long, narrow, nearly flat valley of near-optimal weight vectors. Any optimiser has to decide when to stop walking down it.</p>
 <p>R’s synthdid walks it with Frank-Wolfe on a capped iteration budget and stops at 3.06%. mlsynth hands the identical problem to a convex solver which runs it to optimality and returns 3.039%. Stata’s sdid inherits synthdid’s Frank-Wolfe and stops in the same place — tighten its convergence and its SDID estimate drifts from 2.79% to 2.80%, which is where mlsynth already is.</p>
@@ -1060,7 +986,7 @@
 <span id="cb8-5"><a href=""></a>errors <span class="op">=</span> [placebo_one(k, h) <span class="cf">for</span> k <span class="kw">in</span> FAKE_DATES <span class="cf">for</span> h <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">4</span>)]   <span class="co"># 20 dates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment"><code>inference=False</code> and an explicit <code>m_grid</code> are what keep this to <strong>13 seconds</strong>.</span></p>
 <aside class="notes">
-<p>Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are <code>vce="noinference"</code> on SDID, <code>method="MSCa"</code> and <code>inference=False</code> on TSSC, and an explicit <code>m_grid</code> on MASC. With TSSC left to select its own variant, that step alone would be around forty minutes.</p>
+<p>Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are <code>vce="noinference"</code> on SDID, <code>method="MSCa"</code> and <code>inference=False</code> on TSSC, and an explicit <code>m_grid</code> on MASC. The post puts the cost of leaving those settings alone plainly: a two-minute loop becomes a two-hour one.</p>
 <p>This is the source paper’s answer to “which stage”, and it is a good one — but read the next slide before accepting the ranking it produces.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1189,7 +1115,7 @@
 <h2>The strongest objection — and the answer</h2>
 <p><span class="objection">Objection.</span> <span class="math inline">\(p = 0.042\)</span> is the <em>smallest attainable</em> with 24 units — the test is at its floor. And SDID’s own interval contains zero.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Five inference routes span <span class="math inline">\(p = 0.006\)</span> to <span class="math inline">\(0.042\)</span> and all reject at 5%. But the floor is real, and no estimator changes it.</p>
+<p><span class="rebuttal">Response.</span> Four p-values span <span class="math inline">\(0.006\)</span> to <span class="math inline">\(0.042\)</span>; <code>scpi</code>’s interval stops short of zero. Five routes, all rejecting at 5%. But the floor is real, and no estimator changes it.</p>
 </div>
 <div class="fragment">
 <p><span class="takeaway fragment">Which is why the deliverable is the cluster, not the point.</span></p>
@@ -1211,8 +1137,8 @@
 </section>
 <section id="what-the-referendum-cost" class="slide level2 center" data-background-color="#1a3a8a">
 <h2>What the referendum cost</h2>
-<p><span class="bignum">2.7 – 3.0%</span></p>
-<p><span class="bignum-label">UK GDP shortfall at end-2018, at every stage of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published</span></p>
+<p><span class="bignum">2.7–3.0%</span></p>
+<p><span class="bignum-label">UK GDP shortfall at end-2018, at every fitted stage of the ladder · 3.8–4.2% a year later · against 2.4% previously published</span></p>
 <aside class="notes">
 <p>That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.</p>
 <style type="text/css">
@@ -1249,8 +1175,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="materials" class="slide level2 smaller center">
-<h2>Materials</h2>
+<section id="everything-here-ships-with-the-post" class="slide level2 smaller center">
+<h2>Everything here ships with the post</h2>
 <ul>
 <li><strong>Post, notebook, Colab</strong> — <a href="./post/python_sc_dsc_sdid/">carlos-mendez.org/post/python_sc_dsc_sdid</a></li>
 <li><strong>Three cheat sheets</strong> — Python, R and Stata; each hard-codes the others’ column.</li>
