@@ -44,7 +44,23 @@ module:
     - source: content
       target: content
       lang: en
-      excludeFiles: '{es,ja,cv}/**'
+      # `post/*/references/.venv/**` is the hermetic virtualenv that a post's
+      # Quarto bundle builds when a reader (or the author) renders tutorial.qmd
+      # in place. It is gitignored, so Netlify never sees it — but a LOCAL build
+      # will, and Hugo then tries to parse files like
+      # jupyter_server/templates/404.html as front matter and the whole build
+      # dies with "unmarshal failed: invalid character '%'". The top-level
+      # `ignoreFiles` entry does not cover it, because these are page-bundle
+      # RESOURCES rather than content files. Excluding it at the mount does.
+      # `_freeze/` is Quarto's execution cache, written next to tutorial.qmd by the
+      # same in-place render. It is gitignored too, and while its JSON does not
+      # crash the build the way jupyter_server's Jinja does, it still publishes
+      # into public/ on a local build. Excluded for the same reason.
+      excludeFiles:
+        - '{es,ja,cv}/**'
+        - '**/.venv/**'
+        - '**/.quarto/**'
+        - '**/_freeze/**'
     - source: content/es
       target: content
       lang: es

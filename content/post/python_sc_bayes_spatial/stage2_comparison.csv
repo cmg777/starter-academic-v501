@@ -1,0 +1,5 @@
+method,engine,att,lo95,hi95,intercept,weight_sum,n_active,r_reference,note
+Classical SC (simplex),mlsynth.VanillaSC,-18.427748367972548,-22.07837149428839,-14.29537984722412,0.0,1.0,5,-18.46,weights on the simplex
+Bayesian SC (BSCM),mlsynth.BSCM,-18.84692718508048,-26.456826598131663,-9.98839395662983,16.86186485715624,0.7576252254775306,26,,horseshoe WITH an explicit intercept
+"Bayesian SC (scspill, rho = 0)",scspill.SCSPILL,-15.68163446071527,,,0.0,0.8852312589936706,25,-15.84,horseshoe WITHOUT an intercept; standardised
+Bayesian spatial SC,scspill.SCSPILL,-16.867982533346094,-23.044981655196505,-10.331599592461474,0.0,0.8852312589936706,25,-16.59,SAR layer active

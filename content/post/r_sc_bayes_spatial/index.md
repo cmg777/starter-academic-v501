@@ -30,6 +30,10 @@ links:
     icon_pack: fas
     name: "Quarto project (.zip)"
     url: r_sc_bayes_spatial.zip
+  - icon: python
+    icon_pack: fab
+    name: "Python edition of this post"
+    url: /post/python_sc_bayes_spatial/
   - icon: markdown
     icon_pack: fab
     name: "MD version"

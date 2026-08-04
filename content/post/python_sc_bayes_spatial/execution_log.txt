@@ -1,0 +1,446 @@
+
+==============================================================================
+0. Setup
+==============================================================================
+  python          3.13.11 (x86_64, darwin)
+  scspill         0.2.1
+  mlsynth         1.0.0  @ 15f168bb9048
+  numpy           2.3.5
+  pandas          3.0.1
+  scipy           1.17.1
+  matplotlib      3.10.8
+  numba           0.62.1
+  numpyro         0.19.0
+  scspill backend requested=auto  resolved=numba
+  BLAS threads    1
+  JAX_ENABLE_X64  1
+  seed            20251022
+  MCMC            m_iter=500,000  burn=250,000  (headline)
+  FORCE_REFIT     False     APP_DATA True
+  BENCH_TIER      full      MC_SIMS 60   MC_JOBS 1
+  cache env key   9f8346e556314dcc
+  mlsynth exports 92 names; this post touches 10 estimators
+
+==============================================================================
+1. The data
+==============================================================================
+  source          scspill.data.load_california()
+  description     California Proposition 99 tobacco panel (Abadie, Diamond & Hainmueller 2010): 39 states, 1970-2000, per-capita cigarette sales, treatment in 1988. Spatial weights are rook contiguity from the 2024 TIGER/Line state shapefile, stored unnormalized. Source: scspill replication package, nonproprietary export.
+  shape           1209 rows x 6 cols
+  units           39 states  (California treated, 38 donors)
+  period          1970-2000 (31 years)
+  outcome         cigsale (packs per capita per year)
+  covariates      ['retprice']
+  treatment time  1988
+  treated rows    13
+  missing values  0
+  pre / post      T0=18  T1=13
+  [check] treated == (state == 'California') & (year >= 1988)  OK
+  [table]  source_data.csv  (1209 rows x 6 cols)
+  [figure] python_sc_bayes_spatial_01_panel_paths.png
+
+==============================================================================
+2. The spatial structure
+==============================================================================
+  spatial_W       (38, 38)  donor-to-donor rook contiguity
+  spatial_w       (38,)  each donor's exposure to California
+  symmetric       True
+  zero diagonal   True
+  degree          min=1 max=8 mean=3.95
+  California's neighbours in the donor pool: {'Nevada': np.float64(1.0)}
+  Oregon and Arizona border California but are not in the ADH donor pool,
+  so rook contiguity leaves exactly one channel out of the treated state.
+  max |eig(Wn)|   1.0000
+  rho support     |rho| < 0.9500
+  [table]  spatial_weights_summary.csv  (38 rows x 4 cols)
+  [table]  spatial_W.csv  (38 rows x 39 cols)
+  [figure] python_sc_bayes_spatial_02_spatial_structure.png
+
+==============================================================================
+3. Stage 1 — classical simplex synthetic control (Abadie et al. 2010)
+==============================================================================
+  mlsynth.VanillaSC fitted in 0.15s
+  ATT             -18.4277 packs per capita per year
+  pre-treatment RMSE 1.5998   R^2 0.9735
+  weights sum     1.000000   active donors (>1e-4): 5
+  donor weights:
+     Utah             0.3430
+     Montana          0.2545
+     Nevada           0.2423
+     Connecticut      0.1457
+     New Hampshire    0.0144
+  top-4 share     0.9856
+  [R edition]     ATT -18.46; Utah 0.327 Nevada 0.255 Montana 0.245 Connecticut 0.148
+  bootstrap 95% CI [-22.0784, -14.2954]  (2000 replicates)
+  [table]  stage1_weights.csv  (38 rows x 3 cols)
+  [table]  stage1_gap.csv  (31 rows x 5 cols)
+  [figure] python_sc_bayes_spatial_03_stage1_fit_gap.png
+  [figure] python_sc_bayes_spatial_04_stage1_weights.png
+
+==============================================================================
+4. Stage 2a — Bayesian synthetic control (mlsynth.BSCM, horseshoe prior)
+==============================================================================
+  [cache] bscm_horseshoe  (took 9.2s when fitted)
+  [cache] bscm_spikeslab  (took 8.6s when fitted)
+  ATT             -18.8469  95% CrI [-26.4568, -9.9884]
+  pre-treatment RMSE 0.0514
+  weights sum     0.7576   active donors (|w|>0.01): 26
+  intercept       beta0 posterior mean = 16.8619
+  BSCM (Kim, Lee & Gupta 2020) fits WITH an explicit intercept, so its
+  weights are not required to sum to one and are not comparable, term by
+  term, with either the simplex weights or scspill's alpha. Section 6
+  quantifies what that intercept is worth.
+  top donors by |posterior mean|:
+     Tennessee        -0.3406
+     Nevada           +0.1922
+     Connecticut      +0.1892
+     West Virginia    +0.1645
+     Montana          +0.1324
+     Illinois         +0.0704
+  [spike-and-slab] ATT -19.2441  [-33.2313, -2.9273]
+  [spike-and-slab] donors with P(inclusion) > 0.5: 4
+  [R edition]      Stage 2 horseshoe ATT -15.84 [-21.76, -9.48]
+  [table]  stage2_bscm_posterior.csv  (38 rows x 6 cols)
+  [figure] python_sc_bayes_spatial_05_stage2_horseshoe_weights.png
+
+==============================================================================
+5. Stage 3 — Bayesian spatial synthetic control (scspill, method="sar")
+==============================================================================
+  [fit]   sar_corrected  (113.5s)
+  configuration   m_iter=500,000  burn=250,000  beta_prior=horseshoe  p_factors=1
+  ATT             -16.8680  95% CrI [-23.0450, -10.3316]  (width 12.71)
+  ATT (plug-in)   -16.8023   effect draws used: 5,000
+  ATT at rho = 0  -15.6816   <- the no-spillover comparator
+  rho             0.3161  95% CrI [0.2312, 0.4032]
+  ESS(rho)        136.8   acceptance 0.444 (target 0.44)   final step 0.00506
+  rho support     |rho| < 0.9500
+  pre-treatment RMSE 0.1859
+  [R edition]     ATT -16.59 [-16.777, -16.393], rho 0.2226, ESS 2.93
+
+  posterior summary (scspill's own diagnostics table):
+                             mean      sd     q025      q50     q975          ess  rhat_split    mcse  geweke_z
+    parameter                                                                                                  
+    rho                    0.3161  0.0430   0.2312   0.3162   0.4032     136.7806      1.0154  0.0037   -0.5704
+    sigma2                61.5905  3.4887  55.1382  61.4554  68.8232  204094.9179      1.0000  0.0077   -0.2965
+    alpha[Tennessee]      -0.2505  0.1675  -0.5833  -0.2543   0.0121   10194.7170      1.0000  0.0017   -0.4424
+    alpha[Connecticut]     0.2296  0.1672  -0.0273   0.2319   0.5575   11798.6429      1.0000  0.0015    0.0571
+    alpha[Nevada]          0.1997  0.0370   0.1191   0.2016   0.2693   25855.2663      1.0000  0.0002    1.2922
+    alpha[Montana]         0.1289  0.1299  -0.0305   0.1015   0.4114   11047.2550      1.0001  0.0012    1.2323
+    alpha[West Virginia]   0.1253  0.0954  -0.0189   0.1261   0.3072   12238.6311      1.0000  0.0009   -0.7574
+    alpha[Illinois]        0.1049  0.1159  -0.0356   0.0755   0.3810   14970.6186      1.0000  0.0009   -0.6747
+    beta[retprice]         0.3475  0.0256   0.2979   0.3472   0.3988     388.4297      1.0060  0.0013    0.6091
+
+  active donors (|alpha| > 0.01): 25
+  [table]  stage3_summary.csv  (13 rows x 4 cols)
+  [table]  stage2_alpha_posterior.csv  (38 rows x 5 cols)
+  [table]  stage3_gap.csv  (31 rows x 8 cols)
+  [figure] python_sc_bayes_spatial_07_stage3_panel.png
+  [figure] python_sc_bayes_spatial_08_stage3_weights.png
+  [figure] python_sc_bayes_spatial_09_rho_posterior.png
+
+==============================================================================
+6. Stage 2b — the rho = 0 case, read off the Stage-3 fit
+==============================================================================
+  scspill has no `rho` argument: rho is estimated, not set. But the model
+  collapses EXACTLY to a Bayesian horseshoe synthetic control at rho = 0,
+  and scspill exposes that case directly, so Stage 2b costs no extra MCMC:
+     result.effects_detail.att_scm
+     treated_counterfactual(Y0, Yc, Wn, wn, alpha_hat, rho=0.0)
+
+  ATT at rho = 0  -15.6816
+  ATT at rho-hat  -16.8680   (difference -1.1863)
+
+                          method            engine      att     lo95     hi95  intercept  weight_sum  n_active  r_reference                                         note
+          Classical SC (simplex) mlsynth.VanillaSC -18.4277 -22.0784 -14.2954     0.0000      1.0000         5       -18.46                       weights on the simplex
+              Bayesian SC (BSCM)      mlsynth.BSCM -18.8469 -26.4568  -9.9884    16.8619      0.7576        26          NaN         horseshoe WITH an explicit intercept
+  Bayesian SC (scspill, rho = 0)   scspill.SCSPILL -15.6816      NaN      NaN     0.0000      0.8852        25       -15.84 horseshoe WITHOUT an intercept; standardised
+             Bayesian spatial SC   scspill.SCSPILL -16.8680 -23.0450 -10.3316     0.0000      0.8852        25       -16.59                             SAR layer active
+  [table]  stage2_comparison.csv  (4 rows x 10 cols)
+
+  The two Bayesian synthetic controls disagree by 3.17 packs. They are not the same model:
+  BSCM carries an intercept whose posterior mean is 16.86 packs and its
+  weights sum to 0.758, not 1; scspill's Step 1 has no intercept.
+  scspill's rho = 0 case reproduces the R edition's Stage 2 (-15.84) to 0.16 packs.
+  [figure] python_sc_bayes_spatial_06_stage2_two_bayesian.png
+
+==============================================================================
+7. The spillover received by each donor
+==============================================================================
+  spillover_panel = Yc - Yc(0): observed donor outcome minus its
+  no-treatment counterfactual. Negative = the donor sold FEWER packs than
+  it would have without Proposition 99.
+  panel shape     (31, 38)  (years x donors)
+  post-1988 rows  13
+
+  top 8 donors by mean post-1988 |spillover|:
+     Nevada           -5.4995
+     Idaho            -0.4929
+     Utah             -0.4917
+     Wyoming          -0.0590
+     Montana          -0.0466
+     Colorado         -0.0311
+     South Dakota     -0.0067
+     North Dakota     -0.0061
+
+  Nevada absorbs 11.2x the next-largest donor (Idaho).
+  [R edition]  Nevada -3.75, Idaho -0.228
+  [table]  stage3_spillover_effects.csv  (38 rows x 7 cols)
+  [table]  stage3_spillover_panel.csv  (1178 rows x 3 cols)
+  [figure] python_sc_bayes_spatial_10_spillover_map.png
+  [figure] python_sc_bayes_spatial_11_spillover_bars.png
+
+==============================================================================
+8. Reconciling with the R edition
+==============================================================================
+  scspill departs from the authors' R replication code in six documented
+  ways. Three have escape hatches, so an 'R specification' mode exists;
+  three do not, so the reproduction is close but not exact.
+  [cache] sar_rspec_rbudget  (took 1.5s when fitted)
+  [fit]   sar_rspec_headline  (145.2s)
+  [fit]   mlsynth_spillsynth_sar  (1094.1s)
+
+                              spec   engine  m_iter   burn      att     lo95     hi95  att_scm  rho_hat  rho_lo  rho_hi  rho_ess  acc_rho  seconds  spill_nevada
+             R edition (published) R + Rcpp    5000   2500 -16.5900 -16.7770 -16.3930 -15.8400   0.2226  0.1685  0.2715   2.9300      NaN      NaN       -3.7500
+         scspill, R spec, R budget  scspill    5000   2500 -16.2858 -16.5914 -16.1093 -15.5001   0.2282  0.1812  0.3059   3.2742   0.2636      NaN       -3.7781
+  scspill, R spec, headline budget  scspill  500000 250000 -16.7960 -17.1598 -16.4583 -15.6816   0.3134  0.2289  0.3971  66.8628   0.2539      NaN       -5.4277
+       scspill, corrected defaults  scspill  500000 250000 -16.8680 -23.0450 -10.3316 -15.6816   0.3161  0.2312  0.4032 136.7806   0.4441      NaN       -5.4995
+           mlsynth SPILLSYNTH(sar)  mlsynth  500000 250000 -16.5248 -16.9332 -16.1764 -15.6782   0.2476     NaN     NaN 135.2324      NaN      NaN       -4.1904
+
+  notes:
+    R edition (published)              sc_spillover() from the authors' replication helpers
+    scspill, R spec, R budget          ridge beta, alpha fixed at posterior mean, fixed rho step
+    scspill, R spec, headline budget   same specification, 100x the iterations
+    scspill, corrected defaults        horseshoe beta, paired (alpha, rho) draws, adaptive rho step
+    mlsynth SPILLSYNTH(sar)            an INDEPENDENT port of the same paper, inside mlsynth
+  [table]  r_reconciliation.csv  (5 rows x 16 cols)
+
+  The R edition's 95% credible interval is 0.38 packs wide.
+  The corrected interval is 12.71 packs wide — a factor of 33.
+  ESS(rho): R 2.9 -> R spec at R budget 3.3 -> R spec at 500,000 66.9 -> corrected 136.8
+  Acceptance rate: fixed step 0.254 vs adaptive 0.444 (target 0.44)
+  [table]  scspill_departures.csv  (6 rows x 6 cols)
+
+  the six departures:
+     n                area                                                   r_code                                        scspill          escape_hatch                         changes_the_answer
+     1          Covariates scrambled by a (T,N,K) vs (N,T,K) memory-layout mismatch            a proper (T, N, K) array throughout       drop covariates                  yes — this is the big one
+     2       Prior on beta                              flat-plus-ridge conditional                          the paper's horseshoe    beta_prior="ridge"                                   modestly
+     3           ATT bands          vary rho only, alpha held at its posterior mean                      paired (alpha, rho) draws propagate_alpha=False yes — this is why the R interval is narrow
+     4         rho sampler                                    fixed Metropolis step Robbins-Monro adaptation toward 44% acceptance       adapt_rho=False                the interval, not the point
+     5       Factor scales    inconsistent omega_k conditionals; C+(0,1) hyperprior        N(0, sigma_eta^2 omega_k) with C+(0,10)                  none        little, but the sampler was invalid
+     6 FFBS initialisation           gamma_1 inconsistent with its own conditionals                           coherent gamma_0 = 0                  none        little, but the sampler was invalid
+  [figure] python_sc_bayes_spatial_12_r_reconciliation.png
+
+==============================================================================
+9. Prior and sampler validation
+==============================================================================
+  Y0_pre (18,)   Yc_pre (18, 38)   X_pre (18, 38, 1)
+  [fit]   prior_predictive  (4.9s)
+  prior predictive check (observed statistic vs its prior distribution):
+            statistic  p_value
+              yc_mean   0.9195
+           log_yc_var   0.7045
+    spatial_quadratic   0.8200
+          corr_y0_wyc   0.6105
+                  ac1   0.9960
+                  ac2   0.9985
+              pve_pc1   0.0285
+         avg_skewness   0.4950
+         avg_kurtosis   0.7320
+  [table]  prior_predictive.csv  (9 rows x 2 cols)
+  [figure] python_sc_bayes_spatial_13_prior_predictive.png
+  [cache] geweke_simple_20000  (took 14.4s when fitted)
+  geweke_test(kernel='simple', m=20,000): max |z| = 3.48, 1 statistic(s) below the Bonferroni threshold p < 0.0063
+                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval
+                  rho   -0.0046     0.0604  0.0030   0.0314 -2.0589 0.0395
+           log_sigma2    0.5747     0.4690  0.0091   0.0468  2.2195 0.0265
+              yc_mean    0.0090     0.0119  0.0106   0.0126 -0.1735 0.8622
+           log_yc_var    1.7820     1.5655  0.0107   0.0613  3.4760 0.0005
+    spatial_quadratic  -20.6000    -5.6645  5.0974   3.1656 -2.4891 0.0128
+          corr_y0_wyc    0.0011     0.0093  0.0041   0.0069 -1.0196 0.3079
+             Eta_mean    0.0047    -0.0121  0.0036   0.0088  1.7644 0.0777
+           Gamma_mean    0.0058     0.0002  0.0035   0.0093  0.5658 0.5715
+  [cache] geweke_simple_200000  (took 134.2s when fitted)
+  geweke_test(kernel='simple', m=200,000): max |z| = 2.50, 0 statistic(s) below the Bonferroni threshold p < 0.0063
+                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval
+                  rho   -0.0002     0.0106  0.0010   0.0161 -0.6676 0.5044
+           log_sigma2    0.5794     0.6135  0.0029   0.0175 -1.9175 0.0552
+              yc_mean    0.0044    -0.0100  0.0036   0.0045  2.4989 0.0125
+           log_yc_var    1.7718     1.8229  0.0034   0.0299 -1.6988 0.0894
+    spatial_quadratic  -21.7655   -24.6135  2.3974   9.8910  0.2798 0.7796
+          corr_y0_wyc    0.0009     0.0035  0.0013   0.0022 -1.0252 0.3053
+             Eta_mean    0.0007     0.0011  0.0011   0.0028 -0.1345 0.8930
+           Gamma_mean    0.0016     0.0025  0.0011   0.0027 -0.3192 0.7496
+  [table]  geweke.csv  (16 rows x 9 cols)
+
+  |z| shrinks for 6 of 8 statistics when the chain grows 20,000 -> 200,000.
+  That is the signature of a mixing artifact, not an incoherent
+  conditional: a genuine error is stable across chain lengths.
+  [figure] python_sc_bayes_spatial_14_geweke.png
+  [fit]   prior_sensitivity  (102.5s)
+  [table]  prior_sensitivity.csv  (18 rows x 11 cols)
+  prior sensitivity, posterior for rho across six settings:
+     grid_row  step_rho  rho_hi  rho_lo  b0  a0 parameter   mean     sd   q025   q975
+            0      0.05    0.99   -0.99 1.0 1.0       rho 0.8526 0.0073 0.8387 0.8672
+            1      0.05    0.99   -0.99 1.0 3.0       rho 0.7825 0.0103 0.7620 0.8025
+            2      0.05    0.99   -0.99 0.1 0.1       rho 0.7827 0.0107 0.7619 0.8040
+            3      0.05    0.50   -0.50 1.0 1.0       rho 0.4990 0.0010 0.4964 0.5000
+            4      0.01    0.99   -0.99 1.0 1.0       rho 0.8425 0.0232 0.7740 0.8638
+            5      0.05    0.99   -0.99 2.0 5.0       rho 0.8441 0.0239 0.7749 0.8662
+
+  NOTE: prior_sensitivity re-runs the SIMPLIFIED Step-2 kernel
+  (kernel='simple'), not the production sampler, so its rho level is not
+  the headline rho. What is informative is the VARIATION across rows.
+
+  across the 5 rows with an unrestricted support, varying a0 from 0.1 to 5, b0 from 0.1 to 2 and the Metropolis step
+  by a factor of 5 moves the posterior mean of rho by 0.0702 (0.7825 to 0.8526).
+  Restricting the support to [-0.5, 0.5] pins it at 0.4990, hard against the bound -- a shift of 0.3219,
+  about 5x what every conventional prior setting did combined.
+  The support IS a prior, and here it is the one that actually binds.
+  [figure] python_sc_bayes_spatial_15_prior_sensitivity.png
+
+==============================================================================
+10. Eight more Bayesian and spillover estimators from mlsynth
+==============================================================================
+  BPSCS coordinates: 2-D classical MDS of the rook graph (stress-free axes, NOT geographic)
+  [fit]   benchmark  (1456.6s)
+
+  9 of 9 returned an ATT; 0 errored; 0 skipped
+                                             label    family  comparable     att     lo95    hi95                                extra status  seconds
+               BVSS — soft simplex, spike-and-slab  bayesian        True -16.317  -33.829  -6.548                                          ok  190.984
+               MVBBSC — Martinez & Vives-i-Bastida  bayesian        True -23.126  -29.138 -17.104                                          ok   13.111
+                         BFSC — Bayesian factor SC  bayesian        True -18.102  -34.964  -0.652                                          ok  173.617
+             BPSCS — penalised SC under spillovers spillover        True -17.185  -32.042   1.803                                          ok   77.436
+  SPILLSYNTH(sar) — the same paper, inside mlsynth spillover        True -16.525  -16.933 -16.176 rho=0.2476 ESS=135.2 att_scm=-15.678     ok  994.378
+                       SPILLSYNTH(cd) — Cao & Dowd spillover       False  -2.773      NaN     NaN att_scm=-10.524 Nevada spill=+12.772     ok    0.251
+                   SpSyDiD — spatial synthetic DiD spillover       False -17.108      NaN     NaN             ate=-20.164 aite=+14.881     ok    0.019
+                     ISCM — imperfect/inclusive SC spillover       False -37.762 -136.284  60.761                                          ok    0.223
+                SPOTSYNTH — spillover-detecting SC spillover        True -26.315  -29.223 -23.865                                          ok    6.590
+
+  estimands — the column that keeps this table from lying:
+    comparable  bvss       ATT on the treated, weights shrunk toward the simplex
+    comparable  mvbbsc     ATT on the treated, hard simplex with a Bernstein-von Mises interval
+    comparable  bfsc       ATT on the treated via a latent-factor counterfactual
+    comparable  bpscs      ATT on the treated under a distance-decay prior that down-weights neighbours
+    comparable  spill_sar  spillover-adjusted ATT (Sakaguchi & Tagawa 2026)
+    NOT compar. spill_cd   spillover-adjusted ATT measured against a DEMEANED leave-one-out baseline
+    NOT compar. spsydid    three estimands at once: direct (att), total (ate), average indirect (aite)
+    NOT compar. iscm       ATT under an imperfect-fit correction, on its own normalisation
+    comparable  spotsynth  ATT after screening contaminated donors out of the pool entirely
+
+  runtime spread: 0.02s (spsydid) to 994.4s (spill_sar)
+  [table]  benchmark.csv  (9 rows x 15 cols)
+  [figure] python_sc_bayes_spatial_16_benchmark.png
+
+==============================================================================
+11. Monte Carlo — does modelling the leak pay?
+==============================================================================
+  design: N=16 (4x4 rook lattice), T0=20, T1=10, rho in (-0.6, -0.3, -0.1, 0.0, 0.1, 0.3, 0.6)
+  60 replications per cell  (420 fits), n_jobs=1
+  NOTE: mc_grid's inner sampler fixes adapt_rho=False and p=0 to mirror the
+  reference study, so this section cannot demonstrate the adaptation fix.
+  [fit]   mc_grid  (61.3s)
+   N  T0  T1  rho  method  bias_point  rmse_point  cover95_point
+  16  20  10 -0.6     SCM     -0.0848      0.4111            NaN
+  16  20  10 -0.6    BSCM     -0.1356      0.1896         0.0017
+  16  20  10 -0.6 SCSPILL     -0.0003      0.0041         0.9833
+  16  20  10 -0.3     SCM     -0.0877      0.3690            NaN
+  16  20  10 -0.3    BSCM     -0.0705      0.0995         0.0033
+  16  20  10 -0.3 SCSPILL     -0.0012      0.0069         0.9833
+  16  20  10 -0.1     SCM     -0.0080      0.3353            NaN
+  16  20  10 -0.1    BSCM     -0.0260      0.0363         0.0050
+  16  20  10 -0.1 SCSPILL     -0.0029      0.0093         0.9500
+  16  20  10  0.0     SCM      0.0069      0.3268            NaN
+  16  20  10  0.0    BSCM     -0.0000      0.0000         1.0000
+  16  20  10  0.0 SCSPILL      0.0005      0.0083         1.0000
+  16  20  10  0.1     SCM      0.0147      0.3057            NaN
+  16  20  10  0.1    BSCM      0.0285      0.0403         0.0067
+  16  20  10  0.1 SCSPILL     -0.0000      0.0113         0.9517
+  16  20  10  0.3     SCM      0.0787      0.3121            NaN
+  16  20  10  0.3    BSCM      0.0978      0.1443         0.0017
+  16  20  10  0.3 SCSPILL     -0.0015      0.0170         0.9033
+  16  20  10  0.6     SCM      0.2392      0.4709            NaN
+  16  20  10  0.6    BSCM      0.2880      0.4041         0.0000
+  16  20  10  0.6 SCSPILL      0.0033      0.0263         0.9667
+  [table]  mc_grid.csv  (21 rows x 8 cols)
+  [figure] python_sc_bayes_spatial_17_mc_bias.png
+
+==============================================================================
+12. The whole ladder, side by side
+==============================================================================
+                      stage  engine                        command      att     lo95     hi95  n_active  rho_hat  rho_ess  r_reference                                                         note   r_gap
+            1. Classical SC mlsynth           VanillaSC(cfg).fit() -18.4277 -22.0784 -14.2954       5.0      NaN      NaN       -18.46      simplex constraint; weights non-negative and sum to one  0.0323
+     2a. Bayesian SC (BSCM) mlsynth  BSCM(prior="horseshoe").fit() -18.8469 -26.4568  -9.9884      26.0      NaN      NaN          NaN  horseshoe prior on unconstrained weights, WITH an intercept     NaN
+     3. Bayesian spatial SC scspill    SCSPILL(method="sar").fit() -16.8680 -23.0450 -10.3316      25.0   0.3161 136.7806       -16.59 SAR layer on donor outcomes; SUTVA on the donor pool dropped -0.2780
+  2b. Bayesian SC (rho = 0) scspill  result.effects_detail.att_scm -15.6816      NaN      NaN      25.0      NaN      NaN       -15.84          the SAR model's rho = 0 special case; no extra MCMC  0.1584
+    3'. Bayesian spatial SC mlsynth SPILLSYNTH(method="sar").fit() -16.5248 -16.9332 -16.1764       NaN   0.2476 135.2324       -16.59                 independent implementation of the same model  0.0652
+  [table]  att_ladder.csv  (5 rows x 12 cols)
+
+  every estimator on the ladder agrees on the sign.
+  range: -18.85 to -15.68 packs (spread 3.17)
+  max |Python - R| across the 4 comparable stages: 0.278 packs
+  [figure] python_sc_bayes_spatial_18_att_ladder.png
+
+==============================================================================
+13. Assertions
+==============================================================================
+  [PASS] classical ATT within 0.20 of R's -18.46
+  [PASS] classical weights lie on the simplex
+  [PASS] Nevada is California's only donor-pool neighbour
+  [PASS] scspill rho=0 within 0.60 of R's Stage 2 -15.84
+  [PASS] scspill SAR within 0.60 of R's -16.59
+  [PASS] scspill and mlsynth SAR agree within 1.00 packs
+  [PASS] R-spec at the R budget reproduces R's ESS(rho) < 10
+  [PASS] R-spec at the R budget within 0.60 of R's ATT
+  [PASS] rho_hat lies inside the identified support
+  [PASS] adaptation improves ESS(rho)
+  [PASS] adaptation lands acceptance near the 0.44 target
+  [PASS] the corrected interval is wider than the R edition's
+  [PASS] Nevada absorbs the largest spillover
+  [PASS] Nevada's spillover is negative
+  [PASS] spillover shrinks with graph distance (Idaho < Nevada)
+  [PASS] purging the spillover deepens the estimated effect
+  [PASS] every ladder stage agrees on the sign
+  [PASS] every benchmark row has a status
+  [table]  assertions.csv  (18 rows x 2 cols)
+
+==============================================================================
+14. How long must the chain be?
+==============================================================================
+  The estimand converges long before the nuisance parameter does. This is
+  the evidence behind the headline budget: the ATT is stable from 100k on,
+  but ESS(rho) does not clear the conventional 100 until roughly 500k.
+  [cache] budget_5000  (took 1.5s when fitted)
+  [cache] budget_20000  (took 5.2s when fitted)
+  [cache] budget_50000  (took 12.2s when fitted)
+  [cache] budget_100000  (took 23.7s when fitted)
+  [cache] budget_250000  (took 58.0s when fitted)
+  [cache] budget_500000  (took 116.1s when fitted)
+   m_iter   burn      att     lo95     hi95  ci_width  att_scm  rho_hat  rho_lo  rho_hi  rho_ess  acc_rho
+     5000   2500 -16.6683 -22.7271 -10.9081   11.8190 -15.5001   0.3183  0.2157  0.4523   2.7538   0.4028
+    20000  10000 -16.9258 -23.0856 -10.5651   12.5205 -15.6770   0.3486  0.2579  0.4250   5.8160   0.4349
+    50000  25000 -17.0050 -23.2776 -10.5071   12.7704 -15.7628   0.3454  0.2714  0.4568  13.2965   0.4350
+   100000  50000 -16.8962 -23.0266 -10.6100   12.4165 -15.6717   0.3361  0.2506  0.4288  24.2151   0.4435
+   250000 125000 -16.8458 -23.0081 -10.3762   12.6319 -15.6858   0.3224  0.2271  0.4156  74.5979   0.4439
+   500000 250000 -16.8680 -23.0450 -10.3316   12.7134 -15.6816   0.3161  0.2312  0.4032 136.7806   0.4441
+  [table]  mcmc_budget_ladder.csv  (6 rows x 12 cols)
+
+  ATT range across the ladder: -17.005 to -16.668 (spread 0.337)
+  ESS(rho) range: 2.8 to 136.8
+  first budget with ESS(rho) >= 100: 500000
+  [figure] python_sc_bayes_spatial_19_mcmc_budget.png
+
+==============================================================================
+15. Web-app data
+==============================================================================
+  [table]  app_rho_sweep.csv  (31 rows x 2 cols)
+  [app]    web_app/data/results.json  (201 KB, 16 top-level keys)
+
+==============================================================================
+Done
+==============================================================================
+  figures  19
+  tables   23
+  headline ATT -16.868 [-23.045, -10.332]   rho 0.3161  ESS 137
+  Nevada spillover -5.500 packs per capita
+
+=== Script completed successfully ===

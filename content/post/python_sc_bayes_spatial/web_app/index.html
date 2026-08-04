@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Bayesian Spatial Synthetic Control — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Bayesian Spatial Synthetic Control in Python'. Move the spillover intensity, compare donor pools across three estimators, and watch what an effective sample size of 3 does to a credible interval.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Who Else Was Treated? — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Bayesian Spatial Synthetic Control in Python: California's Proposition 99</em>
+    <a class="post-link" href="/post/python_sc_bayes_spatial/" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button class="tab-btn active" role="tab" aria-selected="true"  aria-controls="tab-stages" id="btn-stages">1 · Three Stages</button>
+  <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-blend"  id="btn-blend">2 · Who's in the Blend</button>
+  <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-leak"   id="btn-leak">3 · Where It Leaked</button>
+  <button class="tab-btn"        role="tab" aria-selected="false" aria-controls="tab-trust"  id="btn-trust">4 · Can You Trust the Interval?</button>
+</nav>
+
+<main>
+
+<!-- ─────────────────────────── TAB 1 ─────────────────────────── -->
+<section class="tab-pane active" id="tab-stages" role="tabpanel" aria-labelledby="btn-stages">
+  <p class="lede">
+    Three nested estimators on the California Proposition 99 panel. Each keeps everything the
+    previous one assumed except a single restriction. Switch between them and watch the
+    counterfactual — and the uncertainty around it — change.
+  </p>
+
+  <div class="control-row">
+    <span class="control-label">Estimator</span>
+    <label><input type="radio" name="stage" value="classical" checked> Classical SC (simplex)</label>
+    <label><input type="radio" name="stage" value="bscm"> Bayesian SC (BSCM, intercept)</label>
+    <label><input type="radio" name="stage" value="scspill_rho0"> Bayesian SC (&rho; = 0)</label>
+    <label><input type="radio" name="stage" value="scspill_sar"> Bayesian spatial SC</label>
+  </div>
+
+  <div class="stat-row" id="stage-stats"></div>
+
+  <div class="chart-card">
+    <h3>California against its synthetic</h3>
+    <div id="chart-paths"></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>The gap</h3>
+    <div id="chart-gap"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <p>
+      Every estimator tracks California closely before 1988 — that is what they are fitted to do.
+      They disagree about the <em>level</em> of the counterfactual afterwards, and that disagreement
+      is the whole spread of the ATT. The BSCM path sits apart from the other three because it fits
+      an explicit intercept the others do not; it is answering a slightly different question, not
+      getting the same question wrong.
+    </p>
+  </div>
+
+  <div class="chart-card">
+    <h3>Every estimator that has been run on this panel</h3>
+    <div id="chart-forest"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Reading the forest plot honestly</h4>
+    <p>
+      Teal markers target the same estimand as the three stages. <strong>Grey markers do not.</strong>
+      <code>SPILLSYNTH(cd)</code> measures against a demeaned leave-one-out baseline,
+      <code>SpSyDiD</code> reports three effects at once, and <code>ISCM</code> uses a different
+      normalisation. Putting them in one column without that distinction would be the easiest way to
+      draw a false conclusion from a tidy-looking table. Hover any row for its estimand.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── TAB 2 ─────────────────────────── -->
+<section class="tab-pane" id="tab-blend" role="tabpanel" aria-labelledby="btn-blend">
+  <p class="lede">
+    The simplex forces donor weights to be non-negative and to sum to one. A horseshoe prior only
+    makes zero <em>likely</em>. Same data, same pre-treatment fit — a very different answer to
+    "which states resemble California?"
+  </p>
+
+  <div class="control-row">
+    <span class="control-label">Sort by</span>
+    <label><input type="radio" name="sort" value="simplex" checked> simplex weight</label>
+    <label><input type="radio" name="sort" value="alpha"> posterior mean</label>
+    <label><input type="radio" name="sort" value="name"> alphabetical</label>
+    <label class="sep"><input type="checkbox" id="show-bscm"> show BSCM weights</label>
+  </div>
+
+  <div class="stat-row" id="blend-stats"></div>
+
+  <div class="chart-card">
+    <h3>Simplex against horseshoe, all 38 donors</h3>
+    <div id="chart-dumbbell"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>The question this tab asks</h4>
+    <p>
+      Which states does the constraint <em>invent</em>, and which does it <em>erase</em>? Thirty-three
+      donors receive exactly zero under the simplex. Under the horseshoe most of them receive
+      something — and almost none of those credible intervals exclude zero. The broader pool is not
+      more informative; it is more honest about how little the pre-treatment fit pins down.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── TAB 3 ─────────────────────────── -->
+<section class="tab-pane" id="tab-leak" role="tabpanel" aria-labelledby="btn-leak">
+  <p class="lede">
+    The spatial intensity &rho; controls how much of California's policy reaches its neighbours.
+    Move it and watch the spillovers and the ATT respond. No MCMC runs in the browser: the ATT is
+    read off a 31-point sweep computed in Python, and the per-state spillovers are the fitted panel
+    at &rho;&#770; rescaled linearly in &rho;. The ranking is exact; the levels away from &rho;&#770;
+    are an approximation, not a refit.
+  </p>
+
+  <div class="control-row slider-row">
+    <label for="rho-slider">Spillover intensity &rho;</label>
+    <input type="range" id="rho-slider" min="0" max="0.6" step="0.02" value="0.32">
+    <output id="rho-out">0.32</output>
+    <button class="mini-btn" id="rho-reset">snap to &rho;&#770;</button>
+  </div>
+
+  <div class="stat-row" id="leak-stats"></div>
+
+  <div class="chart-card">
+    <h3>Where the policy leaked</h3>
+    <div id="chart-tiles"></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>The ten largest spillovers at this &rho;</h3>
+    <div id="chart-spillbars"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <p>
+      At &rho; = 0 every spillover is zero by construction and the ATT equals the plain Bayesian
+      synthetic control. As &rho; rises, Nevada moves first and moves furthest — it is the only donor
+      that touches California. Idaho and Utah follow, one step further out on the contiguity graph,
+      and everything beyond that second ring stays flat. The estimated &rho; is marked on the slider;
+      the concentration you see there is the finding, not a scaling choice.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────── TAB 4 ─────────────────────────── -->
+<section class="tab-pane" id="tab-trust" role="tabpanel" aria-labelledby="btn-trust">
+  <p class="lede">
+    The published R analysis of this model reported a 95% credible interval 0.38 packs wide. The
+    corrected configuration reports 12.7. Two different things were wrong, and this tab separates
+    them.
+  </p>
+
+  <div class="control-row slider-row">
+    <label for="thin-slider">Keep every <em>k</em>-th draw</label>
+    <input type="range" id="thin-slider" min="1" max="20" step="1" value="1">
+    <output id="thin-out">1</output>
+  </div>
+
+  <div class="stat-row" id="trust-stats"></div>
+
+  <div class="chart-card">
+    <h3>The &rho; chain: fixed step against adaptive step</h3>
+    <div id="chart-trace"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Failure one: the interval was unreliable</h4>
+    <p>
+      Thin the chain and watch what does <em>not</em> happen. Keeping every second draw halves the
+      sample and leaves the effective sample size almost unchanged — that is the point of ESS: it
+      counts information, not rows, and the draws you discard were largely redundant. What the
+      comparison does show is the gap between the two chains. A chain of a quarter of a million
+      highly correlated draws can be worth a few dozen independent ones, and quantiles computed from
+      an ESS in single digits are not posterior summaries — they describe where the chain happened to
+      wander. The orange trace is the R specification's fixed Metropolis step; the teal one is
+      Robbins–Monro adaptation targeting 44% acceptance. (Past <em>k</em> = 20 the retained sample is
+      too small for the estimator itself to be reliable, which is why the slider stops there.)
+    </p>
+  </div>
+
+  <div class="chart-card">
+    <h3>What each fix buys</h3>
+    <div id="chart-widths"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Failure two: the interval was incomplete</h4>
+    <p>
+      Running the R specification for a hundred times as many iterations widens the interval by 45%.
+      Propagating the donor-weight uncertainty instead of pinning &alpha; at its posterior mean widens
+      it by 1,700%. <strong>Effective sample size asks whether an interval is reliable; what you
+      condition on asks whether it is complete.</strong> The published interval failed both, which is
+      why it came out 33 times too narrow.
+    </p>
+  </div>
+
+  <div class="chart-card">
+    <h3>How long must the chain be?</h3>
+    <div id="chart-budget"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Why half a million draws</h4>
+    <p>
+      The estimand settles early: the ATT is stable from about 100,000 draws. The nuisance parameter
+      does not — ESS(&rho;) needs roughly five times that to clear the conventional floor of 100. The
+      binding constraint is the data, not the computer: there is exactly one contiguity channel out of
+      California, so the panel holds one state's worth of evidence about how strongly policies leak.
+    </p>
+  </div>
+
+  <details class="gloss">
+    <summary>Glossary</summary>
+    <dl>
+      <dt>Potential outcomes under interference</dt><dd>Each unit has an outcome it would show under every possible assignment of treatment across <em>all</em> units — not just its own. Classical synthetic control assumes a donor's outcome depends only on its own (untreated) status; interference is what happens when that fails.</dd>
+      <dt>ATT</dt><dd>Average treatment effect on the treated: California's observed sales minus its reconstructed no-treatment sales, averaged over 1988–2000.</dd>
+      <dt>Donor pool</dt><dd>The 38 states with no large tobacco-control programme of their own, from which the counterfactual is built.</dd>
+      <dt>Simplex</dt><dd>The constraint that weights be non-negative and sum to one. Guarantees interpolation; forces sparsity.</dd>
+      <dt>Horseshoe prior</dt><dd>A shrinkage prior with an infinite spike at zero and Cauchy tails. Makes zero the default without making it compulsory.</dd>
+      <dt>SUTVA</dt><dd>The assumption that one unit's treatment does not affect another unit's outcome. What Stage 3 drops.</dd>
+      <dt>&rho;</dt><dd>Spatial autoregressive intensity — how strongly a unit's outcome depends on its neighbours'. At &rho; = 0 the spatial model collapses to the Bayesian one.</dd>
+      <dt>Spillover effect</dt><dd>A donor's observed outcome minus the outcome it would have had if California had never been treated. Negative means the donor sold fewer packs.</dd>
+      <dt>ESS</dt><dd>Effective sample size: how many <em>independent</em> draws an autocorrelated chain is worth.</dd>
+      <dt>propagate_alpha</dt><dd>Whether the credible interval accounts for uncertainty in the donor weights, or holds them fixed at their posterior mean.</dd>
+    </dl>
+  </details>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Bayesian Spatial Synthetic Control in Python</em> · D3.js v7 · no backend, no tracking ·
+  <a href="/post/python_sc_bayes_spatial/" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<!-- D3 pinned to an exact version with Subresource Integrity. The usual
+     d3js.org/d3.v7.min.js is a moving alias, so it cannot carry an SRI hash:
+     any 7.x patch release would silently change the bytes. Pinning 7.9.0 lets
+     the browser verify what it executes. -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

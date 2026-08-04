@@ -1,0 +1,151 @@
+state_i,state_j,contiguous
+Alabama,Georgia,1
+Alabama,Mississippi,1
+Alabama,Tennessee,1
+Arkansas,Louisiana,1
+Arkansas,Mississippi,1
+Arkansas,Missouri,1
+Arkansas,Oklahoma,1
+Arkansas,Tennessee,1
+Arkansas,Texas,1
+Colorado,Kansas,1
+Colorado,Nebraska,1
+Colorado,New Mexico,1
+Colorado,Oklahoma,1
+Colorado,Utah,1
+Colorado,Wyoming,1
+Connecticut,Rhode Island,1
+Delaware,Pennsylvania,1
+Georgia,Alabama,1
+Georgia,North Carolina,1
+Georgia,South Carolina,1
+Georgia,Tennessee,1
+Idaho,Montana,1
+Idaho,Nevada,1
+Idaho,Utah,1
+Idaho,Wyoming,1
+Illinois,Indiana,1
+Illinois,Iowa,1
+Illinois,Kentucky,1
+Illinois,Missouri,1
+Illinois,Wisconsin,1
+Indiana,Illinois,1
+Indiana,Kentucky,1
+Indiana,Ohio,1
+Iowa,Illinois,1
+Iowa,Minnesota,1
+Iowa,Missouri,1
+Iowa,Nebraska,1
+Iowa,South Dakota,1
+Iowa,Wisconsin,1
+Kansas,Colorado,1
+Kansas,Missouri,1
+Kansas,Nebraska,1
+Kansas,Oklahoma,1
+Kentucky,Illinois,1
+Kentucky,Indiana,1
+Kentucky,Missouri,1
+Kentucky,Ohio,1
+Kentucky,Tennessee,1
+Kentucky,Virginia,1
+Kentucky,West Virginia,1
+Louisiana,Arkansas,1
+Louisiana,Mississippi,1
+Louisiana,Texas,1
+Maine,New Hampshire,1
+Minnesota,Iowa,1
+Minnesota,North Dakota,1
+Minnesota,South Dakota,1
+Minnesota,Wisconsin,1
+Mississippi,Alabama,1
+Mississippi,Arkansas,1
+Mississippi,Louisiana,1
+Mississippi,Tennessee,1
+Missouri,Arkansas,1
+Missouri,Illinois,1
+Missouri,Iowa,1
+Missouri,Kansas,1
+Missouri,Kentucky,1
+Missouri,Nebraska,1
+Missouri,Oklahoma,1
+Missouri,Tennessee,1
+Montana,Idaho,1
+Montana,North Dakota,1
+Montana,South Dakota,1
+Montana,Wyoming,1
+Nebraska,Colorado,1
+Nebraska,Iowa,1
+Nebraska,Kansas,1
+Nebraska,Missouri,1
+Nebraska,South Dakota,1
+Nebraska,Wyoming,1
+Nevada,Idaho,1
+Nevada,Utah,1
+New Hampshire,Maine,1
+New Hampshire,Vermont,1
+New Mexico,Colorado,1
+New Mexico,Oklahoma,1
+New Mexico,Texas,1
+North Carolina,Georgia,1
+North Carolina,South Carolina,1
+North Carolina,Tennessee,1
+North Carolina,Virginia,1
+North Dakota,Minnesota,1
+North Dakota,Montana,1
+North Dakota,South Dakota,1
+Ohio,Indiana,1
+Ohio,Kentucky,1
+Ohio,Pennsylvania,1
+Ohio,West Virginia,1
+Oklahoma,Arkansas,1
+Oklahoma,Colorado,1
+Oklahoma,Kansas,1
+Oklahoma,Missouri,1
+Oklahoma,New Mexico,1
+Oklahoma,Texas,1
+Pennsylvania,Delaware,1
+Pennsylvania,Ohio,1
+Pennsylvania,West Virginia,1
+Rhode Island,Connecticut,1
+South Carolina,Georgia,1
+South Carolina,North Carolina,1
+South Dakota,Iowa,1
+South Dakota,Minnesota,1
+South Dakota,Montana,1
+South Dakota,Nebraska,1
+South Dakota,North Dakota,1
+South Dakota,Wyoming,1
+Tennessee,Alabama,1
+Tennessee,Arkansas,1
+Tennessee,Georgia,1
+Tennessee,Kentucky,1
+Tennessee,Mississippi,1
+Tennessee,Missouri,1
+Tennessee,North Carolina,1
+Tennessee,Virginia,1
+Texas,Arkansas,1
+Texas,Louisiana,1
+Texas,New Mexico,1
+Texas,Oklahoma,1
+Utah,Colorado,1
+Utah,Idaho,1
+Utah,Nevada,1
+Utah,Wyoming,1
+Vermont,New Hampshire,1
+Virginia,Kentucky,1
+Virginia,North Carolina,1
+Virginia,Tennessee,1
+Virginia,West Virginia,1
+West Virginia,Kentucky,1
+West Virginia,Ohio,1
+West Virginia,Pennsylvania,1
+West Virginia,Virginia,1
+Wisconsin,Illinois,1
+Wisconsin,Iowa,1
+Wisconsin,Minnesota,1
+Wyoming,Colorado,1
+Wyoming,Idaho,1
+Wyoming,Montana,1
+Wyoming,Nebraska,1
+Wyoming,South Dakota,1
+Wyoming,Utah,1

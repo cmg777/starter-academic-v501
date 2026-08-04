@@ -1,0 +1,6 @@
+stage,engine,command,att,lo95,hi95,n_active,rho_hat,rho_ess,r_reference,note,r_gap
+1. Classical SC,mlsynth,VanillaSC(cfg).fit(),-18.427748367972548,-22.07837149428839,-14.29537984722412,5.0,,,-18.46,simplex constraint; weights non-negative and sum to one,0.03225163202745307
+2a. Bayesian SC (BSCM),mlsynth,"BSCM(prior=""horseshoe"").fit()",-18.84692718508048,-26.456826598131663,-9.98839395662983,26.0,,,,"horseshoe prior on unconstrained weights, WITH an intercept",
+3. Bayesian spatial SC,scspill,"SCSPILL(method=""sar"").fit()",-16.867982533346094,-23.044981655196505,-10.331599592461474,25.0,0.31613590654572216,136.78062783987494,-16.59,SAR layer on donor outcomes; SUTVA on the donor pool dropped,-0.27798253334609413
+2b. Bayesian SC (rho = 0),scspill,result.effects_detail.att_scm,-15.68163446071527,,,25.0,,,-15.84,the SAR model's rho = 0 special case; no extra MCMC,0.15836553928473052
+3'. Bayesian spatial SC,mlsynth,"SPILLSYNTH(method=""sar"").fit()",-16.524813910246003,-16.933229474640406,-16.176386530130696,,0.24756292443212174,135.23242573022674,-16.59,independent implementation of the same model,0.06518608975399687

@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-08-04">
+  <title>Who Else Was Treated?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Who Else Was Treated?</h1>
+  <p class="subtitle">Three synthetic controls, one policy, and the interval that was 33 times too narrow</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">−16.87</span><span class="kr-cap">packs per capita, once the leak is modelled</span></div>
+    <div class="kr"><span class="kr-num">−5.50</span><span class="kr-cap">Nevada’s spillover from a law it never passed</span></div>
+    <div class="kr"><span class="kr-num">33×</span><span class="kr-cap">how much too narrow the published interval was</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">August 4, 2026</p>
+</section>
+<section>
+<section id="two-assumptions" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>Two Assumptions</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="the-most-replicated-result-in-causal-inference-rests-on-two-untested-assumptions" class="slide level2 center">
+<h2>The most replicated result in causal inference rests on two untested assumptions</h2>
+<p>California’s Proposition 99, 1988. A 25-cent cigarette tax. The canonical synthetic control study.</p>
+<div class="fragment">
+<p><strong>One.</strong> The donor weights must be non-negative and sum to one — the <em>simplex</em>.</p>
+</div>
+<div class="fragment">
+<p><strong>Two.</strong> No donor state absorbed any part of the treatment — <em>SUTVA</em>.</p>
+</div>
+<div class="fragment">
+<p>Neither is a fact about the world. Both are modelling choices, and both are testable.</p>
+<p><span class="takeaway fragment">This deck tests both. The effect survives. Neither assumption does.</span></p>
+<aside class="notes">
+<p>The point of opening this way is that everybody knows the Prop 99 result and almost nobody states these two assumptions out loud. Naming them as assumptions rather than as machinery is the whole setup.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="thirty-nine-states-thirty-one-years-and-one-line-that-leaves-the-pack" class="slide level2 center">
+<h2>Thirty-nine states, thirty-one years, and one line that leaves the pack</h2>
+
+<img data-src="../python_sc_bayes_spatial_01_panel_paths.png" alt="California's per-capita cigarette sales against all 38 donor states, 1970-2000, with a vertical rule at the 1988 treatment year." class="r-stretch"><p><span class="takeaway fragment">39 states · 1,209 rows · 18 pre-treatment years · 38 donors</span></p>
+<aside class="notes">
+<p>California is already falling faster than the pack before the dashed line. That is why difference-in-differences fails here and why synthetic control exists at all.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="nevada-is-californias-only-neighbour-inside-the-donor-pool" class="slide level2 center">
+<h2>Nevada is California’s only neighbour inside the donor pool</h2>
+<p>Oregon and Arizona border California too — but both ran their own tobacco programmes, so <strong>neither is in the donor pool.</strong></p>
+<div class="fragment">
+<p>Eleven states are excluded altogether: AK, AZ, FL, HI, MD, MA, MI, NJ, NY, OR, WA.</p>
+</div>
+<div class="fragment">
+<p>The result: <strong>exactly one leak channel</strong>, and we can name it.</p>
+<p><span class="takeaway fragment"><code>spatial_w</code> has one non-zero entry. That is the whole spatial story, and it is why <span class="math inline">\(\rho\)</span> is hard to pin down.</span></p>
+</div>
+</section>
+<section id="the-simplex-and-sutva-written-down" class="slide level2 center">
+<h2>The simplex and SUTVA, written down</h2>
+<p><span class="math display">\[\widehat{\alpha} = \arg\min_{\alpha \in \Delta} \sum_{t \le T_0}\Big(Y_{1t} - \alpha^{\top}\mathbf{Y}^{c}_{t}\Big)^2,
+\qquad \Delta = \Big\{\alpha : \alpha_j \ge 0,\ \textstyle\sum_j \alpha_j = 1\Big\}\]</span></p>
+<div class="fragment">
+<p><span class="math display">\[\text{SUTVA:} \qquad Y_{jt}(\mathbf{D}) = Y_{jt}(D_j) \quad \text{for every donor } j\]</span></p>
+<p><span class="takeaway fragment">Relax the first and the donor pool changes. Relax the second and the counterfactual changes.</span></p>
+</div>
+</section>
+<section id="python-can-now-do-all-three-stages-without-leaving-one-language" class="slide level2 center">
+<h2>Python can now do all three stages without leaving one language</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>pip install <span class="st">"scspill[numba]==0.2.1"</span></span>
+<span id="cb1-2"><a href=""></a>pip install <span class="st">"mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15f168bb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
+<p><strong><code>mlsynth</code></strong> — 46 synthetic-control estimators behind one config dictionary.</p>
+<p><strong><code>scspill</code></strong> — the Bayesian spatial spillover model of Sakaguchi &amp; Tagawa (2026), which returns <em>two</em> estimands.</p>
+<p><span class="takeaway fragment">Both are young. Both are pinned — one to a release, one to a commit.</span></p>
+<aside class="notes">
+<p>mlsynth’s PyPI release lags main at the same version string, which is why it gets a commit pin rather than a version pin.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment"><strong>Stage 1</strong> — the simplex, as Abadie wrote it</li>
+<li class="fragment"><strong>Stage 2</strong> — the simplex replaced by a prior</li>
+<li class="fragment"><strong>Stage 3</strong> — SUTVA dropped, and a second estimand appears</li>
+<li class="fragment"><strong>Reconcile</strong> — why the R edition of this analysis reports a different interval</li>
+<li class="fragment"><strong>Diagnose</strong> — what an effective sample size of 3 actually means</li>
+</ul>
+</section></section>
+<section>
+<section id="three-stages-on-one-panel" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>Three Stages on One Panel</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="each-stage-keeps-every-assumption-but-one" class="slide level2 center">
+<h2>Each stage keeps every assumption but one</h2>
+<p><strong>Stage 1</strong> — hard constraint: <span class="math inline">\(\qquad \alpha \in \Delta\)</span></p>
+<div class="fragment">
+<p><strong>Stage 2</strong> — soft prior: <span class="math inline">\(\qquad \alpha_j \mid \lambda_j \sim \mathcal{N}(0, \lambda_j^2), \quad \lambda_j \mid \tau \sim \mathcal{C}^{+}(0,\tau)\)</span></p>
+</div>
+<div class="fragment">
+<p><strong>Stage 3</strong> — same <span class="math inline">\(\alpha\)</span>, but the donors are no longer clean:</p>
+<p><span class="math display">\[\mathbf{Y}^{c}_{t} = \rho\big(\mathbf{w}\,Y_{1t} + W\mathbf{Y}^{c}_{t}\big) + X_t\beta + \mathbf{u}_t\]</span></p>
+<p><span class="takeaway fragment">One regression, three stages. Each drops exactly one restriction.</span></p>
+<aside class="notes">
+<p>Stress that this is one regression, not three models. Stage 1 constrains alpha to the simplex. Stage 2 replaces that hard constraint with a prior — same alpha, weaker claim. Stage 3 keeps the prior and instead drops the assumption that the donors are clean. So when a number moves between stages, we know exactly which restriction moved it. That is the whole design of the talk.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="stage-1-the-simplex-picks-five-donors-and-stops" class="slide level2 center">
+<h2>Stage 1 — the simplex picks five donors and stops</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1-2|4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>common <span class="op">=</span> <span class="bu">dict</span>(df<span class="op">=</span>df, outcome<span class="op">=</span><span class="st">"cigsale"</span>, treat<span class="op">=</span><span class="st">"treated"</span>,</span>
+<span id="cb2-2"><a href=""></a>              unitid<span class="op">=</span><span class="st">"state"</span>, time<span class="op">=</span><span class="st">"year"</span>, display_graphs<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-3"><a href=""></a></span>
+<span id="cb2-4"><a href=""></a>sc <span class="op">=</span> mlsynth.VanillaSC(<span class="bu">dict</span>(common)).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
+<table class="caption-top">
+<tbody>
+<tr class="odd">
+<td>ATT</td>
+<td style="text-align: right;"><strong>−18.43</strong></td>
+</tr>
+<tr class="even">
+<td>pre-treatment RMSE</td>
+<td style="text-align: right;">1.60</td>
+</tr>
+<tr class="odd">
+<td>active donors</td>
+<td style="text-align: right;">5 of 38</td>
+</tr>
+<tr class="even">
+<td>top-4 share of weight</td>
+<td style="text-align: right;">98.6%</td>
+</tr>
+</tbody>
+</table>
+<p><span class="takeaway fragment">Utah 0.343 · Montana 0.254 · <strong>Nevada 0.242</strong> · Connecticut 0.146</span></p>
+<aside class="notes">
+<p>Note Nevada is already in the blend, carrying a quarter of the counterfactual. The one state we have reason to suspect.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="california-and-its-synthetic-are-indistinguishable-until-1988" class="slide level2 center">
+<h2>California and its synthetic are indistinguishable until 1988</h2>
+
+<img data-src="../python_sc_bayes_spatial_03_stage1_fit_gap.png" alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to -26.7 packs by 2000." class="r-stretch"><p><span class="takeaway fragment">Reproduces the R edition’s −18.46 to within 0.04 packs, from a different package and a different optimiser.</span></p>
+</section>
+<section id="thirty-three-donors-get-exactly-zero" class="slide level2 center">
+<h2>Thirty-three donors get exactly zero</h2>
+
+<img data-src="../python_sc_bayes_spatial_04_stage1_weights.png" alt="Simplex donor weights: Utah 0.34, Montana 0.25, Nevada 0.24, Connecticut 0.15, New Hampshire 0.01, and exactly zero for the other 33 states." class="r-stretch"><p><span class="takeaway fragment">Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.</span></p>
+</section>
+<section id="the-horseshoe-makes-zero-the-default-without-making-it-compulsory" class="slide level2 center">
+<h2>The horseshoe makes zero the default without making it compulsory</h2>
+<p><span class="math display">\[\alpha_j \mid \lambda_j \sim \mathcal{N}\big(0, \lambda_j^2\big), \qquad
+\lambda_j \mid \tau \sim \mathcal{C}^{+}(0, \tau), \qquad
+\tau \sim \mathcal{C}^{+}(0, \sigma)\]</span></p>
+<div class="fragment">
+<p>Infinite spike at zero. Cauchy tails. Most <span class="math inline">\(\lambda_j\)</span> come out tiny; any single one can escape.</p>
+</div>
+<div class="fragment">
+<p>Sampling is closed-form via the Makalic–Schmidt inverse-gamma representation — an <strong>exact</strong> reparameterisation, not an approximation.</p>
+<p><span class="takeaway fragment">That is why both libraries run hundreds of thousands of iterations in seconds rather than hours.</span></p>
+</div>
+</section>
+<section id="relax-the-simplex-and-the-active-donor-pool-multiplies-by-five" class="slide level2 center">
+<h2>Relax the simplex and the active donor pool multiplies by five</h2>
+
+<img data-src="../python_sc_bayes_spatial_05_stage2_horseshoe_weights.png" alt="Horseshoe posterior weights for all 38 donors with credible intervals; 25 exceed 0.01 in absolute value but only Nevada's interval excludes zero." class="r-stretch"><p><span class="takeaway fragment">5 → 26 active donors. Almost every credible interval straddles zero.</span></p>
+</section>
+<section id="two-bayesian-synthetic-controls-one-intercept-apart" class="slide level2 smaller center">
+<h2>Two Bayesian synthetic controls, one intercept apart</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Estimator</th>
+<th style="text-align: right;">ATT</th>
+<th style="text-align: right;">Intercept</th>
+<th style="text-align: right;">Weights sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mlsynth.BSCM</code></td>
+<td style="text-align: right;">−18.85</td>
+<td style="text-align: right;"><span class="key">16.86</span></td>
+<td style="text-align: right;">0.758</td>
+</tr>
+<tr class="even">
+<td><code>scspill</code> at <span class="math inline">\(\rho = 0\)</span></td>
+<td style="text-align: right;">−15.68</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.885</td>
+</tr>
+<tr class="odd">
+<td>R edition, Stage 2</td>
+<td style="text-align: right;">−15.84</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p><span class="math display">\[\text{BSCM:}\ \ Y_{1t} = \beta_0 + \sum_j \alpha_j Y_{jt} + \varepsilon_t
+\qquad
+\text{scspill:}\ \ Y_{1t} = \sum_j \alpha_j Y_{jt} + \varepsilon_t\]</span></p>
+<p><span class="takeaway fragment">When two packages disagree about a model they both implement, check the equation before you check the sampler.</span></p>
+<aside class="notes">
+<p>scspill’s rho=0 case lands within 0.16 packs of the R edition, which was separate C++ code. Two independent no-intercept implementations agree; BSCM is doing something else, deliberately.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<aside class="notes">
+<p>This is the slide people push back on. Both are horseshoe synthetic controls, and they land three packs apart. The reason is the intercept: BSCM fits beta-zero at 16.86 and its weights sum to 0.758, so its blend sits about 100 packs against California’s 118 and the intercept lifts it back. scspill has no intercept and standardises first. The tiebreaker is external — scspill’s rho-equals-zero case lands within 0.16 packs of the R edition, produced by entirely separate C++ code. Do not average them.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="four-counterfactual-californias" class="slide level2 center">
+<h2>Four counterfactual Californias</h2>
+
+<img data-src="../python_sc_bayes_spatial_06_stage2_two_bayesian.png" alt="Four counterfactual paths for California and their ATTs, showing the BSCM path sitting apart from the other three because it fits an explicit intercept." class="r-stretch"><p><span class="takeaway fragment">Hollow diamonds are the R edition’s published values.</span></p>
+</section>
+<section id="drop-sutva-and-the-bias-has-a-closed-form" class="slide level2 center">
+<h2>Drop SUTVA and the bias has a closed form</h2>
+<p><span class="math display">\[Y_{1t} - \sum_j \alpha_j Y_{jt} \;=\; \underbrace{\xi_{0t}}_{\text{what we want}}
+\;-\; \underbrace{\sum_j \alpha_j \xi^{c}_{jt}}_{\text{what we get for free}}\]</span></p>
+<div class="fragment">
+<p>The bias is a <strong>product</strong> of two things: how much weight a donor carries, and how contaminated it is.</p>
+<p><span class="takeaway fragment">A filthy donor with zero weight is harmless. A slightly dirty one carrying half the counterfactual is not.</span></p>
+</div>
+</section>
+<section id="the-identifying-assumption-that-replaces-the-simplex" class="slide level2 center">
+<h2>The identifying assumption that replaces the simplex</h2>
+<p><span class="math display">\[\exists\, \alpha \in \mathbb{R}^{N} \;:\; Y_{1t}(\mathbf{0}) = \sum_j \alpha_j Y_{jt}(\mathbf{0}) \quad \forall t\]</span></p>
+<div class="fragment">
+<p>With <span class="math inline">\(A = W + \mathbf{w}\alpha^{\top}\)</span>, the donors’ untreated path solves in closed form:</p>
+<p><span class="math display">\[\mathbf{Y}^{c}_{t}(\mathbf{0}) = \big(I - \rho A\big)^{-1}\Big[\big(I - \rho W\big)\mathbf{Y}^{c}_{t} - \rho\,\mathbf{w}\,Y_{1t}\Big]\]</span></p>
+</div>
+<div class="fragment">
+<p><span class="math display">\[\xi_{0t} = Y_{1t} - \alpha^{\top}\mathbf{Y}^{c}_{t}(\mathbf{0}),
+\qquad \boldsymbol{\xi}^{c}_{t} = \mathbf{Y}^{c}_{t} - \mathbf{Y}^{c}_{t}(\mathbf{0})\]</span></p>
+<p><span class="takeaway fragment">No <span class="math inline">\(\beta\)</span>. No factors. No error variances. They <strong>cancel</strong>.</span></p>
+<aside class="notes">
+<p>Say plainly what has been traded. The simplex is gone, and something has taken its place: the assumption that some fixed alpha reproduces California’s untreated path exactly, in every pre-period. It is not weaker in some absolute sense — it is untestable in a way the simplex is not, because the simplex’s price shows up as pre-treatment RMSE and this one does not show up anywhere.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="that-cancellation-is-what-makes-the-model-usable" class="slide level2 center">
+<h2>That cancellation is what makes the model usable</h2>
+<p>The effects depend on <span class="math inline">\((\alpha, \rho, \mathbf{w}, W)\)</span> and the observed data. <strong>Nothing else.</strong></p>
+<div class="fragment">
+<p>A model this rich has many weakly identified parameters. If the effects depended on all of them, that weakness would poison everything.</p>
+</div>
+<div class="fragment">
+<p>Instead it is confined to one scalar — <span class="math inline">\(\rho\)</span> — where we can see it, measure it, and report it.</p>
+<p><span class="takeaway fragment">Weak identification you can locate is a manageable problem. Weak identification spread across a nuisance block is not.</span></p>
+<aside class="notes">
+<p>This is the technical heart of the talk. Substituting the treated unit’s equation into the donor system eliminates beta, the latent factors and the error variances — they all cancel. What is left depends only on alpha, rho, w, W and observed outcomes. That is why a weakly-mixing nuisance block does not poison the answer: there is nowhere for it to enter. It also localises the whole identification problem onto one scalar, which is what Act III is about.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="one-call-runs-both-samplers-and-post-processes-the-spillovers" class="slide level2 center">
+<h2>One call runs both samplers and post-processes the spillovers</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-code-line-numbers="1-6|8-11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>result <span class="op">=</span> SCSPILL({</span>
+<span id="cb3-2"><a href=""></a>    <span class="op">**</span>panel.config_kwargs(),</span>
+<span id="cb3-3"><a href=""></a>    <span class="st">"m_iter"</span>: <span class="dv">500_000</span>,</span>
+<span id="cb3-4"><a href=""></a>    <span class="st">"burn"</span>: <span class="dv">250_000</span>,</span>
+<span id="cb3-5"><a href=""></a>    <span class="st">"seed"</span>: <span class="dv">20251022</span>,</span>
+<span id="cb3-6"><a href=""></a>}).fit()</span>
+<span id="cb3-7"><a href=""></a></span>
+<span id="cb3-8"><a href=""></a>result.att                      <span class="co"># −16.87</span></span>
+<span id="cb3-9"><a href=""></a>result.effects_detail.att_scm   <span class="co"># −15.68, the ρ = 0 comparator, free</span></span>
+<span id="cb3-10"><a href=""></a>result.rho_hat                  <span class="co"># 0.316</span></span>
+<span id="cb3-11"><a href=""></a>result.spillover_panel          <span class="co"># 31 × 38: who else was treated</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="takeaway fragment">Stage 2 comes out of the Stage-3 fit at no extra cost. The model <em>is</em> nested.</span></p>
+</section>
+<section id="the-spatial-parameter-is-clearly-above-zero" class="slide level2 center" data-background-color="#141413">
+<h2>The spatial parameter is clearly above zero</h2>
+<p><span class="bignum">0.316</span></p>
+<p><span class="bignum-label"><span class="math inline">\(\hat\rho\)</span>, 95% CrI [0.231, 0.403] — the interval excludes zero, so the data reject the restriction that would collapse Stage 3 back to Stage 2</span></p>
+<aside class="notes">
+<p>The interval excludes zero, so the data reject the restriction that would collapse Stage 3 back to Stage 2. That is the SUTVA test, and it is a test the model nests rather than one bolted on afterwards. Resist reading precision into this number — the next slide is about exactly how much that interval is worth.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="everything-in-this-model-is-easy-except-the-one-thing-it-is-for" class="slide level2 smaller center">
+<h2>Everything in this model is easy except the one thing it is for</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th style="text-align: right;">ESS (from 250,000 draws)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\sigma^2\)</span></td>
+<td style="text-align: right;">204,095</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\alpha\)</span> (donor weights)</td>
+<td style="text-align: right;">10,000 – 26,000</td>
+</tr>
+<tr class="odd">
+<td><strong><span class="math inline">\(\rho\)</span></strong></td>
+<td style="text-align: right;"><span class="key"><strong>137</strong></span></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>One contiguity channel out of California means the panel holds <strong>one state’s worth of evidence</strong> about how strongly policies leak across borders.</p>
+<p><span class="takeaway fragment">That is a property of the question, not a defect in the software.</span></p>
+<aside class="notes">
+<p>Read the ESS column top to bottom. Sigma-squared has 204,000, the donor weights 10,000 to 26,000, rho has 137 and the price coefficient 388. Same chain. The point is not that the software is bad — it is that rho is the only parameter drawn by random-walk Metropolis rather than from a closed-form conditional, so its draws are heavily autocorrelated. Its posterior is actually tight: standard deviation 0.043 on a support 1.9 wide. Slow mixing is not the same thing as weak identification, and the distinction matters for what you tell a referee.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="what-the-library-draws-for-you" class="slide level2 center">
+<h2>What the library draws for you</h2>
+
+<img data-src="../python_sc_bayes_spatial_07_stage3_panel.png" alt="The scspill package's own three-panel summary of the spatial fit: observed against counterfactual, the gap, and the posterior for rho." class="r-stretch"><p><span class="takeaway fragment"><code>result.plot(kind="panel")</code> — observed vs counterfactual, the effect path, and the eight largest spillovers.</span></p>
+</section>
+<section id="almost-the-entire-spillover-lands-on-one-state" class="slide level2 center">
+<h2>Almost the entire spillover lands on one state</h2>
+
+<img data-src="../python_sc_bayes_spatial_10_spillover_map.png" alt="A tile cartogram of the United States shaded by estimated spillover; Nevada is far darker than every other state and the field is otherwise pale." class="r-stretch"><p><span class="takeaway fragment">Linear colour scale. The concentration is the finding, not a rendering artefact.</span></p>
+</section>
+<section id="nevada-absorbs-eleven-times-the-next-largest-donor" class="slide level2 center">
+<h2>Nevada absorbs eleven times the next-largest donor</h2>
+
+<img data-src="../python_sc_bayes_spatial_11_spillover_bars.png" alt="Horizontal bars for the eight largest spillovers: Nevada at -5.50 packs, then Idaho and Utah near -0.49, then a steep drop to near zero." class="r-stretch"><p><span class="takeaway fragment">Nevada −5.50 · Idaho −0.49 · Utah −0.49 · everything else is noise.</span></p>
+</section>
+<section id="the-leak-runs-the-opposite-way-to-the-obvious-hypothesis" class="slide level2 center" data-background-color="#141413">
+<h2>The leak runs the <em>opposite</em> way to the obvious hypothesis</h2>
+<p><span class="bignum">−5.50</span></p>
+<p><span class="bignum-label">Nevada’s sales came in <strong>below</strong> its no-treatment path. Not cheap cigarettes crossing the border — the anti-smoking campaign crossing the same border.</span></p>
+</section>
+<section id="which-means-the-classical-estimate-was-biased-toward-zero" class="slide level2 smaller center">
+<h2>Which means the classical estimate was biased <em>toward zero</em></h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Donor</th>
+<th style="text-align: right;"><span class="math inline">\(\alpha_j\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(\xi^{c}_j\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(\alpha_j \xi^{c}_j\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nevada</td>
+<td style="text-align: right;">0.200</td>
+<td style="text-align: right;">−5.50</td>
+<td style="text-align: right;"><span class="key"><strong>−1.098</strong></span></td>
+</tr>
+<tr class="even">
+<td>Utah</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">−0.49</td>
+<td style="text-align: right;">−0.018</td>
+</tr>
+<tr class="odd">
+<td>Idaho</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">−0.49</td>
+<td style="text-align: right;">−0.006</td>
+</tr>
+<tr class="even">
+<td><strong>Sum (all 38 donors)</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>−1.130</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>Purged minus contaminated: <strong>−1.186</strong>. The identity holds.</p>
+<p><span class="takeaway fragment">Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect <strong>larger</strong>.</span></p>
+<aside class="notes">
+<p>This inverts the intuition most audiences arrive with. The prior expectation is cross-border shopping raising Nevada’s sales, which would inflate the estimate. The estimate says Nevada’s sales fell. Negative spillover on a positively-weighted donor drags synthetic California down, so the classical comparison gives the policy less credit than it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights, where Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more contaminated of the two.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="does-the-interval-mean-anything" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>Does the Interval Mean Anything?</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="the-r-edition-of-this-analysis-reports-the-same-effect-and-a-very-different-interval" class="slide level2 smaller center">
+<h2>The R edition of this analysis reports the same effect and a very different interval</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">ATT</th>
+<th>95% CrI</th>
+<th style="text-align: right;">Width</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R edition (published)</td>
+<td style="text-align: right;">−16.59</td>
+<td>[−16.78, −16.39]</td>
+<td style="text-align: right;"><span class="key">0.384</span></td>
+</tr>
+<tr class="even">
+<td>This post, corrected</td>
+<td style="text-align: right;">−16.87</td>
+<td>[−23.05, −10.33]</td>
+<td style="text-align: right;"><span class="key">12.713</span></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>A factor of <strong>33</strong>. “Different language” does not explain that.</p>
+<p><span class="takeaway fragment"><code>scspill</code> documents six departures from the authors’ R code. Three have escape hatches — so put the Python back into the R specification and look.</span></p>
+</div>
+</section>
+<section id="reproducing-the-r-specification-reproduces-its-pathology-exactly" class="slide level2 smaller center">
+<h2>Reproducing the R specification reproduces its pathology exactly</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>beta_prior<span class="op">=</span><span class="st">"ridge"</span>        <span class="co"># departure 2</span></span>
+<span id="cb4-2"><a href=""></a>propagate_alpha<span class="op">=</span><span class="va">False</span>     <span class="co"># departure 3</span></span>
+<span id="cb4-3"><a href=""></a>adapt_rho<span class="op">=</span><span class="va">False</span>           <span class="co"># departure 4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;">R edition</th>
+<th style="text-align: right;">scspill, R spec</th>
+<th style="text-align: right;">Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ATT</td>
+<td style="text-align: right;">−16.590</td>
+<td style="text-align: right;">−16.286</td>
+<td style="text-align: right;">0.304</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\hat\rho\)</span></td>
+<td style="text-align: right;">0.2226</td>
+<td style="text-align: right;">0.2282</td>
+<td style="text-align: right;">0.0056</td>
+</tr>
+<tr class="odd">
+<td>ESS(<span class="math inline">\(\rho\)</span>)</td>
+<td style="text-align: right;">2.93</td>
+<td style="text-align: right;">3.27</td>
+<td style="text-align: right;">0.34</td>
+</tr>
+<tr class="even">
+<td>Nevada spillover</td>
+<td style="text-align: right;">−3.750</td>
+<td style="text-align: right;">−3.778</td>
+<td style="text-align: right;">0.028</td>
+</tr>
+</tbody>
+</table>
+<p><span class="takeaway fragment">Independent code, different language, reproducing <span class="math inline">\(\hat\rho\)</span> to within 0.006 — <strong>including an effective sample size of 3</strong>.</span></p>
+</section>
+<section id="chain-length-was-never-the-problem" class="slide level2 smaller center">
+<h2>Chain length was never the problem</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th style="text-align: right;">Iterations</th>
+<th style="text-align: right;">Width</th>
+<th style="text-align: right;">ESS(<span class="math inline">\(\rho\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scspill, R spec</td>
+<td style="text-align: right;">5,000</td>
+<td style="text-align: right;">0.482</td>
+<td style="text-align: right;">3.3</td>
+</tr>
+<tr class="even">
+<td>scspill, R spec</td>
+<td style="text-align: right;">500,000</td>
+<td style="text-align: right;"><span class="key">0.702</span></td>
+<td style="text-align: right;">66.9</td>
+</tr>
+<tr class="odd">
+<td>scspill, corrected</td>
+<td style="text-align: right;">500,000</td>
+<td style="text-align: right;"><span class="key">12.713</span></td>
+<td style="text-align: right;">136.8</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>A hundred times the iterations widens the interval by 45%. Propagating <span class="math inline">\(\alpha\)</span> widens it by <strong>1,700%</strong>.</p>
+<p><span class="takeaway fragment">Two different failures, and they need to be told apart.</span></p>
+</div>
+</section>
+<section id="ess-and-completeness-are-different-questions" class="slide level2 center">
+<h2>ESS and completeness are different questions</h2>
+<p><strong>Effective sample size</strong> asks whether the interval is <em>reliable</em> — did the chain visit enough of the posterior for its quantiles to mean anything? At ESS 3, no.</p>
+<div class="fragment">
+<p><strong><code>propagate_alpha</code></strong> asks whether the interval is <em>complete</em> — does it account for everything the model is uncertain about? With <span class="math inline">\(\alpha\)</span> pinned at its posterior mean, no.</p>
+</div>
+<div class="fragment">
+<p>The published interval failed <strong>both</strong>.</p>
+<p><span class="takeaway fragment">Report the effective sample size beside every credible interval, or the interval is decoration.</span></p>
+<aside class="notes">
+<p>Two separable failures, and the published interval failed both. ESS asks: is the interval reliable — did the chain actually explore the posterior? At an ESS of 3, no. propagate_alpha asks a different question: is the interval complete — does it carry uncertainty about which states make up synthetic California? With alpha pinned at its posterior mean, no. Running the R specification a hundred times longer fixes the first and moves the width only from 0.48 to 0.70. The other factor of eighteen is the second.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="one-tuning-constant-three-specifications" class="slide level2 center">
+<h2>One tuning constant, three specifications</h2>
+
+<img data-src="../python_sc_bayes_spatial_12_r_reconciliation.png" alt="The R edition, the R specification rerun in Python, and the corrected configuration side by side, showing the interval widening from 0.38 to 12.71 packs." class="r-stretch"><p><span class="takeaway fragment">Adaptation lands acceptance at 0.444 against a 0.44 target, and ESS at 137.</span></p>
+</section>
+<section id="a-memory-layout-was-doing-part-of-the-modelling" class="slide level2 center">
+<h2>A memory layout was doing part of the modelling</h2>
+<p>Departure 1: the covariate array was indexed as <span class="math inline">\((N, T, K)\)</span> when it was laid out as <span class="math inline">\((T, N, K)\)</span>.</p>
+<div class="fragment">
+<p>Nothing crashes. Nothing looks wrong. Each state’s price is silently matched to another state’s sales.</p>
+</div>
+<div class="fragment">
+<p>With covariates entering correctly, <span class="math inline">\(\hat\rho\)</span> moves from about <strong>0.19</strong> to about <strong>0.35</strong> on the same data.</p>
+<p><span class="takeaway fragment">The most dangerous bugs are the ones that return plausible numbers.</span></p>
+</div>
+</section>
+<section id="two-departures-were-found-by-a-test-not-by-inspection" class="slide level2 center">
+<h2>Two departures were found by a test, not by inspection</h2>
+<p>Draw parameters from the prior, simulate data → the <em>marginal-conditional</em> joint distribution.</p>
+<p>Simulate data, then run one Gibbs sweep, repeatedly → the <em>successive-conditional</em> joint distribution.</p>
+<div class="fragment">
+<p>If every conditional is correct, these are the <strong>same distribution</strong>. Any statistic’s mean must agree.</p>
+<p><span class="takeaway fragment">That is how an <span class="math inline">\(\omega_k\)</span> conditional treating a variance as a precision came to light.</span></p>
+<aside class="notes">
+<p>Neither departure 5 nor 6 changes the California answer much. Both mean the R sampler was not converging to any posterior at all.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="artefacts-shrink-errors-do-not" class="slide level2 center">
+<h2>Artefacts shrink; errors do not</h2>
+
+<img data-src="../python_sc_bayes_spatial_14_geweke.png" alt="Geweke joint-distribution test z-scores at two chain lengths, with the maximum falling from 3.48 to 2.50 as the chain grows tenfold." class="r-stretch"><p><span class="takeaway fragment">max <span class="math inline">\(|z|\)</span> falls 3.48 → 2.50 and rejections go 1 → 0 as the chain grows tenfold. That is slow mixing, not an incoherent conditional.</span></p>
+</section>
+<section id="the-only-prior-that-moves-the-answer-is-the-one-nobody-calls-a-prior" class="slide level2 center">
+<h2>The only prior that moves the answer is the one nobody calls a prior</h2>
+
+<img data-src="../python_sc_bayes_spatial_15_prior_sensitivity.png" alt="Posterior mean and interval for rho across six prior configurations, flat except for the row where the support is truncated to plus or minus 0.5." class="r-stretch"><aside class="notes">
+<p>Flag this before anyone reads the level off the axis. <code>prior_sensitivity</code> runs the <em>simplified</em> Step-2 kernel, not the production one, so the rho it reports here sits near 0.8 and must not be compared with the headline 0.316. What is comparable is the <em>shape</em>: the answer is flat across the inverse-gamma hyperparameters and across the step size, and moves only when the support itself is truncated to plus or minus 0.5. That is the finding — the support constraint is a prior too, and it is the one nobody reports.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<p><span class="takeaway fragment">Sweeping <span class="math inline">\(a_0\)</span>, <span class="math inline">\(b_0\)</span> and the step size moves <span class="math inline">\(\rho\)</span> by 0.07. Truncating the <strong>support</strong> moves it by 0.32.</span></p>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection"><strong>Objection.</strong> The SAR layer does not make anything causal that was not causal before. You supplied the graph; a different graph gives different spillovers.</span></p>
+<div class="fragment">
+<p><span class="rebuttal"><strong>Response.</strong> Correct, and the post says so. But the alternative is not “no assumption” — it is <span class="math inline">\(\rho = 0\)</span>, imposed silently and never reported. Making the assumption a parameter is what lets the data reject it.</span></p>
+<p><span class="takeaway fragment">The choice is not between assuming and not assuming. It is between an assumption you can test and one you cannot.</span></p>
+</div>
+</section>
+<section id="every-estimator-targeting-this-att-agrees-on-the-sign-and-the-scale" class="slide level2 center">
+<h2>Every estimator targeting this ATT agrees on the sign and the scale</h2>
+
+<img data-src="../python_sc_bayes_spatial_18_att_ladder.png" alt="Point estimates and credible intervals for every stage of the ladder, with hollow diamonds marking the R edition's published values." class="r-stretch"><p><span class="takeaway fragment">Two libraries, four prior structures, one spatial layer, one independent third implementation.</span></p>
+</section>
+<section id="what-proposition-99-cost-and-who-else-paid" class="slide level2 center" data-background-color="#141413">
+<h2>What Proposition 99 cost, and who else paid</h2>
+<p><span class="bignum">−16.87</span></p>
+<p><span class="bignum-label">packs per capita per year for California — and −5.50 for a state that never voted on it</span></p>
+</section>
+<section id="what-to-take-away" class="slide level2 center">
+<h2>What to take away</h2>
+<ol type="1">
+<li><strong>The effect is robust.</strong> Every relaxation lands between −15.7 and −18.8 packs.</li>
+<li><strong>The donor pool is not.</strong> The same data support 5 active donors or 25, depending entirely on whether sparsity is a constraint or a prior.</li>
+<li><strong>SUTVA is false here</strong> — and the correction is only 1.19 packs for California (1.51 on the simplex weights). It is 5.50 for Nevada.</li>
+<li><strong>The interval was the real error</strong>, not the point estimate. Two distinct failures, one diagnosable by ESS and one by asking what the interval is conditioning on.</li>
+</ol>
+<aside class="notes">
+<p>Land these four and stop. The effect is robust and the classical estimate was fine for the headline number. The donor pool composition is not robust at all, and sentences of the form ‘synthetic California is mostly Utah and Nevada’ are closer to artefacts than findings. SUTVA is false here, but the correction is modest for California and large for Nevada — which is a different question, and the one classical synthetic control could not ask. And the interval, not the point estimate, was where the real error lived.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="materials" class="slide level2 smaller center">
+<h2>Materials</h2>
+<ul>
+<li><strong>Full tutorial</strong> — carlos-mendez.org/post/python_sc_bayes_spatial</li>
+<li><strong>R edition</strong> — carlos-mendez.org/post/r_sc_bayes_spatial</li>
+<li><strong>Run it</strong> — Colab notebook, or the Quarto bundle with a hermetic <code>.venv</code></li>
+<li><strong>Web app</strong> — interactive <span class="math inline">\(\rho\)</span> slider, donor comparator, trace diagnostics</li>
+<li><strong>Data dictionary</strong> — the panel and both spatial objects</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>pip install <span class="st">"scspill[numba]==0.2.1"</span></span>
+<span id="cb5-2"><a href=""></a>pip install <span class="st">"mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15f168bb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section></section>
+<section id="let-the-data-choose-the-donors-let-the-map-tell-you-who-else-was-treated-and-let-the-effective-sample-size-tell-you-whether-the-interval-means-anything." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Let the data choose the donors, let the map tell you who else was treated, and let the effective sample size tell you whether the interval means anything.</h1>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

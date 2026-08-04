@@ -1,0 +1,7 @@
+n,area,r_code,scspill,escape_hatch,changes_the_answer
+1,Covariates,"scrambled by a (T,N,K) vs (N,T,K) memory-layout mismatch","a proper (T, N, K) array throughout",drop covariates,yes — this is the big one
+2,Prior on beta,flat-plus-ridge conditional,the paper's horseshoe,"beta_prior=""ridge""",modestly
+3,ATT bands,"vary rho only, alpha held at its posterior mean","paired (alpha, rho) draws",propagate_alpha=False,yes — this is why the R interval is narrow
+4,rho sampler,fixed Metropolis step,Robbins-Monro adaptation toward 44% acceptance,adapt_rho=False,"the interval, not the point"
+5,Factor scales,"inconsistent omega_k conditionals; C+(0,1) hyperprior","N(0, sigma_eta^2 omega_k) with C+(0,10)",none,"little, but the sampler was invalid"
+6,FFBS initialisation,gamma_1 inconsistent with its own conditionals,coherent gamma_0 = 0,none,"little, but the sampler was invalid"

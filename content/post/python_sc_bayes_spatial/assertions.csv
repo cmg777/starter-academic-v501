@@ -1,0 +1,19 @@
+check,passed
+classical ATT within 0.20 of R's -18.46,True
+classical weights lie on the simplex,True
+Nevada is California's only donor-pool neighbour,True
+scspill rho=0 within 0.60 of R's Stage 2 -15.84,True
+scspill SAR within 0.60 of R's -16.59,True
+scspill and mlsynth SAR agree within 1.00 packs,True
+R-spec at the R budget reproduces R's ESS(rho) < 10,True
+R-spec at the R budget within 0.60 of R's ATT,True
+rho_hat lies inside the identified support,True
+adaptation improves ESS(rho),True
+adaptation lands acceptance near the 0.44 target,True
+the corrected interval is wider than the R edition's,True
+Nevada absorbs the largest spillover,True
+Nevada's spillover is negative,True
+spillover shrinks with graph distance (Idaho < Nevada),True
+purging the spillover deepens the estimated effect,True
+every ladder stage agrees on the sign,True
+every benchmark row has a status,True
