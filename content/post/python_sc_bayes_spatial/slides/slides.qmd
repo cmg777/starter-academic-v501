@@ -8,11 +8,11 @@ date: today
 date-format: long
 key-results:
   - num: "−16.87"
-    cap: "packs per capita, once the leak is modelled"
+    cap: "packs per capita, leak modelled"
   - num: "−5.50"
-    cap: "Nevada's spillover from a law it never passed"
+    cap: "Nevada, from a law it never passed"
   - num: "33×"
-    cap: "how much too narrow the published interval was"
+    cap: "how much too narrow the interval was"
 format:
   revealjs:
     output-file: index.html
@@ -42,6 +42,10 @@ format:
 
 ## The most replicated result in causal inference rests on two untested assumptions
 
+::: {.notes}
+The point of opening this way is that everybody knows the Prop 99 result and almost nobody states these two assumptions out loud. Naming them as assumptions rather than as machinery is the whole setup.
+:::
+
 California's Proposition 99, 1988. A 25-cent cigarette tax. The canonical synthetic control study.
 
 . . .
@@ -56,15 +60,11 @@ California's Proposition 99, 1988. A 25-cent cigarette tax. The canonical synthe
 
 Neither is a fact about the world. Both are modelling choices, and both are testable.
 
-[This deck tests both. The effect survives. Neither assumption does.]{.takeaway .fragment}
-
-::: {.notes}
-The point of opening this way is that everybody knows the Prop 99 result and almost nobody states these two assumptions out loud. Naming them as assumptions rather than as machinery is the whole setup.
-:::
+[This deck relaxes both. The effect survives. The claim that the donor pool was clean does not.]{.takeaway .fragment}
 
 ## Thirty-nine states, thirty-one years, and one line that leaves the pack
 
-![](../python_sc_bayes_spatial_01_panel_paths.png){fig-alt="California's per-capita cigarette sales against all 38 donor states, 1970-2000, with a vertical rule at the 1988 treatment year."}
+![](../python_sc_bayes_spatial_01_panel_paths.png){fig-alt="California's per-capita cigarette sales against all 38 donor states, 1970-2000, with a vertical rule at the 1988 treatment year." fig-align="center"}
 
 [39 states · 1,209 rows · 18 pre-treatment years · 38 donors]{.takeaway .fragment}
 
@@ -99,6 +99,10 @@ $$\text{SUTVA:} \qquad Y_{jt}(\mathbf{D}) = Y_{jt}(D_j) \quad \text{for every do
 
 ## Python can now do all three stages without leaving one language
 
+::: {.notes}
+mlsynth's PyPI release lags main at the same version string, which is why it gets a commit pin rather than a version pin.
+:::
+
 ``` {.python}
 pip install "scspill[numba]==0.2.1"
 pip install "mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15f168bb"
@@ -111,10 +115,6 @@ pip install "mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15
 **`scspill`** — the Bayesian spatial spillover model of Sakaguchi & Tagawa (2026), which returns *two* estimands.
 
 [Both are young. Both are pinned — one to a release, one to a commit.]{.takeaway .fragment}
-
-::: {.notes}
-mlsynth's PyPI release lags main at the same version string, which is why it gets a commit pin rather than a version pin.
-:::
 
 ## Where we're going
 
@@ -130,7 +130,15 @@ mlsynth's PyPI release lags main at the same version string, which is why it get
 
 [Act II]{.act}
 
-## Each stage keeps every assumption but one
+## Each stage drops exactly one restriction from the stage before
+
+::: {.notes}
+Stress that this is one regression, not three models. Stage 1 constrains alpha to the
+simplex. Stage 2 replaces that hard constraint with a prior — same alpha, weaker claim.
+Stage 3 keeps the prior and instead drops the assumption that the donors are clean. So
+when a number moves between stages, we know exactly which restriction moved it. That is
+the whole design of the talk.
+:::
 
 **Stage 1** — hard constraint: $\qquad \alpha \in \Delta$
 
@@ -144,18 +152,13 @@ mlsynth's PyPI release lags main at the same version string, which is why it get
 
 $$\mathbf{Y}^{c}_{t} = \rho\big(\mathbf{w}\,Y_{1t} + W\mathbf{Y}^{c}_{t}\big) + X_t\beta + \mathbf{u}_t$$
 
-[One regression, three stages. Each drops exactly one restriction.]{.takeaway .fragment}
-
-
-::: {.notes}
-Stress that this is one regression, not three models. Stage 1 constrains alpha to the
-simplex. Stage 2 replaces that hard constraint with a prior — same alpha, weaker claim.
-Stage 3 keeps the prior and instead drops the assumption that the donors are clean. So
-when a number moves between stages, we know exactly which restriction moved it. That is
-the whole design of the talk.
-:::
+[One regression, not three models. When a number moves, we know which restriction moved it.]{.takeaway .fragment}
 
 ## Stage 1 — the simplex picks five donors and stops
+
+::: {.notes}
+Note Nevada is already in the blend, carrying a quarter of the counterfactual. The one state we have reason to suspect.
+:::
 
 ``` {.python code-line-numbers="1-2|4"}
 common = dict(df=df, outcome="cigsale", treat="treated",
@@ -175,19 +178,15 @@ sc = mlsynth.VanillaSC(dict(common)).fit()
 
 [Utah 0.343 · Montana 0.254 · **Nevada 0.242** · Connecticut 0.146]{.takeaway .fragment}
 
-::: {.notes}
-Note Nevada is already in the blend, carrying a quarter of the counterfactual. The one state we have reason to suspect.
-:::
-
 ## California and its synthetic are indistinguishable until 1988
 
-![](../python_sc_bayes_spatial_03_stage1_fit_gap.png){fig-alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to -26.7 packs by 2000."}
+![](../python_sc_bayes_spatial_03_stage1_fit_gap.png){fig-alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to −26.7 packs by 2000." fig-align="center"}
 
 [Reproduces the R edition's −18.46 to within 0.04 packs, from a different package and a different optimiser.]{.takeaway .fragment}
 
 ## Thirty-three donors get exactly zero
 
-![](../python_sc_bayes_spatial_04_stage1_weights.png){fig-alt="Simplex donor weights: Utah 0.34, Montana 0.25, Nevada 0.24, Connecticut 0.15, New Hampshire 0.01, and exactly zero for the other 33 states."}
+![](../python_sc_bayes_spatial_04_stage1_weights.png){fig-alt="Simplex donor weights: Utah 0.34, Montana 0.25, Nevada 0.24, Connecticut 0.15, New Hampshire 0.01, and exactly zero for the other 33 states." fig-align="center"}
 
 [Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.]{.takeaway .fragment}
 
@@ -209,11 +208,20 @@ Sampling is closed-form via the Makalic–Schmidt inverse-gamma representation �
 
 ## Relax the simplex and the active donor pool multiplies by five
 
-![](../python_sc_bayes_spatial_05_stage2_horseshoe_weights.png){fig-alt="Horseshoe posterior weights for all 38 donors with credible intervals; 25 exceed 0.01 in absolute value but only Nevada's interval excludes zero."}
+![](../python_sc_bayes_spatial_05_stage2_horseshoe_weights.png){fig-alt="Posterior donor weights from mlsynth.BSCM with 95% credible intervals, the 24 largest by magnitude; 26 of the 38 donors exceed 0.01 in absolute value, and only Nevada's interval clears zero." fig-align="center"}
 
 [5 → 26 active donors. Almost every credible interval straddles zero.]{.takeaway .fragment}
 
 ## Two Bayesian synthetic controls, one intercept apart {.smaller}
+
+::: {.notes}
+This is the slide people push back on. Both are horseshoe synthetic controls, and they
+land three packs apart. The reason is the intercept: BSCM fits beta-zero at 16.86 and its
+weights sum to 0.758, so its blend sits about 100 packs against California's 118 and the
+intercept lifts it back. scspill has no intercept and standardises first. The tiebreaker
+is external — scspill's rho-equals-zero case lands within 0.16 packs of the R edition,
+produced by entirely separate C++ code. Do not average them.
+:::
 
 | Estimator | ATT | Intercept | Weights sum |
 |---|---:|---:|---:|
@@ -229,23 +237,9 @@ $$\text{BSCM:}\ \ Y_{1t} = \beta_0 + \sum_j \alpha_j Y_{jt} + \varepsilon_t
 
 [When two packages disagree about a model they both implement, check the equation before you check the sampler.]{.takeaway .fragment}
 
-::: {.notes}
-scspill's rho=0 case lands within 0.16 packs of the R edition, which was separate C++ code. Two independent no-intercept implementations agree; BSCM is doing something else, deliberately.
-:::
-
-
-::: {.notes}
-This is the slide people push back on. Both are horseshoe synthetic controls, and they
-land three packs apart. The reason is the intercept: BSCM fits beta-zero at 16.86 and its
-weights sum to 0.758, so its blend sits about 100 packs against California's 118 and the
-intercept lifts it back. scspill has no intercept and standardises first. The tiebreaker
-is external — scspill's rho-equals-zero case lands within 0.16 packs of the R edition,
-produced by entirely separate C++ code. Do not average them.
-:::
-
 ## Four counterfactual Californias
 
-![](../python_sc_bayes_spatial_06_stage2_two_bayesian.png){fig-alt="Four counterfactual paths for California and their ATTs, showing the BSCM path sitting apart from the other three because it fits an explicit intercept."}
+![](../python_sc_bayes_spatial_06_stage2_two_bayesian.png){fig-alt="Four counterfactual paths for California and their ATTs, showing the BSCM path sitting apart from the other three because it fits an explicit intercept." fig-align="center"}
 
 [Hollow diamonds are the R edition's published values.]{.takeaway .fragment}
 
@@ -262,6 +256,14 @@ The bias is a **product** of two things: how much weight a donor carries, and ho
 
 ## The identifying assumption that replaces the simplex
 
+::: {.notes}
+Say plainly what has been traded. The simplex is gone, and something has taken its
+place: the assumption that some fixed alpha reproduces California's untreated path
+exactly, in every pre-period. It is not weaker in some absolute sense — it is untestable
+in a way the simplex is not, because the simplex's price shows up as pre-treatment RMSE
+and this one does not show up anywhere.
+:::
+
 $$\exists\, \alpha \in \mathbb{R}^{N} \;:\; Y_{1t}(\mathbf{0}) = \sum_j \alpha_j Y_{jt}(\mathbf{0}) \quad \forall t$$
 
 . . .
@@ -277,16 +279,16 @@ $$\xi_{0t} = Y_{1t} - \alpha^{\top}\mathbf{Y}^{c}_{t}(\mathbf{0}),
 
 [No $\beta$. No factors. No error variances. They **cancel**.]{.takeaway .fragment}
 
+## That cancellation is what makes the model usable
 
 ::: {.notes}
-Say plainly what has been traded. The simplex is gone, and something has taken its
-place: the assumption that some fixed alpha reproduces California's untreated path
-exactly, in every pre-period. It is not weaker in some absolute sense — it is untestable
-in a way the simplex is not, because the simplex's price shows up as pre-treatment RMSE
-and this one does not show up anywhere.
+This is the technical heart of the talk. Substituting the treated unit's equation into
+the donor system eliminates beta, the latent factors and the error variances — they all
+cancel. What is left depends only on alpha, rho, w, W and observed outcomes. That is why
+a weakly-mixing nuisance block does not poison the answer: there is nowhere for it to
+enter. It also localises the whole identification problem onto one scalar, which is what
+Act III is about.
 :::
-
-## That cancellation is what makes the model usable
 
 The effects depend on $(\alpha, \rho, \mathbf{w}, W)$ and the observed data. **Nothing else.**
 
@@ -299,16 +301,6 @@ A model this rich has many weakly identified parameters. If the effects depended
 Instead it is confined to one scalar — $\rho$ — where we can see it, measure it, and report it.
 
 [Weak identification you can locate is a manageable problem. Weak identification spread across a nuisance block is not.]{.takeaway .fragment}
-
-
-::: {.notes}
-This is the technical heart of the talk. Substituting the treated unit's equation into
-the donor system eliminates beta, the latent factors and the error variances — they all
-cancel. What is left depends only on alpha, rho, w, W and observed outcomes. That is why
-a weakly-mixing nuisance block does not poison the answer: there is nowhere for it to
-enter. It also localises the whole identification problem onto one scalar, which is what
-Act III is about.
-:::
 
 ## One call runs both samplers and post-processes the spillovers
 
@@ -332,7 +324,7 @@ result.spillover_panel          # 31 × 38: who else was treated
 
 [0.316]{.bignum}
 
-[$\hat\rho$, 95% CrI [0.231, 0.403] — the interval excludes zero, so the data reject the restriction that would collapse Stage 3 back to Stage 2]{.bignum-label}
+[$\widehat{\rho}$, 95% CrI [0.231, 0.403]. The interval excludes zero. The data reject $\rho = 0$ — and with it, SUTVA on the donor pool.]{.bignum-label}
 
 
 ::: {.notes}
@@ -342,20 +334,7 @@ than one bolted on afterwards. Resist reading precision into this number — the
 is about exactly how much that interval is worth.
 :::
 
-## Everything in this model is easy except the one thing it is for {.smaller}
-
-| Parameter | ESS (from 250,000 draws) |
-|---|---:|
-| $\sigma^2$ | 204,095 |
-| $\alpha$ (donor weights) | 10,000 – 26,000 |
-| **$\rho$** | [**137**]{.key} |
-
-. . .
-
-One contiguity channel out of California means the panel holds **one state's worth of evidence** about how strongly policies leak across borders.
-
-[That is a property of the question, not a defect in the software.]{.takeaway .fragment}
-
+## The two parameters leaning on one contiguity channel are the hard ones {.smaller}
 
 ::: {.notes}
 Read the ESS column top to bottom. Sigma-squared has 204,000, the donor weights 10,000
@@ -367,21 +346,34 @@ is not the same thing as weak identification, and the distinction matters for wh
 tell a referee.
 :::
 
+| Parameter | ESS (from 250,000 draws) |
+|---|---:|
+| $\sigma^2$ | 204,095 |
+| $\alpha$ (donor weights) | 10,000 – 26,000 |
+| $\beta$ (retail price) | 388 |
+| **$\rho$** | [137]{.key} |
+
+. . .
+
+$\rho$ is the only parameter drawn by random-walk Metropolis rather than from a closed-form conditional, so consecutive draws are heavily correlated. The posterior itself is tight — SD 0.043 on a support 1.9 wide.
+
+[Slow mixing is not weak identification, and neither is a defect in the software.]{.takeaway .fragment}
+
 ## What the library draws for you
 
-![](../python_sc_bayes_spatial_07_stage3_panel.png){fig-alt="The scspill package's own three-panel summary of the spatial fit: observed against counterfactual, the gap, and the posterior for rho."}
+![](../python_sc_bayes_spatial_07_stage3_panel.png){fig-alt="The scspill package's own three-panel summary of the spatial fit: observed against counterfactual, the treatment effect on the treated, and the top eight spillover paths." fig-align="center"}
 
 [`result.plot(kind="panel")` — observed vs counterfactual, the effect path, and the eight largest spillovers.]{.takeaway .fragment}
 
 ## Almost the entire spillover lands on one state
 
-![](../python_sc_bayes_spatial_10_spillover_map.png){fig-alt="A tile cartogram of the United States shaded by estimated spillover; Nevada is far darker than every other state and the field is otherwise pale."}
+![](../python_sc_bayes_spatial_10_spillover_map.png){fig-alt="A tile cartogram of the United States shaded by estimated spillover; Nevada is far darker than every other state and the field is otherwise pale." fig-align="center"}
 
 [Linear colour scale. The concentration is the finding, not a rendering artefact.]{.takeaway .fragment}
 
 ## Nevada absorbs eleven times the next-largest donor
 
-![](../python_sc_bayes_spatial_11_spillover_bars.png){fig-alt="Horizontal bars for the eight largest spillovers: Nevada at -5.50 packs, then Idaho and Utah near -0.49, then a steep drop to near zero."}
+![](../python_sc_bayes_spatial_11_spillover_bars.png){fig-alt="Horizontal bars for the eight largest spillovers: Nevada at −5.50 packs, then Idaho and Utah near −0.49, then a steep drop to near zero." fig-align="center"}
 
 [Nevada −5.50 · Idaho −0.49 · Utah −0.49 · everything else is noise.]{.takeaway .fragment}
 
@@ -393,20 +385,6 @@ tell a referee.
 
 ## Which means the classical estimate was biased *toward zero* {.smaller}
 
-| Donor | $\alpha_j$ | $\xi^{c}_j$ | $\alpha_j \xi^{c}_j$ |
-|---|---:|---:|---:|
-| Nevada | 0.200 | −5.50 | [**−1.098**]{.key} |
-| Utah | — | −0.49 | −0.018 |
-| Idaho | — | −0.49 | −0.006 |
-| **Sum (all 38 donors)** | | | **−1.130** |
-
-. . .
-
-Purged minus contaminated: **−1.186**. The identity holds.
-
-[Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect **larger**.]{.takeaway .fragment}
-
-
 ::: {.notes}
 This inverts the intuition most audiences arrive with. The prior expectation is
 cross-border shopping raising Nevada's sales, which would inflate the estimate. The
@@ -416,6 +394,19 @@ it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights
 Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more
 contaminated of the two.
 :::
+
+| Donor | $\alpha_j$ | $\xi^{c}_j$ | $\alpha_j \xi^{c}_j$ |
+|---|---:|---:|---:|
+| Nevada | 0.200 | −5.50 | [−1.098]{.key} |
+| Utah | 0.036 | −0.49 | −0.018 |
+| Idaho | 0.012 | −0.49 | −0.006 |
+| **Sum (all 38 donors)** | | | **−1.130** |
+
+. . .
+
+Purged minus contaminated: **−1.186**. The identity holds to 0.06 packs — the plug-in decomposition uses $\widehat{\alpha}$ alone, the purged ATT averages over paired $(\alpha, \rho)$ draws.
+
+[Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect **larger**.]{.takeaway .fragment}
 
 # Does the Interval Mean Anything? {.divider background-color="#00d4c8"}
 
@@ -445,11 +436,11 @@ adapt_rho=False           # departure 4
 | Quantity | R edition | scspill, R spec | Difference |
 |---|---:|---:|---:|
 | ATT | −16.590 | −16.286 | 0.304 |
-| $\hat\rho$ | 0.2226 | 0.2282 | 0.0056 |
+| $\widehat{\rho}$ | 0.2226 | 0.2282 | 0.0056 |
 | ESS($\rho$) | 2.93 | 3.27 | 0.34 |
 | Nevada spillover | −3.750 | −3.778 | 0.028 |
 
-[Independent code, different language, reproducing $\hat\rho$ to within 0.006 — **including an effective sample size of 3**.]{.takeaway .fragment}
+[Independent code, different language, reproducing $\widehat{\rho}$ to within 0.006 — **including an effective sample size of 3**.]{.takeaway .fragment}
 
 ## Chain length was never the problem {.smaller}
 
@@ -467,6 +458,15 @@ A hundred times the iterations widens the interval by 45%. Propagating $\alpha$ 
 
 ## ESS and completeness are different questions
 
+::: {.notes}
+Two separable failures, and the published interval failed both. ESS asks: is the
+interval reliable — did the chain actually explore the posterior? At an ESS of 3, no.
+propagate_alpha asks a different question: is the interval complete — does it carry
+uncertainty about which states make up synthetic California? With alpha pinned at its
+posterior mean, no. Running the R specification a hundred times longer fixes the first and
+moves the width only from 0.48 to 0.70. The other factor of eighteen is the second.
+:::
+
 **Effective sample size** asks whether the interval is *reliable* — did the chain visit enough of the posterior for its quantiles to mean anything? At ESS 3, no.
 
 . . .
@@ -479,19 +479,9 @@ The published interval failed **both**.
 
 [Report the effective sample size beside every credible interval, or the interval is decoration.]{.takeaway .fragment}
 
-
-::: {.notes}
-Two separable failures, and the published interval failed both. ESS asks: is the
-interval reliable — did the chain actually explore the posterior? At an ESS of 3, no.
-propagate_alpha asks a different question: is the interval complete — does it carry
-uncertainty about which states make up synthetic California? With alpha pinned at its
-posterior mean, no. Running the R specification a hundred times longer fixes the first and
-moves the width only from 0.48 to 0.70. The other factor of eighteen is the second.
-:::
-
 ## One tuning constant, three specifications
 
-![](../python_sc_bayes_spatial_12_r_reconciliation.png){fig-alt="The R edition, the R specification rerun in Python, and the corrected configuration side by side, showing the interval widening from 0.38 to 12.71 packs."}
+![](../python_sc_bayes_spatial_12_r_reconciliation.png){fig-alt="Left: the rho chain under three specifications. Right: effective sample size for rho as a bar chart — 3 for the R edition, 3 at the R specification, 67 at the headline budget, 137 with corrected defaults." fig-align="center"}
 
 [Adaptation lands acceptance at 0.444 against a 0.44 target, and ESS at 137.]{.takeaway .fragment}
 
@@ -505,11 +495,15 @@ Nothing crashes. Nothing looks wrong. Each state's price is silently matched to 
 
 . . .
 
-With covariates entering correctly, $\hat\rho$ moves from about **0.19** to about **0.35** on the same data.
+It is also the one departure with **no escape hatch worth using**: dropping the covariates entirely is the only way to sidestep it, and that trades one specification error for another.
 
 [The most dangerous bugs are the ones that return plausible numbers.]{.takeaway .fragment}
 
 ## Two departures were found by a test, not by inspection
+
+::: {.notes}
+Neither departure 5 nor 6 changes the California answer much. Both mean the R sampler was not converging to any posterior at all.
+:::
 
 Draw parameters from the prior, simulate data → the *marginal-conditional* joint distribution.
 
@@ -519,21 +513,17 @@ Simulate data, then run one Gibbs sweep, repeatedly → the *successive-conditio
 
 If every conditional is correct, these are the **same distribution**. Any statistic's mean must agree.
 
-[That is how an $\omega_k$ conditional treating a variance as a precision came to light.]{.takeaway .fragment}
-
-::: {.notes}
-Neither departure 5 nor 6 changes the California answer much. Both mean the R sampler was not converging to any posterior at all.
-:::
+[That is how an $\omega_k$ conditional treating $\omega$ as a variance, while its neighbours treated it as a precision, came to light.]{.takeaway .fragment}
 
 ## Artefacts shrink; errors do not
 
-![](../python_sc_bayes_spatial_14_geweke.png){fig-alt="Geweke joint-distribution test z-scores at two chain lengths, with the maximum falling from 3.48 to 2.50 as the chain grows tenfold."}
+![](../python_sc_bayes_spatial_14_geweke.png){fig-alt="Geweke joint-distribution test z-scores at two chain lengths, with the maximum falling from 3.48 to 2.50 as the chain grows tenfold." fig-align="center"}
 
 [max $|z|$ falls 3.48 → 2.50 and rejections go 1 → 0 as the chain grows tenfold. That is slow mixing, not an incoherent conditional.]{.takeaway .fragment}
 
 ## The only prior that moves the answer is the one nobody calls a prior
 
-![](../python_sc_bayes_spatial_15_prior_sensitivity.png){fig-alt="Posterior mean and interval for rho across six prior configurations, flat except for the row where the support is truncated to plus or minus 0.5."}
+![](../python_sc_bayes_spatial_15_prior_sensitivity.png){fig-alt="Posterior mean and interval for rho across six prior configurations, flat except for the row where the support is truncated to plus or minus 0.5." fig-align="center"}
 
 ::: {.notes}
 Flag this before anyone reads the level off the axis. `prior_sensitivity` runs the
@@ -559,7 +549,7 @@ reports.
 
 ## Every estimator targeting this ATT agrees on the sign and the scale
 
-![](../python_sc_bayes_spatial_18_att_ladder.png){fig-alt="Point estimates and credible intervals for every stage of the ladder, with hollow diamonds marking the R edition's published values."}
+![](../python_sc_bayes_spatial_18_att_ladder.png){fig-alt="Point estimates and credible intervals for every stage of the ladder, with hollow diamonds marking the R edition's published values." fig-align="center"}
 
 [Two libraries, four prior structures, one spatial layer, one independent third implementation.]{.takeaway .fragment}
 
@@ -572,7 +562,7 @@ reports.
 ## What to take away
 
 1. **The effect is robust.** Every relaxation lands between −15.7 and −18.8 packs.
-2. **The donor pool is not.** The same data support 5 active donors or 25, depending entirely on whether sparsity is a constraint or a prior.
+2. **The donor pool is not.** The same data support 5 active donors or 25–26, depending entirely on whether sparsity is a constraint or a prior.
 3. **SUTVA is false here** — and the correction is only 1.19 packs for California (1.51 on the simplex weights). It is 5.50 for Nevada.
 4. **The interval was the real error**, not the point estimate. Two distinct failures, one diagnosable by ESS and one by asking what the interval is conditioning on.
 

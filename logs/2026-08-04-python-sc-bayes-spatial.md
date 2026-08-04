@@ -442,3 +442,49 @@ shipped — but it was being *read* as evidence that the post's code runs. After
 any edit to `index.md`'s code blocks, re-render the bundle rather than trusting
 the previous render; `freeze: auto` only re-executes what changed, so the cost
 is small and the alternative is a stale artifact vouching for code it never saw.
+
+## Slide-deck revision — display defects and one retracted number
+
+A six-lens audit of `slides/` (numbers, math, typography, Quarto mechanics,
+rendered output, argument coherence), each finding put through an adversarial
+verifier, plus a browser pass over all 44 slides at 1280×720.
+
+**The one substantive error.** Line 508 asserted that with the covariates
+entering correctly `$\hat\rho$` "moves from about **0.19** to about **0.35** on
+the same data." Neither number exists in any CSV, log or table —
+`r_reconciliation.csv` gives 0.2226 / 0.2282 / 0.3134 / 0.3161. This is the same
+sentence `post-review.md` row 15 recorded as deleted from `index.md`; the
+retraction never propagated to the deck. Replaced with `index.md:1140`'s
+substantive point: departure 1 has no escape hatch worth using.
+
+**Four display defects the earlier review missed**, all found in the browser
+rather than in the source:
+
+| Defect | Cause | Effect before the fix |
+|---|---|---|
+| All 12 figures left-aligned | `![](…){fig-alt=…}` — empty brackets never earn `quarto-figure-center` | figures sat flush left with up to 624 px of dead space at the right |
+| 12 of 15 speaker notes unreachable | note written *after* a `. . .`, so Quarto nests the `<aside>` inside `<div class="fragment">`; `notes.js` drops those via `filter(t => null === t.closest(".fragment"))` | presenter view blank on 11 content slides |
+| 2 of 7 `.key` highlights the wrong colour | `[**137**]{.key}` — the inner `<strong>` lets `.reveal strong{color:#6a9bcc}` beat the inherited `.key` orange | ESS 137 and bias −1.098 rendered steel blue |
+| Title key-results strip wrapped 2+1 | captions totalled 134 chars against a site median of 82 | third result dropped to its own row |
+
+The figure fix is `fig-align="center"` as an attribute, **not** alt text moved
+into the brackets: bracket text renders as a visible `<p class="caption">` under
+the image. Verified by test render — `![alt](f.png){fig-alt="alt"}` centres but
+emits a caption; `![](f.png){fig-alt="alt" fig-align="center"}` centres, keeps
+the `alt` attribute and emits none.
+
+**Content corrections.** Three `fig-alt` strings described the wrong chart —
+figure 05 said "all 38 donors … 25 exceed 0.01" for a plot of the top 24 by
+magnitude with 26 active; figure 07 called its third panel a ρ posterior when it
+is "Top 8 spillover paths"; figure 12 described interval widths for a figure
+showing a ρ trace and ESS bars. The ESS slide's title ("Everything in this model
+is easy except the one thing it is for") asserted what `index.md:992` explicitly
+retracts and dropped the `beta[retprice]` row its own speaker note reads aloud;
+the bias table blanked the α column for Utah and Idaho while showing their
+non-zero products; "The identity holds" sat one line from −1.130 and −1.186 with
+no tolerance. Also normalised `\hat` → `\widehat` (line 91 already used it).
+
+**Verified after rebuild.** 44 slides, max content height 708 px against a 720 px
+box (no overflow), 12/12 figures centred, 15/15 speaker notes reachable, 0
+duplicate note blocks, 7/7 `.key` cells orange, title strip on one row, and zero
+raw LaTeX, stray `$` or literal markdown in the rendered text.
