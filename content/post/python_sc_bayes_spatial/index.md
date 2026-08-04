@@ -1274,10 +1274,10 @@ grid = pd.DataFrame([
 sens = prior_sensitivity(Yc, W_raw, w_raw, result.alpha_hat, grid, X=X, p=1,
                          m_burn=5_000, m_keep=20_000, base_seed=SEED)
 
-# prior_sensitivity returns long format -- 18 rows over six parameter labels.
-# Only the rho rows are the subject here.
-print(sens.query("parameter == 'rho'")
-          .drop(columns="parameter").round(4).to_string(index=False))
+# prior_sensitivity returns a PriorSensitivityResult, not a dataframe. The long
+# table -- 18 rows over six parameter labels -- is on `.table`. Only rho here.
+print(sens.table.query("parameter == 'rho'")
+               .drop(columns="parameter").round(4).to_string(index=False))
 ```
 
 ```text

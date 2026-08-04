@@ -267,3 +267,150 @@ production exactly: **0 files leaked, 232 under the post.**
 | Link targets | all 6 local targets resolve; no bare `/slides/` or `/web_app/` hrefs |
 | Infographic | **26/26** numeric claims verified against the CSVs |
 | Branding | `site-brand.scss` and `title-slide.html` still byte-identical to the templates |
+
+---
+
+# Colab notebook rebuild — 2026-08-04 (same day, after the push)
+
+`notebook.ipynb` shipped in the two commits above and was **broken on arrival**.
+Three separate problems, one of them mechanical and total.
+
+## It did not display, and the cause was one line
+
+Every `source` array stored its lines without trailing `\n`:
+
+```json
+"source": ["# Bayesian Spatial Synthetic Control in Python", "",
+           "## California's Proposition 99 with `scspill` and `mlsynth`"]
+```
+
+nbformat defines `source` as a list whose **concatenation** is the cell body. With
+the newlines gone, Colab and GitHub render each cell as a single run-on line:
+markdown headings merge into a paragraph and every code cell becomes one
+syntactically invalid line, which indentation-based Python cannot survive.
+
+The cause was one line in the generator:
+
+```python
+"source": src.strip("\n").split("\n")      # drops every newline
+```
+
+Measured against the siblings: `python_sc_dsc_sdid` has 438/493 lines
+newline-terminated and `python_ml_random_forest` 295/327 — the shortfall in each
+being the correctly-bare last line of a cell. This notebook had **0 of 493**. It
+was the only broken notebook on the site.
+
+Fixed at the generator, not in the JSON, so it cannot come back:
+
+```python
+def _lines(src):
+    body = src.strip("\n").split("\n")
+    return [l + "\n" for l in body[:-1]] + body[-1:]   # last line stays bare
+```
+
+## It was also thin, and its sections were its own
+
+The post carries **24 Python blocks across 21 sections**; the notebook had 18
+cells under a private 0–10 numbering that did not track the post. Absent
+entirely: §4 (the by-hand three-donor derivation), §11 Diagnostics (prior
+predictive, Geweke, prior sensitivity), §14 chain budget, §15 Monte Carlo, §16
+the ladder.
+
+Rebuilt to **90 cells (59 markdown, 31 code)** mirroring the post's own numbering
+and titles, so the two can be read side by side and Colab's table of contents
+lands on the same sections. One or two lines of prose per section plus the
+equations that carry the argument; the discussion stays in the post.
+
+## The install cells, which is where a Colab notebook actually fails
+
+Three defects beyond the newline damage:
+
+- **No fallback for the `[numba]` extra.** The post and `references/setup_env.py`
+  both carry one; the notebook did not. numba lags each new CPython release by
+  months, so on a newer Colab image the whole install failed. `%pip` is a magic
+  and cannot take the post's shell `||`, so the fallback is now a `subprocess`
+  helper that reports which path it took.
+- **Restart detection only fired on a downgrade to numpy 1.x.** Replaced with a
+  general on-disk-versus-in-memory comparison that catches any resolver-driven
+  swap — and that imports none of numpy/scipy/pandas, so §5's BLAS pinning still
+  takes effect.
+- **Ordering.** `OMP_NUM_THREADS` is a no-op once numpy is imported.
+
+Pins verified identical across `notebook.ipynb`, `setup_env.py` and `index.md`:
+`scspill[numba]==0.2.1` and `mlsynth[bayes] @ ...@15f168bb`.
+
+## Fidelity: a dial, not a compromise
+
+Stages 1–3 and the diagnostics run at the post's real budget (`m_iter = 500_000`),
+so the headline numbers match the published ones; §13–§15 use a survey budget,
+because `SPILLSYNTH(sar)` at 500,000 draws alone takes about 17 minutes. `FAST =
+True` in §5 drops everything to a ~3-minute pass. Also restored
+`max_effect_draws=5_000` on the Stage 3 fit — harmless at 4,000 iterations, a
+memory risk at 500,000 on a Colab box.
+
+## Four portability problems solved rather than papered over
+
+| | |
+|---|---|
+| §8.3 forward-references `result` | fine in a post assembled by `analysis.py`, fatal in a linear notebook. The single `SCSPILL` fit now runs **at 8.3** — truthful, since `result.effects_detail.att_scm` *is* Stage 2 inside the Stage 3 fit — and saves a duplicate half-million-draw run |
+| Three blocks read local CSVs | `scspill_departures.csv` inlined as markdown; the bias identity and the ladder rebuilt from the live objects |
+| §17 is a Mermaid diagram | Colab cannot render Mermaid; converted to a plain-text decision tree |
+| Goldmark escaping | equations copied with the doubling removed (`\\hat\\rho` → `\hat\rho`); audited, none leaked |
+
+## A latent defect in the post, found by executing the notebook
+
+§11.3's code block calls `sens.query("parameter == 'rho'")`. `prior_sensitivity`
+returns a `PriorSensitivityResult`, **not** a dataframe — the long table is on
+`.table`, which is exactly what `analysis.py:1523` does
+(`pd.DataFrame(getattr(sens, "table", sens))`). Copy-pasted from the post, the
+line raises `AttributeError`.
+
+It had never executed. `references/tutorial.html` was rendered at 13:41, before
+the review pass rewrote the block, and contains no `parameter == ` string at all —
+so the freeze cache was showing an older, passing version and nothing ever caught
+it. The published `text` output block is real (it comes from
+`prior_sensitivity.csv` via `analysis.py`), so only the one line was wrong.
+
+Fixed in **`index.md`**, **`references/tutorial.qmd`** and the notebook; bundle
+`.zip` rebuilt. This is the argument for actually running a notebook end to end
+rather than static-checking it — the review pass verified §11.3 by `ast.parse`
+and an undefined-name scan, both of which it passes.
+
+## Verification
+
+| Check | Result |
+|---|---|
+| `nbformat.validate` | OK, v4.5 with unique cell ids |
+| Newline audit | **90/90 cells** correct; last line of each cell correctly bare |
+| `ast.parse` | 31/31 code cells and the concatenation; undefined-name scan **none** |
+| Section coverage vs `index.md` | every `##`/`###` heading present, **in the post's order** |
+| KaTeX parse of every expression | **124/124**, 0 failures |
+| Portability | 0 mermaid fences, 0 local-file reads, 0 Goldmark escapes leaked |
+| End-to-end execution, `FAST=True` | **31/31 cells, 0 tracebacks**, 259 s; 29 stream outputs, 4 figures |
+| §13 catalogue | all **9 estimators ran, none errored** |
+| Cross-implementation check | `SPILLSYNTH(sar)` −16.469 against Stage 3's −16.130 at the survey budget |
+| Hugo 0.111.3 `--gc --minify --buildFuture` | exit 0, 1,274 EN / 552 ES / 552 JA; `notebook.ipynb` absent from `public/`, no `.venv`/`_freeze` leakage |
+| Bundle | rebuilt, 15 files |
+| Outputs | stripped before commit, matching `python_sc_dsc_sdid` and `python_dowhy` |
+
+### Fidelity spot-check at the shipped budget
+
+The notebook was then run **as shipped** (`FAST = False`, `m_iter = 500_000`)
+through section 9.5 and compared against the post's published values:
+
+| Quantity | Notebook | Post | Delta |
+|---|---:|---:|---:|
+| ATT | −16.868 | −16.87 | +0.002 |
+| ATT at ρ=0 | −15.6816 | −15.68 | −0.002 |
+| ρ | 0.3161 | 0.316 | +0.0001 |
+| ρ 95% CrI | [0.2312, 0.4032] | [0.231, 0.403] | +0.0002 |
+| ESS(ρ) | 136.8 | 137 | — |
+
+Acceptance came out at **0.444** against §9.4's stated 0.44 Robbins–Monro target,
+and `BSCM` reproduced the intercept fit exactly: weights summing to 0.7576 over
+26 active donors, against the post's 0.758 and 26. The default configuration
+reproduces the post; `FAST = True` does not, and says so.
+
+Both `links:` entries for the notebook resolve against
+`github.com/cmg777/starter-academic-v501/blob/master/…`, so the fix reaches
+readers only on push.
