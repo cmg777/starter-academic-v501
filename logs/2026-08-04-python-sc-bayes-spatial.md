@@ -414,3 +414,31 @@ reproduces the post; `FAST = True` does not, and says so.
 Both `links:` entries for the notebook resolve against
 `github.com/cmg777/starter-academic-v501/blob/master/…`, so the fix reaches
 readers only on push.
+
+## Closing the gap the defect exposed
+
+The §11.3 fix was verified through the *notebook's* execution path but not
+through Quarto's, and `references/tutorial.html` was still the stale 13:41
+render — the artifact whose staleness hid the bug in the first place. Its freeze
+cache (`references/_freeze/tutorial/execute-results/html.json`) contained
+neither `sens.query` nor the string `parameter ==`, so the cached HTML had been
+produced from an older §11.3 entirely and the current block had never run
+anywhere.
+
+`quarto render tutorial.qmd` re-executed the document from scratch: **26/26
+chunks, exit 0, 0 tracebacks**. Because Quarto fails a render on any cell error,
+that is the definitive sweep for sibling defects of the same class — a post code
+block that has never actually executed. There are none. §11.3 now renders the
+published table, means matching to four decimals across all six rows, with row 3
+pinned at 0.4990 against the truncated support exactly as the post reports.
+
+The three CSV-reading blocks the notebook replaces with live objects (§10.2
+departures, §12 bias identity, §16 ladder) were checked separately against their
+files: all four columns resolve, Nevada at 0.1997 and −5.4995 against the post's
+stated 0.200 and −5.50.
+
+**The process lesson.** `tutorial.html` is gitignored, so its staleness never
+shipped — but it was being *read* as evidence that the post's code runs. After
+any edit to `index.md`'s code blocks, re-render the bundle rather than trusting
+the previous render; `freeze: auto` only re-executes what changed, so the cost
+is small and the alternative is a stale artifact vouching for code it never saw.
