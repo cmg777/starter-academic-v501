@@ -1,0 +1,809 @@
+---
+title: "Evaluating the Impact of Infrastructure"
+subtitle: "A beginner's guide to difference-in-differences with the Jamuna Bridge"
+author: "Carlos Mendez"
+date: today
+date-format: long
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    code-fold: false
+    code-tools: true
+    theme: cosmo
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+    embed-resources: false
+    df-print: paged
+execute:
+  warning: false
+  message: false
+  freeze: auto
+jupyter: bridge-impact-tutorial
+---
+
+::: {.callout-note}
+## What this bundle is
+
+This is the runnable companion to
+[the full post](https://carlos-mendez.org/post/python_bridge_impact/). It reproduces the
+difference-in-differences evaluation of the Jamuna Bridge end to end: the 2x2, two-way fixed
+effects, the event study, both doubly-robust estimators, the spatial heterogeneity, and the
+HonestDiD sensitivity analysis.
+
+`analysis.py`, in this same folder, is the full script behind the post. It goes further: all four
+outcome families, every published table, the three-engine estimator-agreement check, and a
+122-coefficient reproduction audit against the original Stata output. Run it with
+`python analysis.py`.
+:::
+
+
+In June 1998 a 4.8-kilometre bridge opened over the Jamuna river in Bangladesh. It cost about
+\$985 million, connected roughly 26 million people in the isolated northwest to Dhaka, and cut
+freight costs by about half. A truck from Bogra to Dhaka went from twenty hours to six.
+
+This notebook rebuilds the impact evaluation of that bridge from scratch, replicating
+Blankespoor, Emran, Shilpi and Xu (2021), *"Bridge to bigpush or backwash?"*, published in the
+*Journal of Economic Geography*.
+
+**The research question.** When you connect a poor region to a rich one, does the poor region
+revive, or does it get hollowed out? There are three answers in the literature:
+
+| Theory | Prediction for manufacturing | Prediction for population |
+|---|---|---|
+| **Big push** — integration raises efficiency | up, or flat | up |
+| **Backwash** — the core captures increasing returns | **down** | **down** |
+| **Comparative advantage** — the region specialises | **down** | up or flat |
+
+Notice that backwash and comparative advantage make the *same* prediction about factories. They
+only separate on population. That is the methodological lesson of this notebook.
+
+**The design.** Treated: 123 upazilas (subdistricts) in the Jamuna hinterland. Comparison: 125
+upazilas in the Padma hinterland, cut off by the *other* great river, whose own bridge was not
+started until 2015 — so it stayed isolated for the whole study window.
+
+**Companion post:** <https://carlos-mendez.org/post/python_bridge_impact/>
+
+
+***
+## 1. Setup
+
+`diff-diff` is the difference-in-differences engine; `pyfixest` is an independent second opinion.
+
+```{python}
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import pyfixest as pf
+
+from diff_diff import (
+    DifferenceInDifferences, MultiPeriodDiD, SurveyDesign,
+    check_parallel_trends, compute_honest_did, equivalence_test_trends,
+)
+
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+
+# Site palette (dark theme)
+DARK_NAVY, GRID_LINE = "#0f1729", "#1f2b5e"
+LIGHT_TEXT, WHITE_TEXT = "#c8d0e0", "#e8ecf2"
+STEEL_BLUE, WARM_ORANGE, TEAL = "#6a9bcc", "#d97757", "#00d4c8"
+
+plt.rcParams.update({
+    "figure.facecolor": DARK_NAVY, "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY, "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT, "axes.grid": True,
+    "grid.color": GRID_LINE, "grid.alpha": 0.8,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "axes.spines.left": False, "axes.spines.bottom": False,
+    "xtick.color": LIGHT_TEXT, "ytick.color": LIGHT_TEXT,
+    "text.color": WHITE_TEXT, "font.size": 12, "legend.frameon": False,
+    "savefig.facecolor": DARK_NAVY, "figure.figsize": (9.5, 5.5),
+})
+print("ready")
+```
+
+***
+## 2. Load the data
+
+Four data families, all committed alongside the post as tidy CSVs.
+
+```{python}
+from pathlib import Path
+
+# Read the CSVs that ship inside this bundle; fall back to GitHub if they were moved.
+_here = Path.cwd()
+BASE = str(_here) + "/" if (_here / "bridge_nightlights.csv").exists() else (
+    "https://raw.githubusercontent.com/cmg777/starter-academic-v501/"
+    "master/content/post/python_bridge_impact/data/")
+
+nl_raw   = pd.read_csv(BASE + "bridge_nightlights.csv")     # DMSP-OLS satellite luminosity
+emp_raw  = pd.read_csv(BASE + "bridge_employment.csv")      # population censuses
+yld_raw  = pd.read_csv(BASE + "bridge_yield.csv")           # Boro rice yield
+hh_raw   = pd.read_csv(BASE + "bridge_dhs_household.csv")   # DHS/HIES households
+vill_raw = pd.read_csv(BASE + "bridge_dhs_village.csv")     # DHS village questionnaire
+
+for nm, d, unit in [("employment", emp_raw, "geocode"), ("nightlights", nl_raw, "geocode"),
+                    ("yield", yld_raw, "dist"), ("dhs household", hh_raw, "District"),
+                    ("dhs village", vill_raw, "District")]:
+    ins = d[d["smp1"].notna()]
+    print(f"{nm:15s} rows={len(d):5d}  units={d[unit].nunique():4d}"
+          f"  periods={d['year'].nunique()}"
+          f"  treated={ins.loc[ins.treat == 1, unit].nunique():4d}"
+          f"  comparison={ins.loc[ins.treat == 0, unit].nunique():4d}")
+```
+
+### The single most important detail
+
+The `year` column holds the integers **1 to 7**, not calendar years. Annual satellite data are
+averaged into three-year blocks to smooth out transitory shocks:
+
+| `year` | window |
+|---|---|
+| 1 | 1992-94 |
+| 2 | 1995-97 |
+| 3 | 1998-00 &nbsp; ← the bridge opens inside this block |
+| 4 | 2001-04 |
+| 5 | 2005-07 |
+| 6 | 2008-10 |
+| 7 | 2011-13 |
+
+This matters beyond labelling, because the control variables interact baseline characteristics
+with `year`. Substitute calendar years there and every coefficient changes.
+
+Also note `smp1`: it is **missing** for the Dhaka-Chittagong core, which is neither treated nor a
+valid comparison. Filtering on `smp1.notna()` is how the core gets excluded.
+
+```{python}
+NL_YEARS = {1: "1992-94", 2: "1995-97", 3: "1998-00", 4: "2001-04",
+            5: "2005-07", 6: "2008-10", 7: "2011-13"}
+nl_raw.head(4)
+```
+
+***
+## 3. Build the analysis panel
+
+Six things happen here. Read the comments — each line encodes a decision.
+
+```{python}
+nl = nl_raw.copy()
+
+# Distance to the *relevant* bridge foot: Jamuna for treated, Padma site for comparison.
+nl["mdist"]   = np.minimum(nl["jamuna_m"], nl["padma_m"]) / 1000.0
+nl["lmdist"]  = np.log(nl["mdist"] + 1)
+nl["lpop91"]  = np.log(nl["pop91"])
+
+# Outcome. Luminosity is bottom-coded at 1.0, so the +1 keeps the many near-dark
+# upazilas from dominating the log transform.
+nl["lmn"] = np.log(nl["mn"] + 1)
+
+# Rainfall controls. NOTE: this dataset has zeros, hence the +1 -- the census and
+# yield do-files use plain log(rainm). Small differences like this are what make a
+# replication succeed or fail.
+nl["lrainm"]  = np.log(nl["rainm"] + 1)
+nl["lrainsd"] = np.log(nl["rainsd"].replace(0, np.nan))
+
+# Initial conditions interacted with the time index. A unit fixed effect already absorbs
+# lpop91 and lmdist (they never change), so entering them alone would do nothing. Interacting
+# them with the trend lets an upazila that was large or remote IN 1991 be on a permanently
+# different trajectory. That relaxes parallel trends from "all upazilas trend alike" to
+# "upazilas that started alike trend alike".
+nl["lpop91_t"] = nl["lpop91"] * nl["year"]
+nl["lmdist_t"] = nl["lmdist"] * nl["year"]
+
+CONTROLS = ["lpop91_t", "lrainm", "lrainsd", "lmdist_t"]
+nl = nl.dropna(subset=CONTROLS)
+
+# Timing indicators
+nl["post"] = (nl["year"] > 2).astype(int)                            # bridge opens in period 3
+nl["sr"]   = ((nl["year"] >= 3) & (nl["year"] <= 4)).astype(int)     # short run 1998-2004
+nl["lr"]   = (nl["year"] > 4).astype(int)                            # long run 2005-2013
+nl["treat_post"] = nl["treat"] * nl["post"]
+nl["treat_sr"]   = nl["treat"] * nl["sr"]
+nl["treat_lr"]   = nl["treat"] * nl["lr"]
+
+# The estimation sample: Jamuna vs Padma hinterlands, core excluded.
+NL = nl[nl["smp1"].notna()].copy()
+for c in ["year", "geocode", "treat", "post"]:
+    NL[c] = NL[c].astype(int)
+
+print(f"estimation sample: {len(NL)} rows, {NL.geocode.nunique()} upazilas, "
+      f"{NL.year.nunique()} periods")
+```
+
+***
+## 4. The 2x2: four numbers, no library
+
+Difference-in-differences is two subtractions. Do it by hand before touching an estimator.
+
+```{python}
+cell = NL.groupby(["treat", "post"])["lmn"].mean().unstack()
+d_treated = cell.loc[1, 1] - cell.loc[1, 0]
+d_control = cell.loc[0, 1] - cell.loc[0, 0]
+
+print(f"treated    pre {cell.loc[1,0]:.4f}   post {cell.loc[1,1]:.4f}   change {d_treated:+.4f}")
+print(f"comparison pre {cell.loc[0,0]:.4f}   post {cell.loc[0,1]:.4f}   change {d_control:+.4f}")
+print(f"\ndifference-in-differences = {d_treated:+.4f} - ({d_control:+.4f}) = "
+      f"{d_treated - d_control:+.4f}")
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(9, 5.5))
+xs = [0, 1]
+ax.plot(xs, [cell.loc[1, 0], cell.loc[1, 1]], marker="o", ms=9, lw=2.5,
+        color=WARM_ORANGE, label="Jamuna hinterland (treated)")
+ax.plot(xs, [cell.loc[0, 0], cell.loc[0, 1]], marker="o", ms=9, lw=2.5,
+        color=STEEL_BLUE, label="Padma hinterland (comparison)")
+counter = cell.loc[1, 0] + d_control
+ax.plot(xs, [cell.loc[1, 0], counter], marker="o", ms=9, lw=2.5, ls="--",
+        color=TEAL, label="Counterfactual for the treated")
+ax.annotate("", xy=(1, cell.loc[1, 1]), xytext=(1, counter),
+            arrowprops=dict(arrowstyle="<->", color=WHITE_TEXT, lw=2))
+ax.text(1.03, (cell.loc[1, 1] + counter) / 2, f"ATT = {d_treated - d_control:+.4f}",
+        color=WHITE_TEXT, va="center", fontweight="bold")
+ax.set_xticks(xs)
+ax.set_xticklabels(["Before the bridge\n(1992-1997)", "After the bridge\n(1998-2013)"])
+ax.set_ylabel("Mean log(luminosity + 1)")
+ax.set_title("The difference-in-differences logic in one picture",
+             fontweight="bold", fontsize=13)
+ax.set_xlim(-0.15, 1.45)
+ax.legend(loc="upper left")
+plt.tight_layout(); plt.show()
+```
+
+The teal dashed line is the counterfactual: where the treated group would have landed had it
+grown at the comparison group's rate. The gap between that line and where it actually landed is
+the estimate.
+
+**What each subtraction removes.** The first difference (post minus pre, within a group) removes
+anything permanent about a place — its size, its soil, its distance from the capital. The second
+difference (treated minus comparison) removes anything that happened to the whole country in
+those years — a fertiliser subsidy, a monsoon, a change in how the satellite was calibrated.
+
+***
+## 5. Two-way fixed effects with `diff-diff`
+
+With 247 upazilas and 7 periods we can do better than two group means: give every upazila its own
+level and every period its own shock.
+
+$$Y_{it} = \theta_0 + \mu_i + \mu_t + \theta_1 (D_J \times D_{post}) + \sum_q \beta_q X_{qit}
++ \sum_m \pi_m (Z_{mi0} \times t) + \varepsilon_{it}$$
+
+The API takes the **group** indicator (`treat`) and the **period** indicator (`post`) separately
+and builds the interaction itself.
+
+```{python}
+res = DifferenceInDifferences(cluster="geocode").fit(
+    NL, outcome="lmn", treatment="treat", time="post",
+    covariates=CONTROLS, absorb=["geocode", "year"], unit="geocode")
+
+print(res)
+res.print_summary()
+```
+
+**Two API traps worth knowing.**
+
+1. Use `absorb=` rather than `fixed_effects=`. Both give the same coefficient, but `absorb`
+   partials the fixed effects out before the degrees-of-freedom correction — which is what
+   Stata's `xtreg, fe` does, and what reproduces the published standard error of 0.022.
+   `fixed_effects=` gives 0.0238 here.
+2. `time=` is the binary pre/post switch, **not** the 1-7 period index.
+
+Now cross-check in a completely different library. A DiD estimate is a small number extracted
+through several layers of transformation, and the cheapest insurance against a coding error is to
+reproduce it in software that shares none of your code.
+
+```{python}
+fit = pf.feols("lmn ~ treat_post + post + lpop91_t + lrainm + lrainsd + lmdist_t"
+               " | geocode + year", data=NL, vcov={"CRV1": "geocode"})
+print(f"pyfixest : {fit.coef()['treat_post']:.7f}  (se {fit.se()['treat_post']:.7f})")
+print(f"diff-diff: {res.att:.7f}  (se {res.se:.7f})")
+```
+
+***
+## 6. The event study
+
+One post-bridge dummy compresses fifteen years into a single number. Give every period its own
+coefficient instead, measured relative to the last pre-bridge window.
+
+$$Y_{it} = \mu_i + \mu_t + \sum_{k \neq 2} \gamma_k \, D_J \cdot \mathbf{1}[t = k]
++ \sum_q \beta_q X_{qit} + u_{it}$$
+
+The coefficients for $k < 3$ are a **test** — they should be zero if parallel trends holds. The
+coefficients for $k \geq 3$ are the **answer**.
+
+```{python}
+ev = MultiPeriodDiD(cluster="geocode").fit(
+    NL, outcome="lmn", treatment="treat", time="year",
+    post_periods=[3, 4, 5, 6, 7], covariates=CONTROLS,
+    absorb=["geocode"], reference_period=2, unit="geocode")
+
+rows = [{"period": p, "label": NL_YEARS[p], "effect": ev.get_effect(p).effect,
+         "se": ev.get_effect(p).se} for p in sorted(ev.period_effects)]
+rows.append({"period": 2, "label": NL_YEARS[2], "effect": 0.0, "se": 0.0})
+es = pd.DataFrame(rows).sort_values("period").reset_index(drop=True)
+print(f"average post-treatment ATT = {ev.avg_att:+.4f} (se {ev.avg_se:.4f})\n")
+es.round(4)
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.axhline(0, color=WHITE_TEXT, lw=1)
+ax.axvspan(0.55, 2.5, color=GRID_LINE, alpha=0.35)
+ax.axvline(2.5, color=TEAL, ls="--", lw=1.8)
+ax.text(2.6, es["effect"].max() * 0.9, "bridge opens", color=TEAL, fontsize=10)
+for _, r in es.iterrows():
+    ax.errorbar(r["period"], r["effect"], yerr=1.96 * r["se"], fmt="o", ms=8,
+                color=WARM_ORANGE if r["period"] >= 3 else STEEL_BLUE, capsize=4, lw=1.8)
+ax.plot(es["period"], es["effect"], color=WARM_ORANGE, lw=1.2, alpha=0.5)
+ax.set_xticks(es["period"]); ax.set_xticklabels(es["label"], rotation=45, ha="right")
+ax.set_ylabel("Effect on log(luminosity + 1)")
+ax.set_title("Nighttime lights: no pre-trend, then a steady climb",
+             fontweight="bold", fontsize=13)
+plt.tight_layout(); plt.show()
+```
+
+This is the most persuasive figure in the whole analysis, and the original paper never drew it.
+The pre-bridge coefficient sits on zero. Then the effect climbs monotonically across all five
+post-bridge periods.
+
+Think about what a confounder would have to look like to produce this: absent before June 1998,
+appearing at exactly the right moment, then growing steadily for fifteen years without reversing.
+Such things exist, but the list is short.
+
+***
+## 7. Testing parallel trends
+
+Two tests that do different jobs.
+
+```{python}
+pt = check_parallel_trends(NL, outcome="lmn", time="year",
+                           treatment_group="treat", pre_periods=[1, 2])
+eq = equivalence_test_trends(NL, outcome="lmn", time="year",
+                             treatment_group="treat", unit="geocode", pre_periods=[1, 2])
+
+print("check_parallel_trends:")
+for k in ["trend_difference", "trend_difference_se", "p_value", "parallel_trends_plausible"]:
+    print(f"   {k:28s} {pt[k]}")
+print("\nequivalence_test_trends:")
+for k in ["equivalence_margin", "tost_p_value", "equivalent"]:
+    print(f"   {k:28s} {eq[k]}")
+```
+
+The second test is the more useful one, and the distinction is worth internalising.
+
+`check_parallel_trends` *fails to reject* a difference in trends. That is reassuring but weak —
+failing to reject is not evidence of similarity, especially when the standard error is large
+enough to hide almost anything.
+
+`equivalence_test_trends` flips the null around and asks whether the trend difference is
+*smaller* than a margin. Rejecting there is a positive finding rather than an absence of one.
+When you can, report both, and never treat an insignificant pre-trend on its own as strong
+evidence.
+
+***
+## 8. Two doubly robust estimators, built by hand
+
+So far the comparison group has been used as-is. But the two hinterlands differ on measured
+characteristics. There are two classical fixes: **reweight** the comparison group (needs a model
+of who got treated), or **regression-adjust** (needs a model of the outcome). A *doubly robust*
+estimator does both and is consistent if **either** model is right.
+
+> **Analogy.** A skydiver carries a main chute and a reserve. Only if both fail does the jump end
+> badly. But two chutes do not help if you jumped over the wrong country — double robustness
+> protects against getting a model's *shape* wrong, never against a confounder you never measured.
+
+### 8.1 The propensity model
+
+```{python}
+s = NL.dropna(subset=["lpop91", "lmdist"]).copy()
+X = sm.add_constant(s[["lpop91", "lmdist"]].astype(float))
+D = s["treat"].to_numpy(float)
+
+logit = sm.Logit(D, X).fit(disp=0)
+s["p"] = logit.predict(X)
+cut = np.percentile(s["p"], 5)
+
+print(f"logit N={len(s)}  coefficients={logit.params.to_numpy().round(6)}")
+print(f"5% trim cutoff: p = {cut:.7f}")
+```
+
+**Why trim?** A comparison unit with a propensity of 0.03 must be multiplied by about thirty to
+stand in for a treated one, and then speaks with the voice of thirty upazilas. It is like settling
+a national budget at an exchange rate of thirty to one: one mis-measured rainfall figure arrives
+in the final accounts multiplied thirtyfold. Trimming says you will not trade at rates above a
+certain level.
+
+The cost is real: the estimand shifts slightly, from the ATT on all treated units to the ATT on
+the region of common support.
+
+### 8.2 LWDR — propensity odds as ATT weights
+
+$$w_i^{LW} = \frac{p_i}{1 - p_i} \cdot \frac{1 - \pi}{\pi}$$
+
+```{python}
+pi = D.mean()
+s["ipw1"] = np.where(D == 1, 1.0, s["p"] / (1 - s["p"]) * (1 - pi) / pi)
+s["ipw3"] = np.where((s["p"] < cut) & (D == 0), np.nan, s["ipw1"])   # trimmed version
+print(s.loc[s.treat == 0, ["p", "ipw1", "ipw3"]].describe().T.round(4))
+```
+
+The line `np.where(D == 1, 1.0, ...)` is not a formatting convenience. Treated units get a weight
+of exactly one because we want the effect *on the treated*: the treated distribution is the
+target, and only the comparison group is reshaped to match it. Weighting treated units by $1/p$
+instead would target the ATE. **That single line is what makes these ATT weights.**
+
+### 8.3 KOBDR — Kline's Oaxaca-Blinder reweighting
+
+$$w_i^{KOB} = \frac{1 - D_{J,i}}{N_1}
+\left( \sum_{j : D_{J,j}=1} X_j \right)^{\prime}
+\left( \sum_{j : D_{J,j}=0} X_j X_j^{\prime} \right)^{-1} X_i$$
+
+Run the outcome regression on the comparison group only, then evaluate it at the *average
+treated* covariate profile. Kline (2011) showed this is algebraically a weighted average of the
+comparison outcomes, and this is the weight it implies.
+
+```{python}
+n1, Xm, nD = D.sum(), X.to_numpy(float), 1.0 - D
+ob = ((D @ Xm) @ np.linalg.inv(Xm.T @ (Xm * nD[:, None])) @ Xm.T / n1) * nD * n1
+
+s["ipw2"] = np.where(D == 1, 1.0, np.where(ob < 0, np.nan, ob))
+s["ipw4"] = np.where((s["p"] < cut) & (D == 0), np.nan, s["ipw2"])
+
+print(f"comparison units with a NEGATIVE Oaxaca-Blinder weight: "
+      f"{int(((ob < 0) & (D == 0)).sum())}  (dropped)")
+print(f"correlation between the two weighting schemes: "
+      f"{s.loc[s.treat == 0, 'ipw1'].corr(s.loc[s.treat == 0, 'ipw2']):.4f}")
+
+NLW = s.copy()
+```
+
+> **Analogy.** A director must stage the Jamuna hinterland using only Padma actors. She writes
+> down the profile of the average Jamuna upazila and asks what blend of Padma actors reproduces it
+> exactly. The blend proportions are the Oaxaca-Blinder weights. Nothing forces them to be
+> positive: sometimes the best way to hit the target is to weight one actor at 1.4 and another at
+> $-0.4$. Negative casting is not interpretable, so those units are dismissed.
+
+### 8.4 Does the reweighting actually work?
+
+```{python}
+units = NLW.drop_duplicates("geocode")
+rows = []
+for var in ["lpop91", "lmdist"]:
+    t = units.loc[units.treat == 1, var]
+    for lab, wcol in [("unweighted", None), ("LWDR", "ipw3"), ("KOBDR", "ipw4")]:
+        c = units[units.treat == 0].dropna(subset=[var] + ([wcol] if wcol else []))
+        w = np.ones(len(c)) if wcol is None else c[wcol].to_numpy(float)
+        cm = np.average(c[var], weights=w)
+        sd = np.sqrt((t.var() + c[var].var()) / 2)
+        rows.append({"variable": var, "weighting": lab,
+                     "std_difference": (t.mean() - cm) / sd})
+pd.DataFrame(rows).round(4)
+```
+
+The distance covariate starts badly imbalanced — a standardised difference above the conventional
+0.10 threshold — because Jamuna upazilas sit systematically farther from their bridge foot than
+Padma upazilas do from theirs. KOBDR reweighting moves both covariates comfortably inside the
+threshold. This is the clearest evidence the reweighting does what it claims.
+
+***
+## 9. Estimating with the weights
+
+`diff-diff` accepts external weights through a `SurveyDesign`. `weight_type="aweight"` reproduces
+Stata's analytic weights and `psu` sets the clustering unit.
+
+One implementation note: `diff-diff` refuses to absorb two fixed-effect dimensions at once when
+survey weights are supplied — weighted sequential demeaning is not the same operation as
+unweighted, and the library declines to pretend otherwise. The workaround is to absorb the unit
+and pass explicit year dummies as covariates.
+
+```{python}
+def weighted_did(data, wcol):
+    d = data[data[wcol].notna()].copy()
+    dums = pd.get_dummies(d["year"], prefix="yd", drop_first=True).astype(float)
+    for c in dums.columns:
+        d[c] = dums[c].to_numpy()
+    return DifferenceInDifferences(cluster="geocode").fit(
+        d, outcome="lmn", treatment="treat", time="post",
+        covariates=CONTROLS + list(dums.columns), absorb=["geocode"], unit="geocode",
+        survey_design=SurveyDesign(weights=wcol, weight_type="aweight", psu="geocode"))
+
+for lab, wcol in [("LWDR ", "ipw3"), ("KOBDR", "ipw4")]:
+    r = weighted_did(NLW, wcol)
+    print(f"{lab}: ATT = {r.att:+.4f}  (se {r.se:.4f})  N = {r.n_obs}")
+print(f"OLS  : ATT = {res.att:+.4f}  (se {res.se:.4f})  N = {res.n_obs}")
+```
+
+Both reweighted estimates are **larger** than the unweighted one. Adjustment does not always
+shrink an effect — a useful thing to see once.
+
+Published values for comparison: OLS 0.088 (0.022), LWDR 0.106 (0.022), KOBDR 0.109 (0.022).
+
+***
+## 10. Short run versus long run — the discriminating test
+
+Now the census panel, which carries the outcome that decides the theoretical question. We need a
+weighted fixed-effects estimator with Stata's exact standard-error correction to reproduce the
+published numbers, so here is a compact one.
+
+```{python}
+def independent_columns(M, tol=1e-9):
+    # Stata's "omitted because of collinearity", scanning left to right.
+    keep, basis = [], np.zeros((M.shape[0], 0))
+    for j in range(M.shape[1]):
+        v = M[:, j]
+        if basis.shape[1]:
+            v = v - basis @ (basis.T @ v)
+        n = np.linalg.norm(v)
+        if n > tol * max(1.0, np.linalg.norm(M[:, j])):
+            keep.append(j); basis = np.column_stack([basis, v / n])
+    return keep
+
+
+def stata_fe(data, y, rhs, unit, time="year", weight=None):
+    # Weighted unit-FE regression: xtreg y rhs i.time, fe robust cluster(unit) [aw=weight]
+    cols = [y] + list(rhs) + [unit, time] + ([weight] if weight else [])
+    d = data.dropna(subset=list(dict.fromkeys(cols))).copy()
+    w = np.ones(len(d)) if weight is None else d[weight].to_numpy(float)
+    w = w * len(d) / w.sum()                       # Stata normalises aweights to mean 1
+
+    dums = pd.get_dummies(d[time].astype(int), prefix="t", drop_first=True).astype(float)
+    Z = pd.concat([d[list(rhs)].astype(float).reset_index(drop=True),
+                   dums.reset_index(drop=True)], axis=1)
+    names = list(rhs) + list(dums.columns)
+
+    g = d[unit].to_numpy()
+    den = pd.Series(w).groupby(g).transform("sum").to_numpy()
+
+    def demean(a):
+        a = np.asarray(a, float)
+        return a - pd.Series(a * w).groupby(g).transform("sum").to_numpy() / den
+
+    yv = demean(d[y].to_numpy(float))
+    Zv = np.column_stack([demean(Z[c].to_numpy(float)) for c in names])
+    keep = independent_columns(Zv)
+    Zv, names = Zv[:, keep], [names[i] for i in keep]
+
+    fit = sm.WLS(yv, Zv, weights=w).fit(cov_type="cluster", cov_kwds={"groups": g})
+    return {"coef": pd.Series(fit.params, index=names),
+            "se": pd.Series(fit.bse, index=names),
+            "p": pd.Series(fit.pvalues, index=names),
+            "n": len(d), "g": d[unit].nunique()}
+```
+
+```{python}
+# Build the census panel and its KOBDR weights
+emp = emp_raw.copy()
+emp["mdist"]   = np.minimum(emp["jamuna_m"], emp["padma_m"]) / 1000.0
+emp["lmdist"]  = np.log(emp["mdist"] + 1)
+emp["lpop91"]  = np.log(emp["pop91"])
+emp["lrainm"]  = np.log(emp["rainm"].replace(0, np.nan))     # NOTE: no +1 here
+emp["lrainsd"] = np.log(emp["rainsd"].replace(0, np.nan))
+
+es_ = emp[emp["smp1"].notna()].dropna(subset=["lpop91", "lmdist"]).copy()
+Xe = sm.add_constant(es_[["lpop91", "lmdist"]].astype(float))
+De = es_["treat"].to_numpy(float)
+pe = sm.Logit(De, Xe).fit(disp=0).predict(Xe)
+cute = np.percentile(pe, 5)
+n1e, Xme, nDe = De.sum(), Xe.to_numpy(float), 1.0 - De
+obe = ((De @ Xme) @ np.linalg.inv(Xme.T @ (Xme * nDe[:, None])) @ Xme.T / n1e) * nDe * n1e
+es_["ipw4"] = np.where((pe < cute) & (De == 0), np.nan,
+                       np.where(De == 1, 1.0, np.where(obe < 0, np.nan, obe)))
+es_ = es_[es_["ipw4"].notna() | (es_["treat"] == 1)]
+
+emp = emp.merge(es_.groupby("geocode")["ipw4"].first().reset_index(), on="geocode", how="left")
+emp["ldensity"] = np.log(emp["density"])
+emp["sind"]  = emp["pop_ind"]  / emp["emp"]
+emp["sserv"] = emp["pop_serv"] / emp["emp"]
+emp["sagr"]  = emp["pop_agr"]  / emp["emp"]
+emp["lpop91_t"] = emp["lpop91"] * emp["year"]
+emp["lmdist_t"] = emp["lmdist"] * emp["year"]
+emp = emp.dropna(subset=CONTROLS)
+emp["treat_sr"] = emp["treat"] * (emp["year"] == 2)      # 2001
+emp["treat_lr"] = emp["treat"] * (emp["year"] == 3)      # 2011
+EMP = emp[emp["smp1"].notna()].copy()
+
+print("Short run / long run effects (KOBDR):\n")
+for y, lab in [("ldensity", "Population density"), ("sind", "Industry share"),
+               ("sserv", "Services share"), ("sagr", "Agriculture share")]:
+    r = stata_fe(EMP, y, ["treat_sr", "treat_lr"] + CONTROLS, unit="geocode", weight="ipw4")
+    print(f"  {lab:20s} SR {r['coef']['treat_sr']:+.4f} ({r['se']['treat_sr']:.4f})"
+          f"   LR {r['coef']['treat_lr']:+.4f} ({r['se']['treat_lr']:.4f})")
+```
+
+### This is the answer
+
+Published values: density $-0.025$ / $+0.059$; industry $-0.006$ / $-0.012$;
+services $+0.020$ / $+0.024$; agriculture $-0.014$ / $-0.012$.
+
+Now apply the discriminating test from the introduction:
+
+- **Manufacturing falls** 1.2 percentage points in the long run. Both backwash and comparative
+  advantage predict that, so it settles nothing on its own. (For scale: the 1991 baseline
+  manufacturing share was 2.8 percent, so this is roughly a third of the sector.)
+- **Population density rises** 5.9 percent in the long run, significant at the 0.1 percent level.
+
+Backwash requires the region to be *emptying* — capital and labour both leaving for the core. It
+gained people. So the region did not decline; it **specialised**.
+
+Note also the sign reversal in density: $-2.5$ percent short run, $+5.9$ percent long run. Pooling
+those into one number gives an insignificant $+2.5$ percent and tells you nothing. **Split by time
+before believing a null.**
+
+***
+## 11. Space: where did the gains land?
+
+Split by distance from the bridge into terciles.
+
+```{python}
+EMP = EMP.copy()
+EMP["band"] = pd.qcut(EMP["lmdist"], 3, labels=["near", "mid", "far"])
+for b in ["near", "mid", "far"]:
+    dm = (EMP["band"] == b).astype(float)
+    EMP[f"sr_{b}"]  = (EMP["year"] == 2).astype(float) * dm
+    EMP[f"lr_{b}"]  = (EMP["year"] == 3).astype(float) * dm
+    EMP[f"tsr_{b}"] = EMP["treat"] * EMP[f"sr_{b}"]
+    EMP[f"tlr_{b}"] = EMP["treat"] * EMP[f"lr_{b}"]
+
+het_terms  = [f"tsr_{b}" for b in ["near", "mid", "far"]] + \
+             [f"tlr_{b}" for b in ["near", "mid", "far"]]
+main_terms = [f"sr_{b}" for b in ["near", "mid", "far"]] + \
+             [f"lr_{b}" for b in ["near", "mid", "far"]]
+
+print("Long-run effects by distance band (KOBDR):\n")
+print(f"  {'outcome':22s} {'nearest':>12s} {'middle':>12s} {'farthest':>12s}")
+out = {}
+for y, lab in [("sagr", "Agriculture share"), ("sserv", "Services share"),
+               ("sind", "Industry share"), ("ldensity", "Population density")]:
+    # NOTE: the census heterogeneity spec has NO year dummies -- the band-specific
+    # post dummies absorb the time effects. The nightlights spec does include them.
+    r = stata_fe(EMP.assign(_c=1), y, het_terms + main_terms + CONTROLS,
+                 unit="geocode", time="_c", weight="ipw4")
+    vals = [r["coef"][f"tlr_{b}"] for b in ["near", "mid", "far"]]
+    out[lab] = vals
+    print(f"  {lab:22s} " + "".join(f"{v:+12.4f}" for v in vals))
+```
+
+Read the agriculture and services rows across and the average effect **reverses sign**. Near the
+bridge, labour moves *into* agriculture and *out of* services. Far from it, the other way and much
+harder.
+
+**Why do the distant upazilas gain more, when they got the smallest proportional cut in travel
+time?** The upazilas nearest the bridge saw travel time fall about 40 percent; the farthest about
+17 percent.
+
+Think about two discounts. A 40 percent cut on a ten-dollar taxi saves four dollars. A 17 percent
+cut on a five-hundred-dollar flight saves eighty-five. The percentage is smaller, the base is
+enormous, the saving is much larger. Upazilas near the bridge were already reasonably connected —
+the ferry was an inconvenience, not a wall. Upazilas 250 km out were close to autarky. **Trade
+responds to the level of the barrier, not the percentage change in it.**
+
+The policy lesson is blunt: an evaluation reporting only the average would tell a minister to
+build near the demand centre. The heterogeneity says the payoff was at the end of the line.
+
+***
+## 12. How wrong could the assumption be?
+
+Passing a pre-trend test is a low bar. The better question is how badly parallel trends would have
+to fail before the conclusion changes. Rambachan and Roth (2023) answer it by allowing the
+post-treatment violation to be up to $M$ times the largest pre-treatment violation.
+
+```{python}
+rows = []
+for M in [0.0, 0.25, 0.5, 1.0, 1.5, 2.0]:
+    h = compute_honest_did(ev, method="relative_magnitude", M=M)
+    rows.append({"M": M, "lower": h.ci_lb, "upper": h.ci_ub,
+                 "excludes zero": bool(h.ci_lb > 0 or h.ci_ub < 0)})
+honest = pd.DataFrame(rows)
+honest.round(4)
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.fill_between(honest["M"], honest["lower"], honest["upper"],
+                color=STEEL_BLUE, alpha=0.35, label="HonestDiD confidence set")
+ax.plot(honest["M"], honest["lower"], color=STEEL_BLUE, lw=2)
+ax.plot(honest["M"], honest["upper"], color=STEEL_BLUE, lw=2)
+ax.axhline(0, color=WARM_ORANGE, lw=2, ls="--", label="No effect")
+ax.set_xlabel("M -- allowed violation, as a multiple of the largest pre-trend")
+ax.set_ylabel("Effect on log(luminosity + 1)")
+ax.set_title("How wrong could parallel trends be before the result dies?",
+             fontweight="bold", fontsize=13)
+ax.legend()
+plt.tight_layout(); plt.show()
+```
+
+The breakdown value sits just under $M = 1$: the post-bridge violation would have to be as large
+as the largest pre-bridge violation for the result to become inconclusive.
+
+That is a **moderate** robustness margin, not a spectacular one, and it is better to say so than
+to dress it up. A result surviving to $M = 3$ would be much stronger; one breaking at $M = 0.3$
+would be fragile. This sits in between.
+
+***
+## 13. What we found
+
+| Outcome | Short run | Long run |
+|---|---|---|
+| Nighttime lights | +4.9% | **+11.2%** |
+| Rice yield | +1.2% (n.s.) | **+7.9%** |
+| Population density | **−2.5%** | **+5.9%** |
+| Manufacturing share | −0.6 pp (n.s.) | **−1.2 pp** |
+| Services share | **+2.0 pp** | **+2.4 pp** |
+
+The bridge worked, and it worked in a way neither textbook prediction anticipated. Manufacturing
+fell — but population rose. That combination is what the core-periphery backwash model cannot
+produce and the comparative-advantage story predicts directly. The region stopped making things it
+was never especially good at and did more of what it was: growing rice, and moving, processing and
+trading what it grew.
+
+**Three limitations worth stating plainly.**
+
+1. **Displacement.** If the long-run density gains partly reflect people leaving the still-isolated
+   Padma hinterland, the comparison group is contaminated downward and these are upper bounds. It
+   does not rescue backwash, which requires the *treated* region to lose people.
+2. **Thin clusters.** The rice-yield result rests on nine to eleven former districts.
+   Cluster-robust inference with nine clusters is fragile.
+3. **One pre-period for the census outcomes.** Population density — the variable that settles the
+   theoretical question — has exactly one pre-bridge observation, so no pre-trend test is possible
+   for it.
+
+### Six things to take away
+
+1. Difference-in-differences is two subtractions. Compute the four group means by hand first.
+2. The assumption is about **trends**, not levels, and it is untestable in principle.
+3. An event study is a test and a result at once.
+4. Doubly robust means two chances, not immunity to unmeasured confounders.
+5. Averages hide reversals. Split by time and by space before believing a null.
+6. **Read the sample size first.** In the original replication package, an undefined Stata macro
+   silently dropped every comparison unit and turned a coefficient of 0.109 into 1.064 — with no
+   warning. The only visible symptom was 124 upazilas in a table that should have shown 239.
+
+***
+## 14. Exercises
+
+1. **Change the clustering level.** Re-run the mean-effect nightlights DiD clustering on `dist`
+   instead of `geocode`. Does the standard error rise or fall? Which level is defensible?
+
+2. **Interrogate the plus one.** The outcome is $\ln(mn + 1)$. Recompute the KOBDR effect with
+   $\ln(mn + 0.01)$ and $\ln(mn + 5)$. How much of the headline depends on that constant?
+
+3. **Trim sensitivity.** Re-estimate trimming at 1, 5, 10 and 20 percent. Plot the coefficient and
+   its confidence interval against the trim fraction. Where, if anywhere, does significance break?
+
+4. **Two roads to the same number.** Fit `MultiPeriodDiD` on `ldensity` with 1991 as the reference
+   period, and show its two period effects equal the short-run and long-run coefficients above.
+
+5. **Stress the "doubly".** Break the outcome model by dropping `lmdist_t` while keeping correct
+   weights; then break the weights while keeping the correct outcome model. Which failure does the
+   estimator survive, and does that match the promise of double robustness?
+
+6. **Swap the treatment.** Pretend the Padma hinterland was treated in 1998 and Jamuna was the
+   comparison. What sign should the estimate take, and what would you conclude if the placebo came
+   back significant with the *same* sign as the real estimate?
+
+7. **Reproduce the bug on purpose.** Set the trimming cutoff so that every comparison unit fails
+   it, and confirm you recover 1.064 (0.710) on 868 observations and 124 upazilas. Then write one
+   sentence saying what that 1.064 is actually estimating.
+
+***
+## References
+
+- Blankespoor, B., Emran, M. S., Shilpi, F., & Xu, L. (2021). Bridge to bigpush or backwash?
+  Market integration, reallocation and productivity effects of Jamuna Bridge in Bangladesh.
+  *Journal of Economic Geography*.
+- Kline, P. (2011). Oaxaca-Blinder as a reweighting estimator. *American Economic Review*, 101(3),
+  532-537.
+- Rambachan, A., & Roth, J. (2023). A more credible approach to parallel trends. *Review of
+  Economic Studies*, 90(5), 2555-2591.
+- Myrdal, G. (1957). *Economic Theory and Underdeveloped Regions*.
+- Krugman, P. (1991). Increasing returns and economic geography. *Journal of Political Economy*,
+  99(3), 483-499.
+- `diff-diff`: <https://github.com/igerber/diff-diff> — docs at <https://diff-diff.readthedocs.io>
+- `pyfixest`: <https://py-econometrics.github.io/pyfixest/>
+
+**Full tutorial:** <https://carlos-mendez.org/post/python_bridge_impact/>
+

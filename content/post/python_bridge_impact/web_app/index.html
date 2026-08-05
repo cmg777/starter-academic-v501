@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Jamuna Bridge — Difference-in-Differences Explorer</title>
+<meta name="description" content="Interactive companion to 'Evaluating the Impact of Infrastructure: A Beginner's Guide to Difference-in-Differences with the Jamuna Bridge'. Turn the dials on parallel trends, walk the event study period by period, and see how the effect changes with distance from the bridge.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Jamuna Bridge — Difference-in-Differences Explorer</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Evaluating the Impact of Infrastructure: A Beginner's Guide to Difference-in-Differences with the Jamuna Bridge</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · The Question</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · DiD Lab</button>
+  <button id="tab-event"    class="tab"        data-pane="pane-event"    role="tab" aria-selected="false">3 · Event Study</button>
+  <button id="tab-space"    class="tab"        data-pane="pane-space"    role="tab" aria-selected="false">4 · Distance</button>
+  <button id="tab-robust"   class="tab"        data-pane="pane-robust"   role="tab" aria-selected="false">5 · Robustness</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: THE QUESTION ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What happens to a poor region when you finally connect it to a rich one?</h2>
+  <p class="lede">
+    In June 1998 a 4.8-kilometre bridge opened over the Jamuna river in Bangladesh.
+    It cost about US$985 million, connected roughly 26 million people in the isolated
+    northwest to Dhaka, and cut freight costs by about half. A truck from Bogra to
+    Dhaka went from twenty hours to six.
+  </p>
+  <p class="lede">
+    Economists disagree — sharply — about what should happen next. This app lets you
+    work through the evidence yourself: turn the dials on the assumption that carries
+    the whole design, walk the effect period by period, and see where in space the
+    gains actually landed.
+  </p>
+
+  <div class="card">
+    <h3>Three theories, and two of them predict the same thing about factories</h3>
+    <p>
+      This is the trap the study had to escape. A study that measured only
+      manufacturing would see the share fall, write the word "deindustrialisation",
+      and declare backwash. It would be wrong, and it would have no way of knowing.
+    </p>
+    <table class="theory-table">
+      <thead>
+        <tr><th>Theory</th><th>Manufacturing share</th><th>Population density</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Big push</strong><br><span class="muted">Integration raises efficiency</span></td>
+            <td class="up">up, or flat</td><td class="up">up</td></tr>
+        <tr class="hl"><td><strong>Backwash</strong><br><span class="muted">Myrdal 1957, Krugman 1991</span></td>
+            <td class="down"><strong>down</strong></td><td class="down"><strong>down</strong></td></tr>
+        <tr class="hl"><td><strong>Comparative advantage</strong><br><span class="muted">The region specialises</span></td>
+            <td class="down"><strong>down</strong></td><td class="up"><strong>up or flat</strong></td></tr>
+      </tbody>
+    </table>
+    <p class="note">
+      Backwash and comparative advantage agree on factories and disagree on
+      <strong>people</strong>. That one extra outcome — from a census that was already
+      sitting there — turns an ambiguous finding into a decisive one.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>The discriminating test, live</h3>
+    <p>
+      Press the button to reveal what actually happened to each of the two outcomes,
+      and watch which theories survive.
+    </p>
+    <div class="chart-area" id="intro-discriminator"></div>
+    <div class="controls">
+      <button class="btn" id="btn-reveal">Reveal the estimates</button>
+      <button class="btn btn-ghost" id="btn-reset-intro">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why the Padma hinterland is a fair comparison</h3>
+    <p>
+      Bangladesh is cut into three by two enormous rivers. The Jamuna separated the
+      poor northwest from Dhaka; the Padma cut off the south. Only one got a bridge.
+      The Padma crossing was not begun until <strong>2015</strong> — two years after
+      these data end — so the comparison region stayed isolated for the entire window.
+    </p>
+    <p>
+      Which river came first was decided by political geography, not economics:
+      President Ershad's base was in Rangpur and Prime Minister Khaleda Zia's in Bogra,
+      both in the Jamuna hinterland.
+    </p>
+    <div class="kpi-row" id="intro-kpis"></div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DID LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>The 2&times;2, and the assumption it rests on</h2>
+  <p class="lede">
+    Difference-in-differences is four numbers and two subtractions. The first
+    difference removes anything permanent about a place; the second removes anything
+    that hit the whole country. What survives both is the bridge — <em>provided</em>
+    the two regions would have moved together without it.
+  </p>
+
+  <div class="card">
+    <h3>Drag the counterfactual and watch the estimate break</h3>
+    <p>
+      The teal dashed line is what difference-in-differences assumes: the treated
+      region would have grown at the comparison region's rate. Use the slider to
+      suppose that assumption is wrong by some amount, and watch the estimated
+      effect move away from the truth.
+    </p>
+    <div class="chart-area" id="lab-chart"></div>
+    <div class="controls">
+      <label class="slider-label">
+        Parallel-trends violation
+        <span class="kbd" id="lab-violation-val">0.000</span>
+        <input type="range" id="lab-violation" min="-0.08" max="0.08" step="0.002" value="0">
+      </label>
+      <label class="slider-label">
+        Outcome
+        <select id="lab-outcome">
+          <option value="lmn" selected>Nighttime lights (log)</option>
+          <option value="ldensity">Population density (log)</option>
+          <option value="lyld">Rice yield (log)</option>
+          <option value="sserv">Services empl. share</option>
+        </select>
+      </label>
+    </div>
+    <div class="readout" id="lab-readout"></div>
+    <p class="note">
+      Notice that the bias is one-for-one: every unit of violation in the
+      counterfactual trend passes straight into the estimate. That is why so much of
+      the analysis is spent bounding how large the violation could plausibly be,
+      rather than testing whether it is exactly zero.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Three estimators, three columns</h3>
+    <p>
+      The published table reports the same specification three ways: unweighted OLS,
+      and two doubly robust estimators that reweight the comparison group to look
+      like the treated one. Toggle between them.
+    </p>
+    <div class="chart-area" id="lab-forest"></div>
+    <div class="controls" id="lab-estimator-toggle"></div>
+    <p class="note">
+      Both reweighted estimates are <em>larger</em> than the unweighted one. Adjustment
+      does not always shrink an effect — a useful thing to see once.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: EVENT STUDY ====================== -->
+<section id="pane-event" class="tab-pane" role="tabpanel" aria-labelledby="tab-event">
+
+  <h2>Every period gets its own coefficient</h2>
+  <p class="lede">
+    A single post-treatment dummy compresses fifteen years into one number. Give
+    every period its own coefficient instead, measured against the last pre-bridge
+    window. The coefficients <em>before</em> the bridge are a test of the assumption;
+    the ones after are the answer.
+  </p>
+
+  <div class="card">
+    <h3>Walk the effect period by period</h3>
+    <div class="controls" id="event-outcome-toggle"></div>
+    <div class="chart-area" id="event-chart"></div>
+    <div class="controls">
+      <button class="btn" id="btn-play">▶ Play</button>
+      <button class="btn btn-ghost" id="btn-show-all">Show all periods</button>
+    </div>
+    <div class="readout" id="event-readout"></div>
+  </div>
+
+  <div class="card">
+    <h3>What would a confounder have to look like?</h3>
+    <p>
+      For nighttime lights the pre-bridge coefficient sits on zero, and then the effect
+      climbs monotonically across all five post-bridge periods. A confounder producing
+      that shape would have to be absent before June 1998, appear at exactly the right
+      moment, and grow steadily for fifteen years without ever reversing.
+    </p>
+    <p class="note">
+      Compare the rice-yield panel. Its pre-bridge coefficients are also insignificant —
+      but with standard errors so wide that the test has very little power. With nine
+      clusters there is not much that panel can rule out, and it would be wrong to
+      present its clean pre-period as strong evidence.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: DISTANCE ====================== -->
+<section id="pane-space" class="tab-pane" role="tabpanel" aria-labelledby="tab-space">
+
+  <h2>The average effect hides almost everything</h2>
+  <p class="lede">
+    Split the treated region into three bands by distance from the bridge foot, and
+    two of the outcomes reverse sign across bands. The upazilas nearest the bridge got
+    the largest proportional cut in travel time — and gained the least.
+  </p>
+
+  <div class="card">
+    <h3>Effects by distance band</h3>
+    <div class="controls" id="space-outcome-toggle"></div>
+    <div class="chart-area" id="space-chart"></div>
+    <div class="controls">
+      <label class="slider-label">
+        Horizon
+        <select id="space-horizon">
+          <option value="LR" selected>Long run</option>
+          <option value="SR">Short run</option>
+        </select>
+      </label>
+    </div>
+    <div class="readout" id="space-readout"></div>
+  </div>
+
+  <div class="card">
+    <h3>Why do the distant places gain more?</h3>
+    <p>
+      A 40 percent cut on a ten-dollar taxi ride saves four dollars. A 17 percent cut
+      on a five-hundred-dollar flight saves eighty-five. The percentage is smaller, the
+      base is enormous, and the saving is much larger.
+    </p>
+    <p>
+      Upazilas near the bridge foot were already reasonably connected — the ferry was
+      an inconvenience, not a wall. Upazilas 250 kilometres out were close to autarky,
+      where fertiliser rarely arrived and rice rarely left.
+      <strong>Trade responds to the level of the barrier, not the percentage change
+      in it.</strong>
+    </p>
+    <div class="chart-area" id="space-gradient"></div>
+    <p class="note">
+      Before the bridge existed, the agriculture share rose with distance while
+      manufacturing and services fell. The places furthest out had the most
+      agricultural output to ship — and therefore the most to gain when shipping
+      got cheaper.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 5: ROBUSTNESS ====================== -->
+<section id="pane-robust" class="tab-pane" role="tabpanel" aria-labelledby="tab-robust">
+
+  <h2>How hard can you push before the answer changes?</h2>
+
+  <div class="card">
+    <h3>HonestDiD: bounding the violation instead of testing for it</h3>
+    <p>
+      Rather than asking whether the pre-trend is exactly zero, allow the
+      post-treatment violation of parallel trends to be up to <span class="kbd">M</span>
+      times the largest violation observed <em>before</em> treatment, and report the
+      widest confidence set consistent with that.
+    </p>
+    <div class="chart-area" id="robust-honest"></div>
+    <div class="controls">
+      <label class="slider-label">
+        M — allowed violation
+        <span class="kbd" id="robust-m-val">1.00</span>
+        <input type="range" id="robust-m" min="0" max="2" step="0.25" value="1">
+      </label>
+    </div>
+    <div class="readout" id="robust-readout"></div>
+    <p class="note">
+      The breakdown value sits just under M = 1. That is a moderate robustness margin,
+      not a spectacular one. A result surviving to M = 3 would be much stronger; one
+      breaking at M = 0.3 would be fragile. Saying which is more useful than dressing
+      it up.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>The political-economy placebo</h3>
+    <p>
+      The most serious rival explanation is that a prime minister with roots in the
+      Jamuna hinterland simply sent more schools, clinics and electricity there. If so,
+      the "bridge effect" would be a public-spending effect in disguise.
+    </p>
+    <div class="chart-area" id="robust-placebo"></div>
+    <p class="note">
+      Twenty-one estimates, and not one is significant at 5 percent. The closest is the
+      long-run distance to a high school — and it has the wrong sign for the story,
+      since it says schools got <em>farther</em> away in treated villages.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>One undefined macro, two different papers</h3>
+    <p>
+      The most instructive thing in the original replication package is a bug that
+      produces no error message. An undefined Stata global made a trimming cutoff
+      missing; because any number is less than missing in Stata, the trim then fired
+      for <em>every</em> comparison unit, and the regression silently ran on treated
+      units only.
+    </p>
+    <div class="chart-area" id="robust-forensics"></div>
+    <p class="note">
+      The tell is not the coefficient — it is the footer. <strong>124 upazilas where
+      there should be 239.</strong> Read the sample size first.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>All 122 published coefficients reproduce</h3>
+    <div class="chart-area" id="robust-audit"></div>
+    <p class="note">
+      Every headline coefficient in the paper's four tables, re-estimated in Python and
+      compared with the authors' own Stata output. Maximum absolute deviation 0.0005 —
+      inside the tolerance implied by three-decimal printing.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  <p>
+    Built for <a href="../" target="_blank" rel="noopener">Evaluating the Impact of Infrastructure</a>
+    on <a href="https://carlos-mendez.org" target="_blank" rel="noopener">carlos-mendez.org</a>.
+    Every number is computed from the published estimates; nothing here is simulated
+    except the parallel-trends slider in tab 2, which is explicitly a thought experiment.
+  </p>
+  <p class="muted">
+    Data derived from the replication package of Blankespoor, Emran, Shilpi &amp; Xu (2021),
+    <em>Journal of Economic Geography</em>.
+  </p>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

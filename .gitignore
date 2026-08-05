@@ -98,6 +98,12 @@ content/post/*/slides/.quarto/
 # tutorial — never publish or commit it (Hugo would copy ~7MB into public/).
 content/post/python_dynamic_panel/referenceMaterials/
 
+# Blankespoor, Emran, Shilpi & Xu (2021) Jamuna Bridge manuscript, online appendix and
+# Stata replication package — reference material only for the python_bridge_impact
+# tutorial. Never commit: Hugo would publish the manuscript PDFs/DOCX and the authors'
+# .dta files. The tutorial ships tidy CSVs under that post's data/ folder instead.
+content/post/python_bridge_impact/referenceMaterials/
+
 # Lessmann & Seidel (2017) replication archive — reference material only for the
 # python_kuznets_dmsp tutorial — never publish or commit it (Hugo would copy ~166MB
 # into public/). Kept on local disk for reference; Netlify builds from git so it

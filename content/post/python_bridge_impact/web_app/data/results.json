@@ -1,0 +1,2234 @@
+{
+ "meta": {
+  "title": "Jamuna Bridge \u2014 Difference-in-Differences Explorer",
+  "auditTotal": 122,
+  "auditMatches": 122,
+  "nUnitsTreated": 123,
+  "nUnitsControl": 125,
+  "bridgeYear": 1998
+ },
+ "pretty": {
+  "lmn": "Nighttime lights (log)",
+  "D_lmn": "Nightlights growth",
+  "lyld": "Rice yield (log)",
+  "D_lyld": "Rice yield growth",
+  "ldensity": "Population density (log)",
+  "sind": "Industry empl. share",
+  "sserv": "Services empl. share",
+  "sagr": "Agriculture empl. share"
+ },
+ "twoByTwo": [
+  {
+   "group": "treated",
+   "pre": 1.2551256,
+   "post": 1.327017,
+   "change": 0.07189131
+  },
+  {
+   "group": "comparison",
+   "pre": 1.2113206,
+   "post": 1.2191248,
+   "change": 0.0078041553
+  }
+ ],
+ "table1": [
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "OLS",
+   "coef": 0.0880676206265931,
+   "se": 0.0220037015773126,
+   "p": 6.270310733591855e-05,
+   "n": 1729,
+   "units": 247,
+   "r2_within": 0.3213309851041714
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "LWDR",
+   "coef": 0.105876444656255,
+   "se": 0.0222349733569525,
+   "p": 1.91961555492309e-06,
+   "n": 1673,
+   "units": 239,
+   "r2_within": 0.3038186513317856
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "KOBDR",
+   "coef": 0.1087665132755405,
+   "se": 0.0223253657890507,
+   "p": 1.1054104985089654e-06,
+   "n": 1673,
+   "units": 239,
+   "r2_within": 0.3012438482671513
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "OLS",
+   "coef": 0.0162566630701307,
+   "se": 0.0160274417327038,
+   "p": 0.3104387632948624,
+   "n": 1482,
+   "units": 247,
+   "r2_within": 0.4990425116432282
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "LWDR",
+   "coef": 0.0316914092661811,
+   "se": 0.0162209648438806,
+   "p": 0.0507329841520392,
+   "n": 1434,
+   "units": 239,
+   "r2_within": 0.4903894258216494
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "KOBDR",
+   "coef": 0.0326196486942649,
+   "se": 0.0162829445009705,
+   "p": 0.0451449263769239,
+   "n": 1434,
+   "units": 239,
+   "r2_within": 0.4880582852520457
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "OLS",
+   "coef": 0.0321852842941987,
+   "se": 0.0152098399821351,
+   "p": 0.0343377464081353,
+   "n": 738,
+   "units": 246,
+   "r2_within": 0.7274426821687306
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "LWDR",
+   "coef": 0.0248062957488066,
+   "se": 0.0150667976407035,
+   "p": 0.0996770618168112,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.7354796994687607
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "KOBDR",
+   "coef": 0.0247068464923236,
+   "se": 0.0151668704920493,
+   "p": 0.1033128171114821,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.7298877743597845
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "OLS",
+   "coef": -0.0097607768844361,
+   "se": 0.0042353291044152,
+   "p": 0.0211884905692857,
+   "n": 738,
+   "units": 246,
+   "r2_within": 0.6699049250838482
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "LWDR",
+   "coef": -0.0094245928733049,
+   "se": 0.0041984192940642,
+   "p": 0.024781261734945,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.6558934331376485
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "KOBDR",
+   "coef": -0.0095859564989638,
+   "se": 0.0042130463053543,
+   "p": 0.022887765280443,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.6538350327679741
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "OLS",
+   "coef": 0.0174952446131896,
+   "se": 0.0055165974661352,
+   "p": 0.001517148565329,
+   "n": 738,
+   "units": 246,
+   "r2_within": 0.5169265442863322
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "LWDR",
+   "coef": 0.0223109466311949,
+   "se": 0.0054282308889023,
+   "p": 3.953695509442977e-05,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.5149303948758124
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "KOBDR",
+   "coef": 0.0226853098620514,
+   "se": 0.0054249038805004,
+   "p": 2.893400884061028e-05,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.5100710891445711
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "OLS",
+   "coef": -0.0077344677287534,
+   "se": 0.0066370306960737,
+   "p": 0.2438771033411624,
+   "n": 738,
+   "units": 246,
+   "r2_within": 0.7345634861499675
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "LWDR",
+   "coef": -0.0128863537578899,
+   "se": 0.0065745755658555,
+   "p": 0.0499924899490312,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.7231042374836985
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "KOBDR",
+   "coef": -0.0130993533630876,
+   "se": 0.006567212175089,
+   "p": 0.0460800092858615,
+   "n": 714,
+   "units": 238,
+   "r2_within": 0.7201118289301587
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "OLS",
+   "coef": 0.0492131285682026,
+   "se": 0.0305578077071408,
+   "p": 0.1072903212269515,
+   "n": 88,
+   "units": 11,
+   "r2_within": 0.8567561014051724
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "LWDR",
+   "coef": 0.058843384371075,
+   "se": 0.025310176733291,
+   "p": 0.0200778268033141,
+   "n": 72,
+   "units": 9,
+   "r2_within": 0.9485820400217368
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "KOBDR",
+   "coef": 0.0633796149859022,
+   "se": 0.0227433122209234,
+   "p": 0.0053241775953256,
+   "n": 72,
+   "units": 9,
+   "r2_within": 0.9495516007584504
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "OLS",
+   "coef": -0.0416940170018622,
+   "se": 0.0842727719364454,
+   "p": 0.6207760740285615,
+   "n": 77,
+   "units": 11,
+   "r2_within": 0.3348707616358205
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "LWDR",
+   "coef": 0.0489041352851654,
+   "se": 0.0488944677625453,
+   "p": 0.3172148313457886,
+   "n": 63,
+   "units": 9,
+   "r2_within": 0.5875660505022021
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "KOBDR",
+   "coef": 0.0530859032667504,
+   "se": 0.0484380709763567,
+   "p": 0.2730988547526517,
+   "n": 63,
+   "units": 9,
+   "r2_within": 0.5972656253116049
+  }
+ ],
+ "table2": [
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": 0.0257248415635865,
+   "se": 0.0184364929072711,
+   "p": 0.1629188031455786,
+   "n": 1729,
+   "units": 247
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": 0.0902464671080002,
+   "se": 0.0225082768570559,
+   "p": 6.085282170915406e-05,
+   "n": 1729,
+   "units": 247
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": 0.0473013566196899,
+   "se": 0.0184611481647531,
+   "p": 0.0104008113232686,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.1085079089849783,
+   "se": 0.0229676727776025,
+   "p": 2.308236499546566e-06,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": 0.0486825323442127,
+   "se": 0.0184556060316022,
+   "p": 0.0083441316949581,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.1115257041705999,
+   "se": 0.0230770388377534,
+   "p": 1.346556038473901e-06,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": 0.0040741296129986,
+   "se": 0.025374624838269,
+   "p": 0.8724405869554228,
+   "n": 1482,
+   "units": 247
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": 0.0154585196530931,
+   "se": 0.0163661596551234,
+   "p": 0.3448929221020456,
+   "n": 1482,
+   "units": 247
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": 0.0274871294897837,
+   "se": 0.0259783424394603,
+   "p": 0.2900195871943538,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.0314137152764669,
+   "se": 0.0165902013707586,
+   "p": 0.0582900549822667,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": 0.0288453564581987,
+   "se": 0.0260516696365058,
+   "p": 0.2681917411254918,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.0323626612658111,
+   "se": 0.0166597889816611,
+   "p": 0.0520691871910009,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": -0.023401927504595,
+   "se": 0.0138229875733652,
+   "p": 0.0904608440069266,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": 0.0651795382404469,
+   "se": 0.0161536012846463,
+   "p": 5.460579513940836e-05,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": -0.0244827672807867,
+   "se": 0.0140609670924279,
+   "p": 0.0816508778572054,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.0587072526828726,
+   "se": 0.0162334196193609,
+   "p": 0.0002986779174508,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": -0.0247926196595086,
+   "se": 0.0141654834333012,
+   "p": 0.0800814884680746,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.0589513183167786,
+   "se": 0.0163514148425306,
+   "p": 0.0003118246710052,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": -0.0056113482974588,
+   "se": 0.0051369969602925,
+   "p": 0.2746835960737778,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": -0.0122237048871233,
+   "se": 0.0046639770003438,
+   "p": 0.0087704183390916,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": -0.0060862748212022,
+   "se": 0.0048584485546276,
+   "p": 0.2103076886112911,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": -0.0117206839239422,
+   "se": 0.0047113447676629,
+   "p": 0.0128551305087947,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": -0.006029947410043,
+   "se": 0.0048564598039928,
+   "p": 0.2143714946070474,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": -0.0120460568297338,
+   "se": 0.0047416435171586,
+   "p": 0.0110700003723999,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": 0.0173929438699961,
+   "se": 0.0052960589801022,
+   "p": 0.0010229788163422,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": 0.0175559660739463,
+   "se": 0.0072990744282652,
+   "p": 0.016162209607865,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": 0.0203975122055853,
+   "se": 0.0051123223576732,
+   "p": 6.610894083559992e-05,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.0236270044759101,
+   "se": 0.0076474157104226,
+   "p": 0.0020046602726773,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": 0.0204370694376553,
+   "se": 0.0051921219022751,
+   "p": 8.279266877451216e-05,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.0242406762498763,
+   "se": 0.0076297823923979,
+   "p": 0.0014874937378742,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": -0.0117815955725373,
+   "se": 0.0063763418481902,
+   "p": 0.0646451015927589,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": -0.0053322611868229,
+   "se": 0.0083933261476112,
+   "p": 0.5252342430892606,
+   "n": 738,
+   "units": 246
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": -0.014311237384383,
+   "se": 0.0060730058049644,
+   "p": 0.0184464384215471,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": -0.0119063205519679,
+   "se": 0.0088818834665172,
+   "p": 0.1800771466261699,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": -0.0144071220276122,
+   "se": 0.0061383577176906,
+   "p": 0.0189219744099181,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": -0.0121946194201424,
+   "se": 0.008874292546674,
+   "p": 0.1693947587258664,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": -0.0173895507980451,
+   "se": 0.0300891274046301,
+   "p": 0.5633082072774587,
+   "n": 88,
+   "units": 11
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": 0.0711410782054623,
+   "se": 0.027071834231799,
+   "p": 0.0085923050191259,
+   "n": 88,
+   "units": 11
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": 0.0065718420253231,
+   "se": 0.0272011861494679,
+   "p": 0.8090891121054237,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.0746999640212213,
+   "se": 0.0257856392597984,
+   "p": 0.0037679786367636,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": 0.0117838803793303,
+   "se": 0.0253965960432424,
+   "p": 0.6426517003437019,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.0787490140472908,
+   "se": 0.0238457414023912,
+   "p": 0.0009584925611645,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "OLS",
+   "horizon": "SR",
+   "coef": -0.1016574905474959,
+   "se": 0.0966922072591061,
+   "p": 0.2930972134955409,
+   "n": 77,
+   "units": 11
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "OLS",
+   "horizon": "LR",
+   "coef": -0.0389674165173298,
+   "se": 0.0776684777307622,
+   "p": 0.6158682270439206,
+   "n": 77,
+   "units": 11
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "LWDR",
+   "horizon": "SR",
+   "coef": -0.0053180555411371,
+   "se": 0.0780623136572361,
+   "p": 0.9456855132993904,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "LWDR",
+   "horizon": "LR",
+   "coef": 0.047135938077629,
+   "se": 0.0475551963890032,
+   "p": 0.321595861961214,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "KOBDR",
+   "horizon": "SR",
+   "coef": 0.0040569040725961,
+   "se": 0.0783780676780781,
+   "p": 0.9587193660873444,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "KOBDR",
+   "horizon": "LR",
+   "coef": 0.0510769998255434,
+   "se": 0.04814535312327,
+   "p": 0.2887391754753819,
+   "n": 63,
+   "units": 9
+  }
+ ],
+ "table3": [
+  {
+   "source": "household",
+   "outcome": "Electricity",
+   "horizon": "SR",
+   "coef": -0.0569072695738291,
+   "se": 0.0603120103742845,
+   "p": 0.3454007365885072,
+   "n": 1543,
+   "units": 37
+  },
+  {
+   "source": "household",
+   "outcome": "Electricity",
+   "horizon": "LR",
+   "coef": 0.0355585056489505,
+   "se": 0.0470927740859317,
+   "p": 0.4502048838188781,
+   "n": 1543,
+   "units": 37
+  },
+  {
+   "source": "village",
+   "outcome": "dist_Thana",
+   "horizon": "SR",
+   "coef": -1.0256001582328924,
+   "se": 1.1902953751349823,
+   "p": 0.3888884033400407,
+   "n": 559,
+   "units": 36
+  },
+  {
+   "source": "village",
+   "outcome": "dist_district",
+   "horizon": "SR",
+   "coef": -0.4138208882861538,
+   "se": 3.1619467418450102,
+   "p": 0.8958739143443856,
+   "n": 618,
+   "units": 37
+  },
+  {
+   "source": "village",
+   "outcome": "dist_satellite_clinic",
+   "horizon": "SR",
+   "coef": -3.11551718108646,
+   "se": 2.400204890020135,
+   "p": 0.1942800001064556,
+   "n": 398,
+   "units": 36
+  },
+  {
+   "source": "village",
+   "outcome": "dist_hos",
+   "horizon": "SR",
+   "coef": 0.0552932058134685,
+   "se": 0.3974296764781597,
+   "p": 0.8893497784494309,
+   "n": 1440,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "dist_hos",
+   "horizon": "LR",
+   "coef": 0.2216919145055189,
+   "se": 0.446873988924521,
+   "p": 0.6198274451909953,
+   "n": 1440,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "primary_school",
+   "horizon": "SR",
+   "coef": 0.4809467339065377,
+   "se": 0.3754453369887299,
+   "p": 0.2001924899125057,
+   "n": 1292,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "primary_school",
+   "horizon": "LR",
+   "coef": 0.5327573644978787,
+   "se": 0.5264932805230207,
+   "p": 0.3115869465195517,
+   "n": 1292,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "high_school",
+   "horizon": "SR",
+   "coef": 0.3070783491847195,
+   "se": 0.3820247269363042,
+   "p": 0.4215020968815651,
+   "n": 1303,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "high_school",
+   "horizon": "LR",
+   "coef": 0.5350948174981895,
+   "se": 0.2902000492837311,
+   "p": 0.0652002533801491,
+   "n": 1303,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "madrassa_school",
+   "horizon": "SR",
+   "coef": 0.1094239537217101,
+   "se": 0.2764478833828986,
+   "p": 0.6922368806505118,
+   "n": 1297,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "madrassa_school",
+   "horizon": "LR",
+   "coef": 0.0253309855068062,
+   "se": 0.2245280644241525,
+   "p": 0.910174217804818,
+   "n": 1297,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "grameen_bank",
+   "horizon": "SR",
+   "coef": -0.1585032670241329,
+   "se": 0.1200346502423285,
+   "p": 0.1866750536073623,
+   "n": 1449,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "grameen_bank",
+   "horizon": "LR",
+   "coef": -0.0415152929038714,
+   "se": 0.0711931914791608,
+   "p": 0.5598019398862163,
+   "n": 1449,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "cinema",
+   "horizon": "SR",
+   "coef": -0.8842164803378713,
+   "se": 0.8109792653452124,
+   "p": 0.2755778727315595,
+   "n": 1306,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "cinema",
+   "horizon": "LR",
+   "coef": -0.3644416562482279,
+   "se": 0.8335327267432767,
+   "p": 0.6619479113327076,
+   "n": 1306,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "post_office",
+   "horizon": "SR",
+   "coef": 0.419972218126254,
+   "se": 0.2630543978155595,
+   "p": 0.1103722260268028,
+   "n": 1307,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "post_office",
+   "horizon": "LR",
+   "coef": 0.1163041294377769,
+   "se": 0.1560943470654452,
+   "p": 0.456218118017905,
+   "n": 1307,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "co_operative_soc",
+   "horizon": "SR",
+   "coef": 0.0895850591244069,
+   "se": 0.1079331054213218,
+   "p": 0.4065357369221852,
+   "n": 1448,
+   "units": 41
+  },
+  {
+   "source": "village",
+   "outcome": "co_operative_soc",
+   "horizon": "LR",
+   "coef": 0.0506705778041897,
+   "se": 0.0778090764538703,
+   "p": 0.5149065468080704,
+   "n": 1448,
+   "units": 41
+  }
+ ],
+ "table4": [
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.007796978238927,
+   "se": 0.0235291020867243,
+   "p": 0.7403605389652734,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": 0.0631598835514767,
+   "se": 0.0296096414775066,
+   "p": 0.0329177499970616,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.0550865509500312,
+   "se": 0.0268864739988373,
+   "p": 0.0404760619489036,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0260542680256728,
+   "se": 0.0343256049833391,
+   "p": 0.4478327973280768,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.1489543509164119,
+   "se": 0.0401425752999475,
+   "p": 0.0002067419221084,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.1015209737106012,
+   "se": 0.0382553327700014,
+   "p": 0.0079597326179404,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0145103623804354,
+   "se": 0.0308016222119747,
+   "p": 0.6375758591853999,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": 0.0431468026160138,
+   "se": 0.0351308698259517,
+   "p": 0.2193818521962912,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.0307685811646151,
+   "se": 0.0319509470788666,
+   "p": 0.3355503641558349,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0113634681554017,
+   "se": 0.024126650244845,
+   "p": 0.637646184305239,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.0275457604979104,
+   "se": 0.0246738497448984,
+   "p": 0.2642531272864673,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.0384229988182705,
+   "se": 0.0224125373263041,
+   "p": 0.0864639294287003,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0368881310047482,
+   "se": 0.0244104790113266,
+   "p": 0.1307477791355846,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": -0.0708890282661762,
+   "se": 0.0241729124594638,
+   "p": 0.003361570214051,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.0156600254482338,
+   "se": 0.0170973901971592,
+   "p": 0.3597032166656472,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0688601646717948,
+   "se": 0.0242862355838385,
+   "p": 0.0045774404514075,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.0050487819991877,
+   "se": 0.028906325317423,
+   "p": 0.8613467124201363,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.0927837958707006,
+   "se": 0.0240628724724815,
+   "p": 0.0001153092057872,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0154032432213839,
+   "se": 0.00860568597171,
+   "p": 0.0734713733447014,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": 0.0001560219453889,
+   "se": 0.0047555960681972,
+   "p": 0.9738276399501076,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "SR",
+   "band": "far",
+   "coef": -0.003438635118247,
+   "se": 0.0062806375987665,
+   "p": 0.584036797867131,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "LR",
+   "band": "near",
+   "coef": -0.0058950297655292,
+   "se": 0.0097061701293335,
+   "p": 0.543619528502012,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": -0.0247953871823882,
+   "se": 0.007131758325926,
+   "p": 0.0005075184966734,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "horizon": "LR",
+   "band": "far",
+   "coef": -0.0013311288796806,
+   "se": 0.0075015357551716,
+   "p": 0.8591568877417717,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0153786848600999,
+   "se": 0.009612821799627,
+   "p": 0.1096408224397105,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": 0.0291444398558635,
+   "se": 0.0091060689664214,
+   "p": 0.001371650026911,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.0221273535581209,
+   "se": 0.0089252691561638,
+   "p": 0.0131684635011561,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "LR",
+   "band": "near",
+   "coef": -0.0263988410550115,
+   "se": 0.0132210633136059,
+   "p": 0.0458549545529377,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.016812197539009,
+   "se": 0.0120055017923244,
+   "p": 0.1614012276868861,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.0586271751685577,
+   "se": 0.0157384776413305,
+   "p": 0.0001952490178827,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "SR",
+   "band": "near",
+   "coef": 0.0307819280814839,
+   "se": 0.0106743250239551,
+   "p": 0.0039298890646892,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": -0.0293004618012525,
+   "se": 0.0097051570543341,
+   "p": 0.0025355941741038,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "SR",
+   "band": "far",
+   "coef": -0.0186887184398738,
+   "se": 0.0101701829102805,
+   "p": 0.0661215091190735,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0322938708205408,
+   "se": 0.0146330565111152,
+   "p": 0.0273201944872131,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.0079831896433791,
+   "se": 0.013723647046955,
+   "p": 0.5607616949255434,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "horizon": "LR",
+   "band": "far",
+   "coef": -0.057296046288877,
+   "se": 0.0172631351439483,
+   "p": 0.0009034603770279,
+   "n": 714,
+   "units": 238
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0247117072207333,
+   "se": 0.0184801154834676,
+   "p": 0.1811556526520901,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": 0.0175380223937471,
+   "se": 0.0240258241927213,
+   "p": 0.4654112827250354,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.1040995715087982,
+   "se": 0.0295990854625116,
+   "p": 0.0004364766736517,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0493633208980946,
+   "se": 0.02240681932835,
+   "p": 0.0275912952546875,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.065431899980459,
+   "se": 0.022271239593563,
+   "p": 0.0033038496250434,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.2645781860735834,
+   "se": 0.0245930907016067,
+   "p": 5.419975864594529e-27,
+   "n": 72,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "SR",
+   "band": "near",
+   "coef": -0.0278512821289875,
+   "se": 0.0522768257325346,
+   "p": 0.5941960122140846,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "SR",
+   "band": "mid",
+   "coef": -0.0298822065100413,
+   "se": 0.0626032610178372,
+   "p": 0.6331295179421695,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "SR",
+   "band": "far",
+   "coef": 0.2270961595914141,
+   "se": 0.0985720055004844,
+   "p": 0.0212304701169609,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "LR",
+   "band": "near",
+   "coef": 0.0252300284880684,
+   "se": 0.0357559956705174,
+   "p": 0.480426521785856,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "LR",
+   "band": "mid",
+   "coef": 0.0107561783116297,
+   "se": 0.0335768833740661,
+   "p": 0.7487070033945487,
+   "n": 63,
+   "units": 9
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "horizon": "LR",
+   "band": "far",
+   "coef": 0.3441435661222367,
+   "se": 0.0902465062707464,
+   "p": 0.0001370831315556,
+   "n": 63,
+   "units": 9
+  }
+ ],
+ "eventStudies": {
+  "nightlights": [
+   {
+    "period": 1,
+    "label": "1992-94",
+    "effect": -0.0081796042272921,
+    "se": 0.0167085730259221,
+    "is_post": false
+   },
+   {
+    "period": 2,
+    "label": "1995-97",
+    "effect": 0.0,
+    "se": 0.0,
+    "is_post": false
+   },
+   {
+    "period": 3,
+    "label": "1998-00",
+    "effect": 0.0068276443407829,
+    "se": 0.0179282881877746,
+    "is_post": true
+   },
+   {
+    "period": 4,
+    "label": "2001-04",
+    "effect": 0.0328306281754247,
+    "se": 0.0217239013146506,
+    "is_post": true
+   },
+   {
+    "period": 5,
+    "label": "2005-07",
+    "effect": 0.0501102246897909,
+    "se": 0.021623123038139,
+    "is_post": true
+   },
+   {
+    "period": 6,
+    "label": "2008-10",
+    "effect": 0.0830840649718232,
+    "se": 0.0237970147526281,
+    "is_post": true
+   },
+   {
+    "period": 7,
+    "label": "2011-13",
+    "effect": 0.1278746064778818,
+    "se": 0.0270538502452322,
+    "is_post": true
+   }
+  ],
+  "yield": [
+   {
+    "period": 1,
+    "label": "1988-91",
+    "effect": -0.0604987028135963,
+    "se": 0.0954116013954213,
+    "is_post": false
+   },
+   {
+    "period": 2,
+    "label": "1992-94",
+    "effect": 0.0621567634914305,
+    "se": 0.0670279151072892,
+    "is_post": false
+   },
+   {
+    "period": 3,
+    "label": "1995-97",
+    "effect": 0.0,
+    "se": 0.0,
+    "is_post": false
+   },
+   {
+    "period": 4,
+    "label": "1998-00",
+    "effect": -0.0422389346238365,
+    "se": 0.0522955721340375,
+    "is_post": true
+   },
+   {
+    "period": 5,
+    "label": "2001-04",
+    "effect": -0.0612983052960871,
+    "se": 0.0721623902110863,
+    "is_post": true
+   },
+   {
+    "period": 6,
+    "label": "2005-07",
+    "effect": 0.0329474222281922,
+    "se": 0.064833522907619,
+    "is_post": true
+   },
+   {
+    "period": 7,
+    "label": "2008-10",
+    "effect": 0.0544365324440653,
+    "se": 0.0716461089338694,
+    "is_post": true
+   },
+   {
+    "period": 8,
+    "label": "2011-13",
+    "effect": 0.0732985035799203,
+    "se": 0.068834358070135,
+    "is_post": true
+   }
+  ],
+  "density": [
+   {
+    "period": 1,
+    "label": 1991,
+    "effect": 0.0,
+    "se": 0.0,
+    "is_post": false
+   },
+   {
+    "period": 2,
+    "label": 2001,
+    "effect": -0.0234019275043532,
+    "se": 0.0138324651113665,
+    "is_post": true
+   },
+   {
+    "period": 3,
+    "label": 2011,
+    "effect": 0.0651795382405907,
+    "se": 0.0161646767753496,
+    "is_post": true
+   }
+  ],
+  "services": [
+   {
+    "period": 1,
+    "label": 1991,
+    "effect": 0.0,
+    "se": 0.0,
+    "is_post": false
+   },
+   {
+    "period": 2,
+    "label": 2001,
+    "effect": 0.0173929438700061,
+    "se": 0.0052996901488376,
+    "is_post": true
+   },
+   {
+    "period": 3,
+    "label": 2011,
+    "effect": 0.0175559660739471,
+    "se": 0.007304078936518,
+    "is_post": true
+   }
+  ]
+ },
+ "honest": [
+  {
+   "M": 0.0,
+   "lb": 0.0235814374802755,
+   "ub": 0.0967094299820059,
+   "significant": true
+  },
+  {
+   "M": 0.25,
+   "lb": 0.0174467343098064,
+   "ub": 0.102844133152475,
+   "significant": true
+  },
+  {
+   "M": 0.5,
+   "lb": 0.0113120311393373,
+   "ub": 0.1089788363229441,
+   "significant": true
+  },
+  {
+   "M": 1.0,
+   "lb": -0.0009573752016008,
+   "ub": 0.1212482426638823,
+   "significant": false
+  },
+  {
+   "M": 1.5,
+   "lb": -0.013226781542539,
+   "ub": 0.1335176490048205,
+   "significant": false
+  },
+  {
+   "M": 2.0,
+   "lb": -0.0254961878834772,
+   "ub": 0.1457870553457588,
+   "significant": false
+  }
+ ],
+ "bands": [
+  {
+   "band": "near",
+   "min": 8.438517,
+   "max": 83.41712,
+   "count": 246
+  },
+  {
+   "band": "mid",
+   "min": 83.727295,
+   "max": 128.15216,
+   "count": 246
+  },
+  {
+   "band": "far",
+   "min": 128.32623,
+   "max": 269.4748,
+   "count": 246
+  }
+ ],
+ "gradients": [
+  {
+   "variable": "sagr",
+   "slope_per_km": 0.0006924866715234
+  },
+  {
+   "variable": "sind",
+   "slope_per_km": -0.0002782404973465
+  },
+  {
+   "variable": "sserv",
+   "slope_per_km": -0.0004142461741769
+  },
+  {
+   "variable": "ldensity",
+   "slope_per_km": -0.0018642264352094
+  }
+ ],
+ "agreement": [
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "OLS",
+   "stata_recipe_coef": 0.0880676206265931,
+   "stata_recipe_se": 0.0220037015773126,
+   "pyfixest_coef": 0.0880676206266007,
+   "pyfixest_se": 0.0220101082455464,
+   "diffdiff_coef": 0.0880676213738779,
+   "diffdiff_se": 0.0219717512308641,
+   "max_coef_gap": 7.47284817359528e-10,
+   "max_se_gap": 3.835701468231367e-05
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.105876444656255,
+   "stata_recipe_se": 0.0222349733569525,
+   "pyfixest_coef": 0.1058764446562437,
+   "pyfixest_se": 0.0222416655988956,
+   "diffdiff_coef": 0.1058764446562438,
+   "diffdiff_se": 0.0226704838121173,
+   "max_coef_gap": 1.1338152638984411e-14,
+   "max_se_gap": 0.0004355104551648
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "lmn",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.1087665132755405,
+   "stata_recipe_se": 0.0223253657890507,
+   "pyfixest_coef": 0.108766513275542,
+   "pyfixest_se": 0.0223320852371457,
+   "diffdiff_coef": 0.1087665132755414,
+   "diffdiff_se": 0.0230387690756726,
+   "max_coef_gap": 1.429412144204889e-15,
+   "max_se_gap": 0.0007134032866218
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "OLS",
+   "stata_recipe_coef": 0.0162566630701307,
+   "stata_recipe_se": 0.0160274417327038,
+   "pyfixest_coef": 0.0162566630701284,
+   "pyfixest_se": 0.0160328886119547,
+   "diffdiff_coef": 0.0162566636393223,
+   "diffdiff_se": 0.0160057096637094,
+   "max_coef_gap": 5.691939385099597e-10,
+   "max_se_gap": 2.7178948245314832e-05
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.0316914092661811,
+   "stata_recipe_se": 0.0162209648438806,
+   "pyfixest_coef": 0.0316914092661815,
+   "pyfixest_se": 0.0162266634089058,
+   "diffdiff_coef": 0.0316914092661813,
+   "diffdiff_se": 0.0163536676671892,
+   "max_coef_gap": 3.9551695252271197e-16,
+   "max_se_gap": 0.0001327028233086
+  },
+  {
+   "dataset": "nightlights",
+   "outcome": "D_lmn",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.0326196486942649,
+   "stata_recipe_se": 0.0162829445009705,
+   "pyfixest_coef": 0.0326196486942689,
+   "pyfixest_se": 0.0162886648399847,
+   "diffdiff_coef": 0.0326196486942688,
+   "diffdiff_se": 0.0164250466234564,
+   "max_coef_gap": 4.0314973581701005e-15,
+   "max_se_gap": 0.0001421021224858
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "OLS",
+   "stata_recipe_coef": 0.0321852842941987,
+   "stata_recipe_se": 0.0152098399821351,
+   "pyfixest_coef": 0.0321852842941987,
+   "pyfixest_se": 0.0152202541154895,
+   "diffdiff_coef": 0.032185283904316,
+   "diffdiff_se": 0.015199447242685,
+   "max_coef_gap": 3.8988270945061743e-10,
+   "max_se_gap": 2.080687280452999e-05
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.0248062957488066,
+   "stata_recipe_se": 0.0150667976407035,
+   "pyfixest_coef": 0.0248062957488066,
+   "pyfixest_se": 0.0150774644014312,
+   "diffdiff_coef": 0.0248062957488072,
+   "diffdiff_se": 0.0136523370651619,
+   "max_coef_gap": 5.551115123125784e-16,
+   "max_se_gap": 0.0014251273362692
+  },
+  {
+   "dataset": "employment",
+   "outcome": "ldensity",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.0247068464923236,
+   "stata_recipe_se": 0.0151668704920493,
+   "pyfixest_coef": 0.0247068464923236,
+   "pyfixest_se": 0.0151776081008222,
+   "diffdiff_coef": 0.0247068464923236,
+   "diffdiff_se": 0.0135076248425502,
+   "max_coef_gap": 1.0408340855860844e-17,
+   "max_se_gap": 0.0016699832582719
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "OLS",
+   "stata_recipe_coef": -0.0097607768844361,
+   "stata_recipe_se": 0.0042353291044152,
+   "pyfixest_coef": -0.0097607768844362,
+   "pyfixest_se": 0.0042382290219781,
+   "diffdiff_coef": -0.0097607767833748,
+   "diffdiff_se": 0.0042324351243499,
+   "max_coef_gap": 1.0106139189391959e-10,
+   "max_se_gap": 5.793897628112062e-06
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "LWDR",
+   "stata_recipe_coef": -0.0094245928733049,
+   "stata_recipe_se": 0.0041984192940642,
+   "pyfixest_coef": -0.0094245928733049,
+   "pyfixest_se": 0.0042013916266801,
+   "diffdiff_coef": -0.0094245928733048,
+   "diffdiff_se": 0.004201013602205,
+   "max_coef_gap": 1.6132928326584306e-16,
+   "max_se_gap": 2.972332615884012e-06
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sind",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": -0.0095859564989638,
+   "stata_recipe_se": 0.0042130463053543,
+   "pyfixest_coef": -0.0095859564989638,
+   "pyfixest_se": 0.0042160289933777,
+   "diffdiff_coef": -0.0095859564989638,
+   "diffdiff_se": 0.0042298671531232,
+   "max_coef_gap": 3.4694469519536136e-17,
+   "max_se_gap": 1.682084776894084e-05
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "OLS",
+   "stata_recipe_coef": 0.0174952446131896,
+   "stata_recipe_se": 0.0055165974661352,
+   "pyfixest_coef": 0.0174952446131896,
+   "pyfixest_se": 0.005520374664432,
+   "diffdiff_coef": 0.0174952446437932,
+   "diffdiff_se": 0.0055128280003116,
+   "max_coef_gap": 3.0603623801805924e-11,
+   "max_se_gap": 7.546664120404271e-06
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.0223109466311949,
+   "stata_recipe_se": 0.0054282308889023,
+   "pyfixest_coef": 0.0223109466311949,
+   "pyfixest_se": 0.0054320738847032,
+   "diffdiff_coef": 0.0223109466311952,
+   "diffdiff_se": 0.0053852406971443,
+   "max_coef_gap": 2.7755575615628914e-16,
+   "max_se_gap": 4.6833187558882085e-05
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sserv",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.0226853098620514,
+   "stata_recipe_se": 0.0054249038805004,
+   "pyfixest_coef": 0.0226853098620515,
+   "pyfixest_se": 0.0054287445208969,
+   "diffdiff_coef": 0.0226853098620514,
+   "diffdiff_se": 0.0053796685888674,
+   "max_coef_gap": 4.510281037539698e-17,
+   "max_se_gap": 4.907593202949437e-05
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "OLS",
+   "stata_recipe_coef": -0.0077344677287534,
+   "stata_recipe_se": 0.0066370306960737,
+   "pyfixest_coef": -0.0077344677287534,
+   "pyfixest_se": 0.0066415750517558,
+   "diffdiff_coef": -0.0077344678604183,
+   "diffdiff_se": 0.0066324956502705,
+   "max_coef_gap": 1.3166496191929775e-10,
+   "max_se_gap": 9.07940148529244e-06
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "LWDR",
+   "stata_recipe_coef": -0.0128863537578899,
+   "stata_recipe_se": 0.0065745755658555,
+   "pyfixest_coef": -0.01288635375789,
+   "pyfixest_se": 0.0065792301332108,
+   "diffdiff_coef": -0.0128863537578903,
+   "diffdiff_se": 0.0063649861609415,
+   "max_coef_gap": 4.3715031594615544e-16,
+   "max_se_gap": 0.0002142439722692
+  },
+  {
+   "dataset": "employment",
+   "outcome": "sagr",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": -0.0130993533630876,
+   "stata_recipe_se": 0.006567212175089,
+   "pyfixest_coef": -0.0130993533630876,
+   "pyfixest_se": 0.0065718615294236,
+   "diffdiff_coef": -0.0130993533630876,
+   "diffdiff_se": 0.0063796152405928,
+   "max_coef_gap": 6.591949208711867e-17,
+   "max_se_gap": 0.0001922462888308
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "OLS",
+   "stata_recipe_coef": 0.0492131285682026,
+   "stata_recipe_se": 0.0305578077071408,
+   "pyfixest_coef": 0.0492131285682029,
+   "pyfixest_se": 0.0307608518525011,
+   "diffdiff_coef": 0.0492131297017819,
+   "diffdiff_se": 0.0294186043626952,
+   "max_coef_gap": 1.1335792374222995e-09,
+   "max_se_gap": 0.0013422474898058
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.058843384371075,
+   "stata_recipe_se": 0.025310176733291,
+   "pyfixest_coef": 0.0588433843710749,
+   "pyfixest_se": 0.0255237685093518,
+   "diffdiff_coef": 0.0588433843710746,
+   "diffdiff_se": 0.0352188129666149,
+   "max_coef_gap": 4.649058915617843e-16,
+   "max_se_gap": 0.0099086362333239
+  },
+  {
+   "dataset": "yield",
+   "outcome": "lyld",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.0633796149859022,
+   "stata_recipe_se": 0.0227433122209234,
+   "pyfixest_coef": 0.0633796149859021,
+   "pyfixest_se": 0.0229352423090459,
+   "diffdiff_coef": 0.0633796149859013,
+   "diffdiff_se": 0.0340976624247297,
+   "max_coef_gap": 8.187894806610529e-16,
+   "max_se_gap": 0.0113543502038062
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "OLS",
+   "stata_recipe_coef": -0.0416940170018622,
+   "stata_recipe_se": 0.0842727719364454,
+   "pyfixest_coef": -0.0416940170018621,
+   "pyfixest_se": 0.0849185497475918,
+   "diffdiff_coef": -0.041694017936456,
+   "diffdiff_se": 0.0812512575422433,
+   "max_coef_gap": 9.345939647187331e-10,
+   "max_se_gap": 0.0036672922053484
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "LWDR",
+   "stata_recipe_coef": 0.0489041352851654,
+   "stata_recipe_se": 0.0488944677625453,
+   "pyfixest_coef": 0.0489041352851653,
+   "pyfixest_se": 0.0493714982565043,
+   "diffdiff_coef": 0.0489041352851658,
+   "diffdiff_se": 0.0676810864300104,
+   "max_coef_gap": 5.065392549852277e-16,
+   "max_se_gap": 0.0187866186674651
+  },
+  {
+   "dataset": "yield",
+   "outcome": "D_lyld",
+   "estimator": "KOBDR",
+   "stata_recipe_coef": 0.0530859032667504,
+   "stata_recipe_se": 0.0484380709763567,
+   "pyfixest_coef": 0.0530859032667512,
+   "pyfixest_se": 0.0489106487132995,
+   "diffdiff_coef": 0.0530859032667502,
+   "diffdiff_se": 0.0734270467966787,
+   "max_coef_gap": 1.033895191682177e-15,
+   "max_se_gap": 0.024988975820322
+  }
+ ],
+ "forensics": [
+  {
+   "run": "published (trim = 5th pctile)",
+   "outcome": "lmn",
+   "coef": 0.1087665132755405,
+   "se": 0.0223253657890507,
+   "n": 1673,
+   "units": 239
+  },
+  {
+   "run": "published (trim = 5th pctile)",
+   "outcome": "D_lmn",
+   "coef": 0.0326196486942649,
+   "se": 0.0162829445009705,
+   "n": 1434,
+   "units": 239
+  },
+  {
+   "run": "as shipped (trimL undefined)",
+   "outcome": "lmn",
+   "coef": 1.0635535711302406,
+   "se": 0.7096893725260878,
+   "n": 868,
+   "units": 124
+  },
+  {
+   "run": "as shipped (trimL undefined)",
+   "outcome": "D_lmn",
+   "coef": -0.5192615620816147,
+   "se": 0.2860949827561947,
+   "n": 744,
+   "units": 124
+  }
+ ],
+ "balance": [
+  {
+   "variable": "lpop91",
+   "weighting": "unweighted",
+   "treated_mean": 12.154749313198538,
+   "comparison_mean": 12.110889940837271,
+   "std_diff": 0.0968707463431155
+  },
+  {
+   "variable": "lpop91",
+   "weighting": "LWDR",
+   "treated_mean": 12.154749313198538,
+   "comparison_mean": 12.176268055120415,
+   "std_diff": -0.0475880798816304
+  },
+  {
+   "variable": "lpop91",
+   "weighting": "KOBDR",
+   "treated_mean": 12.154749313198538,
+   "comparison_mean": 12.160473081481571,
+   "std_diff": -0.0126579492084521
+  },
+  {
+   "variable": "lmdist",
+   "weighting": "unweighted",
+   "treated_mean": 4.686566352844238,
+   "comparison_mean": 4.452159871899985,
+   "std_diff": 0.4041117819486966
+  },
+  {
+   "variable": "lmdist",
+   "weighting": "LWDR",
+   "treated_mean": 4.686566352844238,
+   "comparison_mean": 4.645879234271395,
+   "std_diff": 0.0792641015162232
+  },
+  {
+   "variable": "lmdist",
+   "weighting": "KOBDR",
+   "treated_mean": 4.686566352844238,
+   "comparison_mean": 4.658804519819006,
+   "std_diff": 0.0540838680244422
+  }
+ ],
+ "yearLabels": {
+  "nightlights": {
+   "1": "1992-94",
+   "2": "1995-97",
+   "3": "1998-00",
+   "4": "2001-04",
+   "5": "2005-07",
+   "6": "2008-10",
+   "7": "2011-13"
+  },
+  "yield": {
+   "1": "1988-91",
+   "2": "1992-94",
+   "3": "1995-97",
+   "4": "1998-00",
+   "5": "2001-04",
+   "6": "2005-07",
+   "7": "2008-10",
+   "8": "2011-13"
+  },
+  "density": {
+   "1": "1991",
+   "2": "2001",
+   "3": "2011"
+  },
+  "services": {
+   "1": "1991",
+   "2": "2001",
+   "3": "2011"
+  }
+ },
+ "firstPost": {
+  "nightlights": 3,
+  "yield": 4,
+  "density": 2,
+  "services": 2
+ }
+}

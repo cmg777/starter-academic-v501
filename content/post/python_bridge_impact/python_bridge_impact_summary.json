@@ -1,0 +1,17 @@
+{
+  "n_figures": 21,
+  "audit_rows": 122,
+  "audit_coef_matches": 122,
+  "audit_exact_matches": 113,
+  "nightlights_mean_kobdr": 0.10876651327554059,
+  "nightlights_lr_kobdr": 0.11152570417059998,
+  "yield_lr_kobdr": 0.07874901404729087,
+  "density_sr_kobdr": -0.024792619659508672,
+  "density_lr_kobdr": 0.058951318316778634,
+  "industry_lr_kobdr": -0.012046056829733823,
+  "services_lr_kobdr": 0.024240676249876303,
+  "yield_lr_far_band": 0.26457818607358347,
+  "randomization_p": 0.0,
+  "honest_breakdown_M": 1.0,
+  "estimator_max_coef_gap": 1.1335792374222997e-09
+}

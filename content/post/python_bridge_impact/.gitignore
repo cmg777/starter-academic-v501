@@ -1,0 +1,9 @@
+cache/
+/.quarto/
+references/.quarto/
+references/.venv/
+references/tutorial.html
+references/tutorial_files/
+**/*.quarto_ipynb
+__pycache__/
+*.pyc

@@ -1,0 +1,596 @@
+
+==============================================================================
+SECTION 1: Loading the Jamuna Bridge replication data
+==============================================================================
+  built data/bridge_employment.csv  shape=(1053, 20)
+  built data/bridge_nightlights.csv  shape=(2513, 13)
+  built data/bridge_yield.csv  shape=(128, 13)
+  built data/bridge_dhs_household.csv  shape=(1543, 20)
+  built data/bridge_dhs_village.csv  shape=(1455, 22)
+  employment      rows= 1053  units= 351  periods=3  treated units= 123  comparison units= 125
+  nightlights     rows= 2513  units= 359  periods=7  treated units= 127  comparison units= 125
+  yield           rows=  128  units=  16  periods=8  treated units=   5  comparison units=   6
+  dhs household   rows= 1543  units=  37  periods=7  treated units=  16  comparison units=  21
+  dhs village     rows= 1455  units=  41  periods=7  treated units=  20  comparison units=  21
+
+==============================================================================
+SECTION 2: Building the analysis panels
+==============================================================================
+  [nightlights] logit N=1743  coefs=[-7.206172  0.313503  0.741379]
+  [nightlights] negative Oaxaca-Blinder weights: 35 obs dropped
+  [nightlights] 5% propensity trim at p=0.2918769
+  [employment] logit N=744  coefs=[-7.356198  0.323244  0.747624]
+  [employment] negative Oaxaca-Blinder weights: 15 obs dropped
+  [employment] 5% propensity trim at p=0.2884626
+  [yield] logit N=88  coefs=[-39.315575   2.000518   5.287847]
+  [yield] negative Oaxaca-Blinder weights: 16 obs dropped
+
+  Distance bands (employment sample, km from bridge foot):
+             min         max  count
+band                               
+near    8.440000   83.419998    246
+mid    83.730003  128.149994    246
+far   128.330002  269.470001    246
+
+  Estimation samples
+    nightlights  OLS N= 1729 units= 247 | weighted N= 1673 units= 239
+    employment   OLS N=  738 units= 246 | weighted N=  714 units= 238
+    yield        OLS N=   88 units=  11 | weighted N=   72 units=   9
+    dhs hh       N= 1543 districts=  37
+    dhs village  N= 1455 districts=  41
+
+==============================================================================
+SECTION 3: Exploratory analysis -- the raw series
+==============================================================================
+    figure -> python_bridge_impact_01_hinterland_geography.png
+    figure -> python_bridge_impact_02_trends_nightlights.png
+    figure -> python_bridge_impact_03_trends_yield.png
+    figure -> python_bridge_impact_04_trends_census.png
+    figure -> python_bridge_impact_05_sectoral_composition.png
+    figure -> python_bridge_impact_06_pre_bridge_distance_gradient.png
+  Pre-bridge gradients per km (treated upazilas, 1991):
+    Agriculture empl. share      +0.000692
+    Industry empl. share         -0.000278
+    Services empl. share         -0.000414
+    Log population density       -0.001864
+
+==============================================================================
+SECTION 4: The canonical 2x2 difference-in-differences
+==============================================================================
+  Group means of log(nightlights + 1):
+    treated    pre 1.2551   post 1.3270   change +0.0719
+    comparison pre 1.2113   post 1.2191   change +0.0078
+    difference-in-differences = +0.0719 - (+0.0078) = +0.0641
+
+  diff-diff, no controls, no fixed effects: ATT=0.0641 (se 0.0185)
+    figure -> python_bridge_impact_07_did_2x2.png
+
+==============================================================================
+SECTION 5: Doubly-robust reweighting -- propensity scores and Oaxaca-Blinder
+==============================================================================
+    figure -> python_bridge_impact_08_propensity_and_weights.png
+  comparison-group weight summary (nightlights, one row per upazila)
+      count    mean     std     min     25%     50%     75%     max
+ipw1  118.0  1.0046  0.3104  0.3700  0.7715  1.0045  1.2318  1.7097
+ipw2  118.0  1.0473  0.3592  0.0070  0.8318  1.1157  1.3124  1.6548
+ipw3  115.0  1.0208  0.2974  0.4449  0.7836  1.0157  1.2404  1.7097
+ipw4  115.0  1.0730  0.3257  0.1803  0.8536  1.1197  1.3147  1.6548
+
+  correlation between the two weighting schemes: 0.9707
+
+  Covariate balance (standardised difference):
+variable  weighting  treated_mean  comparison_mean  std_diff
+  lpop91 unweighted       12.1547          12.1109    0.0969
+  lpop91       LWDR       12.1547          12.1763   -0.0476
+  lpop91      KOBDR       12.1547          12.1605   -0.0127
+  lmdist unweighted        4.6866           4.4522    0.4041
+  lmdist       LWDR        4.6866           4.6459    0.0793
+  lmdist      KOBDR        4.6866           4.6588    0.0541
+    figure -> python_bridge_impact_09_covariate_balance.png
+
+==============================================================================
+SECTION 6: Table 1 -- mean effects of the bridge
+==============================================================================
+    dataset  outcome estimator    coef     se      p    n  units  r2_within
+nightlights      lmn       OLS  0.0881 0.0220 0.0001 1729    247     0.3213
+nightlights      lmn      LWDR  0.1059 0.0222 0.0000 1673    239     0.3038
+nightlights      lmn     KOBDR  0.1088 0.0223 0.0000 1673    239     0.3012
+nightlights    D_lmn       OLS  0.0163 0.0160 0.3104 1482    247     0.4990
+nightlights    D_lmn      LWDR  0.0317 0.0162 0.0507 1434    239     0.4904
+nightlights    D_lmn     KOBDR  0.0326 0.0163 0.0451 1434    239     0.4881
+ employment ldensity       OLS  0.0322 0.0152 0.0343  738    246     0.7274
+ employment ldensity      LWDR  0.0248 0.0151 0.0997  714    238     0.7355
+ employment ldensity     KOBDR  0.0247 0.0152 0.1033  714    238     0.7299
+ employment     sind       OLS -0.0098 0.0042 0.0212  738    246     0.6699
+ employment     sind      LWDR -0.0094 0.0042 0.0248  714    238     0.6559
+ employment     sind     KOBDR -0.0096 0.0042 0.0229  714    238     0.6538
+ employment    sserv       OLS  0.0175 0.0055 0.0015  738    246     0.5169
+ employment    sserv      LWDR  0.0223 0.0054 0.0000  714    238     0.5149
+ employment    sserv     KOBDR  0.0227 0.0054 0.0000  714    238     0.5101
+ employment     sagr       OLS -0.0077 0.0066 0.2439  738    246     0.7346
+ employment     sagr      LWDR -0.0129 0.0066 0.0500  714    238     0.7231
+ employment     sagr     KOBDR -0.0131 0.0066 0.0461  714    238     0.7201
+      yield     lyld       OLS  0.0492 0.0306 0.1073   88     11     0.8568
+      yield     lyld      LWDR  0.0588 0.0253 0.0201   72      9     0.9486
+      yield     lyld     KOBDR  0.0634 0.0227 0.0053   72      9     0.9496
+      yield   D_lyld       OLS -0.0417 0.0843 0.6208   77     11     0.3349
+      yield   D_lyld      LWDR  0.0489 0.0489 0.3172   63      9     0.5876
+      yield   D_lyld     KOBDR  0.0531 0.0484 0.2731   63      9     0.5973
+
+==============================================================================
+SECTION 7: Table 2 -- short-run and long-run effects
+==============================================================================
+    dataset  outcome estimator horizon    coef     se      p    n  units
+nightlights      lmn       OLS      SR  0.0257 0.0184 0.1629 1729    247
+nightlights      lmn       OLS      LR  0.0902 0.0225 0.0001 1729    247
+nightlights      lmn      LWDR      SR  0.0473 0.0185 0.0104 1673    239
+nightlights      lmn      LWDR      LR  0.1085 0.0230 0.0000 1673    239
+nightlights      lmn     KOBDR      SR  0.0487 0.0185 0.0083 1673    239
+nightlights      lmn     KOBDR      LR  0.1115 0.0231 0.0000 1673    239
+nightlights    D_lmn       OLS      SR  0.0041 0.0254 0.8724 1482    247
+nightlights    D_lmn       OLS      LR  0.0155 0.0164 0.3449 1482    247
+nightlights    D_lmn      LWDR      SR  0.0275 0.0260 0.2900 1434    239
+nightlights    D_lmn      LWDR      LR  0.0314 0.0166 0.0583 1434    239
+nightlights    D_lmn     KOBDR      SR  0.0288 0.0261 0.2682 1434    239
+nightlights    D_lmn     KOBDR      LR  0.0324 0.0167 0.0521 1434    239
+ employment ldensity       OLS      SR -0.0234 0.0138 0.0905  738    246
+ employment ldensity       OLS      LR  0.0652 0.0162 0.0001  738    246
+ employment ldensity      LWDR      SR -0.0245 0.0141 0.0817  714    238
+ employment ldensity      LWDR      LR  0.0587 0.0162 0.0003  714    238
+ employment ldensity     KOBDR      SR -0.0248 0.0142 0.0801  714    238
+ employment ldensity     KOBDR      LR  0.0590 0.0164 0.0003  714    238
+ employment     sind       OLS      SR -0.0056 0.0051 0.2747  738    246
+ employment     sind       OLS      LR -0.0122 0.0047 0.0088  738    246
+ employment     sind      LWDR      SR -0.0061 0.0049 0.2103  714    238
+ employment     sind      LWDR      LR -0.0117 0.0047 0.0129  714    238
+ employment     sind     KOBDR      SR -0.0060 0.0049 0.2144  714    238
+ employment     sind     KOBDR      LR -0.0120 0.0047 0.0111  714    238
+ employment    sserv       OLS      SR  0.0174 0.0053 0.0010  738    246
+ employment    sserv       OLS      LR  0.0176 0.0073 0.0162  738    246
+ employment    sserv      LWDR      SR  0.0204 0.0051 0.0001  714    238
+ employment    sserv      LWDR      LR  0.0236 0.0076 0.0020  714    238
+ employment    sserv     KOBDR      SR  0.0204 0.0052 0.0001  714    238
+ employment    sserv     KOBDR      LR  0.0242 0.0076 0.0015  714    238
+ employment     sagr       OLS      SR -0.0118 0.0064 0.0646  738    246
+ employment     sagr       OLS      LR -0.0053 0.0084 0.5252  738    246
+ employment     sagr      LWDR      SR -0.0143 0.0061 0.0184  714    238
+ employment     sagr      LWDR      LR -0.0119 0.0089 0.1801  714    238
+ employment     sagr     KOBDR      SR -0.0144 0.0061 0.0189  714    238
+ employment     sagr     KOBDR      LR -0.0122 0.0089 0.1694  714    238
+      yield     lyld       OLS      SR -0.0174 0.0301 0.5633   88     11
+      yield     lyld       OLS      LR  0.0711 0.0271 0.0086   88     11
+      yield     lyld      LWDR      SR  0.0066 0.0272 0.8091   72      9
+      yield     lyld      LWDR      LR  0.0747 0.0258 0.0038   72      9
+      yield     lyld     KOBDR      SR  0.0118 0.0254 0.6427   72      9
+      yield     lyld     KOBDR      LR  0.0787 0.0238 0.0010   72      9
+      yield   D_lyld       OLS      SR -0.1017 0.0967 0.2931   77     11
+      yield   D_lyld       OLS      LR -0.0390 0.0777 0.6159   77     11
+      yield   D_lyld      LWDR      SR -0.0053 0.0781 0.9457   63      9
+      yield   D_lyld      LWDR      LR  0.0471 0.0476 0.3216   63      9
+      yield   D_lyld     KOBDR      SR  0.0041 0.0784 0.9587   63      9
+      yield   D_lyld     KOBDR      LR  0.0511 0.0481 0.2887   63      9
+
+==============================================================================
+SECTION 8: Event studies -- letting every period speak
+==============================================================================
+
+  Nightlights: average post-treatment ATT = +0.0601 (se 0.0187)
+ period   label  effect     se  is_post
+      1 1992-94 -0.0082 0.0167    False
+      2 1995-97  0.0000 0.0000    False
+      3 1998-00  0.0068 0.0179     True
+      4 2001-04  0.0328 0.0217     True
+      5 2005-07  0.0501 0.0216     True
+      6 2008-10  0.0831 0.0238     True
+      7 2011-13  0.1279 0.0271     True
+
+  Rice yield: average post-treatment ATT = +0.0114 (se 0.0634)
+ period   label  effect     se  is_post
+      1 1988-91 -0.0605 0.0954    False
+      2 1992-94  0.0622 0.0670    False
+      3 1995-97  0.0000 0.0000    False
+      4 1998-00 -0.0422 0.0523     True
+      5 2001-04 -0.0613 0.0722     True
+      6 2005-07  0.0329 0.0648     True
+      7 2008-10  0.0544 0.0716     True
+      8 2011-13  0.0733 0.0688     True
+
+  Population density: average post-treatment ATT = +0.0209 (se 0.0143)
+ period label  effect     se  is_post
+      1  1991  0.0000 0.0000    False
+      2  2001 -0.0234 0.0138     True
+      3  2011  0.0652 0.0162     True
+
+  Services share: average post-treatment ATT = +0.0175 (se 0.0051)
+ period label  effect     se  is_post
+      1  1991  0.0000 0.0000    False
+      2  2001  0.0174 0.0053     True
+      3  2011  0.0176 0.0073     True
+    figure -> python_bridge_impact_10_event_study_nightlights.png
+    figure -> python_bridge_impact_11_event_study_others.png
+
+==============================================================================
+SECTION 9: Table 4 -- effects by distance from the bridge
+==============================================================================
+    dataset  outcome horizon band    coef     se      p    n  units
+nightlights      lmn      SR near -0.0078 0.0235 0.7404 1673    239
+nightlights      lmn      SR  mid  0.0632 0.0296 0.0329 1673    239
+nightlights      lmn      SR  far  0.0551 0.0269 0.0405 1673    239
+nightlights      lmn      LR near  0.0261 0.0343 0.4478 1673    239
+nightlights      lmn      LR  mid  0.1490 0.0401 0.0002 1673    239
+nightlights      lmn      LR  far  0.1015 0.0383 0.0080 1673    239
+nightlights    D_lmn      SR near -0.0145 0.0308 0.6376 1434    239
+nightlights    D_lmn      SR  mid  0.0431 0.0351 0.2194 1434    239
+nightlights    D_lmn      SR  far  0.0308 0.0320 0.3356 1434    239
+nightlights    D_lmn      LR near  0.0114 0.0241 0.6376 1434    239
+nightlights    D_lmn      LR  mid  0.0275 0.0247 0.2643 1434    239
+nightlights    D_lmn      LR  far  0.0384 0.0224 0.0865 1434    239
+ employment ldensity      SR near -0.0369 0.0244 0.1307  714    238
+ employment ldensity      SR  mid -0.0709 0.0242 0.0034  714    238
+ employment ldensity      SR  far  0.0157 0.0171 0.3597  714    238
+ employment ldensity      LR near  0.0689 0.0243 0.0046  714    238
+ employment ldensity      LR  mid  0.0050 0.0289 0.8613  714    238
+ employment ldensity      LR  far  0.0928 0.0241 0.0001  714    238
+ employment     sind      SR near -0.0154 0.0086 0.0735  714    238
+ employment     sind      SR  mid  0.0002 0.0048 0.9738  714    238
+ employment     sind      SR  far -0.0034 0.0063 0.5840  714    238
+ employment     sind      LR near -0.0059 0.0097 0.5436  714    238
+ employment     sind      LR  mid -0.0248 0.0071 0.0005  714    238
+ employment     sind      LR  far -0.0013 0.0075 0.8592  714    238
+ employment    sserv      SR near -0.0154 0.0096 0.1096  714    238
+ employment    sserv      SR  mid  0.0291 0.0091 0.0014  714    238
+ employment    sserv      SR  far  0.0221 0.0089 0.0132  714    238
+ employment    sserv      LR near -0.0264 0.0132 0.0459  714    238
+ employment    sserv      LR  mid  0.0168 0.0120 0.1614  714    238
+ employment    sserv      LR  far  0.0586 0.0157 0.0002  714    238
+ employment     sagr      SR near  0.0308 0.0107 0.0039  714    238
+ employment     sagr      SR  mid -0.0293 0.0097 0.0025  714    238
+ employment     sagr      SR  far -0.0187 0.0102 0.0661  714    238
+ employment     sagr      LR near  0.0323 0.0146 0.0273  714    238
+ employment     sagr      LR  mid  0.0080 0.0137 0.5608  714    238
+ employment     sagr      LR  far -0.0573 0.0173 0.0009  714    238
+      yield     lyld      SR near -0.0247 0.0185 0.1812   72      9
+      yield     lyld      SR  mid  0.0175 0.0240 0.4654   72      9
+      yield     lyld      SR  far  0.1041 0.0296 0.0004   72      9
+      yield     lyld      LR near  0.0494 0.0224 0.0276   72      9
+      yield     lyld      LR  mid  0.0654 0.0223 0.0033   72      9
+      yield     lyld      LR  far  0.2646 0.0246 0.0000   72      9
+      yield   D_lyld      SR near -0.0279 0.0523 0.5942   63      9
+      yield   D_lyld      SR  mid -0.0299 0.0626 0.6331   63      9
+      yield   D_lyld      SR  far  0.2271 0.0986 0.0212   63      9
+      yield   D_lyld      LR near  0.0252 0.0358 0.4804   63      9
+      yield   D_lyld      LR  mid  0.0108 0.0336 0.7487   63      9
+      yield   D_lyld      LR  far  0.3441 0.0902 0.0001   63      9
+    figure -> python_bridge_impact_12_heterogeneity_by_distance.png
+
+==============================================================================
+SECTION 10: Table 3 -- ruling out the political-economy story
+==============================================================================
+   source               outcome horizon    coef     se      p    n  units
+household           Electricity      SR -0.0569 0.0603 0.3454 1543     37
+household           Electricity      LR  0.0356 0.0471 0.4502 1543     37
+  village            dist_Thana      SR -1.0256 1.1903 0.3889  559     36
+  village            dist_Thana      LR     NaN    NaN    NaN  559     36
+  village         dist_district      SR -0.4138 3.1619 0.8959  618     37
+  village         dist_district      LR     NaN    NaN    NaN  618     37
+  village dist_satellite_clinic      SR -3.1155 2.4002 0.1943  398     36
+  village dist_satellite_clinic      LR     NaN    NaN    NaN  398     36
+  village              dist_hos      SR  0.0553 0.3974 0.8893 1440     41
+  village              dist_hos      LR  0.2217 0.4469 0.6198 1440     41
+  village        primary_school      SR  0.4809 0.3754 0.2002 1292     41
+  village        primary_school      LR  0.5328 0.5265 0.3116 1292     41
+  village           high_school      SR  0.3071 0.3820 0.4215 1303     41
+  village           high_school      LR  0.5351 0.2902 0.0652 1303     41
+  village       madrassa_school      SR  0.1094 0.2764 0.6922 1297     41
+  village       madrassa_school      LR  0.0253 0.2245 0.9102 1297     41
+  village          grameen_bank      SR -0.1585 0.1200 0.1867 1449     41
+  village          grameen_bank      LR -0.0415 0.0712 0.5598 1449     41
+  village                cinema      SR -0.8842 0.8110 0.2756 1306     41
+  village                cinema      LR -0.3644 0.8335 0.6619 1306     41
+  village           post_office      SR  0.4200 0.2631 0.1104 1307     41
+  village           post_office      LR  0.1163 0.1561 0.4562 1307     41
+  village      co_operative_soc      SR  0.0896 0.1079 0.4065 1448     41
+  village      co_operative_soc      LR  0.0507 0.0778 0.5149 1448     41
+  village                   NGO      SR     NaN    NaN    NaN  413     36
+  village                   NGO      LR     NaN    NaN    NaN  413     36
+
+  Public-goods outcomes significant at 5%: 0 of 21 estimates
+    figure -> python_bridge_impact_13_public_goods_placebo.png
+
+==============================================================================
+SECTION 11: Balance tests and pre-trends (Appendix Table AT.3)
+==============================================================================
+    dataset  test  outcome estimator    coef     se      p   n
+ employment level ldensity     naive -0.0236 0.0685 0.7301 246
+ employment level ldensity       OLS  0.1741 0.1077 0.1060 246
+ employment level ldensity      LWDR  0.1559 0.1171 0.1829 238
+ employment level ldensity     KOBDR  0.1489 0.1175 0.2050 238
+ employment level     sind     naive  0.0002 0.0061 0.9672 246
+ employment level     sind       OLS  0.0065 0.0062 0.2942 246
+ employment level     sind      LWDR  0.0028 0.0055 0.6105 238
+ employment level     sind     KOBDR  0.0025 0.0055 0.6545 238
+ employment level    sserv     naive -0.0879 0.0143 0.0000 246
+ employment level    sserv       OLS -0.0179 0.0186 0.3338 246
+ employment level    sserv      LWDR -0.0177 0.0193 0.3594 238
+ employment level    sserv     KOBDR -0.0183 0.0191 0.3379 238
+ employment level     sagr     naive  0.0877 0.0170 0.0000 246
+ employment level     sagr       OLS  0.0114 0.0207 0.5809 246
+ employment level     sagr      LWDR  0.0149 0.0211 0.4805 238
+ employment level     sagr     KOBDR  0.0159 0.0209 0.4476 238
+nightlights level      lmn     naive  0.0438 0.0652 0.5014 494
+nightlights trend      lmn     naive  0.0110 0.0109 0.3107 494
+nightlights level      lmn       OLS  0.0802 0.0892 0.3685 494
+nightlights trend      lmn       OLS  0.0434 0.0190 0.0222 494
+nightlights level      lmn      LWDR  0.0798 0.1018 0.4332 478
+nightlights trend      lmn      LWDR  0.0272 0.0192 0.1575 478
+nightlights level      lmn     KOBDR  0.0663 0.1040 0.5234 478
+nightlights trend      lmn     KOBDR  0.0271 0.0195 0.1639 478
+      yield level     lyld     naive  0.0340 0.0512 0.5065  33
+      yield trend     lyld     naive  0.0096 0.0459 0.8348  33
+      yield level     lyld       OLS  0.1027 0.0820 0.2107  33
+      yield trend     lyld       OLS  0.0409 0.0384 0.2861  33
+      yield level     lyld      LWDR  0.0637 0.0317 0.0444  27
+      yield trend     lyld      LWDR  0.0286 0.0233 0.2196  27
+      yield level     lyld     KOBDR  0.0705 0.0326 0.0303  27
+      yield trend     lyld     KOBDR  0.0279 0.0238 0.2426  27
+    figure -> python_bridge_impact_14_balance_pretrends.png
+
+==============================================================================
+SECTION 12: diff-diff diagnostics -- parallel trends, placebo, HonestDiD
+==============================================================================
+  check_parallel_trends (nightlights, 1992-97):
+    treated_trend                0.06444
+    treated_trend_se             0.05784
+    control_trend                0.056
+    control_trend_se             0.07209
+    trend_difference             0.00844
+    trend_difference_se          0.09242
+    t_statistic                  0.0913
+    p_value                      0.92725
+    parallel_trends_plausible    True
+
+  equivalence_test_trends:
+    mean_difference              0.00844
+    se_difference                0.01024
+    equivalence_margin           0.04019
+    lower_t_stat                 4.75055
+    upper_t_stat                 -3.10182
+    lower_p_value                0.0
+    upper_p_value                0.00107
+    tost_p_value                 0.00107
+    degrees_of_freedom           244.838
+    equivalent                   True
+
+  placebo_timing_test (pretend the bridge opened in 1995-97, one period early):
+    placebo effect = +0.00844 (se 0.01025), p = 0.4106, significant = False
+    for comparison, the real effect is +0.06409 (se 0.01850)
+
+  HonestDiD sensitivity (Rambachan and Roth relative-magnitude bounds):
+    M=0.0  CI = [+0.0236, +0.0967]  excludes zero
+    M=0.25 CI = [+0.0174, +0.1028]  excludes zero
+    M=0.5  CI = [+0.0113, +0.1090]  excludes zero
+    M=1.0  CI = [-0.0010, +0.1212]  includes zero
+    M=1.5  CI = [-0.0132, +0.1335]  includes zero
+    M=2.0  CI = [-0.0255, +0.1458]  includes zero
+
+  Breakdown value: the nightlights result survives until M = 1.0
+    figure -> python_bridge_impact_15_honest_did_sensitivity.png
+
+  Randomisation inference over 500 placebo assignments:
+    true estimate +0.0881; placebo |effect| >= |true| in 0.0% of draws
+    figure -> python_bridge_impact_16_randomization_inference.png
+
+==============================================================================
+SECTION 13: Estimator agreement -- diff-diff, pyfixest, and Stata's recipe
+==============================================================================
+    dataset  outcome estimator  stata_recipe_coef  stata_recipe_se  pyfixest_coef  pyfixest_se  diffdiff_coef  diffdiff_se  max_coef_gap  max_se_gap
+nightlights      lmn       OLS            0.08807          0.02200        0.08807      0.02201        0.08807      0.02197           0.0     0.00004
+nightlights      lmn      LWDR            0.10588          0.02223        0.10588      0.02224        0.10588      0.02267           0.0     0.00044
+nightlights      lmn     KOBDR            0.10877          0.02233        0.10877      0.02233        0.10877      0.02304           0.0     0.00071
+nightlights    D_lmn       OLS            0.01626          0.01603        0.01626      0.01603        0.01626      0.01601           0.0     0.00003
+nightlights    D_lmn      LWDR            0.03169          0.01622        0.03169      0.01623        0.03169      0.01635           0.0     0.00013
+nightlights    D_lmn     KOBDR            0.03262          0.01628        0.03262      0.01629        0.03262      0.01643           0.0     0.00014
+ employment ldensity       OLS            0.03219          0.01521        0.03219      0.01522        0.03219      0.01520           0.0     0.00002
+ employment ldensity      LWDR            0.02481          0.01507        0.02481      0.01508        0.02481      0.01365           0.0     0.00143
+ employment ldensity     KOBDR            0.02471          0.01517        0.02471      0.01518        0.02471      0.01351           0.0     0.00167
+ employment     sind       OLS           -0.00976          0.00424       -0.00976      0.00424       -0.00976      0.00423           0.0     0.00001
+ employment     sind      LWDR           -0.00942          0.00420       -0.00942      0.00420       -0.00942      0.00420           0.0     0.00000
+ employment     sind     KOBDR           -0.00959          0.00421       -0.00959      0.00422       -0.00959      0.00423           0.0     0.00002
+ employment    sserv       OLS            0.01750          0.00552        0.01750      0.00552        0.01750      0.00551           0.0     0.00001
+ employment    sserv      LWDR            0.02231          0.00543        0.02231      0.00543        0.02231      0.00539           0.0     0.00005
+ employment    sserv     KOBDR            0.02269          0.00542        0.02269      0.00543        0.02269      0.00538           0.0     0.00005
+ employment     sagr       OLS           -0.00773          0.00664       -0.00773      0.00664       -0.00773      0.00663           0.0     0.00001
+ employment     sagr      LWDR           -0.01289          0.00657       -0.01289      0.00658       -0.01289      0.00636           0.0     0.00021
+ employment     sagr     KOBDR           -0.01310          0.00657       -0.01310      0.00657       -0.01310      0.00638           0.0     0.00019
+      yield     lyld       OLS            0.04921          0.03056        0.04921      0.03076        0.04921      0.02942           0.0     0.00134
+      yield     lyld      LWDR            0.05884          0.02531        0.05884      0.02552        0.05884      0.03522           0.0     0.00991
+      yield     lyld     KOBDR            0.06338          0.02274        0.06338      0.02294        0.06338      0.03410           0.0     0.01135
+      yield   D_lyld       OLS           -0.04169          0.08427       -0.04169      0.08492       -0.04169      0.08125           0.0     0.00367
+      yield   D_lyld      LWDR            0.04890          0.04889        0.04890      0.04937        0.04890      0.06768           0.0     0.01879
+      yield   D_lyld     KOBDR            0.05309          0.04844        0.05309      0.04891        0.05309      0.07343           0.0     0.02499
+
+  Largest coefficient disagreement across the three engines: 0.000000
+  Largest standard-error disagreement: 0.024989
+    figure -> python_bridge_impact_17_estimator_agreement.png
+
+==============================================================================
+SECTION 14: Reproducing the $trimL bug in nite_2021.do
+==============================================================================
+  published (trim = 5th pctile)    lmn     +0.1088 (0.0223)  N= 1673  upazilas=239
+  published (trim = 5th pctile)    D_lmn   +0.0326 (0.0163)  N= 1434  upazilas=239
+  as shipped (trimL undefined)     lmn     +1.0636 (0.7097)  N=  868  upazilas=124
+  as shipped (trimL undefined)     D_lmn   -0.5193 (0.2861)  N=  744  upazilas=124
+
+  The authors' own archived output records both runs: nlite_mean.txt carries the
+  degenerate numbers, nlite2_mean.txt the correct ones. Only the latter reached print.
+    figure -> python_bridge_impact_18_trimL_forensics.png
+
+==============================================================================
+SECTION 15: Reproduction audit against the authors' Stata output
+==============================================================================
+table     outcome estimator    term  stata_coef  stata_se  python_coef  python_se  abs_diff_coef  abs_diff_se  match_coef  match_se match_flag
+   T1       D_lmn     KOBDR    mean       0.033     0.016      0.03262    0.01628        0.00038      0.00028        True      True      exact
+   T1       D_lmn      LWDR    mean       0.032     0.016      0.03169    0.01622        0.00031      0.00022        True      True      exact
+   T1       D_lmn       OLS    mean       0.016     0.016      0.01626    0.01603        0.00026      0.00003        True      True      exact
+   T1      D_lyld     KOBDR    mean       0.053     0.049      0.05309    0.04844        0.00009      0.00056        True      True      exact
+   T1      D_lyld      LWDR    mean       0.049     0.049      0.04890    0.04889        0.00010      0.00011        True      True      exact
+   T1      D_lyld       OLS    mean      -0.042     0.085     -0.04169    0.08427        0.00031      0.00073        True     False  coef only
+   T1    ldensity     KOBDR    mean       0.025     0.015      0.02471    0.01517        0.00029      0.00017        True      True      exact
+   T1    ldensity      LWDR    mean       0.025     0.015      0.02481    0.01507        0.00019      0.00007        True      True      exact
+   T1    ldensity       OLS    mean       0.032     0.015      0.03219    0.01521        0.00019      0.00021        True      True      exact
+   T1         lmn     KOBDR    mean       0.109     0.022      0.10877    0.02233        0.00023      0.00033        True      True      exact
+   T1         lmn      LWDR    mean       0.106     0.022      0.10588    0.02223        0.00012      0.00023        True      True      exact
+   T1         lmn       OLS    mean       0.088     0.022      0.08807    0.02200        0.00007      0.00000        True      True      exact
+   T1        lyld     KOBDR    mean       0.063     0.023      0.06338    0.02274        0.00038      0.00026        True      True      exact
+   T1        lyld      LWDR    mean       0.059     0.026      0.05884    0.02531        0.00016      0.00069        True     False  coef only
+   T1        lyld       OLS    mean       0.049     0.031      0.04921    0.03056        0.00021      0.00044        True      True      exact
+   T1        sagr     KOBDR    mean      -0.013     0.007     -0.01310    0.00657        0.00010      0.00043        True      True      exact
+   T1        sagr      LWDR    mean      -0.013     0.007     -0.01289    0.00657        0.00011      0.00043        True      True      exact
+   T1        sagr       OLS    mean      -0.008     0.007     -0.00773    0.00664        0.00027      0.00036        True      True      exact
+   T1        sind     KOBDR    mean      -0.010     0.004     -0.00959    0.00421        0.00041      0.00021        True      True      exact
+   T1        sind      LWDR    mean      -0.009     0.004     -0.00942    0.00420        0.00042      0.00020        True      True      exact
+   T1        sind       OLS    mean      -0.010     0.004     -0.00976    0.00424        0.00024      0.00024        True      True      exact
+   T1       sserv     KOBDR    mean       0.023     0.005      0.02269    0.00542        0.00031      0.00042        True      True      exact
+   T1       sserv      LWDR    mean       0.022     0.005      0.02231    0.00543        0.00031      0.00043        True      True      exact
+   T1       sserv       OLS    mean       0.017     0.006      0.01750    0.00552        0.00050      0.00048        True      True      exact
+   T2       D_lmn     KOBDR      LR       0.032     0.017      0.03236    0.01666        0.00036      0.00034        True      True      exact
+   T2       D_lmn     KOBDR      SR       0.029     0.026      0.02885    0.02605        0.00015      0.00005        True      True      exact
+   T2       D_lmn      LWDR      LR       0.031     0.017      0.03141    0.01659        0.00041      0.00041        True      True      exact
+   T2       D_lmn      LWDR      SR       0.027     0.026      0.02749    0.02598        0.00049      0.00002        True      True      exact
+   T2       D_lmn       OLS      LR       0.015     0.016      0.01546    0.01637        0.00046      0.00037        True      True      exact
+   T2       D_lmn       OLS      SR       0.004     0.025      0.00407    0.02537        0.00007      0.00037        True      True      exact
+   T2      D_lyld     KOBDR      LR       0.051     0.049      0.05108    0.04815        0.00008      0.00085        True     False  coef only
+   T2      D_lyld     KOBDR      SR       0.004     0.079      0.00406    0.07838        0.00006      0.00062        True     False  coef only
+   T2      D_lyld      LWDR      LR       0.047     0.048      0.04714    0.04756        0.00014      0.00044        True      True      exact
+   T2      D_lyld      LWDR      SR      -0.005     0.079     -0.00532    0.07806        0.00032      0.00094        True     False  coef only
+   T2      D_lyld       OLS      LR      -0.039     0.078     -0.03897    0.07767        0.00003      0.00033        True      True      exact
+   T2      D_lyld       OLS      SR      -0.102     0.097     -0.10166    0.09669        0.00034      0.00031        True      True      exact
+   T2    ldensity     KOBDR      LR       0.059     0.016      0.05895    0.01635        0.00005      0.00035        True      True      exact
+   T2    ldensity     KOBDR      SR      -0.025     0.014     -0.02479    0.01417        0.00021      0.00017        True      True      exact
+   T2    ldensity      LWDR      LR       0.059     0.016      0.05871    0.01623        0.00029      0.00023        True      True      exact
+   T2    ldensity      LWDR      SR      -0.024     0.014     -0.02448    0.01406        0.00048      0.00006        True      True      exact
+   T2    ldensity       OLS      LR       0.065     0.016      0.06518    0.01615        0.00018      0.00015        True      True      exact
+   T2    ldensity       OLS      SR      -0.023     0.014     -0.02340    0.01382        0.00040      0.00018        True      True      exact
+   T2         lmn     KOBDR      LR       0.112     0.023      0.11153    0.02308        0.00047      0.00008        True      True      exact
+   T2         lmn     KOBDR      SR       0.049     0.018      0.04868    0.01846        0.00032      0.00046        True      True      exact
+   T2         lmn      LWDR      LR       0.109     0.023      0.10851    0.02297        0.00049      0.00003        True      True      exact
+   T2         lmn      LWDR      SR       0.047     0.018      0.04730    0.01846        0.00030      0.00046        True      True      exact
+   T2         lmn       OLS      LR       0.090     0.023      0.09025    0.02251        0.00025      0.00049        True      True      exact
+   T2         lmn       OLS      SR       0.026     0.018      0.02572    0.01844        0.00028      0.00044        True      True      exact
+   T2        lyld     KOBDR      LR       0.079     0.024      0.07875    0.02385        0.00025      0.00015        True      True      exact
+   T2        lyld     KOBDR      SR       0.012     0.026      0.01178    0.02540        0.00022      0.00060        True     False  coef only
+   T2        lyld      LWDR      LR       0.075     0.026      0.07470    0.02579        0.00030      0.00021        True      True      exact
+   T2        lyld      LWDR      SR       0.007     0.027      0.00657    0.02720        0.00043      0.00020        True      True      exact
+   T2        lyld       OLS      LR       0.071     0.027      0.07114    0.02707        0.00014      0.00007        True      True      exact
+   T2        lyld       OLS      SR      -0.017     0.030     -0.01739    0.03009        0.00039      0.00009        True      True      exact
+   T2        sagr     KOBDR      LR      -0.012     0.009     -0.01219    0.00887        0.00019      0.00013        True      True      exact
+   T2        sagr     KOBDR      SR      -0.014     0.006     -0.01441    0.00614        0.00041      0.00014        True      True      exact
+   T2        sagr      LWDR      LR      -0.012     0.009     -0.01191    0.00888        0.00009      0.00012        True      True      exact
+   T2        sagr      LWDR      SR      -0.014     0.006     -0.01431    0.00607        0.00031      0.00007        True      True      exact
+   T2        sagr       OLS      LR      -0.005     0.008     -0.00533    0.00839        0.00033      0.00039        True      True      exact
+   T2        sagr       OLS      SR      -0.012     0.006     -0.01178    0.00638        0.00022      0.00038        True      True      exact
+   T2        sind     KOBDR      LR      -0.012     0.005     -0.01205    0.00474        0.00005      0.00026        True      True      exact
+   T2        sind     KOBDR      SR      -0.006     0.005     -0.00603    0.00486        0.00003      0.00014        True      True      exact
+   T2        sind      LWDR      LR      -0.012     0.005     -0.01172    0.00471        0.00028      0.00029        True      True      exact
+   T2        sind      LWDR      SR      -0.006     0.005     -0.00609    0.00486        0.00009      0.00014        True      True      exact
+   T2        sind       OLS      LR      -0.012     0.005     -0.01222    0.00466        0.00022      0.00034        True      True      exact
+   T2        sind       OLS      SR      -0.006     0.005     -0.00561    0.00514        0.00039      0.00014        True      True      exact
+   T2       sserv     KOBDR      LR       0.024     0.008      0.02424    0.00763        0.00024      0.00037        True      True      exact
+   T2       sserv     KOBDR      SR       0.020     0.005      0.02044    0.00519        0.00044      0.00019        True      True      exact
+   T2       sserv      LWDR      LR       0.024     0.008      0.02363    0.00765        0.00037      0.00035        True      True      exact
+   T2       sserv      LWDR      SR       0.020     0.005      0.02040    0.00511        0.00040      0.00011        True      True      exact
+   T2       sserv       OLS      LR       0.018     0.007      0.01756    0.00730        0.00044      0.00030        True      True      exact
+   T2       sserv       OLS      SR       0.017     0.005      0.01739    0.00530        0.00039      0.00030        True      True      exact
+   T3 Electricity     KOBDR      LR       0.036     0.047      0.03556    0.04709        0.00044      0.00009        True      True      exact
+   T3 Electricity     KOBDR      SR      -0.057     0.060     -0.05691    0.06031        0.00009      0.00031        True      True      exact
+   T4       D_lmn     KOBDR  LR_far       0.038     0.022      0.03842    0.02241        0.00042      0.00041        True      True      exact
+   T4       D_lmn     KOBDR  LR_mid       0.028     0.025      0.02755    0.02467        0.00045      0.00033        True      True      exact
+   T4       D_lmn     KOBDR LR_near       0.011     0.024      0.01136    0.02413        0.00036      0.00013        True      True      exact
+   T4       D_lmn     KOBDR  SR_far       0.031     0.032      0.03077    0.03195        0.00023      0.00005        True      True      exact
+   T4       D_lmn     KOBDR  SR_mid       0.043     0.035      0.04315    0.03513        0.00015      0.00013        True      True      exact
+   T4       D_lmn     KOBDR SR_near      -0.015     0.031     -0.01451    0.03080        0.00049      0.00020        True      True      exact
+   T4      D_lyld     KOBDR  LR_far       0.344     0.091      0.34414    0.09025        0.00014      0.00075        True     False  coef only
+   T4      D_lyld     KOBDR  LR_mid       0.011     0.034      0.01076    0.03358        0.00024      0.00042        True      True      exact
+   T4      D_lyld     KOBDR LR_near       0.025     0.036      0.02523    0.03576        0.00023      0.00024        True      True      exact
+   T4      D_lyld     KOBDR  SR_far       0.227     0.100      0.22710    0.09857        0.00010      0.00143        True     False  coef only
+   T4      D_lyld     KOBDR  SR_mid      -0.030     0.063     -0.02988    0.06260        0.00012      0.00040        True      True      exact
+   T4      D_lyld     KOBDR SR_near      -0.028     0.053     -0.02785    0.05228        0.00015      0.00072        True     False  coef only
+   T4    ldensity     KOBDR  LR_far       0.093     0.024      0.09278    0.02406        0.00022      0.00006        True      True      exact
+   T4    ldensity     KOBDR  LR_mid       0.005     0.029      0.00505    0.02891        0.00005      0.00009        True      True      exact
+   T4    ldensity     KOBDR LR_near       0.069     0.024      0.06886    0.02429        0.00014      0.00029        True      True      exact
+   T4    ldensity     KOBDR  SR_far       0.016     0.017      0.01566    0.01710        0.00034      0.00010        True      True      exact
+   T4    ldensity     KOBDR  SR_mid      -0.071     0.024     -0.07089    0.02417        0.00011      0.00017        True      True      exact
+   T4    ldensity     KOBDR SR_near      -0.037     0.024     -0.03689    0.02441        0.00011      0.00041        True      True      exact
+   T4         lmn     KOBDR  LR_far       0.102     0.038      0.10152    0.03826        0.00048      0.00026        True      True      exact
+   T4         lmn     KOBDR  LR_mid       0.149     0.040      0.14895    0.04014        0.00005      0.00014        True      True      exact
+   T4         lmn     KOBDR LR_near       0.026     0.034      0.02605    0.03433        0.00005      0.00033        True      True      exact
+   T4         lmn     KOBDR  SR_far       0.055     0.027      0.05509    0.02689        0.00009      0.00011        True      True      exact
+   T4         lmn     KOBDR  SR_mid       0.063     0.030      0.06316    0.02961        0.00016      0.00039        True      True      exact
+   T4         lmn     KOBDR SR_near      -0.008     0.024     -0.00780    0.02353        0.00020      0.00047        True      True      exact
+   T4        lyld     KOBDR  LR_far       0.265     0.025      0.26458    0.02459        0.00042      0.00041        True      True      exact
+   T4        lyld     KOBDR  LR_mid       0.065     0.022      0.06543    0.02227        0.00043      0.00027        True      True      exact
+   T4        lyld     KOBDR LR_near       0.049     0.023      0.04936    0.02241        0.00036      0.00059        True      True      exact
+   T4        lyld     KOBDR  SR_far       0.104     0.030      0.10410    0.02960        0.00010      0.00040        True      True      exact
+   T4        lyld     KOBDR  SR_mid       0.018     0.024      0.01754    0.02403        0.00046      0.00003        True      True      exact
+   T4        lyld     KOBDR SR_near      -0.025     0.019     -0.02471    0.01848        0.00029      0.00052        True      True      exact
+   T4        sagr     KOBDR  LR_far      -0.057     0.017     -0.05730    0.01726        0.00030      0.00026        True      True      exact
+   T4        sagr     KOBDR  LR_mid       0.008     0.014      0.00798    0.01372        0.00002      0.00028        True      True      exact
+   T4        sagr     KOBDR LR_near       0.032     0.015      0.03229    0.01463        0.00029      0.00037        True      True      exact
+   T4        sagr     KOBDR  SR_far      -0.019     0.010     -0.01869    0.01017        0.00031      0.00017        True      True      exact
+   T4        sagr     KOBDR  SR_mid      -0.029     0.010     -0.02930    0.00971        0.00030      0.00029        True      True      exact
+   T4        sagr     KOBDR SR_near       0.031     0.011      0.03078    0.01067        0.00022      0.00033        True      True      exact
+   T4        sind     KOBDR  LR_far      -0.001     0.008     -0.00133    0.00750        0.00033      0.00050        True      True      exact
+   T4        sind     KOBDR  LR_mid      -0.025     0.007     -0.02480    0.00713        0.00020      0.00013        True      True      exact
+   T4        sind     KOBDR LR_near      -0.006     0.010     -0.00590    0.00971        0.00010      0.00029        True      True      exact
+   T4        sind     KOBDR  SR_far      -0.003     0.006     -0.00344    0.00628        0.00044      0.00028        True      True      exact
+   T4        sind     KOBDR  SR_mid       0.000     0.005      0.00016    0.00476        0.00016      0.00024        True      True      exact
+   T4        sind     KOBDR SR_near      -0.015     0.009     -0.01540    0.00861        0.00040      0.00039        True      True      exact
+   T4       sserv     KOBDR  LR_far       0.059     0.016      0.05863    0.01574        0.00037      0.00026        True      True      exact
+   T4       sserv     KOBDR  LR_mid       0.017     0.012      0.01681    0.01201        0.00019      0.00001        True      True      exact
+   T4       sserv     KOBDR LR_near      -0.026     0.013     -0.02640    0.01322        0.00040      0.00022        True      True      exact
+   T4       sserv     KOBDR  SR_far       0.022     0.009      0.02213    0.00893        0.00013      0.00007        True      True      exact
+   T4       sserv     KOBDR  SR_mid       0.029     0.009      0.02914    0.00911        0.00014      0.00011        True      True      exact
+   T4       sserv     KOBDR SR_near      -0.015     0.010     -0.01538    0.00961        0.00038      0.00039        True      True      exact
+
+  122 of 122 coefficients reproduce to the printed precision (100.0%)
+  113 of 122 reproduce both the coefficient and the standard error (92.6%)
+    figure -> python_bridge_impact_19_reproduction_audit.png
+
+==============================================================================
+SECTION 16: Headline results
+==============================================================================
+    figure -> python_bridge_impact_20_forest_table1.png
+    figure -> python_bridge_impact_21_forest_table2.png
+
+==============================================================================
+SECTION 17: Summary
+==============================================================================
+{
+  "n_figures": 21,
+  "audit_rows": 122,
+  "audit_coef_matches": 122,
+  "audit_exact_matches": 113,
+  "nightlights_mean_kobdr": 0.10876651327554059,
+  "nightlights_lr_kobdr": 0.11152570417059998,
+  "yield_lr_kobdr": 0.07874901404729087,
+  "density_sr_kobdr": -0.024792619659508672,
+  "density_lr_kobdr": 0.058951318316778634,
+  "industry_lr_kobdr": -0.012046056829733823,
+  "services_lr_kobdr": 0.024240676249876303,
+  "yield_lr_far_band": 0.26457818607358347,
+  "randomization_p": 0.0,
+  "honest_breakdown_M": 1.0,
+  "estimator_max_coef_gap": 1.1335792374222997e-09
+}
+
+  The bridge did not hollow out the Jamuna hinterland.
+    Population density   -0.025 short run, then +0.059 long run
+    Industry share       -0.012 in the long run
+    Services share       +0.024 in the long run
+    Rice yield           +0.079 in the long run
+    Nightlights          +0.112 in the long run
+  Manufacturing fell, but density rose -- which is exactly the pattern the core-periphery
+  backwash story cannot produce, and the comparative-advantage story predicts.
+
+
+=== Script completed successfully ===

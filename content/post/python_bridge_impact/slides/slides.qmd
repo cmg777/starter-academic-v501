@@ -1,0 +1,495 @@
+---
+title: "A Bridge, Two Rivers, and One Number That Settles It"
+subtitle: "What happens to a poor region when you finally connect it to a rich one"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "+5.9%"
+    cap: "population density, long run"
+  - num: "−1.2 pp"
+    cap: "manufacturing share, long run"
+  - num: "+26.5%"
+    cap: "rice yield, farthest from the bridge"
+format:
+  revealjs:
+    output-file: index.html
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    link-external-icon: false
+---
+
+# The Question {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## A country cut into three pieces by two of the largest rivers on earth
+
+::: {.notes}
+Open with the geography, because the geography is the research design. Bangladesh is a delta, and two enormous rivers slice it into three. The northwest and the south are each cut off from Dhaka. That is not a metaphor — before 1998 there was no bridge over either.
+:::
+
+Bangladesh is a delta. Two rivers cut it into three.
+
+. . .
+
+The **Jamuna** — the local name for the Brahmaputra, ninth in the world by discharge — separated the poor northwest from Dhaka.
+
+. . .
+
+The **Ganges**, locally the **Padma**, cut off the south.
+
+. . .
+
+[Two isolated hinterlands. One capital. And, until 1998, no bridge over either river.]{.takeaway .fragment}
+
+## In June 1998 one of the two got a bridge
+
+::: {.notes}
+The magnitudes here matter for the rest of the deck. This was not a marginal improvement to an existing road. It was a discontinuous change in the cost of reaching the capital.
+:::
+
+The Jamuna (Bangabandhu) Bridge — 4.8 km, about US\$985 million, opened June 1998.
+
+::: {.incremental}
+- Connected **26 million people**, a quarter of the 1991 population
+- Freight costs fell roughly **50%**
+- Ferry crossing: **3 hours**, and up to **36 hours** waiting at Eid
+- Truck, Bogra to Dhaka: **20 hours → 6 hours**
+:::
+
+. . .
+
+[This is about as close to a discontinuous change in trade costs as the real world offers.]{.takeaway .fragment}
+
+## Economists disagree, sharply, about what should happen next
+
+::: {.notes}
+Three theories, and this is the crux of the whole deck. Do not rush this slide. The audience needs to feel that these are genuinely opposed predictions, not variations on optimism.
+:::
+
+::: {.incremental}
+- **Big push.** Integration raises competition and efficiency. The lagging region revives.
+- **Backwash.** Myrdal 1957, Krugman 1991. With increasing returns, the *core* captures the gains. The periphery is hollowed out.
+- **Comparative advantage.** The region specialises in what it is relatively good at. Factories leave — as specialisation, not decay.
+:::
+
+. . .
+
+[The policy implication flips completely between the first two. And the third looks exactly like the second.]{.takeaway .fragment}
+
+## Two of the three theories make the same prediction about factories {background-color="#141413"}
+
+::: {.notes}
+This is the trap. A study that measured only manufacturing would see the share fall, write the word "deindustrialisation," and declare backwash. It would be wrong, and it would have no way of knowing.
+:::
+
+| Theory | Manufacturing | Population |
+|---|---|---|
+| Big push | up, or flat | up |
+| **Backwash** | **down** | **down** |
+| **Comparative advantage** | **down** | **up or flat** |
+
+. . .
+
+[Measure only factories and you cannot tell decline from specialisation. The two stories separate on **people**.]{.takeaway .fragment}
+
+# The Design {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The other hinterland is the comparison group, and it stayed isolated
+
+::: {.notes}
+The Padma bridge is what makes this design work. It was needed, it was discussed since before independence, and it was not built. Construction started in 2015 — two years after the data end.
+:::
+
+**Treated:** 123 upazilas in the Jamuna hinterland.
+
+**Comparison:** 125 upazilas in the Padma hinterland.
+
+. . .
+
+The Padma hinterland had the same problem — cut off by a great river — and no solution. Its own bridge was not begun until **2015**.
+
+. . .
+
+[The data end in 2013. The comparison region stayed isolated for the entire study window.]{.takeaway .fragment}
+
+## Which river got a bridge first was decided by politics, not economics
+
+::: {.notes}
+This is the identification argument. If bridge priority had tracked economic shocks in the northwest, and those shocks persisted, parallel trends would fail. The historical record says it tracked personal geography instead.
+:::
+
+::: {.incremental}
+- President Ershad's base: **Rangpur** — Jamuna hinterland
+- Prime Minister Khaleda Zia's base: **Bogra** — Jamuna hinterland
+- The Padma bridge began only under a PM whose home district is **Gopalganj** — Padma hinterland
+:::
+
+. . .
+
+Latitude separation between the two hinterlands: **under 3 degrees**. Florida spans more than five.
+
+. . .
+
+[Idiosyncratic political geography, not economic prospects.]{.takeaway .fragment}
+
+## The map draws itself without a shapefile
+
+![](../python_bridge_impact_01_hinterland_geography.png)
+
+::: {.notes}
+Every upazila plotted by its distance to each of the two crossings. The equidistance diagonal separates the two hinterlands cleanly, and the excluded Dhaka-Chittagong core sits away from both. Note the symmetry: both hinterlands span 8 to 270 km from their own river.
+:::
+
+## Difference-in-differences is four numbers and two subtractions
+
+::: {.notes}
+Always show the hand computation before the estimator. If the regression later disagrees wildly with this, one of them is wrong and you need to know which.
+:::
+
+$$\widehat{\tau} = \left( \bar{Y}_{J,post} - \bar{Y}_{J,pre} \right) - \left( \bar{Y}_{P,post} - \bar{Y}_{P,pre} \right)$$
+
+. . .
+
+The **first** difference removes anything permanent about a place — its soil, its size, its distance from the capital.
+
+. . .
+
+The **second** removes anything that hit the whole country — a fertiliser subsidy, a monsoon, a satellite recalibration.
+
+. . .
+
+[What survives both subtractions is the bridge.]{.takeaway .fragment}
+
+## The whole idea, in one picture
+
+![](../python_bridge_impact_07_did_2x2.png)
+
+::: {.notes}
+Treated group up 0.072 log points, comparison up 0.008. The teal dashed line is where the treated group would have landed at the comparison group's growth rate. The gap is the estimate: 0.064.
+:::
+
+## The assumption is about trends, not levels — and it is untestable
+
+::: {.notes}
+Spend a moment on this. The most common misunderstanding in applied DiD is that the two groups have to look alike. They do not. They have to *move* alike.
+:::
+
+$$E\left[ Y_{it}(0) - Y_{i,t-1}(0) \mid D_J = 1 \right] = E\left[ Y_{it}(0) - Y_{i,t-1}(0) \mid D_J = 0 \right]$$
+
+. . .
+
+Two hikers on parallel ridges, one a hundred metres higher. As long as the *terrain* runs parallel, you can measure what a helicopter lift did to one of them.
+
+. . .
+
+[It says nothing about levels. And because it describes a world that never happened, no test can confirm it.]{.takeaway .fragment}
+
+## Every period gets its own coefficient, and the ones before the bridge are a test {background-color="#141413"}
+
+![](../python_bridge_impact_10_event_study_nightlights.png)
+
+::: {.notes}
+This is the most persuasive figure in the whole analysis, and the original paper never drew it. Pre-bridge coefficient sits on zero. Then a monotone climb across all five post-bridge periods.
+:::
+
+## What would a confounder have to look like?
+
+::: {.notes}
+Make the audience do the work here. Ask them to design a confounder that produces this shape. The list of candidates is short, and every one of them is easier to argue about with this figure on screen.
+:::
+
+Pre-bridge: **−0.008** (se 0.017). On zero.
+
+. . .
+
+Then: **+0.7% → +3.3% → +5.0% → +8.3% → +12.8%**
+
+. . .
+
+A confounder producing this would have to be **absent before June 1998**, appear at exactly the right moment, and then **grow steadily for fifteen years** without reversing.
+
+. . .
+
+[Such things exist. The list is short.]{.takeaway .fragment}
+
+## Reweight the comparison group so it resembles the treated one
+
+::: {.notes}
+Two doubly robust estimators, both rebuilt by hand in NumPy for the tutorial. The key line in both is that treated units get weight exactly one — that is what makes them ATT weights rather than ATE weights.
+:::
+
+::: {.incremental}
+- **LWDR** — weight each comparison unit by its odds of having been treated
+- **KOBDR** — Kline's Oaxaca-Blinder projection of the treated covariate mean onto the comparison design
+- Both put weight **exactly 1** on treated units. That is what makes them **ATT** weights.
+- Both also enter the covariates in the regression — hence *doubly* robust
+:::
+
+. . .
+
+[A main chute and a reserve. Only if both models fail does the estimate fail. But two chutes do not help if you jumped over the wrong country.]{.takeaway .fragment}
+
+## The reweighting closes a gap that was genuinely open
+
+![](../python_bridge_impact_09_covariate_balance.png)
+
+::: {.notes}
+Distance starts at a standardised difference of 0.40 — well above the 0.10 rule of thumb — because Jamuna upazilas sit systematically farther from their bridge foot than Padma upazilas do from theirs. KOBDR takes it to 0.054.
+:::
+
+# What The Data Say {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## The bridge raised activity across the board {.smaller}
+
+::: {.notes}
+Read these as the average over the whole post-bridge period, under the paper's preferred doubly robust estimator. Note the manufacturing number looks small until you check the base.
+:::
+
+| Outcome | Effect | |
+|---|---|---|
+| Nighttime lights | **+10.9%** | (se 0.022) |
+| Rice yield | **+6.3%** | (se 0.023) |
+| Services employment share | **+2.3 pp** | (se 0.005) |
+| Manufacturing employment share | **−1.0 pp** | (se 0.004) |
+| Population density | +2.5% | (n.s.) |
+
+. . .
+
+That manufacturing number looks negligible. The 1991 baseline share was **2.8%**.
+
+. . .
+
+[A 1.0 point fall removes roughly a third of the sector.]{.takeaway .fragment}
+
+## Then split the post-bridge period in two, and one outcome reverses sign {background-color="#141413"}
+
+::: {.notes}
+This is the payoff slide. The pooled density effect was insignificant because it averaged a negative and a positive. Migration and adjustment take time.
+:::
+
+| Outcome | Short run | Long run |
+|---|---|---|
+| Nighttime lights | +4.9% | **+11.2%** |
+| Rice yield | +1.2% (n.s.) | **+7.9%** |
+| **Population density** | **−2.5%** | **+5.9%** |
+| Manufacturing share | −0.6 pp (n.s.) | **−1.2 pp** |
+| Services share | **+2.0 pp** | **+2.4 pp** |
+
+. . .
+
+[People left first. Then more came than had left.]{.takeaway .fragment}
+
+## The discriminating test
+
+::: {.notes}
+Now close the loop opened in Act I. Manufacturing fell, which both theories predicted. Density rose, which only one of them can accommodate.
+:::
+
+Manufacturing fell **1.2 percentage points**. Backwash predicted that. So did comparative advantage.
+
+. . .
+
+Backwash *also* requires the region to be **emptying** — capital and labour both leaving for the core.
+
+. . .
+
+Population density: **+5.9%**, se 0.016, significant at the 0.1% level.
+
+. . .
+
+[The region gained people while losing factories. **Backwash is rejected.** The Jamuna hinterland did not decline — it specialised.]{.takeaway .fragment}
+
+## The average effect hides almost everything interesting
+
+![](../python_bridge_impact_12_heterogeneity_by_distance.png)
+
+::: {.notes}
+Split by distance tercile and the agriculture and services rows reverse sign across bands. Near the bridge, labour moves INTO agriculture. Far from it, out of agriculture and into services, three times harder.
+:::
+
+## The gains land at the end of the line, not next to the bridge {.smaller}
+
+::: {.notes}
+The counterintuitive result. Ask the audience to explain it before you do.
+:::
+
+| Outcome, long run | Nearest | Middle | **Farthest** |
+|---|---|---|---|
+| Rice yield | +4.9% | +6.5% | **+26.5%** |
+| Services share | **−2.6 pp** | +1.7 pp | **+5.9 pp** |
+| Agriculture share | **+3.2 pp** | +0.8 pp | **−5.7 pp** |
+
+. . .
+
+But the nearest upazilas got the **largest** proportional cut in travel time — about 40%, against 17% at the far end.
+
+. . .
+
+[Why do the distant places gain more?]{.takeaway .fragment}
+
+## Because trade responds to the level of the barrier, not the percentage change in it
+
+::: {.notes}
+The taxi-versus-flight analogy lands well. Give it a beat.
+:::
+
+A **40%** cut on a ten-dollar taxi ride saves four dollars.
+
+. . .
+
+A **17%** cut on a five-hundred-dollar flight saves **eighty-five**.
+
+. . .
+
+Upazilas near the bridge foot were already reasonably connected — the ferry was an inconvenience, not a wall.
+
+. . .
+
+Upazilas 250 km out were close to **autarky**, where fertiliser rarely arrived and rice rarely left.
+
+. . .
+
+[An evaluation reporting only the average tells a minister to build near the demand centre. The heterogeneity says the payoff was at the end of the line.]{.takeaway .fragment}
+
+## Could it just have been politics? {background-color="#141413"}
+
+![](../python_bridge_impact_13_public_goods_placebo.png)
+
+::: {.notes}
+The rival explanation: a prime minister with roots in the Jamuna hinterland simply sent more schools, clinics and electricity there. Twenty-one estimates, zero significant at 5 percent. The closest is high schools getting FARTHER away — wrong sign for the story.
+:::
+
+## How wrong could parallel trends be before this dies?
+
+![](../python_bridge_impact_15_honest_did_sensitivity.png)
+
+::: {.notes}
+Rambachan and Roth bounds. Be honest here: the breakdown value is just under M equals 1. That is moderate, not spectacular, and saying so is more useful than dressing it up.
+:::
+
+## The honest answer is "moderately"
+
+::: {.incremental}
+- Breakdown value: just under **M = 1**
+- The post-bridge violation would have to be **as large as the largest pre-bridge violation** to overturn the result
+- Randomisation inference over 500 placebo assignments: **not one draw** reaches the real estimate
+- Placebo timing, moving the bridge one period early: **+0.008** against the real **+0.064**
+:::
+
+. . .
+
+[A result surviving to M = 3 would be much stronger. One breaking at M = 0.3 would be fragile. This sits in between — and that is worth saying out loud.]{.takeaway .fragment}
+
+# What Replication Taught Us {.divider background-color="#1a3a8a"}
+
+[Act IV]{.act}
+
+## All 122 published coefficients reproduce {background-color="#141413"}
+
+![](../python_bridge_impact_19_reproduction_audit.png)
+
+::: {.notes}
+Every headline coefficient in the paper's four tables, reproduced in Python to the printed three decimals. Maximum deviation 0.0005.
+:::
+
+## Getting there took three specific pieces of care {.smaller}
+
+::: {.incremental}
+1. **`ln(0)` must become missing, not `-inf`.** Twenty-four rows have zero rainfall. Stata drops them; NumPy keeps them, and nothing matches.
+2. **The dof correction excludes the fixed effects.** Counting them inflates every standard error by about 20 percent.
+3. **Distance terciles are cut at different points in different do-files.** One drops missing rows first; the other does not. That alone moves every heterogeneity coefficient in the third decimal.
+:::
+
+. . .
+
+[None of these produce an error. All three produce wrong numbers quietly.]{.takeaway .fragment}
+
+## One undefined macro turned 0.109 into 1.064 {background-color="#141413"}
+
+![](../python_bridge_impact_18_trimL_forensics.png)
+
+::: {.notes}
+The single most instructive thing in the replication package. An undefined Stata global, a missing cutoff, and Stata's rule that any number is less than missing — and every comparison unit silently loses its weight.
+:::
+
+## Every step is legal Stata and nothing warns
+
+::: {.notes}
+Walk the chain slowly. This is the part people remember.
+:::
+
+::: {.incremental}
+- `global trimL` is never defined in that do-file
+- `gen cut11 = r(p$trimL)` expands to `r(p)`, which does not exist → **cut11 is missing**
+- `replace ipw4 = . if p < cut11` — in Stata, **any number is less than missing** → fires for **every** comparison unit
+- The regression runs on **treated units only**
+- It prints **1.064 (se 0.710)**
+:::
+
+. . .
+
+[The tell is not the coefficient. It is the footer: **124 upazilas** where there should be **239**.]{.takeaway .fragment}
+
+## The paper's conclusions all survive — and that is the point
+
+::: {.notes}
+End this act generously and accurately. Nothing found here changes a conclusion. And every one of these findings was only findable because the authors shipped a complete package.
+:::
+
+Nothing found in the package changes a single conclusion of the paper.
+
+. . .
+
+But notice what made each finding *possible*: the authors shipped the buggy output **and** the corrected output. They shipped the intermediate tables. They shipped the data.
+
+. . .
+
+[A paper that published only its conclusions would be opaque on every count. This one is unusually **checkable** — which is exactly why a 122-of-122 reproduction was possible at all.]{.takeaway .fragment}
+
+## Four things to take away {background-color="#141413"}
+
+::: {.incremental}
+1. **The assumption is about trends, not levels** — and no test can confirm it. Bound the violation instead of testing for it.
+2. **Averages hide reversals.** Density was insignificant on average because it was negative then positive. Split by time and by space before believing a null.
+3. **When two theories predict the same sign on your headline outcome, go find the outcome where they disagree.** Here it was one extra variable from a census already sitting there.
+4. **Read the sample size first.** It is the only thing that would have caught the worst bug in this package.
+:::
+
+## Everything here is runnable today {.smaller}
+
+::: {.notes}
+Point at the resources and stop. Do not summarise again.
+:::
+
+::: {.incremental}
+- **`diff-diff`** — the DiD engine used throughout: 2x2, TWFE, event study, HonestDiD, placebo suite
+- **`pyfixest`** — the independent cross-check. All three engines agree to nine decimals.
+- **Five datasets**, tidy CSVs, committed with the post
+- **A Colab notebook**, a Quarto bundle, an interactive web app, and a Stata companion
+- **The full post:** [carlos-mendez.org/post/python_bridge_impact](https://carlos-mendez.org/post/python_bridge_impact/)
+:::
+
+# A region can lose its factories and still be better off. You only find that out if you measure the people too. {.divider background-color="#00d4c8"}
