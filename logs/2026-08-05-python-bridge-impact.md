@@ -175,3 +175,48 @@ Exercise 10's "thirteen" village regressions → twelve.
 - `featured.webp` — left for manual addition, per standing preference
 - The infographic image itself — `infographic_instructions.md` holds the prompt; generation is manual
 - Nothing is committed; `git status` is left dirty for review
+
+---
+
+## Follow-up: internal review documents were publicly served
+
+Found while verifying that this post's own review reports stayed unpublished. They did — but
+`content/post/r_dynamic_bma2/` has **no `index.md`**, so it is not a leaf bundle, and Hugo was
+turning each of its working documents into a live page:
+
+```
+/post/r_dynamic_bma2/plan/
+/post/r_dynamic_bma2/readme/
+/post/r_dynamic_bma2/results_report/
+/post/r_dynamic_bma2/results_report_review/
+/post/r_dynamic_bma2/script-review/
+/post/r_dynamic_bma2/web_app/review/
+```
+
+All six were in `sitemap.xml` and in the JSON search index. The directory has no post — only the
+pipeline's intermediate artifacts, committed in `dc14d530` and `0e9f0e16`.
+
+**Root cause is structural, not local.** In a leaf bundle these files are page *resources* and Hugo
+never publishes them; in a directory without an `index.md` they are ordinary content files and each
+becomes a page. `r_dynamic_bma2` was the only such directory today, but 412 working documents across
+`content/` sit behind that same single condition.
+
+**Fix:** seven filename patterns added to `ignoreFiles` in `config/_default/config.yaml` —
+`plan.md`, `README.md`, `results_report.md`, `results_report_review.md`, `script-review.md`,
+`REVIEW.md`, `SLIDES_REVIEW.md`. This closes the six pages and makes the other ~400 immune to the
+same mistake. Nothing links to any of them as a Hugo resource, so ignoring them costs nothing.
+
+**Verified by diffing the full published-URL set across the two configs:**
+
+- **6 URLs removed, 0 added** — exactly the six documents above
+- 1914 → 1908 published pages
+- `r_dynamic_bma2/web_app/index.html` (the real app) still publishes
+- every post spot-checked still renders, including this post's slides, web app, data dictionary
+  and slides PDF
+
+The `Pages` figure in Hugo's build summary drops 1300 → 1159 because it counts the ignored in-bundle
+`.md` resources; the published-page count is the one that moved by six.
+
+**Not done:** `r_dynamic_bma2` still has no post. The directory holds a finished analysis, a results
+report and a working web app with no `index.md` to present them. Writing that post is a separate
+decision.

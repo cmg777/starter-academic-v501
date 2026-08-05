@@ -92,7 +92,20 @@ paginate: 10
 enableEmoji: true
 enableRobotsTXT: true
 footnotereturnlinkcontents: <sup>^</sup>
-ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$, /\.venv/, /\.quarto/, /tutorial_files/]
+# The trailing entries are the pipeline's internal working documents — plans,
+# results reports, and the reports written by the review-* skills. Inside a leaf
+# bundle (a directory with an `index.md`) they are page RESOURCES and Hugo never
+# publishes them. In a directory WITHOUT an `index.md` they are ordinary content
+# files, and Hugo turns each one into a live page: that is how
+# `content/post/r_dynamic_bma2/` came to serve /post/r_dynamic_bma2/plan/,
+# /readme/, /results_report/, /results_report_review/, /script-review/ and
+# /web_app/review/ — six sets of internal notes, in the sitemap and the search
+# index. Ignoring them by name fixes that directory and makes the other ~400
+# working documents immune to the same mistake. Nothing links to any of them as
+# a Hugo resource, so ignoring them costs nothing.
+ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$, /\.venv/, /\.quarto/, /tutorial_files/,
+              /plan\.md$, /README\.md$, /results_report\.md$, /results_report_review\.md$,
+              /script-review\.md$, /REVIEW\.md$, /SLIDES_REVIEW\.md$]
 permalinks:
   event: '/talk/:slug/'
   tags: '/tag/:slug/'
