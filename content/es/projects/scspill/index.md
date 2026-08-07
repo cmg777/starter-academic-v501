@@ -40,6 +40,10 @@ links:
     url: "https://quarcs-lab.github.io/scspill/reference/"
     icon_pack: fas
     icon: book
+  - name: "Para IA / LLM"
+    url: "https://quarcs-lab.github.io/scspill/use-with-llms.html"
+    icon_pack: fas
+    icon: robot
   - name: "GitHub"
     url: "https://github.com/quarcs-lab/scspill"
     icon_pack: fab
@@ -133,12 +137,10 @@ Diríjase a [Primeros pasos](https://quarcs-lab.github.io/scspill/get-started.ht
 
 ## Agradecimiento
 
-El paquete de Python está escrito y es mantenido por Carlos Mendez. El modelo `sar` y su implementación original en R/C++ son obra de Shosei Sakaguchi y Hayato Tagawa: cite el artículo de ambos siempre que estime ese modelo. Su [paquete de replicación](https://doi.org/10.5281/zenodo.19066186) se distribuye bajo licencia MIT, su aviso de derechos de autor se conserva en el archivo `LICENSE` de la biblioteca, y cada versión de `scspill` se valida de forma cruzada frente a sus resultados congelados. La arquitectura del estimador sigue a [mlsynth](https://github.com/jgreathouse9/mlsynth), de Jared Greathouse; la infraestructura de documentación sigue al paquete [geometrics](https://github.com/quarcs-lab/geometrics) del QuaRCS Lab.
+`scspill` es obra de Carlos Mendez, Shosei Sakaguchi y Hayato Tagawa. El paquete de Python está escrito y es mantenido por Carlos Mendez; el modelo `sar` y su implementación original en R/C++ son obra de Shosei Sakaguchi y Hayato Tagawa. Su [paquete de replicación](https://doi.org/10.5281/zenodo.19066186) se distribuye bajo licencia MIT, su aviso de derechos de autor se conserva en el archivo `LICENSE` de la biblioteca, y cada versión de `scspill` se valida de forma cruzada frente a sus resultados congelados. La arquitectura del estimador sigue a [mlsynth](https://github.com/jgreathouse9/mlsynth), de Jared Greathouse; la infraestructura de documentación sigue al paquete [geometrics](https://github.com/quarcs-lab/geometrics) del QuaRCS Lab.
 
-Si utiliza `scspill`, cite tanto el software como el artículo metodológico (los metadatos legibles por máquina están en [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff)):
+Si utiliza `scspill`, cite el software (los metadatos legibles por máquina están en [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff)):
 
-> Mendez, C. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.1). <https://github.com/quarcs-lab/scspill>
-
-> Sakaguchi, S., & Tagawa, H. (2026). Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects. *The Econometrics Journal*. <https://doi.org/10.1093/ectj/utag006>
+> Mendez, C., Sakaguchi, S., & Tagawa, H. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.1). <https://github.com/quarcs-lab/scspill>
 
 Distribuido bajo la licencia MIT.
