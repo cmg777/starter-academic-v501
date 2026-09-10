@@ -10,3 +10,6 @@ references/tutorial_files/
 **/*.quarto_ipynb
 __pycache__/
 *.pyc
+
+# Generated MCP call bodies; rebuild with build_payload.py
+ahaslides/payload.json

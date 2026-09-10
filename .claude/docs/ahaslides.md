@@ -7,9 +7,14 @@ audience layer.
 **Trigger:** "Make an AhaSlides deck for `<post slug>`" / "Add interactive slides to
 `<post>`" / any request to put a deck on AhaSlides.
 
-**Worked reference implementation:** `content/post/python_bridge_impact/ahaslides/`
-(deck `10040213`). Its `README.md` records that deck's specifics; this file is the
-procedure.
+**Worked reference implementations** — their `README.md`s record each deck's specifics;
+this file is the procedure:
+
+- `content/post/python_bridge_impact/ahaslides/` (deck `10040213`) — the first build, with
+  the full narrative of why the image architecture exists.
+- `content/post/python_sc_bayes_spatial/ahaslides/` (deck `10042312`) — the second, built
+  from this doc. Its generators add real validation, including a check that `deck.md`'s
+  titles still match `slides.qmd`. Read its free-plan section before promising a cap.
 
 ---
 
@@ -104,17 +109,32 @@ ask for audience work** — do not invent engagement points.
 
 ### 5. Interleave
 
-`create_slides` appends, so the interactive slides land after the images. Because the
-imported images are already in page order, **one `move_slide` per interactive slide** is
-enough. For an interactive slide at deck position `P`, insert it after image number
-`count(non-interactive positions < P)`.
+For an interactive slide at final deck position `P`, its anchor is image number
+`count(non-interactive positions < P)`. `build_payload.py` computes this and prints the
+plan. Two ways to apply it:
+
+- **Better: `create_slides` takes `insert_after_slide_id`.** Call it once per interactive
+  slide with the anchor image's ID and the slide is born in the right place — no move pass,
+  and no risk of mismatching IDs. Costs one call per slide.
+- `create_slides` for all of them in one batch (they append after the images), then one
+  `move_slide` each. Fewer calls, but you must map the returned IDs back to your slides
+  **by heading, not by array position** — the response does not preserve input order.
+
+Either way the anchors are image slides, whose relative order never changes, so the
+operations are independent and ascending order is not actually required.
 
 ### 6. Verify
 
-1. `get_presentation_detail_tool` → slide count; interactive positions match `deck.md`.
+1. `get_presentation_detail_tool` → slide count; interactive positions match `deck.md`;
+   every quiz has exactly one correct option and every poll none. Its output is large —
+   it will be saved to a file, so parse that rather than reading it.
 2. Open the editor **and** the share link; spot-check one image slide, one divider, one
    quiz. The editor renders lazily — reload before believing a blank slide.
-3. `curl -o /dev/null -w "%{http_code}"` the share link.
+3. **Reload the editor, then read the participant badge and the line under the canvas.**
+   *"up to 50 live participants"* vs **0 / 3** + *"reached the free slide limit"* is the
+   free-plan answer for this deck; note which slides carry a 👑. Do this only after a
+   fresh reload (see *Free-plan behaviour* — crowns are computed lazily).
+4. `curl -o /dev/null -w "%{http_code}"` the share link.
 
 ### 7. Publish + clean up
 
@@ -172,13 +192,37 @@ rebuild the same ID.
 
 ## Free-plan behaviour
 
-Import allows 50 MB / 100 slides. **Word Cloud, Rating Scale and Open Ended are premium
-(👑)**; `poll` and `pick_answer_quiz` are free. A deck of images alone reports *"up to 50
-live participants"*; a deck containing the premium types reports **0 / 3** and *"You have
-reached the free slide limit"* — that notice tracks **premium slide types, not slide
-count** (it appears with only 8 slides present). The exact rule is undocumented: tell the
-user to test a live session before teaching, and offer dropping the three crowned slides
-to keep a poll + quizzes.
+Import allows 50 MB / 100 slides.
+
+**A free deck can hold only a small number of interactive slides — of ANY type — before
+it is capped at 3 live participants.** Establish this with the user *before* designing
+the interaction, because it decides whether the deck is presentable to a class.
+
+Measured on `python_sc_bayes_spatial` (10042312), in this order:
+
+| Deck state | Editor reports |
+|---|---|
+| 36 images, 0 interactive | *"you can host up to 50 live participants"*, no crowns |
+| + 2 `poll` + 6 `pick_answer_quiz` | *"reached the free slide limit"*, **0 / 3**, quizzes crowned 👑 |
+| all 6 quizzes converted to `poll` | **unchanged** — all 8 polls crowned, still 0 / 3 |
+
+So the allowance is a **count of interactive slides**, not a list of premium types.
+Word Cloud, Rating Scale and Open Ended are separately premium on top of that.
+
+**Do not repeat this mistake:** an earlier version of this file claimed `poll` and
+`pick_answer_quiz` were free, from a single reading of the editor in which the two polls
+showed no crown. That reading was stale — **the editor recomputes crowns lazily, so a
+freshly created slide can show no crown for several minutes.** Always reload the editor
+and re-check before concluding anything about the crown state, and never conclude a *type*
+rule from one deck's crown pattern.
+
+Since the cap is the same either way, **prefer `pick_answer_quiz` over `poll` for anything
+with a right answer** — it reveals the correct option and keeps a leaderboard, which a
+poll does not. Use `poll` only for genuine opinion or prediction questions.
+
+If the user needs the 50-participant cap, the only free route is to cut back to a very
+small number of interactive slides; otherwise tell them plainly that the deck needs an
+upgrade, and to test a live session before teaching from it.
 
 ## Related
 
@@ -186,3 +230,5 @@ to keep a poll + quizzes.
 - `post-resource-buttons.md` — the `links:` button rules.
 - `content/post/python_bridge_impact/ahaslides/README.md` — worked example, incl. the
   interaction-design patterns worth reusing (prediction poll → callback quiz).
+- `content/post/python_sc_bayes_spatial/ahaslides/` — second example; copy its
+  `build_deck_json.py` / `build_payload.py`, which are written for this architecture.
