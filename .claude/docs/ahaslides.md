@@ -57,10 +57,16 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
   "https://carlos-mendez.org/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
 ```
 
+Use the **published** URL when the deck is deployed — self-contained and guaranteed to
+match what readers see. A local `hugo server` URL
+(`http://localhost:1313/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false`) works
+identically, and is the right choice immediately after `write-slides` when the deck has
+not been pushed yet.
+
 **Check `pdfinfo deck.pdf` page count equals the deck's `##` slide count + `#` dividers
 + 1 title.** (`Reveal.getTotalSlides()` in the browser is the authoritative number.)
-This supersedes the manual in-browser Print → Save as PDF recipe in the `write-slides`
-skill.
+This is the scriptable alternative to the in-browser Print → Save as PDF route; both are
+listed in the `write-slides` skill's Phase 5 step 2.
 
 ### 2. Presentation + theme
 

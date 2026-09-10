@@ -104,8 +104,21 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
 ## PDF export (manual, not built)
 
 The skill does not generate a PDF. reveal.js exports one in the browser: open the deck, append
-**`?print-pdf`** to the URL, then Print → Save as PDF (Chrome headless is installed, so this
-works). The deck's chalkboard/menu don't interfere with print mode.
+**`?print-pdf`** to the URL, then Print → Save as PDF. The deck's chalkboard/menu don't interfere
+with print mode.
+
+Chrome headless is installed, so the same export is scriptable — and this is the route to prefer
+when anything downstream consumes the PDF:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
+  --no-pdf-header-footer --run-all-compositor-stages-before-draw --virtual-time-budget=40000 \
+  --print-to-pdf=deck.pdf "<deck-url>?print-pdf&pdfSeparateFragments=false"
+```
+
+`pdfSeparateFragments=false` collapses each slide's fragments into **one page per slide** (the
+default gives one page per fragment step). Verify with `pdfinfo deck.pdf` against
+`Reveal.getTotalSlides()`. `.claude/docs/ahaslides.md` depends on exactly this output.
 
 ---
 

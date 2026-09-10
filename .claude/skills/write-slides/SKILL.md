@@ -39,7 +39,9 @@ Devil's-Advocate) lives in [`references/rhetoric-of-decks.md`](references/rhetor
 - **Does not produce a single self-contained file.** The chalkboard plugin is incompatible
   with `embed-resources`, so the deck ships `index.html` + `slides_files/` (Hugo serves this
   fine — the `tutorial.html` precedent).
-- **Does not export a PDF.** It documents reveal.js's in-browser `?print-pdf` recipe.
+- **Does not export a PDF.** It documents reveal.js's `?print-pdf` recipe — both the
+  in-browser route and a scriptable headless-Chrome one-liner (see Phase 5 step 2, and
+  `.claude/docs/ahaslides.md`, which depends on that PDF).
 - **Does not commit, push, or open a PR.** Phase 5 prints copy-pasteable follow-ups.
 - **Does not support standalone-topic invocation.** A deck requires an existing post.
 - **Does not create ES/JA copies.** The deck rides with the English post like `web_app/`.
@@ -283,14 +285,26 @@ NEXT STEPS (copy + paste)
    /tmp/hugo-verify/hugo server --disableFastRender        # or your ≥0.96 hugo
    open http://localhost:1313/post/<slug>/slides/
 
-2. Export a PDF handout (in-browser; the skill does not build one):
-   open "http://localhost:1313/post/<slug>/slides/?print-pdf"
-   then Print → Save as PDF (landscape, no margins, background graphics on)
+2. Export a PDF handout (the skill does not build one). Either:
+   a) in-browser:
+      open "http://localhost:1313/post/<slug>/slides/?print-pdf"
+      then Print → Save as PDF (landscape, no margins, background graphics on)
+   b) scriptable — exactly one page per slide, fragments flattened:
+      CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
+        --run-all-compositor-stages-before-draw --virtual-time-budget=40000 \
+        --print-to-pdf=deck.pdf \
+        "http://localhost:1313/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
+      # verify: pdfinfo deck.pdf  ->  Pages == Reveal.getTotalSlides()
 
 3. Re-render after editing slides.qmd:
    cd content/post/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
 
-4. Commit + push:
+4. Optional — republish as an interactive AhaSlides deck (audience polls/quizzes on
+   top of pixel-faithful slide images). Needs the PDF from step 2b:
+   see .claude/docs/ahaslides.md
+
+5. Commit + push:
    git add content/post/<slug>/slides/ content/post/<slug>/index.md
    git commit -m "<slug>: add Quarto reveal.js slide deck
 
