@@ -26,6 +26,10 @@ links:
     icon_pack: fas
     name: "Slides (PDF)"
     url: https://carlos-mendez.org/post/python_bridge_impact/slides/Infrastructure_Impact_Econometrics.pdf
+  - icon: poll
+    icon_pack: fas
+    name: "Interactive slides (AhaSlides)"
+    url: https://presenter.ahaslides.com/share/1789007350719-n7drztywna
   - icon: laptop-code
     icon_pack: fas
     name: "Web app"
