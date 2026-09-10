@@ -24,29 +24,25 @@ their original order, inside their original acts. Nothing was removed or reorder
 interactive slides are **insertions** placed at points where the Quarto speaker notes
 already instruct the presenter to work the room.
 
-## Conversion rules applied
+## How this file is used now
 
-This file is the editorial source. What the live deck can actually render is
-narrower — see **Known differences from the Quarto deck** in `README.md`.
+The live deck's **36 content slides are images** of the real Quarto slides (rendered to
+PDF and imported), so the original typography, tables, maths, emphasis and act-divider
+colours are preserved exactly. See `README.md`.
 
-- **Fragments.** `. . .` and `::: {.incremental}` have no AhaSlides equivalent. Each
-  becomes a bullet list; the `[…]{.takeaway}` line becomes the final bullet, marked
-  **TAKEAWAY** here and rendered in the deck with a `→` prefix.
-- **Tables.** Four content slides use markdown tables (7, 22, 24, 29). Each is
-  flattened to compact bullet lines; `deck.json` keeps the original table shape in
-  each slide's `sourceNote`.
-- **Math.** Two slides carry display LaTeX (12, 14). AhaSlides has no MathJax; both
-  are written here as Unicode plain text and appear as the first bullet.
-- **Bold.** `**bold**` is preserved here and in `deck.json`, but the native AhaSlides
-  text fields are plain text, so emphasis is stripped when the deck is built.
-- **Speaker notes.** Carried over verbatim from the qmd `::: {.notes}` blocks and
-  attached to the AhaSlides `notes` field on all 36 non-divider slides. They are
-  excluded from the public share link.
-- **Colours.** The qmd colours each divider from the site palette (warm orange
-  `#d97757`, steel blue `#6a9bcc`, teal `#00d4c8`, heading blue `#1a3a8a`, near black
-  `#141413`). AhaSlides applies one deck-wide theme instead, so those per-slide
-  colours are **not** reproduced; the deck uses the Meeting theme. The **DARK**
-  markers below record the original intent only.
+That changes what this file is for. It remains the source of truth for:
+
+- **All speaker notes.** They cannot be attached to imported slides, so `deck.md` is the
+  only place they live — keep it open on a second screen while presenting.
+- **The 8 interactive slides** — question, options, correct answer, points — which are
+  still created natively through the MCP from `deck.json`.
+- **The slide inventory and running order**, which the generators validate.
+
+The per-slide bullet text below is the editorial record of what each Quarto slide says.
+It is no longer what the audience sees (they see the slide image), so the old caveats
+about lost bold, flattened tables and Unicode maths no longer apply to the live deck.
+The `**DARK**` markers and divider colours below record the original design, which the
+images now reproduce faithfully.
 
 ## Figure map (9 uploads)
 

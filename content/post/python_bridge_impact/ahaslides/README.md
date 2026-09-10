@@ -1,12 +1,12 @@
 # AhaSlides via MCP — build notes and playbook
 
-This folder holds the AhaSlides version of the post's Quarto reveal.js deck
-(`../slides/slides.qmd`), and — more usefully — **everything learned building it**,
-so the next deck takes an hour instead of an afternoon.
+The AhaSlides version of the post's Quarto reveal.js deck (`../slides/slides.qmd`),
+and — more usefully — **everything learned building it**, so the next deck takes an
+hour instead of two afternoons.
 
 Read **[Start a new deck](#start-a-new-deck-from-this-one)** if you are here to reuse
-this for another project. Read **[The content-v2 trap](#the-content-v2-trap)** before
-you change how slides are created; it is the one mistake that costs real time.
+this. Read **[Build the content slides](#build-the-content-slides-render-the-qmd-import-the-pdf)**
+before changing how slides are made — the obvious API route is a trap.
 
 | | |
 |---|---|
@@ -14,63 +14,71 @@ you change how slides are created; it is the one mistake that costs real time.
 | **Editor** | <https://presenter.ahaslides.com/presentation/10040213> |
 | **Audience join code** | `Q6U4S` (live sessions only) |
 | Presentation ID | `10040213` |
-| Theme | Meeting (`#000000` base, `#ffffff` text) |
-| Slides | 44 — 1 cover, 5 act dividers, 30 content, 8 interactive |
-| Figures | 9, uploaded to the AhaSlides CDN |
+| Backup of the old text version | presentation `10041434` |
+| Slides | 44 — 36 imported slide images + 8 native interactive |
 
 The public link is self-paced: anyone can page through without a live session.
-**Speaker notes are excluded from it** ("Include slide notes" off) — they are
-presenter-only. Comments are enabled on it.
+**Speaker notes are excluded from it** ("Include slide notes" off) and comments are on.
+
+---
+
+## The architecture that works
+
+**Content slides are images of the real Quarto slides. Interactivity is native.**
+
+That split is the whole design. AhaSlides' own content slide types cannot reproduce a
+Quarto deck — you lose bold runs, tables, math, per-slide colour and all typography. But
+AhaSlides is not a design tool; its value is the live audience layer. So render the
+Quarto deck to images and let AhaSlides do only what it is good at.
+
+What this preserves that the native types destroyed: the serif display titles, the
+orange rules, the coloured emphasis on every number, the takeaway boxes, real tables
+(not flattened bullets), the LaTeX, and the five act dividers in the site palette.
+
+| Layer | How | Count |
+|---|---|---|
+| Content slides | PDF import of the rendered Quarto deck | 36 |
+| Interactive slides | native types via MCP (`poll`, `pick_answer_quiz`, `word_cloud`, `scale`, `open_ended_survey`) | 8 |
 
 ---
 
 ## The five rules
 
-Everything below is elaboration. If you remember only this:
-
-1. **Never use `content-v2`.** It silently renders blank. Use `content`, `listing`,
-   `content_with_title_and_right_image`.
-2. **`canvasBlocks` in the API response is your proof.** Populated = the slide will
-   render. `null` = it will not. Check it on every create.
-3. **`create_slides` appends.** Create in ascending slide order, or spend the evening
-   reordering.
-4. **`update_slide_content` replaces the entire slide.** Resend `notes` or they vanish.
-5. **Verify in the browser, twice** — editor *and* Preview — after a hard reload. The
-   editor renders lazily and will lie to you.
+1. **Content slides come from a PDF import, not from the API.** Render the qmd → PDF →
+   import through the editor UI.
+2. **Never use `content-v2`.** It stores its DSL and silently renders blank.
+3. **`upload_image` rejects PDFs** (`image/*` only) — the PDF has to go through the
+   editor's Import dialog, not the MCP.
+4. **`create_slides` appends**, and the returned ID array is **not** in your input order.
+   Match on `order`, never on array position.
+5. **Verify in the browser, twice** — editor *and* Preview, after a hard reload.
 
 ---
 
 ## The pipeline
 
 ```
-deck.md  ──build_deck_json.py──▶  deck.json  ──build_payload.py──▶  payload.json
-(you edit)                        (validated)                       (feed to MCP)
-                                                    images.json ───────┘
+slides.qmd ──headless Chrome──▶ deck.pdf ──editor Import──▶ 36 image slides
+deck.md ──build_deck_json.py──▶ deck.json ──build_payload.py──▶ 8 interactive slides (MCP)
 ```
 
 | File | Role |
 |---|---|
-| `deck.md` | **Source of truth.** Every slide: title, bullets, image, speaker notes; for interactive slides the options, correct answer, points. This is the only file you hand-edit. |
-| `build_deck_json.py` | Parses `deck.md` → `deck.json`. Also a validator. |
+| `deck.md` | **Source of truth** for slide content and **all speaker notes**. Hand-edited. |
+| `build_deck_json.py` | `deck.md` → `deck.json`, and validates. |
 | `deck.json` | Machine-readable deck. Generated — never hand-edit. |
-| `images.json` | `{source filename: AhaSlides CDN url}`, from `upload_image`. |
-| `build_payload.py` | `deck.json` + `images.json` → `payload.json`, the MCP call bodies. |
+| `build_payload.py` | `deck.json` (+ `images.json`) → `payload.json`, the MCP call bodies. |
+| `images.json` | Figure filename → AhaSlides CDN url. Only needed for the *native* image slides, which the current deck no longer uses. |
 | `payload.json` | Generated, gitignored. |
 
-```bash
-cd content/post/python_bridge_impact/ahaslides
-python3 build_deck_json.py     # 44 slides: 30 content, 5 heading, 8 interactive, 1 title
-python3 build_payload.py       # wrote payload.json: 44 slides {...}
-```
+`deck.md` still matters even though the content slides are now images: it holds the
+speaker notes (which cannot be attached to imported slides — see below) and the exact
+question/option/answer text for the 8 interactive slides.
 
-Why two steps: `deck.json` is the *content* (render-target agnostic, worth keeping if
-AhaSlides ever changes or you port to another tool); `payload.json` is the *API shape*
-(disposable, regenerate freely).
-
-**The generators are also the tests.** `build_deck_json.py` fails loudly if a quiz has
-no correct answer or a referenced figure is missing from disk; `build_payload.py`
-reports any bullet over 175 characters. Both caught real bugs during this build — one
-had silently stripped the bold from all 106 emphasised runs.
+**The generators are also the tests.** `build_deck_json.py` writes nothing and exits 1
+on: non-contiguous slide numbers, a quiz without exactly one correct answer, a poll with
+a correct answer, an interactive slide with no question, or a figure missing from disk.
+Verified against a deliberately broken copy.
 
 ---
 
@@ -80,319 +88,213 @@ had silently stripped the bold from all 106 emphasised runs.
 claude mcp add ahaslides --scope user --transport http https://mcp.ahaslides.com/mcp
 ```
 
-- `--scope user` keeps the server out of the site repo (this project ships no
-  `.mcp.json`, and MCP config does not belong next to content).
-- Then `/mcp` → **ahaslides** → **Authenticate**. A browser opens; sign in.
-  **There is no API key** — OAuth 2.0 against your existing account.
-- **A newly added server is not visible to the running session.** `claude mcp list`
-  will see it while Claude Code does not. Exit and `claude --continue` to resume the
-  same conversation with the tools loaded.
-- Confirm: `claude mcp list | grep ahaslides` → `✔ Connected`.
+`--scope user` keeps the server out of the site repo. Then `/mcp` → **ahaslides** →
+**Authenticate** (OAuth, **no API key**). A newly added server is invisible to the
+running session — exit and `claude --continue` to resume with the tools loaded.
 
 ---
 
-## Build procedure
+## Build the content slides: render the qmd, import the PDF
 
-### 1. Discovery — three calls, before writing anything
+### 1. Render the deck to PDF
 
+Reveal's own print mode gives exactly one page per slide, with fragments flattened to
+their final state (`pdfSeparateFragments=false`):
+
+```bash
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+"$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
+  --run-all-compositor-stages-before-draw --virtual-time-budget=40000 \
+  --print-to-pdf=deck.pdf \
+  "https://carlos-mendez.org/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
 ```
-list_slide_types()                       # what exists in this deployment
-load_slide_type_specs(["listing","content","content_with_title_and_right_image",
-                       "poll","pick_answer_quiz","word_cloud","scale",
-                       "open_ended_survey"])
-get_themes()                             # official presets only
-```
 
-Do this even if you have built a deck before — it is cheap, and the spec text is where
-the real field names live (`paragraphs`, not `body`; that one is called out explicitly
-in the spec because everyone gets it wrong).
+Point it at the **published** URL — self-contained, and guaranteed to match what
+readers see. Check the page count equals the slide count (`pdfinfo deck.pdf`). For this
+deck: 36 pages, 1056×594 pt (16:9).
 
-### 2. Pick the theme before you write a slide
+No screenshotting, no viewport arithmetic, no per-slide navigation. It is one command.
 
-`get_themes` returns **official presets only** — no custom themes, no hex, and *no
-per-slide background colour* through the native types. One theme covers the deck.
+### 2. Import it
 
-**Choose it from your figures' background, not your taste.** These figures are
-`#0f1729` dark navy (`analysis.py` sets `savefig.facecolor = DARK_NAVY`), so a light
-theme would have shown nine dark rectangles floating on white. "Meeting" (`#000000`)
-was chosen so the figure edges disappear. If your next project's figures are on white,
-invert this and pick a light preset.
+In the editor: the **Import** icon beside "New slide" (or the *Import — PPT, PPTX and
+PDF* card on an empty deck) → drop the PDF → choose **"Import slides"**.
 
-Consequence: the Quarto deck's per-act divider colours (warm orange / steel blue /
-teal / heading blue) **cannot be reproduced**. Don't design around them.
+**Choose "Import slides", not "Import and generate slides with AI" or "Generate
+interactive slides"** — those rewrite your content, which defeats the entire point.
 
-### 3. Upload figures
+Limits on the current plan: **50 MB and 100 slides** per import. This deck was 2.35 MB
+/ 36 pages. Import takes about a minute, then runs an AI pass adding alt-text
+descriptions.
 
-Use the MCP `upload_image` with the public URL of each figure; it fetches server-side
-and rehosts to the AhaSlides CDN. **Do not hot-link your own domain** — the renderer
-blocks foreign image URLs. Save the returned `url` per source filename into
-`images.json`.
+Result: each page becomes a slide holding a single Image block at exactly
+**1280×720** — genuinely edge to edge.
 
-The returned URLs are signed and carry an `Expires` stamp. They work inside the
-presentation indefinitely (AhaSlides re-signs internally); treat `images.json` as a
-record of the mapping, and just re-upload if you ever rebuild from scratch.
+### 3. Interleave the interactive slides
 
-### 4. Create slides in order, in batches
+Create the 8 interactive slides with the MCP, then position them with `move_slide`
+(ID-based, one slide per call). Because the imported images are already in page order,
+**you only need one move per interactive slide** — 8 calls, not 44.
 
-`create_slides` **appends**, so send ascending slide order. Batches of 6–10 work well:
-big enough to be quick, small enough that one bad field doesn't cost the whole run.
+For an interactive slide at deck position `P`, insert it after image number
+`count(non-interactive positions < P)`. For this deck (interactive at 5, 15, 18, 23, 25,
+28, 34, 44) that is images 4, 13, 15, 19, 20, 22, 27, 36.
 
-**The returned ID array is not in your input order.** Do not zip your payload against
-it by position — match on the `order` field in the response, or re-fetch. This will
-bite you when you go to patch a specific slide later.
+### Rebuilding in place without losing the share link
 
-### 5. Verify (see [Verification](#verification))
+The post links to the presentation's share URL, so rebuild in place rather than making
+a new deck:
+
+1. `duplicate_presentation` as a backup, then `rename_presentation` it clearly.
+2. Fetch `get_presentation_detail_tool`, split slides into interactive vs content by
+   type. **Do this rather than trusting recorded IDs — IDs change when a slide's type
+   is converted.**
+3. Soft-delete the content slides: `update_slide_properties_tool` with
+   `{id, type: "staticContent", deleted: true}`.
+4. Import the PDF (step 2 above).
+5. Move the interactive slides into place (step 3 above).
 
 ---
 
-## Slide types that work
+## What the MCP cannot do
 
-Every type also accepts `notes` (speaker notes). All the field names below are the
-real ones — copy them.
+- **Full-bleed images.** The only native image type,
+  `content_with_title_and_right_image`, pins the image to a 620×720 right column. There
+  is no background-image slide type and no MCP tool that sets one. `content-v2` has the
+  right primitive (`:::image at=full`) and doesn't render. Hence the PDF import.
+- **Attach speaker notes to imported slides.** `update_slide_content` requires
+  `heading` + `paragraphs`, which would replace the image with a text slide. Tested and
+  refused. Notes live in `deck.md`; present from a second screen, or type them by hand
+  in the editor.
+- **Ingest a PDF.** `upload_image` returns
+  `URL did not return an image (content-type: application/pdf)`.
+- **Report notes back.** `get_presentation_detail_tool` omits the `notes` field
+  entirely, so absence there is not evidence of loss — check a `move_slide` or
+  `update_slide_content` response instead, which do return it.
+
+### The content-v2 trap, in full
+
+The MCP's instructions actively recommend `content-v2` for static slides. Through the
+MCP it does not render: `create_slides` and `update_slide_content` persist
+`slide_attributes.dsl` faithfully, but nothing compiles it into `canvasBlocks`. The
+slide is blank in the editor, in Preview and for the audience, with **no error in the
+API response or the browser console**. It renders only after a human opens it and
+applies a Layout by hand.
+
+**Diagnostic:** `canvasBlocks` populated → renders. `canvasBlocks: null` → does not.
+
+False leads that cost hours, all wrong: pixel `x/y/w/h` vs anchor `at=` positioning;
+`preset=title` vs `display`; percentage vs pixel widths; multi- vs single-slide update
+calls; stale editor render. One divider slide *did* render, which looked like a DSL
+difference — it had simply been touched in the editor.
+
+### Native slide types (still needed for the interactive layer)
 
 | Role | `slide_type` | Fields |
 |---|---|---|
-| Cover, act dividers, closing statement | `content` | `heading`, `paragraphs` — **an array of strings, never `body`** |
-| Any bulleted slide | `listing` | `heading`, `items` (array of strings) |
-| Figure slide | `content_with_title_and_right_image` | `heading`, `image_url`, `sub_heading`, `image_description` |
-| Prediction poll (no right answer) | `poll` | `heading`, `options: [{text}]` |
+| Prediction poll | `poll` | `heading`, `options: [{text}]` |
 | Scored quiz | `pick_answer_quiz` | `heading`, `options: [{text, correct}]` |
-| Free-text cloud | `word_cloud` | `heading` |
+| Word cloud | `word_cloud` | `heading` |
 | Rating | `scale` | `heading`, `options: [{text}]`, `scale_config` |
 | Open question | `open_ended_survey` | `heading` |
+| Text slide (unused now) | `content` / `listing` | `heading` + `paragraphs` (array, **never** `body`) / `items` |
 
-### Layout boxes you cannot exceed
-
-These are fixed by the type; text that overflows is **clipped silently**.
-
-| Slide type | Element | Box | Practical limit |
-|---|---|---|---|
-| `listing` / `content` | heading | 1120px, 48px bold | ~2 lines |
-| `listing` | items | 1120×450 | ~6–7 bullets, keep each under ~175 chars |
-| `content_with_title_and_right_image` | heading | 564×136 @52px | ~3 lines |
-| `content_with_title_and_right_image` | `sub_heading` | 564×96 @32px | **~60 characters** |
-| `content_with_title_and_right_image` | image | 620×720, right column | wide charts stay legible |
-
-The `sub_heading` limit is the one that catches you — it clips mid-word with no
-warning. Write those captions to length rather than truncating prose; auto-truncated
-notes read badly ("Every upazila plotted by its distance to each of the two…").
-
-### What `pick_answer_quiz` does *not* expose
-
-No points or timer fields. `deck.md` records `1000 points / 30 s`, but the MCP applies
-AhaSlides defaults (25 s, 0–100 points). Adjust in the editor, or via
-`update_slide_properties_tool` with `type: "multipleChoiceQuizQuestion"` and
-`minPoint` / `maxPoint` / `timeToAnswer`.
-
----
-
-## The content-v2 trap
-
-**Symptom:** you create slides, the API says `"success": true`, the DSL round-trips
-perfectly when you read it back — and every slide is **blank**. Presenter view, Preview
-view, audience view. No error in the response. No error in the browser console.
-
-**The MCP's own instructions tell you to use it.** They describe `content-v2` as the
-preferred type for static slides, "professionally designed templates", "far better
-looking". It has a documented DSL, a layouts catalogue, a grammar reference. All of
-that machinery exists. Through the MCP it does not render.
-
-**Cause:** `create_slides` and `update_slide_content` both persist
-`slide_attributes.dsl` faithfully, but nothing ever compiles it into `canvasBlocks`.
-The slide renders only after a human opens it in the editor and clicks a Layout, which
-defeats the purpose of automating it.
-
-**The one-line diagnostic:**
-
-```
-canvasBlocks: {...}   → the slide will render
-canvasBlocks: null    → it will not
-```
-
-Native types come back with it populated on the very first `create_slides`. content-v2
-never does.
-
-### False leads — don't repeat these
-
-Hours went into hypotheses that were all wrong. The DSL was never the problem:
-
-- ❌ *Pixel `x=/y=/w=/h=` vs anchor `at=` positioning.* Rewrote the whole generator to
-  anchor-only. No change.
-- ❌ *`preset=title` unsupported.* Swapped to `preset=display`. No change.
-- ❌ *Percentage vs pixel widths.* No change.
-- ❌ *Multi-slide vs single-slide update calls.* No change.
-- ❌ *Stale editor render.* Hard reloads, waits. No change.
-
-The misleading moment: one divider slide **did** render, which made it look like a DSL
-syntax difference. It rendered because it had been touched in the editor. Later, a
-content slide rendered right after a Layout was clicked — that was the tell.
-
-**If you ever need content-v2** (per-slide colours, custom layouts), the only reliable
-path is to create the slide, then apply a Layout by hand in the editor per slide.
-For a 44-slide deck that is not worth it.
-
----
-
-## Other gotchas, in the order they bit
-
-1. **`update_slide_content` replaces the whole slide.** Update a caption without
-   resending `notes` and the notes are gone. Always send the complete object.
-2. **Returned IDs are unordered** relative to your input array (see step 4 above).
-3. **Markdown does not render in native fields.** `**bold**` appears as literal
-   asterisks — strip it. `deck.md` keeps the emphasis for reference; `build_payload.py`
-   strips it on the way out. Backticks too: `` `ln(0)` `` becomes a literal backtick.
-4. **Bullet lists *do* render** — `items` becomes a real `<ul><li>`.
-5. **Speaker notes accept plain text only** and are excluded from the public share
-   link if you leave "Include slide notes" unchecked. Leave it unchecked: these notes
-   contain presenter instructions ("Do not comment on the split"), not audience content.
-6. **MCP responses are enormous.** A 10-slide `create_slides` response is tens of
-   thousands of tokens because it echoes every field of every slide. Batch 6–10, and
-   generate payloads with a script rather than composing them inline.
-7. **A newly added MCP server needs a session restart** (see Setup).
-
----
-
-## Verification
-
-Do all four. Steps 3 and 4 are the ones that catch real defects.
-
-1. **`canvasBlocks` populated** in every create/update response.
-2. **`get_presentation_detail_tool`** — slide count, order, and that each quiz has
-   exactly one `correct: true`.
-3. **Editor, after a hard reload.** The editor renders lazily; a screenshot taken
-   immediately after a write can show blank for a slide that is fine. Reload, wait,
-   then click the slide.
-4. **Preview** (the `?preview=true` view). This is what the audience sees and it is
-   the authoritative check — a slide can look right in the editor and be empty here.
-
-Spot-check at minimum: the cover, one divider, one dense bullet slide, one figure
-slide, one quiz. That covers every layout in the deck.
+All accept `notes`. `update_slide_content` **replaces the whole slide**, so resend
+`notes` or they are wiped. `pick_answer_quiz` exposes no points/timer fields — set them
+via `update_slide_properties_tool` with `type: "multipleChoiceQuizQuestion"`.
 
 ---
 
 ## Free-plan limits actually observed
 
-These **differ from what the AhaSlides marketplace page advertises**, so check your own
-account rather than trusting the docs:
+- **Import** allows 50 MB / 100 slides — ample.
+- **Premium slide types.** Word Cloud, Rating Scale and Open Ended carry a 👑 badge.
+  `poll` and `pick_answer_quiz` are free.
+- **Participants.** A deck of imported images alone reports **"up to 50 live
+  participants"**. This deck, which holds the premium interactive slides, reports
+  **0 / 3** and shows *"You have reached the free slide limit"* — the same message it
+  showed with only 8 slides in it, so that message is about **premium slide types, not
+  slide count**. The correlation is clear; the exact rule is not documented.
 
-- **Slide cap.** At 44 slides the editor shows *"You have reached the free slide limit.
-  To remove the limit, please upgrade or delete some 👑 slides."* The deck is complete
-  and every slide renders — you just cannot add more.
-- **Premium slide types.** Three of the eight interactive slides carry a 👑 badge:
-  **Word Cloud (18)**, **Rating Scale (34)**, **Open Ended (44)**. `poll` and
-  `pick_answer_quiz` are free.
-- **Participants.** The counter reads **0 / 3**, not the 50 the marketplace page
-  advertises.
-
-**Test a live session before teaching from it.** If the cap really is 3, the
-interactive slides will not work with a class, and the deck degrades to a linear
-presentation. The public view link is unaffected.
-
-If you must stay free and keep interaction: drop the three crowned slides and rely on
-the poll plus four pick-answer quizzes, which is still five audience checkpoints.
+**Test a live session before teaching from it.** If the cap really is 3 participants,
+the interactive slides will not work with a class and the deck degrades to a linear
+presentation. The public view link is unaffected. To stay free with interaction, drop
+the three crowned slides and keep the poll plus four pick-answer quizzes — still five
+audience checkpoints.
 
 ---
 
 ## Design decisions worth reusing
 
-The interaction design carried more weight than the layout work, and it ports directly:
-
 - **Put interactive slides where the source deck's speaker notes already ask for
-  audience work.** Three of the eight here came straight from Quarto `::: {.notes}`
-  lines — slide 17's "Make the audience do the work here" became the word cloud. Don't
-  invent engagement points; find the ones already in the talk.
-- **Open with a prediction poll, before naming the theories.** The room commits before
+  audience work.** Three of the eight came straight from Quarto `::: {.notes}` lines —
+  slide 17's "Make the audience do the work here" became the word cloud.
+- **Open with a prediction poll before naming the theories**, so the room commits before
   it has vocabulary to hide behind.
 - **Close the loop.** Slide 5 asks what happens to the factories; slide 25 asks which
-  outcome discriminates. Show the slide 5 bar chart again before revealing 25 — the
-  room sees its own wrong answer next to the data. This is the single most effective
-  thing in the deck.
-- **Ask before you reveal, wherever the source deck says "ask the audience".** Slide 28
-  makes the room commit to a distance tercile; slide 30's explanation lands much harder
-  after they have been wrong.
-- **Make a hedge into a number.** Slide 34 turns "the result is moderately robust" into
-  a 1–5 rating the room owns.
-- Ratio here is 8 interactive in 44 (18%). The MCP guidance suggests 30–50%; that is
-  tuned for corporate workshops and would shred a technical argument. Judge by the
-  material.
+  outcome discriminates. Show the slide 5 chart again before revealing 25 — the room
+  sees its own wrong answer next to the data. The single most effective thing here.
+- **Ask before you reveal** wherever the source says "ask the audience" (slide 28 before
+  slide 30's explanation).
+- **Make a hedge into a number** — slide 34 turns "moderately robust" into a 1–5 rating.
+- 8 interactive in 44 is 18%. The MCP guidance suggests 30–50%, which is tuned for
+  corporate workshops and would shred a technical argument. Judge by the material.
 
 ---
 
 ## Start a new deck from this one
 
-1. **Copy the folder** to the new post: `deck.md`, `build_deck_json.py`,
-   `build_payload.py`. Leave `deck.json`, `images.json`, `payload.json` behind — they
-   regenerate.
-2. **Rewrite `deck.md`.** Keep the structure exactly: the `## N — Kind` headings, the
-   `**Title:** / **Bullets:** / **Notes:**` fields. The parser keys off them. Slide
-   numbers must be contiguous from 1.
-   - **Kind is decided in two places.** The heading picks cover and dividers: it must
-     be exactly `## N — Title` for the cover, and must contain the word `divider` for
-     an act divider. Everything else falls through to the `**Type:**` line, which must
-     contain one of `poll`, `quiz`, `word cloud`, `rating`/`scale`, `open ended` — or
-     none of them, which means an ordinary content slide.
-   - Mark the closing line of a slide `**TAKEAWAY:**` to get the `→` treatment.
-3. **Update the hardcoded bits in the generators** — both are small and obvious:
-   `build_deck_json.py` has the presentation title/URLs; `build_payload.py` has `DIV`
-   (divider titles), `SUBS` (figure captions, ≤60 chars) and `TABLES` (flattened
-   tables). Delete what you don't need.
-4. `python3 build_deck_json.py && python3 build_payload.py` — fix whatever they flag.
-5. **Create the presentation, apply a theme, upload figures, write `images.json`.**
-6. **Feed `payload.json` to `create_slides`** in ascending `_n`, batches of 6–10,
-   stripping the `_n` key.
-7. **Verify** (four steps above).
-8. **Share slides view link** → add a `links:` entry to the post:
+1. **Copy** `deck.md`, `build_deck_json.py`, `build_payload.py`. Leave `deck.json`,
+   `images.json`, `payload.json` — they regenerate.
+2. **Rewrite `deck.md`**, keeping the structure: `## N — Kind` headings and the
+   `**Title:** / **Bullets:** / **Notes:**` fields, contiguous from 1.
+   - **Kind is decided in two places.** The heading picks cover and dividers: exactly
+     `## N — Title` for the cover, and containing `divider` for an act divider.
+     Everything else falls through to the `**Type:**` line, which must contain one of
+     `poll`, `quiz`, `word cloud`, `rating`/`scale`, `open ended` — or none, meaning an
+     ordinary content slide.
+3. `python3 build_deck_json.py` — fix whatever it flags.
+4. **Render the qmd to PDF** (one command above) and check the page count equals the
+   number of non-interactive slides.
+5. **Create the presentation**, import the PDF, then create the interactive slides with
+   the MCP and `move_slide` them into position.
+6. **Verify**: slide count, interactive positions, a spot-check of one image slide and
+   one quiz in **Preview**.
+7. **Share slides view link** → add to the post's `links:`:
    ```yaml
    - icon: poll
      icon_pack: fas
      name: "Interactive slides (AhaSlides)"
      url: https://presenter.ahaslides.com/share/<code>
    ```
-   Absolute URL so it opens in a new tab. `fa-poll` exists in Font Awesome Free 5.14.0,
-   which is what this site loads — check any new icon against that version, not FA6.
+   Absolute URL so it opens in a new tab. `fa-poll` exists in Font Awesome Free
+   **5.14.0**, which is what this site loads — check any new icon against that version,
+   not FA6.
+8. **Delete the rendered PDF and any PNGs** when the import is done; they are
+   regenerable and large.
 
-**Realistic budget for deck two:** an hour or so. Most of this build was diagnosing
-content-v2; with rules 1 and 2 that evaporates.
+**Realistic budget for deck two:** about an hour, most of it writing `deck.md`.
 
 ---
 
 ## Running a live session
 
-1. Open the editor → **Present**. Audience joins at `ahaslides.com/Q6U4S`.
-2. Interactive slides advance only when you choose; results stay on screen.
+1. Editor → **Present**. Audience joins at `ahaslides.com/Q6U4S`.
+2. **Slide 5**, the prediction poll: screenshot the result or keep it in a second tab —
+   **slide 25 calls back to it**.
+3. **Slide 18**, the word cloud: take the two most popular answers and ask whether each
+   *stops at the Jamuna*. Almost none do — they are national shocks, which the Padma
+   hinterland differences out. The identification argument, built by the room.
 
-Two slides need preparation:
-
-- **Slide 5**, the prediction poll: screenshot the bar chart or keep it in a second
-  tab. **Slide 25 calls back to it** and the callback needs the original result.
-- **Slide 18**, the word cloud: take the two most popular answers and ask aloud whether
-  each one *stops at the Jamuna*. Almost none do — they are national shocks, which the
-  Padma hinterland differences out. That is the identification argument, built by the
-  room instead of asserted from the podium.
+Notes for the 8 interactive slides are attached and show in presenter view. Notes for
+the 36 image slides are **only** in `deck.md` — have it open on a second screen.
 
 Afterwards:
 
 > Using the ahaslides MCP, get the quiz scores and poll results from the most recent
 > session of the Jamuna Bridge presentation.
 
-- **Slide 15** — many picking A or B means the levels-vs-trends misconception survived;
-  spend longer on slide 14 next time.
-- **Slide 5 vs 25** — the gap between prediction and data is the best single measure of
-  whether the deck did its job.
-
 ---
-
-## Known differences from the Quarto deck
-
-| Quarto | AhaSlides | Why |
-|---|---|---|
-| Bold emphasis on key terms | plain text | native fields don't parse markdown |
-| 4 markdown tables | bullet lists | no table rendering; `deck.json` keeps the shape in `sourceNote` |
-| `.takeaway` styled block | `→`-prefixed final bullet | no per-run styling |
-| Fragments revealed one at a time | whole list at once | no fragment equivalent |
-| LaTeX via MathJax (slides 12, 14) | Unicode plain text, first bullet | no MathJax |
-| Figures full width | 620×720 right column | fixed by the slide type |
-| 5 act dividers in site palette | one deck-wide theme | no per-slide colour |
 
 ## Related
 
