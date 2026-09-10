@@ -7,3 +7,4 @@ references/tutorial_files/
 **/*.quarto_ipynb
 __pycache__/
 *.pyc
+ahaslides/payload.json

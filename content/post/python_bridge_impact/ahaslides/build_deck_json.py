@@ -164,6 +164,39 @@ def parse_slide(number, heading, body):
     return slide
 
 
+def validate(slides):
+    """Structural checks. These exist because each one caught a real bug."""
+    bad = []
+    numbers = [s["n"] for s in slides]
+    if numbers != list(range(1, len(slides) + 1)):
+        bad.append((0, f"slide numbers are not 1..{len(slides)} contiguous: "
+                       f"{numbers[:8]}..."))
+    for s in slides:
+        n, k = s["n"], s["kind"]
+        if k == "quiz":
+            correct = sum(o["correct"] for o in s.get("options", []))
+            if correct != 1:
+                bad.append((n, f"quiz has {correct} correct answers, expected 1"))
+            if len(s.get("options", [])) < 2:
+                bad.append((n, "quiz needs at least 2 options"))
+        if k == "poll":
+            if any(o["correct"] for o in s.get("options", [])):
+                bad.append((n, "poll must not mark an option correct"))
+            if len(s.get("options", [])) < 2:
+                bad.append((n, "poll needs at least 2 options"))
+        if k in ("quiz", "poll", "word_cloud", "scale", "open_ended") \
+                and not s.get("question"):
+            bad.append((n, f"{k} slide has no question"))
+        if "image" in s and not (HERE.parent / s["image"]).is_file():
+            bad.append((n, f"figure not found on disk: {s['image']}"))
+        if k == "content" and not (s.get("bullets") or s.get("image")
+                                   or s.get("headline")):
+            bad.append((n, "content slide has neither bullets nor an image"))
+        if k in ("title", "heading", "content") and not s.get("title"):
+            bad.append((n, f"{k} slide has no title"))
+    return bad
+
+
 def main():
     lines = SRC.read_text(encoding="utf-8").splitlines()
     slides = [parse_slide(n, h, b) for n, h, b in parse_blocks(lines)]
@@ -192,6 +225,13 @@ def main():
         },
         "slides": slides,
     }
+    problems = validate(slides)
+    if problems:
+        print(f"{SRC.name}: {len(problems)} problem(s) — nothing written\n")
+        for n, msg in problems:
+            print(f"  slide {n}: {msg}")
+        raise SystemExit(1)
+
     OUT.write_text(json.dumps(deck, indent=2, ensure_ascii=False) + "\n",
                    encoding="utf-8")
     kinds = {}
