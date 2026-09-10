@@ -4,6 +4,12 @@ The AhaSlides version of the post's Quarto reveal.js deck (`../slides/slides.qmd
 and — more usefully — **everything learned building it**, so the next deck takes an
 hour instead of two afternoons.
 
+> **The canonical procedure lives in [`.claude/docs/ahaslides.md`](../../../../.claude/docs/ahaslides.md)**
+> — that is what a future session follows for any post (`CLAUDE.md` points at it). **This
+> file is the worked example**: the record of *this* deck, plus the reasoning, the
+> measurements and the interaction-design patterns behind the procedure. If the two ever
+> disagree, the `.claude/docs` file is the one to fix.
+
 Read **[Start a new deck](#start-a-new-deck-from-this-one)** if you are here to reuse
 this. Read **[Build the content slides](#build-the-content-slides-render-the-qmd-import-the-pdf)**
 before changing how slides are made — the obvious API route is a trap.

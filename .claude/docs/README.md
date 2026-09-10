@@ -5,4 +5,5 @@ Agent-facing operational recipes that `CLAUDE.md` points to but does not inline,
 - [dashboards-gallery.md](dashboards-gallery.md) — "Add dashboard app" recipe + the gallery shortcodes/capture-script architecture.
 - [ai-podcast-player.md](ai-podcast-player.md) — "Add AI Podcast to `<post>`" recipe + the inline player block.
 - [post-resource-buttons.md](post-resource-buttons.md) — Slides (PDF) / Slides (HTML) `links:` buttons + tutorial `.zip` bundle convention.
+- [ahaslides.md](ahaslides.md) — "Make an AhaSlides deck for `<post>`" recipe: render the Quarto deck to PDF, import it as full-bleed slide images, add native interactive slides via the MCP.
 - [i18n.md](i18n.md) — detailed trilingual (ES/JA) mechanics, per-section field rules, geolocation, and the "add another language" recipe.

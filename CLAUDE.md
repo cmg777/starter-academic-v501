@@ -63,6 +63,7 @@ The homepage is a widget-based layout. Each file in `content/home/` is a section
 - **Dashboards gallery** (project page) — responsive screenshot-card grid linking out to GEE apps. Trigger: **"Add dashboard app: `<Access App URL>` — `<English title>`"**. See `.claude/docs/dashboards-gallery.md`.
 - **AI Podcast Player** — inline audio-player block appended to a post. Trigger: **"Add AI Podcast to `<post slug>`"**. See `.claude/docs/ai-podcast-player.md`.
 - **Post resource buttons** — the **Slides (PDF)**, **Slides (HTML)**, and tutorial **`.zip` bundle** `links:` entries (each has a specific relative-vs-absolute URL rule). Triggers: "Add slides to `<post>`" / a new `slides/` deck / a Quarto bundle. See `.claude/docs/post-resource-buttons.md`.
+- **AhaSlides interactive deck** — an existing Quarto reveal.js deck re-published on AhaSlides. **Content slides are images of the real slides** (render `slides.qmd` to PDF, import through the editor UI); AhaSlides supplies only the live audience layer (poll / quiz / word cloud / scale / open-ended via MCP). Never build content slides with the API's own text types or `content-v2` — see the doc for why. Trigger: **"Make an AhaSlides deck for `<post slug>`"**. See `.claude/docs/ahaslides.md`.
 
 # Curriculum Vitae (CV)
 
