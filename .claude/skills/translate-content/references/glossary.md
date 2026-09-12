@@ -90,6 +90,7 @@ translate the words and keep the years: `Estudiante de doctorado 2023-2026` /
 | Nagoya University | Universidad de Nagoya | 名古屋大学 |
 | International University of Japan | Universidad Internacional de Japón | 国際大学（日本） |
 | Bolivian Catholic University | Universidad Católica Boliviana | ボリビア・カトリカ大学 |
+| Universidad Católica Boliviana "San Pablo", La Paz, Bolivia | Universidad Católica Boliviana "San Pablo", La Paz, Bolivia | ボリビア・カトリカ大学「サン・パブロ」、ラパス、ボリビア |
 | Graduate School of International Development, Nagoya University | Escuela de Posgrado de Desarrollo Internacional, Universidad de Nagoya | 名古屋大学 国際開発研究科 |
 
 ### Degrees (`education.courses[].course`)
