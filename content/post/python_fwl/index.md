@@ -17,6 +17,10 @@ links:
     icon_pack: fab
     name: "Podcast"
     url: https://open.spotify.com/episode/53iVUZK8aAuIC1sSTU0zuW
+  - icon: youtube
+    icon_pack: fab
+    name: "Video overview"
+    url: "/post/python_fwl/#video-player"
   - icon: chalkboard-teacher
     icon_pack: fas
     name: "Slides (HTML)"
@@ -92,6 +96,238 @@ diagram: true
 <div style="background:#0e1545; border-radius:12px; padding:8px;">
 <iframe style="border-radius:8px" src="https://open.spotify.com/embed/episode/53iVUZK8aAuIC1sSTU0zuW?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 </div>
+
+<style>
+/* Video overview: clickable poster + fullscreen modal */
+.video-poster {
+  position: relative;
+  display: block;
+  margin: 14px 0 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0e1545;
+  border: 1px solid rgba(200,208,224,0.18);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.video-poster:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+.video-poster img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.video-poster .video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 72px;
+  height: 50px;
+  background: rgba(255,0,0,0.92);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.video-poster:hover .video-play {
+  background: #ff0000;
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.video-poster .video-play svg {
+  width: 26px;
+  height: 26px;
+  fill: #fff;
+}
+.video-poster .video-label {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  color: #f0ece2;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+}
+/* Video player overlay */
+.video-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  animation: vidFadeIn 0.3s ease-out;
+}
+@keyframes vidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.video-overlay.vid-closing {
+  animation: vidFadeOut 0.25s ease-in forwards;
+}
+@keyframes vidFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.video-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 94%;
+  max-width: 1600px;
+}
+.video-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.video-top-row h4 {
+  margin: 0;
+  color: #f0ece2;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.video-icon {
+  width: 34px;
+  height: 34px;
+  background: #ff0000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.video-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+}
+.video-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.video-close-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+.video-close-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #c8d0e0;
+}
+.video-frame-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.video-frame-wrap iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+}
+@media (max-width: 600px) {
+  .video-container { width: 98%; }
+  .video-top-row h4 { font-size: 13px; }
+}
+</style>
+
+<div class="video-poster" id="vidPoster" role="button" tabindex="0" aria-label="Play video overview">
+  <img src="https://img.youtube.com/vi/APXH1B2FmGs/hqdefault.jpg" alt="Video overview: The FWL Theorem" loading="lazy">
+  <span class="video-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+  <span class="video-label">Video overview</span>
+</div>
+
+<div class="video-overlay" id="vidOverlay">
+<div class="video-container">
+  <div class="video-top-row">
+    <h4>
+      <span class="video-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+      </span>
+      Video overview: The FWL Theorem
+    </h4>
+    <button class="video-close-btn" onclick="vidClose()" title="Close video">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+  <div class="video-frame-wrap">
+    <iframe id="vidFrame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('vidOverlay');
+  var frame = document.getElementById('vidFrame');
+  var poster = document.getElementById('vidPoster');
+  var vidSrc = 'https://www.youtube.com/embed/APXH1B2FmGs?enablejsapi=1&rel=0&autoplay=1';
+  function vidOpen(){
+    frame.src = vidSrc;
+    overlay.style.display = 'block';
+    overlay.classList.remove('vid-closing');
+  }
+  window.vidClose = function(){
+    overlay.classList.add('vid-closing');
+    setTimeout(function(){
+      overlay.style.display = 'none';
+      frame.src = '';
+    }, 250);
+  };
+  if(poster){
+    poster.addEventListener('click', vidOpen);
+    poster.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); vidOpen(); }
+    });
+  }
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a.btn-page-header');
+    if(!link) return;
+    var text = link.textContent.trim();
+    if(text.indexOf('Video overview') === -1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    vidOpen();
+  });
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay) vidClose();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && overlay.style.display === 'block') vidClose();
+  });
+  if(window.location.hash === '#video-player'){
+    vidOpen();
+  }
+})();
+</script>
 
 ## Abstract
 
