@@ -15,6 +15,9 @@ this file is the procedure:
 - `content/post/python_sc_bayes_spatial/ahaslides/` (deck `10042312`) — the second, built
   from this doc. Its generators add real validation, including a check that `deck.md`'s
   titles still match `slides.qmd`. Read its free-plan section before promising a cap.
+- `content/post/python_fwl/ahaslides/` (deck `10198190`) — the third. Its generators also
+  check speaker notes and each quiz's options against the cue slides, and they letter and
+  reverse the options (see *Hard constraints*). Copy these generators for new decks.
 
 ---
 
@@ -187,6 +190,14 @@ rebuild the same ID.
   nothing. `move_slide` and `update_slide_content` responses do return it.
 - **`update_slide_content` replaces the whole slide** — resend `notes` or they are wiped.
 - **Returned ID arrays are not in input order.** Match on `order`.
+- **Option order is not kept — options display in REVERSE payload order.** The API gives
+  successive options `order` 1, 0.5, 0.25, … and every view sorts ascending, so a payload
+  of A, B, C shows as C, B, A (`get_presentation_detail_tool` lists yet another order —
+  never verify option order from it; look at the editor). Letter every option
+  ("A. …") so it always matches the cue slide and the notes, and send the lettered list
+  reversed so it displays A, B, C. `python_fwl/ahaslides/build_payload.py` does both.
+- **Inserted slides get fractional `order`** (e.g. 4.5 after image 4). Check interactive
+  positions by rank in `slides_with_id_and_order`, not by the raw `order` value.
 - Native text types, if ever needed: `content` takes `heading` + `paragraphs` (an array —
   **never** `body`); `listing` takes `heading` + `items`.
 
