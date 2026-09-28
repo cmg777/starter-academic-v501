@@ -1,0 +1,766 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 19.0
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do analysis.do 
+
+. *============================================================================
+> ==
+. * The FWL Theorem: Making Multivariate Regressions Intuitive — Stata companio
+> n
+. *
+. * This do-file mirrors script.py section by section, so the Python and Stata
+. * implementations can be read side by side. Every number quoted in a comment
+. * is the one published in the post (and stored in fwl_results.json); every
+. * identity the post claims is checked below with -assert-, so the do-file
+. * stops with an error the moment a claim fails.
+. *
+. * Companion post:  https://carlos-mendez.org/post/python_fwl/
+. * Companions:      script.py            (the Python original)
+. *                  cheatsheet_stata.do  cheatsheet_python.py  cheatsheet_R.R
+. *
+. * Data: 50 simulated stores (numpy default_rng(42)), 4 columns:
+. *   income    ~ N(50, 10)                 neighborhood income, thousands $
+. *   dayofweek ~ U{1, ..., 7}
+. *   coupons   = 60 - 0.5*income + N(0, 5)  coupon usage, %
+. *   sales     = 10 + 0.2*coupons + 0.3*income + 0.5*dayofweek + N(0, 3)
+. * The true effect of coupons on sales is +0.2.
+. *
+. * Usage (batch):
+. *   "/Applications/Stata/StataSE.app/Contents/MacOS/stata-se" -b do analysis.
+> do
+. * Run time: about 2 seconds. Besides the batch log, nothing is written to dis
+> k
+. *           unless EXPORT is 1.
+. * Requires: nothing beyond official Stata. (cheatsheet_stata.do optionally us
+> es
+. *           reghdfe:  . ssc install reghdfe   . ssc install ftools)
+. * Verified with: Python 3.13 / R 4.5 / Stata 19 (this file: Stata 19 SE).
+. *============================================================================
+> ==
+. 
+. clear all
+
+. set more off
+
+. set linesize 100
+
+. set varabbrev off          // never let a scalar name resolve to a variable
+
+. version 14                 // runiformint() in section 11 needs Stata 14+
+
+. 
+. global EXPORT 0            // 1 = export the section-10 graph as a PNG
+
+. 
+. * Only the naive and full regressions print the full ANOVA header; every other
+. * -regress- uses -noheader- so the log stays focused on the coefficient tables.
+. 
+. * Site palette (RGB) for the optional graph
+. global BLUE   "106 155 204"   // #6a9bcc steel blue
+
+. global ORANGE "217 119 87"    // #d97757 warm orange
+
+. 
+. global url "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/pyt
+> hon_fwl/data/fwl_store_data.csv"
+
+. 
+. * Print "label ...... value" at the post's 4-decimal precision.
+. capture program drop show
+
+. program define show
+  1.     gettoken label 0 : 0
+  2.     display as text %-46s "`label'" as result %10.4f `0'
+  3. end
+
+. 
+. 
+. *==============================================================================
+. * 0. SETUP AND DATA
+. *    Local copy first (the Quarto zip ships the CSV flat; the post folder keeps
+. *    it under data/), then the raw GitHub URL.
+. *
+. *    -asdouble- is not optional. The CSV stores 2-decimal values such as 37.37,
+. *    which are not exactly representable in binary. Stata's default float
+. *    import keeps about 7 significant digits (37.37 becomes 37.369998931884766),
+. *    so every coefficient drifts in its 7th decimal: invisible at 4 decimals,
+. *    but enough to fail any 1e-8 comparison with the Python and R numbers.
+. *==============================================================================
+. capture confirm file "fwl_store_data.csv"
+
+. if !_rc {
+.     local src "fwl_store_data.csv"
+. }
+
+. else {
+.     capture confirm file "data/fwl_store_data.csv"
+.     if !_rc {
+.         local src "data/fwl_store_data.csv"
+.     }
+.     else {
+.         local src "$url"
+.     }
+. }
+
+. display as text "Loading: `src'"
+Loading: fwl_store_data.csv
+
+. import delimited "`src'", clear asdouble
+(4 vars, 50 obs)
+
+. 
+. assert _N == 50
+
+. confirm numeric variable sales coupons income dayofweek
+
+. 
+. 
+. *==============================================================================
+. * 1. DESCRIBE AND SUMMARIZE
+. *    Published means: sales 33.61, coupons 33.84, income 50.91, dayofweek 3.92
+. *==============================================================================
+. describe
+
+Contains data
+ Observations:            50                  
+    Variables:             4                  
+----------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+----------------------------------------------------------------------------------------------------
+sales           double  %10.0g                
+coupons         double  %10.0g                
+income          double  %10.0g                
+dayofweek       byte    %8.0g                 
+----------------------------------------------------------------------------------------------------
+Sorted by: 
+     Note: Dataset has changed since last saved.
+
+. summarize sales coupons income dayofweek
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       sales |         50     33.6054    3.955344      25.76      44.38
+     coupons |         50     33.8442    4.885875      23.26      43.79
+      income |         50     50.9126    7.682673      30.49      71.42
+   dayofweek |         50        3.92    1.882682          1          7
+
+. 
+. quietly summarize sales
+
+. scalar m_sales = r(mean)
+
+. quietly summarize coupons
+
+. scalar m_coupons = r(mean)
+
+. 
+. 
+. *==============================================================================
+. * 2. THE NAIVE RELATIONSHIP
+. *    Published: -0.1059 (SE 0.1158, p 0.365). Coupons appear to LOWER sales.
+. *==============================================================================
+. regress sales coupons
+
+      Source |       SS           df       MS      Number of obs   =        50
+-------------+----------------------------------   F(1, 48)        =      0.84
+       Model |  13.1259075         1  13.1259075   Prob > F        =    0.3651
+    Residual |  753.466534        48  15.6972195   R-squared       =    0.0171
+-------------+----------------------------------   Adj R-squared   =   -0.0034
+       Total |  766.592442        49  15.6447437   Root MSE        =     3.962
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -.1059313   .1158433    -0.91   0.365    -.3388499    .1269873
+       _cons |   37.19056   3.960459     9.39   0.000     29.22752     45.1536
+------------------------------------------------------------------------------
+
+. scalar b_naive  = _b[coupons]
+
+. scalar se_naive = _se[coupons]
+
+. show "Naive slope (sales on coupons)" b_naive
+Naive slope (sales on coupons)                   -0.1059
+
+. show "  its SE" se_naive
+  its SE                                          0.1158
+
+. 
+. 
+. *==============================================================================
+. * 3. CONTROLLING FOR INCOME
+. *    Published: coupons +0.2673 (SE 0.1203, p 0.031); income +0.3836.
+. *    The sign flips — a textbook Simpson's paradox.
+. *==============================================================================
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =        50
+-------------+----------------------------------   F(2, 47)        =     13.20
+       Model |  275.780642         2  137.890321   Prob > F        =    0.0000
+    Residual |    490.8118        47  10.4428043   R-squared       =    0.3597
+-------------+----------------------------------   Adj R-squared   =    0.3325
+       Total |  766.592442        49  15.6447437   Root MSE        =    3.2315
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2673097   .1202762     2.22   0.031     .0253452    .5092743
+      income |   .3836135   .0764909     5.02   0.000     .2297336    .5374933
+       _cons |   5.027757    7.18074     0.70   0.487    -9.418029    19.47354
+------------------------------------------------------------------------------
+
+. scalar b_full  = _b[coupons]
+
+. scalar se_full = _se[coupons]
+
+. scalar g_hat   = _b[income]
+
+. show "Full slope (sales on coupons + income)" b_full
+Full slope (sales on coupons + income)            0.2673
+
+. show "  its SE" se_full
+  its SE                                          0.1203
+
+. show "Income coefficient, gamma_hat" g_hat
+Income coefficient, gamma_hat                     0.3836
+
+. 
+. 
+. *==============================================================================
+. * 4. WHERE THE BIAS COMES FROM: THE OMITTED-VARIABLE-BIAS IDENTITY
+. *
+. *    naive = full + gamma_hat * delta_hat          (exact, in the sample)
+. *
+. *    gamma_hat : income's coefficient in the FULL regression   = 0.3836
+. *    delta_hat : slope from regressing the OMITTED variable (income) ON the
+. *                included one (coupons)                         = -0.9730
+. *    product   : -0.3732 = naive - full = -0.1059 - 0.2673
+. *
+. *    Population check: Var(coupons) = 0.25*100 + 25 = 50 and
+. *    Cov(income, coupons) = -0.5*100 = -50, so delta = -1.0 and
+. *    plim naive = 0.2 + 0.3*(-1.0) = -0.10.
+. *==============================================================================
+. regress income coupons, noheader
+------------------------------------------------------------------------------
+      income | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -.9729613   .1782944    -5.46   0.000    -1.331446   -.6144763
+       _cons |    83.8417   6.095542    13.75   0.000     71.58579    96.09761
+------------------------------------------------------------------------------
+
+. scalar d_hat = _b[coupons]
+
+. show "delta_hat (income ON coupons)" d_hat
+delta_hat (income ON coupons)                    -0.9730
+
+. show "gamma_hat * delta_hat" g_hat*d_hat
+gamma_hat * delta_hat                            -0.3732
+
+. show "naive - full" b_naive - b_full
+naive - full                                     -0.3732
+
+. assert reldif(g_hat*d_hat, b_naive - b_full) < 1e-8
+
+. 
+. * THE DIRECTION TRAP. Regressing coupons on income is the natural-looking
+. * auxiliary regression (it is FWL's first step), but it is the wrong one for
+. * the OVB formula: -0.3935 x 0.3836 = -0.1510, which reconciles nothing.
+. regress coupons income, noheader
+------------------------------------------------------------------------------
+     coupons | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |  -.3935098   .0721104    -5.46   0.000    -.5384975   -.2485222
+       _cons |   53.87881   3.712064    14.51   0.000      46.4152    61.34241
+------------------------------------------------------------------------------
+
+. scalar d_wrong = _b[income]
+
+. show "WRONG direction: coupons ON income" d_wrong
+WRONG direction: coupons ON income               -0.3935
+
+. show "  gamma_hat * wrong slope (reconciles nothing)" g_hat*d_wrong
+  gamma_hat * wrong slope (reconciles nothing)   -0.1510
+
+. assert abs(g_hat*d_wrong - (b_naive - b_full)) > 0.1
+
+. 
+. 
+. *==============================================================================
+. * 5. FWL STEP 1 — RESIDUALIZE COUPONS ONLY
+. *    Published: 0.2673 with SE 1.2715 (p 0.834). Same coefficient, useless SE.
+. *
+. *    Why the SE explodes: -noconstant- forces the line through the origin, but
+. *    sales has mean 33.6, so the residuals carry the whole level of sales and
+. *    the residual variance is enormous. Add the intercept back and the SE falls
+. *    to 0.1437 — about 98% of the gap to the full-model SE closes. What is left
+. *    is sales' own dependence on income, which Step 2 removes.
+. *==============================================================================
+. quietly regress coupons income         // shown in section 4
+
+. predict double ct, residuals           // coupons, income partialled out
+
+. 
+. regress sales ct, noconstant noheader
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+          ct |   .2673097   1.271451     0.21   0.834    -2.287767    2.822386
+------------------------------------------------------------------------------
+
+. scalar b_s1  = _b[ct]
+
+. scalar se_s1 = _se[ct]
+
+. show "Step 1: sales on ct, no intercept" b_s1
+Step 1: sales on ct, no intercept                 0.2673
+
+. show "  its SE (the blow-up)" se_s1
+  its SE (the blow-up)                            1.2715
+
+. assert reldif(b_s1, b_full) < 1e-8
+
+. 
+. regress sales ct, noheader
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+          ct |   .2673097   .1436505     1.86   0.069     -.021519    .5561384
+       _cons |    33.6054   .5458219    61.57   0.000     32.50795    34.70285
+------------------------------------------------------------------------------
+
+. scalar se_s1c = _se[ct]
+
+. show "Step 1 + intercept: SE" se_s1c
+Step 1 + intercept: SE                            0.1437
+
+. assert reldif(_b[ct], b_full) < 1e-8
+
+. 
+. generate double sdm = sales - m_sales  // demeaned sales, still no intercept
+
+. regress sdm ct, noconstant noheader
+------------------------------------------------------------------------------
+         sdm | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+          ct |   .2673097   .1421771     1.88   0.066    -.0184059    .5530254
+------------------------------------------------------------------------------
+
+. scalar se_s1d = _se[ct]
+
+. show "Step 1, demeaned sales, no intercept: SE" se_s1d
+Step 1, demeaned sales, no intercept: SE          0.1422
+
+. show "Share of the SE gap closed by the intercept" (se_s1 - se_s1c)/(se_s1 - se_full)
+Share of the SE gap closed by the intercept       0.9797
+
+. 
+. * Residualized coupons are UNCORRELATED with income by construction (OLS
+. * residuals are orthogonal to every regressor). That is not the same as
+. * independent: only the linear association is removed.
+. correlate ct income
+(obs=50)
+
+             |       ct   income
+-------------+------------------
+          ct |   1.0000
+      income |   0.0000   1.0000
+
+. assert abs(r(rho)) < 1e-10
+
+. 
+. 
+. *==============================================================================
+. * 6. FWL STEP 2 — RESIDUALIZE BOTH
+. *    Published: 0.2673, SE 0.1178 (p 0.028).
+. *
+. *    The residuals here are IDENTICAL to the full model's residuals. The SE
+. *    differs only because -regress, noconstant- divides the residual sum of
+. *    squares by 50 - 1 = 49, while the full model spends two more degrees of
+. *    freedom (intercept + income) and divides by 47. Hence
+. *        0.1178 * sqrt(49/47) = 0.1203        and   0.1178/0.1203 = sqrt(47/49).
+. *==============================================================================
+. regress sales income, noheader
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |   .2784244   .0625066     4.45   0.000     .1527465    .4041024
+       _cons |   19.43009   3.217685     6.04   0.000      12.9605    25.89968
+------------------------------------------------------------------------------
+
+. predict double st, residuals           // sales, income partialled out
+
+. 
+. regress st ct, noconstant noheader
+------------------------------------------------------------------------------
+          st | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+          ct |   .2673097    .117796     2.27   0.028     .0305898    .5040297
+------------------------------------------------------------------------------
+
+. scalar b_s2  = _b[ct]
+
+. scalar se_s2 = _se[ct]
+
+. show "Step 2: st on ct, no intercept" b_s2
+Step 2: st on ct, no intercept                    0.2673
+
+. show "  its SE (df = 49)" se_s2
+  its SE (df = 49)                                0.1178
+
+. show "  SE x sqrt(49/47) = full-model SE" se_s2*sqrt(49/47)
+  SE x sqrt(49/47) = full-model SE                0.1203
+
+. show "  SE ratio step2/full = sqrt(47/49)" se_s2/se_full
+  SE ratio step2/full = sqrt(47/49)               0.9794
+
+. assert reldif(b_s2, b_full) < 1e-8
+
+. assert reldif(se_s2*sqrt(49/47), se_full) < 1e-8
+
+. 
+. * Same residuals as the full model, observation by observation
+. quietly regress sales coupons income
+
+. predict double e_full, residuals
+
+. quietly regress st ct, noconstant
+
+. predict double e_s2, residuals
+
+. assert reldif(e_full, e_s2) < 1e-8
+
+. 
+. 
+. *==============================================================================
+. * 7. FWL BY HAND
+. *    beta = Cov(st, ct) / Var(ct) = 3.9380 / 14.7320 = 0.2673
+. *    (both with the n - 1 denominator, which cancels)
+. *==============================================================================
+. correlate st ct, covariance
+(obs=50)
+
+             |       st       ct
+-------------+------------------
+          st |  11.0692
+          ct |  3.93801   14.732
+
+. scalar cov_sc = r(cov_12)
+
+. scalar var_c  = r(Var_2)
+
+. show "Cov(st, ct)" cov_sc
+Cov(st, ct)                                       3.9380
+
+. show "Var(ct)" var_c
+Var(ct)                                          14.7320
+
+. show "Cov / Var" cov_sc/var_c
+Cov / Var                                         0.2673
+
+. assert reldif(cov_sc/var_c, b_full) < 1e-8
+
+. 
+. * Matrix form: (ct'ct)^-1 ct'st
+. matrix accum XX  = ct, noconstant
+(obs=50)
+
+. matrix vecaccum yX = st ct, noconstant
+
+. matrix B = yX * invsym(XX)
+
+. show "Matrix form (ct'ct)^-1 ct'st" B[1,1]
+Matrix form (ct'ct)^-1 ct'st                      0.2673
+
+. assert reldif(B[1,1], b_full) < 1e-8
+
+. 
+. 
+. *==============================================================================
+. * 8. SCALING FOR INTERPRETABILITY
+. *    Adding each variable's mean back to its residual moves the cloud to the
+. *    original units without changing the slope: 0.2673 (SE 0.1190, p 0.029).
+. *==============================================================================
+. generate double cs = ct + m_coupons
+
+. generate double ss = st + m_sales
+
+. regress ss cs, noheader
+------------------------------------------------------------------------------
+          ss | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+          cs |   .2673097   .1190167     2.25   0.029     .0280105     .506609
+       _cons |   24.55852   4.053332     6.06   0.000     16.40874    32.70829
+------------------------------------------------------------------------------
+
+. show "Scaled residuals slope" _b[cs]
+Scaled residuals slope                            0.2673
+
+. assert reldif(_b[cs], b_full) < 1e-8
+
+. 
+. 
+. *==============================================================================
+. * 9. EXTENDING TO MULTIPLE CONTROLS: income + dayofweek
+. *    Published: full 0.2706 (SE 0.1194); FWL 0.2706 (SE 0.1157).
+. *
+. *    Why the coefficient moves only from 0.2673 to 0.2706: the OVB identity of
+. *    section 4, one control up,
+. *
+. *        one-control coef = two-control coef + gamma_dow * delta_dow
+. *
+. *    gamma_dow : dayofweek's coefficient in the two-control model = 0.3195
+. *                (p 0.198)
+. *    delta_dow : coupons coefficient in dayofweek ~ coupons + income = -0.0101,
+. *                the PARTIAL association of dayofweek with coupons once income
+. *                is held fixed (partial corr -0.021)
+. *    product   : 0.3195 x (-0.0101) = -0.0032 = 0.2673 - 0.2706
+. *
+. *    The raw corr(dayofweek, coupons) = -0.076 is not the relevant quantity.
+. *    dayofweek is independent of coupons and income in the DGP, so the shift is
+. *    a small chance association that would vanish in large samples.
+. *==============================================================================
+. regress sales coupons income dayofweek, noheader
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2705517   .1194082     2.27   0.028     .0301955     .510908
+      income |   .3773922   .0760717     4.96   0.000     .2242678    .5305166
+   dayofweek |   .3194702   .2445618     1.31   0.198    -.1728071    .8117475
+       _cons |   3.982453   7.172157     0.56   0.581    -10.45435    18.41926
+------------------------------------------------------------------------------
+
+. scalar b_two  = _b[coupons]
+
+. scalar se_two = _se[coupons]
+
+. scalar g_dow  = _b[dayofweek]
+
+. show "Full, two controls" b_two
+Full, two controls                                0.2706
+
+. show "  its SE (df = 46)" se_two
+  its SE (df = 46)                                0.1194
+
+. 
+. quietly regress coupons income dayofweek
+
+. predict double ct2, residuals
+
+. quietly regress sales income dayofweek
+
+. predict double st2, residuals
+
+. regress st2 ct2, noconstant noheader
+------------------------------------------------------------------------------
+         st2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         ct2 |   .2705517   .1156951     2.34   0.023     .0380537    .5030498
+------------------------------------------------------------------------------
+
+. show "FWL, two controls" _b[ct2]
+FWL, two controls                                 0.2706
+
+. show "  its SE (df = 49)" _se[ct2]
+  its SE (df = 49)                                0.1157
+
+. show "  SE x sqrt(49/46)" _se[ct2]*sqrt(49/46)
+  SE x sqrt(49/46)                                0.1194
+
+. assert reldif(_b[ct2], b_two) < 1e-8
+
+. assert reldif(_se[ct2]*sqrt(49/46), se_two) < 1e-8
+
+. 
+. regress dayofweek coupons income, noheader
+------------------------------------------------------------------------------
+   dayofweek | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   -.010148   .0712037    -0.14   0.887    -.1533915    .1330954
+      income |   .0194738   .0452828     0.43   0.669    -.0716234    .1105709
+       _cons |   3.271992   4.251011     0.77   0.445     -5.27994    11.82392
+------------------------------------------------------------------------------
+
+. scalar d_dow = _b[coupons]
+
+. show "gamma_dow (dayofweek, two-control model)" g_dow
+gamma_dow (dayofweek, two-control model)          0.3195
+
+. show "delta_dow (dayofweek on coupons | income)" d_dow
+delta_dow (dayofweek on coupons | income)        -0.0101
+
+. show "gamma_dow * delta_dow" g_dow*d_dow
+gamma_dow * delta_dow                            -0.0032
+
+. show "one control - two controls" b_full - b_two
+one control - two controls                       -0.0032
+
+. assert reldif(g_dow*d_dow, b_full - b_two) < 1e-8
+
+. 
+. quietly regress dayofweek income
+
+. predict double dowt, residuals          // dayofweek, income partialled out
+
+. quietly correlate dowt ct
+
+. display as text %-46s "partial corr(dayofweek, coupons | income)" as result %10.3f r(rho)
+partial corr(dayofweek, coupons | income)         -0.021
+
+. quietly correlate dayofweek coupons
+
+. display as text %-46s "raw corr(dayofweek, coupons), for contrast" as result %10.3f r(rho)
+raw corr(dayofweek, coupons), for contrast        -0.076
+
+. 
+. 
+. *==============================================================================
+. * 10. VISUALIZING THE PARTIALLED-OUT RELATIONSHIP (optional export)
+. *     The FWL plot: residual sales against residual coupons. Its OLS slope is
+. *     the full-model coefficient, 0.2673. The graph is drawn in memory; it is
+. *     written to disk only when EXPORT is 1.
+. *==============================================================================
+. twoway (scatter ss cs, mcolor("$BLUE") msize(medium))              ///
+>        (lfit ss cs, lcolor("$ORANGE") lwidth(thick)),               ///
+>        xtitle("Coupon usage (%, income partialled out + mean)")     ///
+>        ytitle("Daily sales (thousands USD, income partialled out + mean)") ///
+>        title("Conditional relationship after partialling-out income") ///
+>        legend(order(1 "Stores" 2 "Linear fit")) name(g_fwl, replace)
+
+. 
+. if $EXPORT == 1 {
+.     graph export "fwl_partialled_out_stata.png", name(g_fwl) width(1600) replace
+. }
+
+. 
+. 
+. *==============================================================================
+. * SUMMARY — six of the eight rows of the post's results table. The other two,
+. * FWL by hand (NumPy) and FWL (+ income + day), are checked in sections 7
+. * and 9.
+. *==============================================================================
+. display _n as text "{hline 60}"
+
+------------------------------------------------------------
+
+. display as text %-40s "Specification" %10s "coef" %10s "SE"
+Specification                                 coef        SE
+
+. display as text "{hline 60}"
+------------------------------------------------------------
+
+. display as text %-40s "Naive (no controls)"           as result %10.4f b_naive %10.4f se_naive
+Naive (no controls)                        -0.1059    0.1158
+
+. display as text %-40s "Full (+ income)"               as result %10.4f b_full  %10.4f se_full
+Full (+ income)                             0.2673    0.1203
+
+. display as text %-40s "FWL Step 1 (no intercept)"     as result %10.4f b_s1    %10.4f se_s1
+FWL Step 1 (no intercept)                   0.2673    1.2715
+
+. display as text %-40s "FWL Step 1 + intercept"        as result %10.4f b_full  %10.4f se_s1c
+FWL Step 1 + intercept                      0.2673    0.1437
+
+. display as text %-40s "FWL Step 2 (residualize both)" as result %10.4f b_s2    %10.4f se_s2
+FWL Step 2 (residualize both)               0.2673    0.1178
+
+. display as text %-40s "Full (+ income + day)"         as result %10.4f b_two   %10.4f se_two
+Full (+ income + day)                       0.2706    0.1194
+
+. display as text "{hline 60}"
+------------------------------------------------------------
+
+. display as text "All identities asserted above hold."
+All identities asserted above hold.
+
+. 
+. 
+. *==============================================================================
+. * 11. APPENDIX — THE SAME DGP, SIMULATED NATIVELY IN STATA
+. *     Stata's random-number stream is not numpy's, so set seed 42 here gives
+. *     DIFFERENT stores and DIFFERENT estimates from the post. The point is the
+. *     recipe, not the digits: FWL still reproduces the full-model coefficient
+. *     exactly, and the naive slope is still biased downward.
+. *==============================================================================
+. clear
+
+. set obs 50
+Number of observations (_N) was 0, now 50.
+
+. set seed 42
+
+. generate double income    = rnormal(50, 10)
+
+. generate        dayofweek = runiformint(1, 7)
+
+. generate double coupons   = 60 - 0.5*income + rnormal(0, 5)
+
+. generate double sales     = 10 + 0.2*coupons + 0.3*income + 0.5*dayofweek ///
+>                             + rnormal(0, 3)
+
+. foreach v of varlist income coupons sales {
+  2.     replace `v' = round(`v', 0.01)
+  3. }
+(50 real changes made)
+(50 real changes made)
+(50 real changes made)
+
+. 
+. quietly regress sales coupons
+
+. scalar sim_naive = _b[coupons]
+
+. quietly regress sales coupons income
+
+. scalar sim_full = _b[coupons]
+
+. quietly regress coupons income
+
+. predict double sim_ct, residuals
+
+. quietly regress sales income
+
+. predict double sim_st, residuals
+
+. quietly regress sim_st sim_ct, noconstant
+
+. scalar sim_fwl = _b[sim_ct]
+
+. assert reldif(sim_fwl, sim_full) < 1e-8
+
+. 
+. display _n as text "Native Stata simulation (numbers differ from the post by design):"
+
+Native Stata simulation (numbers differ from the post by design):
+
+. show "  naive slope" sim_naive
+  naive slope                                    -0.0284
+
+. show "  full slope (+ income)" sim_full
+  full slope (+ income)                           0.3084
+
+. show "  FWL slope (residualize both)" sim_fwl
+  FWL slope (residualize both)                    0.3084
+
+. 
+. display _n as text "=== done ==="
+
+=== done ===
+
+. 
+end of do-file
