@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-09-28">
   <title>Visualizing Regression with the FWL Theorem in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">September 28, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -231,8 +231,8 @@
       }</style></aside>
 </div>
 </section>
-<section id="the-same-data-same-slope-but-one-picture-is-honest-and-one-is-a-lie" class="slide level2 center">
-<h2>The same data, same slope, but one picture is honest and one is a lie</h2>
+<section id="same-data-opposite-slopes-one-picture-is-honest-and-one-is-a-lie" class="slide level2 center">
+<h2>Same data, opposite slopes — one picture is honest and one is a lie</h2>
 
 <img data-src="../stata_fwl_fig1_naive_vs_controlled.png" class="r-stretch quarto-figure-center"><p class="caption">Naive scatter (left): negative slope, R² = 0.028. After <code>controls(income)</code> the slope reverses to positive, R² = 0.32. Same 200 stores, two pictures.</p><aside class="notes">
 <p>Spoiler figure — don’t explain the mechanism yet. Just plant that the left and right panels are the same dataset, and the slope flips sign. The left panel is the naive scatter everyone draws; the right is what FWL lets you see. We earn the right panel in Act II.</p>
@@ -414,11 +414,11 @@
 </section>
 <section id="the-omitted-variable-bias-formula-predicts-the-gap-exactly" class="slide level2 center">
 <h2>The omitted-variable-bias formula predicts the gap exactly</h2>
-<p><span class="math display">\[\text{bias}=\hat\gamma\times\hat\delta=0.300\times(-0.494)=-0.148\]</span></p>
-<p><span class="math inline">\(\hat\gamma\)</span> is income’s effect on sales; <span class="math inline">\(\hat\delta\)</span> is the coupons-on-income slope. The naive slope is the true slope plus this bias.</p>
+<p><span class="math display">\[\hat\beta_{\text{naive}}=\hat\beta_{\text{full}}+\hat\gamma\,\hat\delta:\qquad -0.0934=0.2123+(-0.3057)\]</span></p>
+<p><span class="math inline">\(\hat\gamma=0.3004\)</span> is income’s effect on sales in the full model; <span class="math inline">\(\hat\delta=-1.0174\)</span> is the slope of income <em>on</em> coupons. Their product is the bias, and it closes the gap exactly.</p>
 <p><span class="takeaway fragment">Nothing mysterious: a positive <span class="math inline">\(\hat\gamma\)</span> times a negative <span class="math inline">\(\hat\delta\)</span> drags the naive estimate down.</span></p>
 <aside class="notes">
-<p>OVB is the flip side of FWL. The bias the naive regression suffers is exactly γ̂ · δ̂ = 0.300 × (−0.494) = −0.148. True 0.212 plus bias −0.148 ≈ 0.064; the actual naive −0.093 differs only by sampling noise at n = 200. The point: the confounding is fully accounted for by one product of two slopes.</p>
+<p>OVB is the flip side of FWL. γ̂ = 0.3004 is the income coefficient in the full model; δ̂ = −1.0174 is the slope from the auxiliary regression of income ON coupons (regress income coupons) — not coupons on income. Their product, −0.3057, is exactly naive −0.0934 minus controlled 0.2123: an algebraic identity, and the do-file asserts it to 1e-8. In the population δ = −1.0, so the naive slope converges to 0.2 + 0.3 × (−1.0) = −0.10. The point: the confounding is fully accounted for by one product of two slopes.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -512,7 +512,7 @@
 <h2>Fixed effects are just FWL on group dummies — and they reshape the cloud</h2>
 
 <img data-src="../stata_fwl_fig4_fixed_effects.png" class="r-stretch quarto-figure-center"><p class="caption">Air-time vs.&nbsp;delay, NYC flights. No FE (left, R² ≈ 0) → origin FE (center) → origin + destination FE (right). <code>fcontrols()</code> demeans by group via reghdfe.</p><aside class="notes">
-<p>fcontrols() in scatterfit partials out categorical group means — the FWL residualization where Z is a set of dummies. Panel A is the raw cloud; B removes the three origin-airport means; C removes destination means too, leaving within-route deviations. The air-time coefficient moves −0.005 → −0.008 → −0.032 across the panels. reghdfe does the demeaning internally, which is why it scales to huge data.</p>
+<p>fcontrols() in scatterfit partials out categorical group means — the FWL residualization where Z is a set of dummies. Panel A is the raw cloud; B removes the three origin-airport means; C removes destination means too, leaving deviations from the origin and destination averages. The air-time coefficient moves −0.005 → −0.008 → −0.032 across the panels. These are estimated on the 5,000-flight sample; the R post estimates on all 317,578 cleaned flights and gets −0.003 → −0.006 → −0.007, so do not expect the flights numbers to match across editions. reghdfe does the demeaning internally, which is why it scales to huge data.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -567,9 +567,9 @@
 <li>no binning / on-plot stats</li>
 </ul>
 </div></div>
-<p><span class="takeaway fragment">The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.</span></p>
+<p><span class="takeaway fragment">R and Stata load the same 200 stores, so their numbers match; Python simulates its own 50 stores, so its numbers differ but obey the same identities.</span></p>
 <aside class="notes">
-<p>This is the trilogy payoff. The naive −0.093, the controlled +0.212, the OVB −0.148 — identical across the R, Python, and Stata posts because they share the data. Stata’s extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.</p>
+<p>This is the trilogy payoff. The R and Stata posts load the same store_data.csv (200 stores), so they report the same naive −0.093, controlled +0.212, and OVB −0.3057. The Python post simulates its own 50-store sample from the same data-generating process, so its numbers differ (naive −0.1059, controlled +0.2673) while the FWL and OVB identities hold exactly there too. Stata’s extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

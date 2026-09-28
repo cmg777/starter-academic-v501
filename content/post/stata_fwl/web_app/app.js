@@ -41,7 +41,7 @@
   // TAB 2 — Confounding Lab.
   // ----------------------------------------------------------------
   const sim = {
-    n: 200, true_alpha: 0.20, gamma: 0.30, delta: -0.50, seed: 42,
+    n: 200, true_alpha: 0.20, gamma: 0.30, pi: -0.50, seed: 42,
     pair:    CHARTS.fwl_scatter_pair(document.getElementById("sim-pair")),
     compare: CHARTS.fwl_compare(document.getElementById("sim-compare")),
     hist:    CHARTS.fwl_histograms(document.getElementById("sim-hist")),
@@ -50,7 +50,7 @@
   function sim_refit() {
     const data = CHARTS.simulate_store({
       n: sim.n, true_alpha: sim.true_alpha, gamma: sim.gamma,
-      delta: sim.delta, seed: sim.seed,
+      pi: sim.pi, seed: sim.seed,
     });
     sim.data = data;
     const slopes = sim.pair.update(data);
@@ -59,9 +59,18 @@
     document.getElementById("sim-stat-fwl").textContent   = slopes.fwl.toFixed(4);
     document.getElementById("sim-stat-true").textContent  = sim.true_alpha.toFixed(3);
 
-    // OVB = gamma * delta (approximate predicted bias on the naive slope).
-    const ovb = sim.gamma * sim.delta;
-    document.getElementById("sim-stat-ovb").textContent = ovb.toFixed(4);
+    // OVB identity (exact in every sample): naive = FWL + gamma_hat * delta_hat.
+    //   gamma_hat = income coefficient in the full model sales ~ coupons + income
+    //               (by FWL: slope of resid(sales | coupons) on resid(income | coupons))
+    //   delta_hat = slope of income ON coupons (the auxiliary regression
+    //               `regress income coupons`) -- NOT coupons on income.
+    const ovb_parts = CHARTS.ovb_identity(data);
+    document.getElementById("sim-stat-ovb").textContent = ovb_parts.ovb.toFixed(4);
+    // innerHTML so the hats can be CSS-drawn spans (styles.css .hat); the
+    // interpolated values are numbers formatted here.
+    document.getElementById("sim-stat-ovb-sub").innerHTML =
+      `<span class="hat lo">γ</span> ${ovb_parts.gamma_hat.toFixed(3)} × <span class="hat">δ</span> ${ovb_parts.delta_hat.toFixed(3)} = naive − FWL ` +
+      `(${(slopes.naive - slopes.fwl).toFixed(4)}) · population γ·δ = ${CHARTS.ovb_population(sim.gamma, sim.pi).toFixed(3)}`;
 
     sim.compare.update({
       naive: slopes.naive,
@@ -87,8 +96,8 @@
     onSimChange();
   });
   document.getElementById("sim-d").addEventListener("input", e => {
-    sim.delta = +e.target.value;
-    document.getElementById("sim-d-val").textContent = sim.delta.toFixed(2);
+    sim.pi = +e.target.value;
+    document.getElementById("sim-d-val").textContent = sim.pi.toFixed(2);
     onSimChange();
   });
   document.getElementById("sim-reseed").addEventListener("click", () => {
@@ -96,15 +105,15 @@
     sim_refit();
   });
   document.getElementById("sim-reset").addEventListener("click", () => {
-    sim.n = 200; sim.true_alpha = 0.20; sim.gamma = 0.30; sim.delta = -0.50; sim.seed = 42;
+    sim.n = 200; sim.true_alpha = 0.20; sim.gamma = 0.30; sim.pi = -0.50; sim.seed = 42;
     document.getElementById("sim-n").value = sim.n;
     document.getElementById("sim-b").value = sim.true_alpha;
     document.getElementById("sim-g").value = sim.gamma;
-    document.getElementById("sim-d").value = sim.delta;
+    document.getElementById("sim-d").value = sim.pi;
     document.getElementById("sim-n-val").textContent = sim.n;
     document.getElementById("sim-b-val").textContent = sim.true_alpha.toFixed(2);
     document.getElementById("sim-g-val").textContent = sim.gamma.toFixed(2);
-    document.getElementById("sim-d-val").textContent = sim.delta.toFixed(2);
+    document.getElementById("sim-d-val").textContent = sim.pi.toFixed(2);
     sim_refit();
   });
 
@@ -128,7 +137,7 @@
       for (; i < end; i++) {
         const d = CHARTS.simulate_store({
           n: sim.n, true_alpha: sim.true_alpha, gamma: sim.gamma,
-          delta: sim.delta, seed: sim.seed + i + 1,
+          pi: sim.pi, seed: sim.seed + i + 1,
         });
         const naive = CHARTS.ols_xy(d.coupons, d.sales).slope;
         const xr = CHARTS.residualize(d.coupons, d.income);

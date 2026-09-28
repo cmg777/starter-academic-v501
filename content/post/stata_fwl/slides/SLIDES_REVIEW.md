@@ -9,6 +9,17 @@
 
 ---
 
+## Erratum (2026-09-28)
+
+Two errors slipped through this audit's source-fidelity check, because the ledger compared the deck against `index.md`, and `index.md` carried the same mistakes. Both are now fixed in `slides.qmd` (deck re-rendered), `index.md`, `analysis.do`/`analysis.log`, the web app and the infographic brief.
+
+1. **OVB direction (HIGH, conceptual).** The OVB slide used $\hat\delta$ from `regress coupons income` (−0.4937), giving a "bias" of 0.300 × (−0.494) = −0.148 and a predicted naive slope of 0.212 − 0.148 = 0.064 that missed the actual −0.093; the notes blamed the gap on sampling noise. That was wrong. In the exact in-sample identity $\hat\beta_{\text{naive}} = \hat\beta_{\text{full}} + \hat\gamma\hat\delta$, $\hat\delta$ is the slope from regressing the omitted variable on the included one, `regress income coupons`: $\hat\delta = -1.0174$, OVB = −0.3057 = naive −0.0934 − full 0.2123, with no leftover gap. `analysis.do` now asserts the identity (`reldif < 1e-8`); the population value is $\delta = -1.0$, so plim naive = 0.2 + 0.3 × (−1.0) = −0.10.
+2. **False shared-data claim (MED, fidelity).** The cross-language slide said the numbers "match across all three because the datasets are identical," and its notes said the R, Python and Stata posts "share the data." Only the R post (`r_fwlplot`) and this Stata post load the same `store_data.csv` (200 stores). The Python post (`python_fwl`) simulates its own 50-store sample (naive −0.1059, controlled +0.2673), so its numbers differ even though the same identities hold.
+
+The ledger row "OVB formula" below is superseded: the correct entry is γ̂ = 0.3004, δ̂ (income on coupons) = −1.0174, OVB = −0.3057 (index.md §4.4, analysis.log).
+
+---
+
 ## Verdict: MINOR REVISION
 
 **Overall assessment.** A strong, faithful deck: every number, figure, table, and equation traces to the source post, branding is byte-identical to the canonical templates, the smoke-test passes 15/15, and math renders cleanly (zero raw-LaTeX slides). The strongest dimension is source fidelity (all 16 ledger items match). The weakest is readability: four slides stack multiple prose sentences in on-slide `.comment` / `.rebuttal` spans that belong in speaker notes. Moving that prose to `::: {.notes}` and keeping a single anchor line on each promotes the deck to ACCEPT.
@@ -110,7 +121,7 @@ None found.
 | corr coupons·sales                | −0.17          | index.md:314 (−0.1664)        | ✓     |
 | corr income·coupons               | −0.71          | index.md:314 (−0.7087)        | ✓     |
 | corr income·sales                 | +0.50          | index.md:314 (0.5003)         | ✓     |
-| OVB formula 0.300×(−0.494)        | −0.148         | index.md:410 (γ0.3004·δ−0.4937)| ✓    |
+| OVB identity (corrected 2026-09-28, see Erratum) | −0.3057 = −0.0934 − 0.2123 | index.md §4.4 (γ̂ 0.3004 · δ̂ −1.0174) | ✓ (was ✗: wrong δ̂ direction) |
 | Manual FWL slope                  | 0.212288       | index.md:435, 440             | ✓     |
 | Three-panel progression           | −0.093→+0.212→+0.222 | index.md:475, 490       | ✓     |
 | R² three panels                   | 0.028→0.32→0.37 | index.md:484, 490            | ✓     |
@@ -128,7 +139,7 @@ Every datum matches. No ✗.
 ## Title sequence (assertion-title test)
 
 1. "Controlling for income" is the one move you can never draw on a scatter
-2. The same data, same slope, but one picture is honest and one is a lie
+2. Same data, opposite slopes — one picture is honest and one is a lie
 3. Where we're going
 4. A toy dataset built so income confounds the coupon–sales link
 5. The raw correlation lies: coupons and sales correlate −0.17

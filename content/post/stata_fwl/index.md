@@ -52,7 +52,7 @@ diagram: true
 
 ## Abstract
 
-The phrase "controlling for a variable" is central to applied regression yet notoriously hard to visualize, because the underlying relationship lives in multidimensional space that cannot be drawn on a two-dimensional scatter. This tutorial—the Stata installment of a trilogy alongside companion R and Python tutorials sharing the same datasets—uses the Frisch-Waugh-Lovell (FWL) theorem and the scatterfit package (Ahrens, 2024, built on reghdfe) to make "controlling for" a literal picture: a scatter of residualized data with a fitted line. Three datasets are analyzed: a simulated retail dataset of 200 store observations where income confounds the coupon-sales relationship, a 5,000-flight NYC sample from 2013, and the Wooldridge wage panel of 545 individuals over 8 years (1980–1987). Using scatterfit with controls() and fcontrols(), manual three-step residualization, binned scatters, and reghdfe fixed-effects tables, the analysis shows that the naive coupon slope of -0.093 (wrong sign) reverses to +0.212 after partialling out income, matching the true effect of +0.2, with R² rising from 0.028 to 0.32. The omitted-variable-bias formula predicts the gap exactly (0.300 × -0.494 = -0.148), and manual FWL reproduces the coefficient to six decimals (0.212288). In the wage panel, individual fixed effects lift R² from 0.04 to 0.59 and yield a within-person return to experience of about 7%. The lesson: FWL is one algebra across languages—only the syntax changes.
+The phrase "controlling for a variable" is central to applied regression yet notoriously hard to visualize, because the underlying relationship lives in multidimensional space that cannot be drawn on a two-dimensional scatter. This tutorial—the Stata installment of a trilogy whose R edition shares its store and wage-panel data and whose Python edition simulates its own 50-store sample—uses the Frisch-Waugh-Lovell (FWL) theorem and the scatterfit package (Ahrens, 2024, built on reghdfe) to make "controlling for" a literal picture: a scatter of residualized data with a fitted line. Three datasets are analyzed: a simulated retail dataset of 200 store observations where income confounds the coupon-sales relationship, a 5,000-flight NYC sample from 2013, and the Wooldridge wage panel of 545 individuals over 8 years (1980–1987). Using scatterfit with controls() and fcontrols(), manual three-step residualization, binned scatters, and reghdfe fixed-effects tables, the analysis shows that the naive coupon slope of -0.093 (wrong sign) reverses to +0.212 after partialling out income, close to the true effect of +0.2, with R² rising from 0.028 to 0.32. The omitted-variable-bias identity accounts for the gap exactly: income's full-model coefficient (0.3004) times the slope of income on coupons (-1.0174) gives -0.3057, which is precisely the naive-minus-controlled difference, and manual FWL reproduces the coefficient to six decimals (0.212288). In the wage panel, individual fixed effects lift R² from 0.04 to 0.59 and yield a within-person return to experience of about 7%. The lesson: FWL is one algebra across languages—only the syntax changes.
 
 ## 1. Overview
 
@@ -60,7 +60,12 @@ The phrase "controlling for a variable" is central to applied regression yet not
 
 The [scatterfit](https://github.com/leojahrens/scatterfit) Stata package (Ahrens, 2024) makes this visual in one command. It takes a dependent variable, an independent variable, and optional controls or fixed effects, then produces a scatter plot of the residualized data with a fitted regression line. Built on `reghdfe`, it handles high-dimensional fixed effects efficiently. It also offers features beyond what R's `fwl_plot()` or Python's manual FWL can do: **binned scatter plots** for large datasets, **regression parameters printed directly on the plot**, and **multiple fit types** (linear, quadratic, lowess).
 
-This tutorial is the third in a trilogy --- see the companion [R tutorial](/post/r_fwlplot/) and [Python tutorial](/post/python_fwl/) --- and uses the **same datasets** for cross-language comparability. All data are loaded from GitHub URLs so the analysis is fully reproducible.
+**Companion editions.** This is the Stata edition of a three-part FWL series, and the editions do not all use the same data:
+
+- **R edition — [r_fwlplot](/post/r_fwlplot/)** — shares the store and wage-panel data with this post. This post loads `store_data.csv` and `wagepan.csv` straight from the R post, so the store-data coefficients below (naive -0.093, controlled +0.212) and the wage-panel regression table match the R edition. The flights data differ: the R edition estimates its flights regressions on all 317,578 cleaned flights and uses a 5,000-flight random sample (`flights_sample.csv`) only for plotting, while this post estimates on that 5,000-flight sample. Its air-time coefficients (-0.003, -0.006, -0.007) therefore differ from ours (-0.005, -0.008, -0.032).
+- **Python edition — [python_fwl](/post/python_fwl/)** — works only with the store example and simulates its *own* 50-store sample with NumPy from the same data-generating process (true coupon effect +0.2). Because it is a different random draw, its estimates differ (naive -0.1059, controlled +0.2673); the algebra, including the exact OVB identity, is the same.
+
+All data are loaded from GitHub URLs so the analysis is fully reproducible.
 
 **Learning objectives:**
 
@@ -133,13 +138,13 @@ Matching apples to apples instead of apples to oranges.
 </div>
 
 **4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$.
-The naive slope of $Y$ on $X\_1$ differs from the true slope by exactly $\gamma \cdot \delta$. Here $\gamma$ is the effect of the omitted $X\_2$ on $Y$. And $\delta$ is the slope of $X\_2$ on $X\_1$.
+In any sample, the naive slope of $Y$ on $X\_1$ differs from the controlled (full-model) slope by exactly $\hat\gamma \cdot \hat\delta$. Here $\hat\gamma$ is the effect of the omitted $X\_2$ on $Y$ in the full model. And $\hat\delta$ is the slope from regressing $X\_2$ *on* $X\_1$.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-The `income` effect on `sales` is +0.3004 ($\gamma$). The `coupons`-on-`income` slope is -0.4937 ($\delta$). OVB = +0.3004 × -0.4937 = -0.1483. The naive coupon slope -0.0934 plus the bias -0.1483 reconciles with the controlled +0.2123.
+The `income` effect on `sales` in the full model is +0.3004 ($\hat\gamma$). The slope from regressing `income` on `coupons` is -1.0174 ($\hat\delta$). Their product is OVB = -0.3057. The naive coupon slope -0.0934 minus the controlled +0.2123 is also -0.3057 — the identity is exact.
 
 </details>
 
@@ -264,7 +269,7 @@ capture net install scatterfit, ///
 
 ### 3.2 Load the simulated store data
 
-We load the same simulated retail dataset used in the R and Python FWL tutorials. The data are hosted on GitHub for reproducibility:
+We load the simulated retail dataset from the R FWL tutorial (`store_data.csv`, 200 stores); the Python tutorial draws its own 50-store sample instead. The data are hosted on GitHub for reproducibility:
 
 ```stata
 import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_fwlplot/store_data.csv", clear
@@ -384,30 +389,60 @@ Adding income as a control flips the coupon coefficient from -0.093 to +0.212 an
 
 ### 4.4 Omitted variable bias: predicting the error
 
-The confounding is not mysterious --- the **omitted variable bias (OVB) formula** predicts it exactly:
+The confounding is not mysterious — the **omitted variable bias (OVB) formula** accounts for it exactly. In any sample, the naive and the controlled coefficients are linked by an algebraic identity of OLS:
 
-$$\text{bias} = \hat{\gamma} \times \hat{\delta}$$
+$$\hat{\beta}\_{\text{naive}} = \hat{\beta}\_{\text{full}} + \underbrace{\hat{\gamma} \times \hat{\delta}}\_{\text{OVB}}$$
 
-In words, the bias equals the effect of the omitted variable on the outcome ($\hat{\gamma}$) multiplied by the relationship between the omitted variable and the treatment ($\hat{\delta}$).
+In words, the bias equals the effect of the omitted variable on the outcome in the full model ($\hat{\gamma}$, the `income` coefficient in `regress sales coupons income`) multiplied by the slope from the *auxiliary* regression of the omitted variable on the included treatment ($\hat{\delta}$, the `coupons` coefficient in `regress income coupons`). The direction of that auxiliary regression matters: $\hat{\delta}$ comes from regressing income *on* coupons. A common slip is to reverse it (`regress coupons income`); that slope answers a different question, and its product with $\hat{\gamma}$ does not reconcile the two coefficients.
 
 ```stata
-* gamma = effect of income on sales (in full model)
+* gamma = effect of income on sales (in the full model)
 regress sales coupons income
-local gamma = _b[income]    // 0.3004
+local gamma     = _b[income]     // 0.3004
+local full_coef = _b[coupons]    // 0.2123
+display "gamma_hat (income -> sales, full model): " %9.4f `gamma'
 
-* delta = regression of coupons on income
-regress coupons income
-local delta = _b[income]    // -0.4937
+* delta = slope of income ON coupons (auxiliary regression)
+regress income coupons
+local delta = _b[coupons]        // -1.0174
+display "delta_hat (slope of income on coupons):  " %9.4f `delta'
 
 * OVB = gamma * delta
-display "OVB = " %9.4f `gamma' * `delta'
+local ovb = `gamma' * `delta'
+display "OVB = gamma_hat * delta_hat:             " %9.4f `ovb'
+
+* Check the identity naive = full + OVB
+regress sales coupons
+local naive_coef = _b[coupons]
+display "Naive coefficient:  " %9.4f `naive_coef'
+display "Full coefficient:   " %9.4f `full_coef'
+display "Naive - Full:       " %9.4f `naive_coef' - `full_coef'
+display "Full + OVB:         " %9.4f `full_coef' + `ovb'
+assert reldif(`naive_coef', `full_coef' + `ovb') < 1e-8
+display "Identity holds: naive = full + OVB (reldif < 1e-8)"
 ```
+
+The auxiliary regression and the displayed results from `analysis.log`:
 
 ```text
-OVB =   -0.1483
+------------------------------------------------------------------------------
+      income | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -1.017422   .0719742   -14.14   0.000    -1.159356   -.8754873
+       _cons |   85.18957   2.555701    33.33   0.000     80.14968    90.22946
+------------------------------------------------------------------------------
+
+gamma_hat (income -> sales, full model):    0.3004
+delta_hat (slope of income on coupons):    -1.0174
+OVB = gamma_hat * delta_hat:               -0.3057
+Naive coefficient:    -0.0934
+Full coefficient:      0.2123
+Naive - Full:         -0.3057
+Full + OVB:           -0.0934
+Identity holds: naive = full + OVB (reldif < 1e-8)
 ```
 
-The OVB formula predicts a bias of -0.148: income's positive effect on sales ($\hat{\gamma} = 0.300$) times its negative relationship with coupons ($\hat{\delta} = -0.494$) produces a large negative bias. The predicted naive coefficient (true + bias = 0.212 + (-0.148) = 0.064) is close to the actual naive coefficient (-0.093) --- the discrepancy comes from sampling variation with $n = 200$.
+Income's positive effect on sales ($\hat{\gamma} = 0.3004$) times the negative slope of income on coupons ($\hat{\delta} = -1.0174$) gives a bias of -0.3057. Adding it to the controlled coefficient reproduces the naive coefficient to machine precision ($0.2123 - 0.3057 = -0.0934$), which is why the `assert` passes. There is no leftover gap to blame on the sample: the identity holds in every sample. Sampling enters only when we compare with the *population*. In the data-generating process, the population slope of income on coupons is $\delta = \text{Cov}(\text{income}, \text{coupons}) / \text{Var}(\text{coupons})$, which equals $(-0.5 \times 100) / (0.25 \times 100 + 25)$ $= -1.0$. The naive slope therefore converges to $0.2 + 0.3 \times (-1.0) = -0.10$; our 200-store draw gives -0.093.
 
 ## 5. Under the Hood: Manual FWL Verification
 
@@ -600,7 +635,7 @@ estimates table fe0 fe1 fe2, stats(r2 N) b(%9.4f) se(%9.4f)
 --------------------------------------------------
 ```
 
-The air time coefficient changes as we add fixed effects: -0.005 (no FE), -0.008 (origin FE), -0.032 (origin + destination FE). Note that these are estimated on the 5,000-observation sample, so the coefficients differ somewhat from the full-data estimates in the R tutorial. The key pattern is the same: adding fixed effects absorbs between-group variation and changes both the magnitude and precision of the coefficient. With origin + destination FE, 6 singleton observations are dropped (N = 4,994) --- singletons are routes with only one flight in the sample, where within-group variation cannot be estimated.
+The air time coefficient changes as we add fixed effects: -0.005 (no FE), -0.008 (origin FE), -0.032 (origin + destination FE). Note that these are estimated on the 5,000-flight sample, while the R tutorial estimates on all 317,578 cleaned flights, so the coefficients differ noticeably: -0.003, -0.006, and -0.007 in R. The gap is largest with origin + destination FE (-0.032 here vs. -0.007 in R), because 5,000 flights spread over 96 destinations leave little within-destination variation in air time. The estimate is correspondingly imprecise (standard error 0.027, so it is not statistically different from zero; R's full-data estimate is significant only at the 10% level). The key pattern is the same: adding fixed effects absorbs between-group variation and changes both the magnitude and precision of the coefficient. With origin + destination FE, 6 singleton observations are dropped (N = 4,994) --- singletons are flights to a destination that appears only once in the sample, so the destination fixed effect fits them perfectly and they carry no within-group variation.
 
 ## 8. Panel Data: Returns to Experience
 
@@ -764,7 +799,7 @@ The FWL theorem is not just a pedagogical tool --- it is the computational engin
 
 The `scatterfit` package offers three advantages over the R and Python implementations of FWL visualization. First, **binned scatter plots** (Section 6) are essential for large datasets where individual points merge into an unreadable blob. Second, **regression parameters on the plot** (`regparameters()`) combine the visual and statistical evidence in a single figure, reducing the back-and-forth between plots and tables. Third, **multiple fit types** (`fit(quadratic)`, `fit(lowess)`) serve as built-in diagnostics for linearity.
 
-Across the three tutorials (Python, R, Stata), the key numbers are the same because we use the same datasets: the naive coupon coefficient is -0.093, the true effect is +0.212 after controlling for income, and the OVB is -0.148. The FWL theorem is the same in every language --- only the syntax changes:
+The R and Stata editions load the same `store_data.csv` (200 stores), so they report the same store numbers: a naive coupon coefficient of -0.093, +0.212 after controlling for income (true effect +0.2), and an OVB of -0.3057 that closes the gap exactly. The Python edition simulates its own 50-store sample from the same data-generating process, so its estimates differ (naive -0.1059, controlled +0.2673, OVB -0.3732), yet every identity — FWL and OVB alike — holds there to machine precision too. The FWL theorem is the same in every language — only the syntax changes:
 
 | Task | Python | R | Stata |
 |------|--------|---|-------|
@@ -781,7 +816,7 @@ One limitation: the FWL theorem applies only to linear regression. For logistic,
 ## 11. Summary and Next Steps
 
 - **Confounding produces misleading regressions:** the naive coupon coefficient was -0.093 (wrong sign), while the true causal effect is +0.2. After FWL residualization with `controls(income)`, the estimate was +0.212.
-- **The OVB formula predicts the bias exactly:** $0.300 \times (-0.494) = -0.148$, correctly predicting the negative direction and approximate magnitude of the confounding.
+- **The OVB formula accounts for the bias exactly:** income's full-model coefficient ($\hat\gamma = 0.3004$) times the slope of income *on* coupons ($\hat\delta = -1.0174$) gives -0.3057, which equals the naive-minus-controlled gap ($-0.0934 - 0.2123$) to machine precision. In the population, $\delta = -1.0$, so the naive slope converges to $0.2 + 0.3 \times (-1.0) = -0.10$.
 - **FWL is an exact identity:** the manual three-step procedure in Stata (`regress` + `predict resid` + `regress`) matches the full regression to six decimal places (0.212288).
 - **Fixed effects are FWL applied to group dummies:** `fcontrols()` in `scatterfit` calls `reghdfe` internally to demean the data, equivalent to `feols(... | FE)` in R.
 - **Binned scatter plots and on-plot statistics are Stata's advantage:** the `binned` and `regparameters()` options provide capabilities that the R and Python FWL tools lack.
@@ -790,7 +825,7 @@ For further study, see the companion [R FWL tutorial](/post/r_fwlplot/) using `f
 
 ## 12. Exercises
 
-1. **OVB direction.** In our simulation, predict the direction of the OVB if you also omit `dayofweek`. Compute $\hat{\gamma}\_{day} \times \hat{\delta}\_{day}$ and add it to the income OVB. Does the total bias match the difference between the naive and the fully controlled coefficient?
+1. **OVB direction.** In our simulation, predict the direction of the OVB if you also omit `dayofweek`. Estimate the fully controlled model `regress sales coupons income dayofweek` and take both $\hat{\gamma}\_{inc}$ and $\hat{\gamma}\_{day}$ from it. Then get $\hat{\delta}\_{inc}$ from `regress income coupons` and $\hat{\delta}\_{day}$ from `regress dayofweek coupons`. Does $\hat{\gamma}\_{inc}\hat{\delta}\_{inc} + \hat{\gamma}\_{day}\hat{\delta}\_{day}$ match the difference between the naive and the fully controlled coefficient?
 
 2. **Binned scatter with different bins.** Re-run `scatterfit sales coupons, controls(income) binned nquantiles(k)` for $k = 5, 10, 20, 50$. How does the visual change? At what point do you lose meaningful information?
 

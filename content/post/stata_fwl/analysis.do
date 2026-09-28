@@ -9,6 +9,9 @@
 *   store_data.csv   -- 200 obs, simulated retail data
 *   flights_sample.csv -- 5,000 obs, NYC flights 2013
 *   wagepan.csv      -- 4,360 obs, wage panel 1980-1987
+* These are the R edition's files (post/r_fwlplot). The Python
+* edition (post/python_fwl) simulates its own 50-store sample,
+* so its numbers differ from the ones in this log.
 *
 * Packages: scatterfit, reghdfe, ftools, estout
 *
@@ -73,30 +76,35 @@ estimates store full_ols
 estimates table naive_ols full_ols, ///
     stats(r2 N) b(%9.4f) se(%9.4f)
 
-* 4.4 OVB calculation
-* gamma = effect of income on sales (in full model)
+* 4.4 OVB calculation -- an exact in-sample identity:
+*       naive = full + gamma_hat * delta_hat
+*   gamma_hat = income coefficient in the full model
+*   delta_hat = slope of the AUXILIARY regression of the omitted variable
+*               (income) ON the included regressor (coupons)
 regress sales coupons income
-local gamma = _b[income]
-display "gamma (income -> sales): " %9.4f `gamma'
+local gamma    = _b[income]
+local full_coef = _b[coupons]
+display "gamma_hat (income -> sales, full model): " %9.4f `gamma'
 
-* delta = regression of coupons on income
-regress coupons income
-local delta = _b[income]
-display "delta (income -> coupons): " %9.4f `delta'
+* delta = slope of income ON coupons (omitted variable on included regressor)
+regress income coupons
+local delta = _b[coupons]
+display "delta_hat (slope of income on coupons):  " %9.4f `delta'
 
 * OVB = gamma * delta
 local ovb = `gamma' * `delta'
-display "OVB = gamma * delta: " %9.4f `ovb'
+display "OVB = gamma_hat * delta_hat:             " %9.4f `ovb'
 
-* Verify: naive ~ true + OVB
+* Verify: naive = full + OVB (algebraic identity, not an approximation)
 regress sales coupons
 local naive_coef = _b[coupons]
-regress sales coupons income
-local true_coef = _b[coupons]
 
 display "Naive coefficient:  " %9.4f `naive_coef'
-display "True coefficient:   " %9.4f `true_coef'
-display "True + OVB:         " %9.4f `true_coef' + `ovb'
+display "Full coefficient:   " %9.4f `full_coef'
+display "Naive - Full:       " %9.4f `naive_coef' - `full_coef'
+display "Full + OVB:         " %9.4f `full_coef' + `ovb'
+assert reldif(`naive_coef', `full_coef' + `ovb') < 1e-8
+display "Identity holds: naive = full + OVB (reldif < 1e-8)"
 
 *---------------------------------------------------
 * Section 5: Manual FWL Verification

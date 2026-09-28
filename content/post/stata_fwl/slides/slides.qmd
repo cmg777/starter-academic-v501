@@ -59,7 +59,7 @@ A store manager asks: do coupons lift sales? The raw scatter says *no* — more 
 This is the hook of the whole tutorial. Everyone uses the phrase "controlling for X," but almost no one can point to the picture. The FWL theorem is the bridge — it turns a multidimensional regression coefficient into a two-dimensional slope you can literally plot. Keep this concrete: one manager, one question, one scatter.
 :::
 
-## The same data, same slope, but one picture is honest and one is a lie
+## Same data, opposite slopes — one picture is honest and one is a lie
 
 ![Naive scatter (left): negative slope, R² = 0.028. After `controls(income)` the slope reverses to positive, R² = 0.32. Same 200 stores, two pictures.](../stata_fwl_fig1_naive_vs_controlled.png)
 
@@ -149,14 +149,14 @@ This is the payoff of the controls() call as a table. The coupon coefficient goe
 
 ## The omitted-variable-bias formula predicts the gap exactly
 
-$$\text{bias}=\hat\gamma\times\hat\delta=0.300\times(-0.494)=-0.148$$
+$$\hat\beta_{\text{naive}}=\hat\beta_{\text{full}}+\hat\gamma\,\hat\delta:\qquad -0.0934=0.2123+(-0.3057)$$
 
-$\hat\gamma$ is income's effect on sales; $\hat\delta$ is the coupons-on-income slope. The naive slope is the true slope plus this bias.
+$\hat\gamma=0.3004$ is income's effect on sales in the full model; $\hat\delta=-1.0174$ is the slope of income *on* coupons. Their product is the bias, and it closes the gap exactly.
 
 [Nothing mysterious: a positive $\hat\gamma$ times a negative $\hat\delta$ drags the naive estimate down.]{.takeaway .fragment}
 
 ::: {.notes}
-OVB is the flip side of FWL. The bias the naive regression suffers is exactly γ̂ · δ̂ = 0.300 × (−0.494) = −0.148. True 0.212 plus bias −0.148 ≈ 0.064; the actual naive −0.093 differs only by sampling noise at n = 200. The point: the confounding is fully accounted for by one product of two slopes.
+OVB is the flip side of FWL. γ̂ = 0.3004 is the income coefficient in the full model; δ̂ = −1.0174 is the slope from the auxiliary regression of income ON coupons (regress income coupons) — not coupons on income. Their product, −0.3057, is exactly naive −0.0934 minus controlled 0.2123: an algebraic identity, and the do-file asserts it to 1e-8. In the population δ = −1.0, so the naive slope converges to 0.2 + 0.3 × (−1.0) = −0.10. The point: the confounding is fully accounted for by one product of two slopes.
 :::
 
 ## By hand, the residual-on-residual slope is 0.212288 — six matching decimals
@@ -209,7 +209,7 @@ With 5,000 or 5 million points a raw scatter is a black blob. The `binned` optio
 ![Air-time vs. delay, NYC flights. No FE (left, R² ≈ 0) → origin FE (center) → origin + destination FE (right). `fcontrols()` demeans by group via reghdfe.](../stata_fwl_fig4_fixed_effects.png)
 
 ::: {.notes}
-fcontrols() in scatterfit partials out categorical group means — the FWL residualization where Z is a set of dummies. Panel A is the raw cloud; B removes the three origin-airport means; C removes destination means too, leaving within-route deviations. The air-time coefficient moves −0.005 → −0.008 → −0.032 across the panels. reghdfe does the demeaning internally, which is why it scales to huge data.
+fcontrols() in scatterfit partials out categorical group means — the FWL residualization where Z is a set of dummies. Panel A is the raw cloud; B removes the three origin-airport means; C removes destination means too, leaving deviations from the origin and destination averages. The air-time coefficient moves −0.005 → −0.008 → −0.032 across the panels. These are estimated on the 5,000-flight sample; the R post estimates on all 317,578 cleaned flights and gets −0.003 → −0.006 → −0.007, so do not expect the flights numbers to match across editions. reghdfe does the demeaning internally, which is why it scales to huge data.
 :::
 
 # The Resolution {.divider background-color="#00d4c8"}
@@ -245,10 +245,10 @@ The Wooldridge wage panel: 545 individuals, 8 years. Panel A's wide fan is peopl
 :::
 ::::
 
-[The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.]{.takeaway .fragment}
+[R and Stata load the same 200 stores, so their numbers match; Python simulates its own 50 stores, so its numbers differ but obey the same identities.]{.takeaway .fragment}
 
 ::: {.notes}
-This is the trilogy payoff. The naive −0.093, the controlled +0.212, the OVB −0.148 — identical across the R, Python, and Stata posts because they share the data. Stata's extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.
+This is the trilogy payoff. The R and Stata posts load the same store_data.csv (200 stores), so they report the same naive −0.093, controlled +0.212, and OVB −0.3057. The Python post simulates its own 50-store sample from the same data-generating process, so its numbers differ (naive −0.1059, controlled +0.2673) while the FWL and OVB identities hold exactly there too. Stata's extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.
 :::
 
 ## Does the scatter make this causal? No — it only makes the algebra visible

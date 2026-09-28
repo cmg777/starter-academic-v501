@@ -68,14 +68,19 @@
   //   x2     = income (confounder)
   //   true_alpha     := coefficient of x1 on y
   //   gamma          := coefficient of x2 on y
-  //   delta          := slope of x1 on x2 (negative confounding)
+  //   pi             := structural slope of x1 on x2 in the DGP
+  //                     (coupons = 60 + pi * income + noise; negative = confounding).
+  //   NOTE: pi is NOT the OVB delta. The OVB delta is the slope of the
+  //   omitted x2 ON the included x1 (regress income coupons); in population
+  //   delta = pi * Var(x2) / (pi^2 * Var(x2) + Var(noise)) = -1.0 at pi = -0.5.
+  //   (opts.delta is still accepted as a legacy alias for opts.pi.)
   // ------------------------------------------------------------------
   function simulate_store(opts) {
     opts = opts || {};
     const n = opts.n || 200;
     const true_alpha = opts.true_alpha != null ? opts.true_alpha : 0.2;
     const gamma = opts.gamma != null ? opts.gamma : 0.3;
-    const delta = opts.delta != null ? opts.delta : -0.5;
+    const pi = opts.pi != null ? opts.pi : (opts.delta != null ? opts.delta : -0.5);
     const seed = opts.seed != null ? opts.seed : 42;
 
     // Seeded RNG (Mulberry32 — same as dgp.js).
@@ -104,10 +109,10 @@
     const sales = new Array(n);
     for (let i = 0; i < n; i++) {
       income[i]  = 50 + 10 * rnorm();
-      coupons[i] = 60 + delta * income[i] + 5 * rnorm();
+      coupons[i] = 60 + pi * income[i] + 5 * rnorm();
       sales[i]   = 10 + true_alpha * coupons[i] + gamma * income[i] + 3 * rnorm();
     }
-    return { n, income, coupons, sales, true_alpha, gamma, delta };
+    return { n, income, coupons, sales, true_alpha, gamma, pi };
   }
 
   // FWL residualization: regress 'a' on 'b', return residuals.
@@ -117,6 +122,31 @@
     const out = new Array(n);
     for (let i = 0; i < n; i++) out[i] = a[i] - (intercept + slope * b[i]);
     return out;
+  }
+
+  // ------------------------------------------------------------------
+  // Omitted-variable-bias identity on one simulated sample.
+  //   naive slope (sales ~ coupons) = FWL slope (sales ~ coupons + income)
+  //                                   + gamma_hat * delta_hat      [exact]
+  //   gamma_hat: income coefficient in the full model, obtained by FWL as the
+  //              slope of resid(sales | coupons) on resid(income | coupons).
+  //   delta_hat: slope of income ON coupons (`regress income coupons`).
+  // ------------------------------------------------------------------
+  function ovb_identity(d) {
+    const delta_hat = ols_xy(d.coupons, d.income).slope;
+    const gamma_hat = ols_xy(residualize(d.income, d.coupons),
+                             residualize(d.sales, d.coupons)).slope;
+    return { gamma_hat, delta_hat, ovb: gamma_hat * delta_hat };
+  }
+
+  // Population OVB for the store DGP: income ~ N(50, 10^2),
+  // coupons = 60 + pi * income + N(0, 5^2). Then
+  //   delta = Cov(income, coupons) / Var(coupons)
+  //         = pi * 100 / (pi^2 * 100 + 25)       (= -1.0 at pi = -0.5)
+  // and OVB = gamma * delta (= -0.30 at the post defaults).
+  function ovb_population(gamma, pi) {
+    const delta = (pi * 100) / (pi * pi * 100 + 25);
+    return gamma * delta;
   }
 
   // ------------------------------------------------------------------
@@ -549,7 +579,7 @@
             const rect = container.getBoundingClientRect();
             tooltip.html(
               `<div><strong style="color:${color}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>β̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><span class='tooltip-key'><span class="hat">β</span> =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(4)}, ${d.ci_hi.toFixed(4)}]</span></div>` +
               `<div><span class='tooltip-key'>controls/FE used =</span> <span class='tooltip-val'>${d.n_selected === null ? "—" : d.n_selected}</span></div>`
@@ -676,7 +706,7 @@
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated β̂ across 100 simulated datasets");
+        .text("Estimated coupon coefficient across 100 simulated datasets");
     }
     return { update };
   }
@@ -707,6 +737,8 @@
     simulate_store,
     residualize,
     ols_xy,
+    ovb_identity,
+    ovb_population,
     C,
   };
 })();
