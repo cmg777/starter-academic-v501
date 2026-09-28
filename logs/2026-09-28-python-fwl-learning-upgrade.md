@@ -1,0 +1,95 @@
+# 2026-09-28 — python_fwl upgraded to the bridge_impact standard, plus four new learning components
+
+**Status: committed on branch `feat/python-fwl-upgrade`; push to master pending** the Spotify
+episode link and the regenerated AI slides PDF (both supplied by the author). The AhaSlides deck is
+built after the author approves its interactive layer.
+
+The FWL tutorial (`content/post/python_fwl/`, simulated 50-store coupons/income/sales data,
+`np.random.default_rng(42)`) was brought up to the tutorial standard set by
+`python_bridge_impact`, and used to pilot four learning components that did not exist anywhere on
+the site. Along the way, a numbers audit found real errors in the post, which had spread into its
+slides, web app, notebook, Quarto bundle and infographic prompt — and the same omitted-variable-bias
+(OVB) error in the sibling posts `r_fwlplot` and `stata_fwl`.
+
+## New reusable learning components
+
+| Component | Where | Notes |
+|---|---|---|
+| Predict-then-reveal card (`.learn-card.predict-card`) | `assets/scss/custom.scss` §24 | question visible, answer in a nested `<details class="learn-card-reveal">`; placed *before* the output that answers it |
+| Worked-solution card (`.solution-card`) | §24 | code + real output (verified by running) + 1–3 sentences |
+| Misconception card (`.misconception-card`) | §24 | myth in the summary, "What is actually true" with evidence |
+| Proof card (`.proof-card`) | §24 | collapsible derivation, `^\top` transposes |
+| Interactive FWL lab (`{{< fwl-lab >}}`) | `layouts/shortcodes/fwl-lab.html`, `assets/js/fwl-lab.js`, `assets/css/fwl-lab.css` | vanilla JS + SVG, fingerprinted with SRI and loaded once per page; defaults reproduce the post's 50 stores exactly |
+
+Recipe and trigger (**"Add learning components to `<post slug>`"**): `.claude/docs/learning-components.md`.
+`write-post` (new `references/learning-components-template.md`) and `review-post` (solution code is
+executed; learning/widget checklists; `learning` focus) now include them. CLAUDE.md lists them under
+Custom Components.
+
+Also fixed site-wide: `.dark details.concept-card` used the `border-color` shorthand, which erased
+the teal/orange Example/Analogy accents in dark mode (the site default) on all 66 posts with concept
+cards. The theme's `summary:focus{outline:none}` is overridden with a `:focus-visible` ring on the new
+cards.
+
+## python_fwl — what changed
+
+| Artifact | Detail |
+|---|---|
+| `index.md` | 1,418 lines, 23 numbered sections; Bloom-verb objectives; Mermaid road-ahead; 7 concept cards with concrete analogies; 6 predict cards; OVB identity (§7.2); proof card (§8.2); FWL by hand in NumPy (§9); SE ladder (§10.2); interactive lab (§16); 5 misconception cards (§18); 8 graded exercises with solution cards (§22); related-FWL cross-links; date 2026-09-28 |
+| `script.py` | single source of truth: writes `data/fwl_store_data.csv`, `fwl_results.json` (all models, OVB, SE ladder, by-hand, dayofweek decomposition, HC0–HC3) and `web_app/data/results.json`; asserts the invariants; no longer writes `featured.png` (it would override `featured.webp`) |
+| `data/` | data dictionary (CSV + labelled `.dta` + `stata_codebook.do` + zip + `index.html`) |
+| Cheat sheets | `cheatsheet_python.py`, `cheatsheet_R.R`, `cheatsheet_stata.do` — local-first loader, the same comparison table in all three, ending with the traps |
+| `analysis.do` + `analysis.log` | Stata port; the log's license header is scrubbed |
+| `notebook.ipynb`, `references/tutorial.qmd`, `python_fwl.zip` | regenerated from the new post; bundle pins work on Python 3.10–3.13 and ship the CSV, cheat sheets and `.do` |
+| `slides/` | 34 slides; six "Before you look" cue slides (answer-free) for the AhaSlides audience layer; OVB, FWL-by-hand and SE-ladder slides |
+| `web_app/` | OVB formula fixed (income ON coupons), sign-flip rate text (98/100 at the defaults), df text, Tab 1 animation on the post's own 50 stores; dead LASSO code removed; D3 pinned with SRI; `#intro/#lab/#forest/#mc/#quiz` deep links; new Quiz tab; `?v=20260928` cache-busting on local assets |
+| `infographic_instructions.md` | Step-1 SE ladder story; OVB identity; no "10.6x" |
+| `ahaslides/` | `deck.md` (41 slides: 34 images + 7 interactive, all speaker notes), validated build scripts |
+
+## Errors corrected (all verified by NumPy, R and Stata engines and a three-lens skeptic panel)
+
+- **OVB direction.** δ̂ is the slope of the omitted variable (income) *on* the treatment (coupons):
+  −0.9730, so 0.3836 × (−0.9730) = −0.3732 = naive − full, exactly. The post used coupons-on-income
+  (−0.3935 → −0.151), which reconciles nothing, and compared the naive slope with the DGP's 0.2
+  instead of the full-regression estimate.
+- **Step-1 standard error.** SE 1.2715 comes mainly from the dropped intercept (0.1437 with an
+  intercept closes about 98% of the gap), not from "outcome variance not yet adjusted".
+- **Degrees of freedom.** Step 2 vs full: two extra parameters, ratio √(47/49) = 0.9794; report 0.1203.
+- "Orthogonal to (independent of)" → uncorrelated with; the 0.2673 → 0.2706 shift is the partial
+  association of day of week with coupons given income (0.3195 × (−0.0101)), not precision; linear
+  FWL is unbiased when only the *treatment* equation is nonlinear; +0.2673 is an estimate of the true
+  0.2; DML now includes cross-fitting; Courthoud reference title; Lovell (2008) added.
+
+## Sibling posts
+
+`r_fwlplot` and `stata_fwl`: the OVB auxiliary regression now runs income on coupons
+(δ̂ = −1.0174, OVB = −0.3057 = −0.0934 − 0.2123) in `index.md`, `analysis.R`/`analysis.do` (re-run;
+Stata log scrubbed), `tutorial.qmd` and the zip, slides (re-rendered), web apps and infographic
+prompts. `stata_fwl` no longer claims to share the Python post's data; each sibling now links the
+other editions with accurate dataset statements.
+
+## Verification
+
+Numbers tribunal (3 engines, 90/82/82 comparisons, 0 mismatches); T3 code-vs-output 28/28; T2
+near-miss number checker 0 across all python_fwl artifacts; production build exit 0 with the baseline
+WARN only; Playwright in dark/light at 1280 and 390 px (0 page errors, 0 MathJax errors, no raw TeX,
+no horizontal overflow); notebook executes; companions run in local and URL mode; the zip renders from
+a clean unzip; review-post / review-slides / review-app recipes; a leftover-error sweep and a
+completeness critic. 63 findings from the first verification wave were fixed and re-verified.
+
+## Deviations from the plan
+
+- Widget CSS lives in `assets/css/fwl-lab.css` (fingerprinted by the shortcode) rather than a
+  `custom.scss` §25, so the widget is self-contained.
+- Exercise answers are verified by executing each solution card (T3), not duplicated into
+  `fwl_results.json`; only the dayofweek decomposition and HC0–HC3 (quoted in prose) were added there.
+
+## Follow-ups (out of scope for this change)
+
+- `r_fwlplot`: the wage-panel "Panel B steepens to 0.122 / 3–4x" claim (the 150-person scatter's
+  within slope is ≈ 0.059; 0.1223 is the full-sample quadratic model), the "Why steeper?" web-app text,
+  and line ~522 on flights sampling; its data dictionary page overflows at 390 px (pre-existing).
+- `stata_fwl`: concept card 6 credits +0.1223 to demeaning `lwage` and `exper` alone (it needs
+  `expersq`).
+- `r_fwlplot` and `stata_fwl` `featured.webp` images still show the old OVB numbers (hand-made).
+- The pre-scrub `stata_fwl/analysis.log` (serial number) remains in git history.
