@@ -339,11 +339,10 @@ def main():
             "language": "en",
             "source": "content/post/python_fwl/slides/slides.qmd",
             "post": "https://carlos-mendez.org/post/python_fwl/",
-            # TBD — filled after the MCP build (see README.md)
-            "presentationId": None,
-            "publicViewLink": None,
-            "editorUrl": None,
-            "joinCode": None,
+            "presentationId": 10198190,
+            "publicViewLink": "https://presenter.ahaslides.com/share/1790567562708-72xqh62ban",
+            "editorUrl": "https://presenter.ahaslides.com/presentation/10198190",
+            "joinCode": "VSXHY",
             "architecture": "content slides are imported PDF pages; only the "
                             "interactive slides are created through the MCP",
             "imagePages": IMAGE_PAGES,

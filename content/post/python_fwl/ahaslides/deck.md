@@ -6,8 +6,8 @@
 **Source deck:** `../slides/slides.qmd` (Quarto reveal.js, 29 content slides + 4 act dividers + title)
 **Post:** https://carlos-mendez.org/post/python_fwl/
 **Language:** English only
-**Public view link:** TBD (filled after the MCP build)
-**Editor:** TBD (filled after the MCP build) — presentation ID and join code likewise TBD
+**Public view link:** https://presenter.ahaslides.com/share/1790567562708-72xqh62ban
+**Editor:** https://presenter.ahaslides.com/presentation/10198190 (ID 10198190, join code VSXHY)
 
 ## Composition
 

@@ -41,17 +41,32 @@ deck = json.loads((HERE / "deck.json").read_text(encoding="utf-8"))
 
 # Only these two types. Adding a premium type here is a plan change, not a
 # code change — read the free-plan note in README.md first.
+# AhaSlides does not keep option order. The API gives successive options
+# order values 1, 0.5, 0.25, ... and every view sorts them ascending, so the
+# options DISPLAY IN REVERSE payload order (verified on presentation 10198190,
+# 2026-09-28; get_presentation_detail_tool lists yet another order). So each
+# option carries its letter -- the audience can always match it to the A/B/C
+# cue slide and the notes ("Answer: B") -- and the lettered list is sent
+# reversed, which makes it display A, B, C.
+def lettered(opts):
+    return [f"{chr(65 + i)}. {o['text']}" for i, o in enumerate(opts)]
+
+
+def reversed_pairs(opts):
+    return list(reversed(list(zip(lettered(opts), opts))))
+
+
 BUILDERS = {
     "poll": lambda s: {
         "slide_type": "poll",
         "heading": s["question"],
-        "options": [{"text": o["text"]} for o in s["options"]],
+        "options": [{"text": t} for t, _ in reversed_pairs(s["options"])],
     },
     "quiz": lambda s: {
         "slide_type": "pick_answer_quiz",
         "heading": s["question"],
-        "options": [{"text": o["text"], "correct": o["correct"]}
-                    for o in s["options"]],
+        "options": [{"text": t, "correct": o["correct"]}
+                    for t, o in reversed_pairs(s["options"])],
     },
 }
 

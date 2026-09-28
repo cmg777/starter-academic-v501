@@ -8,11 +8,11 @@
 
 | | |
 |---|---|
-| **Presentation ID** | TBD (filled after the MCP build) |
-| **Editor** | TBD (filled after the MCP build) |
-| **Public view link** | TBD (filled after the MCP build) |
-| **Join code** | TBD (filled after the MCP build) |
-| **Theme** | Meeting (`#000000`) — nearest preset to the deck's `#0f1729` navy |
+| **Presentation ID** | `10198190` |
+| **Editor** | https://presenter.ahaslides.com/presentation/10198190 |
+| **Public view link** | https://presenter.ahaslides.com/share/1790567562708-72xqh62ban |
+| **Join code** | `VSXHY` |
+| **Theme** | Meeting (`#000000`, theme id 18468) — nearest preset to the deck's `#0f1729` navy |
 | **Source deck** | `../slides/slides.qmd` → 34 printed pages |
 | **Composition** | 34 image slides + 7 interactive = **41** |
 
@@ -44,21 +44,23 @@ comment lines inside the statsmodels code block are not slides, and the generato
 fenced code for exactly that reason. Work in a scratch directory and delete the PDF
 afterwards.
 
-## Free plan: this deck will be capped at 3 live participants
+## Free plan: this deck is capped at 3 live participants
 
-**Like the other two decks, this one will be capped at 3 live participants on the free
-plan — accepted in advance.** The cap was tested on the earlier decks, not on this one:
+**Confirmed on this deck (2026-09-28), after a fresh editor reload:** with the 34 imported
+images alone the badge read **0 / 50**; with the seven interactive slides it reads
+**0 / 3** and *"You have reached the free slide limit"*, and the interactive slides carry
+the crown. The author accepted this in advance. It matches the earlier decks:
 `python_bridge_impact` (10040213) and `python_sc_bayes_spatial` (10042312) both report
 *"You have reached the free slide limit"* and **0 / 3** with eight interactive slides
 each. On the second, the same 36 images with no interactive slides reported *"up to 50
 live participants"*, and converting every quiz to a poll changed nothing. The free
 allowance is a small count of **interactive slides of any type**, so this deck's seven
-are expected to land in the same place.
+land in the same place.
 
 So the deck uses the better mechanic rather than chasing the cap: six scored quizzes
 (automatic correct-answer reveal plus a leaderboard) and one genuine prediction poll.
 Word Cloud, Rating Scale and Open Ended are separately premium and are not used. After
-the build, reload the editor and read the participant badge to confirm — crowns are
+any rebuild, reload the editor and read the participant badge again — crowns are
 computed lazily, so never trust a first reading.
 
 **Practical consequence:** run this deck as-is for a demo or a small group, or upgrade to
@@ -89,6 +91,22 @@ and the next image is the reveal. **I1 is a pure prediction poll** — the room 
 sign for the naive slope before seeing the scatter. The Simpson's paradox side-by-side
 (slide 36) puts that naive −0.106 next to the conditioned +0.267, so screenshot I1's bar
 chart or keep it open in a second tab and show it again there.
+
+## Option order: lettered and sent reversed
+
+**AhaSlides does not keep the option order of the payload.** The API gives successive
+options `order` values 1, 0.5, 0.25, … and the editor, the presenter view and the share
+view sort them ascending, so the options display in **reverse** payload order
+(`get_presentation_detail_tool` lists them in yet another order — do not trust it for
+this). First build: every slide showed C, B, A. Two safeguards, both in
+`build_payload.py`:
+
+1. Every option carries its letter ("A. income on coupons"), so the audience can match
+   it to the cue slide and the notes ("Answer: B") whatever the display order.
+2. The lettered options are sent **reversed** (C, B, A), so they display A, B, C.
+
+Verified after `update_slide_content` (IDs unchanged, notes resent): the editor and the
+share view show A, B, C on all seven slides, each quiz with exactly one correct option.
 
 ## Speaker notes live here, not in AhaSlides
 
@@ -129,11 +147,15 @@ nothing is uploaded separately and there is nothing to record.
 2. `create_presentation_tool`, theme Meeting; import the PDF through the editor UI with
    **"Import slides"** (not the AI options).
 3. For each entry in `payload.json`, strip `_n` / `_after_image` and call `create_slides`
-   with `insert_after_slide_id` = the ID of image `_after_image`.
+   with `insert_after_slide_id` = the ID of image `_after_image` (map page → ID with
+   `slides_with_id_and_order`; inserted slides get fractional `order` values such as 4.5,
+   so check positions by rank). The payload's options are already lettered and reversed
+   (see *Option order*).
 4. Verify per the doc's step 6: 41 slides, interactive at the positions above, one
    correct option per quiz, none on the poll.
-5. Fill in the TBDs: the table above, the header of `deck.md`, and the `presentation`
-   block in `build_deck_json.py`; then regenerate.
+5. Record the presentation ID, editor URL, share link and join code in the table above,
+   the header of `deck.md` and the `presentation` block in `build_deck_json.py`; then
+   regenerate.
 6. Share → *"Share slides view link"* with slide notes **off**, and add the
    `Interactive slides (AhaSlides)` button to the post's `links:`.
 

@@ -2,7 +2,7 @@
 
 **Status: committed on branch `feat/python-fwl-upgrade`; push to master pending** the Spotify
 episode link and the regenerated AI slides PDF (both supplied by the author). The AhaSlides deck is
-built after the author approves its interactive layer.
+built (presentation `10198190`, share link on the post's "Interactive slides (AhaSlides)" button).
 
 The FWL tutorial (`content/post/python_fwl/`, simulated 50-store coupons/income/sales data,
 `np.random.default_rng(42)`) was brought up to the tutorial standard set by
@@ -44,7 +44,7 @@ cards.
 | `slides/` | 34 slides; six "Before you look" cue slides (answer-free) for the AhaSlides audience layer; OVB, FWL-by-hand and SE-ladder slides |
 | `web_app/` | OVB formula fixed (income ON coupons), sign-flip rate text (98/100 at the defaults), df text, Tab 1 animation on the post's own 50 stores; dead LASSO code removed; D3 pinned with SRI; `#intro/#lab/#forest/#mc/#quiz` deep links; new Quiz tab; `?v=20260928` cache-busting on local assets |
 | `infographic_instructions.md` | Step-1 SE ladder story; OVB identity; no "10.6x" |
-| `ahaslides/` | `deck.md` (41 slides: 34 images + 7 interactive, all speaker notes), validated build scripts |
+| `ahaslides/` | AhaSlides deck `10198190` (join code VSXHY): 34 imported slide images + 7 interactive (1 prediction poll, 6 quizzes) at positions 5/14/20/24/29/32/40; free plan → 0 / 3 participants (accepted). `deck.md` holds all speaker notes; options are lettered and sent reversed because AhaSlides displays options in reverse payload order (now in `.claude/docs/ahaslides.md`) |
 
 ## Errors corrected (all verified by NumPy, R and Stata engines and a three-lens skeptic panel)
 

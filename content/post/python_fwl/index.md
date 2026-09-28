@@ -17,6 +17,10 @@ links:
     icon_pack: fas
     name: "Slides (HTML)"
     url: slides/index.html
+  - icon: poll
+    icon_pack: fas
+    name: "Interactive slides (AhaSlides)"
+    url: https://presenter.ahaslides.com/share/1790567562708-72xqh62ban
   - icon: laptop-code
     icon_pack: fas
     name: "Web app"
