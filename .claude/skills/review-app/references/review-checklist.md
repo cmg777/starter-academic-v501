@@ -148,6 +148,7 @@ n-gram overlap algorithm. Additional structural checks here:
 | Rendered `<a>` href on the post page contains `/post/<slug>/web_app/index.html` exactly | HIGH |
 | Hugo serves the app folder index at HTTP 200 | HIGH |
 | Each of the 6 asset files (`styles.css` ... `app.js` + `data/results.json`) returns HTTP 200 | HIGH (per missing) |
+| Every local `<link href>`/`<script src>` in `web_app/index.html` carries a `?v=YYYYMMDD` query string, bumped whenever any local `.css`/`.js` changed (`netlify.toml` caches `*.css`/`*.js` for 30 days; the HTML and `data/*.json` are revalidated, so only CSS/JS go stale) | MED |
 | The post page itself still renders HTTP 200 (no Hugo build break) | HIGH |
 | `index.md` front-matter is otherwise unchanged (no spurious diff vs git HEAD) | LOW |
 

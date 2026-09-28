@@ -104,6 +104,7 @@ Every life decision is a fork in the road. You took one fork. The parallel-unive
 | Definition sentence length | Median ~8 words, max ~20 |
 | Example grounding | Real variable names + real numbers from this post |
 | Analogy domain | Familiar (medicine, courtroom, photography, sports, sailing — not technical jargon from another field) |
+| Analogy | 1–3 concrete sentences (a scenario, not a bare metaphor) |
 | Card class names | `concept-card concept-example` and `concept-card concept-analogy` exactly |
 | Wrapper | `<div class="concept-pair">` around the two `<details>` blocks |
 | Blank lines | After every `<summary>`, before every `</details>` |

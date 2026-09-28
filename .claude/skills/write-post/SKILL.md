@@ -26,6 +26,8 @@ TOC) from `assets/scss/custom.scss`.
 
 - **Does not write scripts.** Use `/project:write-script` to create `script.py`.
 - **Does not execute code.** Use `/project:review-script` to run and verify scripts.
+  Exception: the short exercise solutions in `solution-card` blocks must be run
+  so their outputs are real (§ 2.1b).
 - **Does not generate figures.** Figures come from an existing script (Mode A) or
   are marked for future generation (Mode B).
 - **Does not create `featured.png`.** The user adds this manually.
@@ -133,6 +135,7 @@ Load the following reference files from `references/`:
 
 - **Always:** `latex-escaping.md`, `figure-conventions.md`, `front-matter-templates.md`
 - **If tutorial-style** (Learning objectives present, introduces new vocabulary): `key-concepts-template.md`
+- **If tutorial-style:** `learning-components-template.md` (predict / solution / misconception / proof cards; full recipe in `.claude/docs/learning-components.md`)
 - **If causal inference topic:** `causal-inference.md`
 - **Always:** `quality-checklist.md` (needed for verification step)
 
@@ -233,11 +236,15 @@ question, and the results answer it.
 | **Data preparation** | Scaling, encoding, train/test split as needed | If needed |
 | **Baseline** | Simple approach first (naive OLS, difference in means, basic model) to establish benchmark | Encouraged |
 | **Core method** (1-3 sections) | Main technique with conceptual explanations. Each major step gets its own `##`. At least 1 figure | Yes |
+| **Predict-then-reveal** (placed inside the sections) | 4–6 `predict-card` blocks, each just **before** the code block whose output answers it; the reveal cites that output's real numbers. See § 2.1b | Encouraged |
+| **Proof card** (inside the method section) | One collapsible `proof-card` right after the theorem statement, `^\top` transposes. See § 2.1b | Optional |
+| **Interactive widget** | A shortcode lab (sliders/toggles that recompute a result), in its own `##` section. See `.claude/docs/learning-components.md` § *Interactive widget pattern* | Optional |
 | **Evaluation and results** | Metrics, comparison tables, at least 1 figure | Yes |
 | **Validation and robustness** | At least one robustness check: learner comparison, refutation test, residual analysis, sensitivity analysis | Encouraged |
+| **Common misconceptions** | 3–6 `misconception-card` blocks (myth → "What is actually true" with evidence from this post), after the results and before Discussion; open the section with prose, not a list. See § 2.1b | Encouraged |
 | **Discussion** | What findings mean for the case study question. Connect to real-world context | Yes |
 | **Summary and next steps** | Takeaways (concrete with numbers) + limitations + next steps | Yes |
-| **Exercises** | 2-3 self-study challenges for the reader | Encouraged |
+| **Exercises** | 3–8 graded Warm-up/Core/Stretch under `###` headings (one per exercise, or one per difficulty level with bold `**Exercise N — Title.**` lead-ins), each exercise followed by a solution-card whose output came from running the code. See § 2.1b | Encouraged |
 | **References** | Numbered list of clickable links to all sources | Yes |
 
 **Narrative arc:**
@@ -319,6 +326,29 @@ sentence with the real numbers], [secondary result]. These findings imply
 
 ## Overview
 ```
+
+#### 2.1b Learning components
+
+Tutorials make the reader *do* something. Read
+`references/learning-components-template.md` for the copy-paste blocks and
+quality bar (full recipe: `.claude/docs/learning-components.md`). In short:
+
+- **Predict cards (4–6)** sit between the explanation paragraph and the code
+  block whose output answers them; the reveal cites that output's numbers.
+  They do not break the sandwich pattern.
+- **Exercises (3–8)** are graded Warm-up → Core → Stretch under `###` headings —
+  one `###` per exercise, or one per difficulty level with bold
+  `**Exercise N — Title.**` lead-ins (the python_fwl §22 layout) — with each
+  exercise followed by exactly one `solution-card` whose `text` output was produced by
+  actually running the code (Mode B: mark it `[VERIFY]` like any other output).
+- **Common misconceptions (3–6)** get their own `##` section after the results
+  and before Discussion; each card opens with `**What is actually true.**`.
+- **Proof card** (optional) goes right after the theorem statement.
+- Markup is pure HTML `<details>` styled by `custom.scss` §24: blank line after
+  the opening tag lines and before `</details>`; `<summary>` is raw HTML (no
+  Markdown/backticks/`\_`); no headings inside cards; never inside
+  `.concept-pair`. Lint with
+  `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md`.
 
 #### 2.2 The sandwich pattern (CRITICAL)
 
@@ -552,6 +582,7 @@ Run through the quality checklist from `references/quality-checklist.md`.
 | LaTeX escaping | All `_` in math escaped as `\_`, all `\,` as `\\,` |
 | Math AVOID list | No `\text{var\_name}`, `\text{-}`, `\big|/\Big|/\bigg|` + subscript, `\underbrace/\overbrace`, or `\\!/\\;` in display math (see `references/latex-escaping.md`) |
 | Key concepts (if present) | 5-8 concepts; each has bold term + Definition paragraph + `<div class="concept-pair">` with `<details class="concept-card concept-example">` and `<details class="concept-card concept-analogy">`; blank line after every `<summary>...</summary>` and before every `</details>` |
+| Learning components (if present) | `lint_learn_cards.py` exits 0; exact class names; blank lines after the kicker `<p>`/every `<summary>` and before every `</details>`; predict cards precede the output they ask about; every number in a card (answers, solution outputs, misconception evidence) comes from actually running code; one solution card per exercise; 3–8 graded exercises |
 | Output blocks | Use ` ```text ` language tag (not bare ` ``` `) |
 | Front matter | Complete, `toc: true`, `image.placement: 3`, date is yesterday |
 | Links | Only reference files that exist in the page bundle |
@@ -584,6 +615,9 @@ After delivering the post, offer the user next steps:
 "The post is ready at `content/post/<lang>_<slug>/index.md`. Want me to:
 - Adjust any section, add more figures, or refine interpretations?
 - Run `/project:review-post` for a detailed review?
+- Add learning components? (**"Add learning components to `<post slug>`"** —
+  predict checks, worked exercise solutions, common misconceptions, a proof
+  card; see `.claude/docs/learning-components.md`)
 - Create the infographic prompt with `/project:write-infographic`?
 - [Mode B only] Create the script with `/project:write-script` to generate
   real output and figures?"

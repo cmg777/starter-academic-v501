@@ -26,6 +26,14 @@ Start Hugo on a free port (`for p in 1316 1317 1318 ...; do lsof
 | `/post/<slug>/web_app/data/results.json`             | ✓         |
 | `/post/<slug>/`                                      | ✓ (post itself still renders) |
 
+**Cache-busting.** `netlify.toml` caches `*.css` and `*.js` for 30 days
+(`max-age=2592000`), so a returning visitor keeps an edited app's old
+scripts and styles. Reference every local asset in `web_app/index.html` with a
+`?v=YYYYMMDD` query string (`styles.css?v=20260928`, `app.js?v=20260928`).
+When any local `.css`/`.js` changes, set it to that day's date on all of them.
+The HTML and `data/results.json` are not in that cache rule, so they need no
+query string. The Hugo dev server serves `?v=` URLs as usual.
+
 After verifying assets, **kill the Hugo process** before reporting.
 
 ---

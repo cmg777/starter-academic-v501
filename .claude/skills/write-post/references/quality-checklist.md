@@ -55,11 +55,24 @@ Run through every item before delivering the post.
 - [ ] Blank line after every `<summary>...</summary>` and before every closing `</details>` (required for Goldmark to process inner content as Markdown)
 - [ ] No fragile-math constructs (AVOID list) inside any card body
 
+## Learning components (if present)
+
+- [ ] `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md` exits 0
+- [ ] Class names exact: `learn-card predict-card`, `learn-card solution-card`, `learn-card misconception-card`, `learn-card proof-card`, `learn-card-reveal`
+- [ ] Blank line after the kicker `<p>` and every `<summary>...</summary>`, and before every `</details>`
+- [ ] `<summary>` holds raw HTML only (no Markdown, backticks or `\_`; use `<code>`); no headings inside cards; no card inside `.concept-pair`
+- [ ] 4-6 predict cards, each placed **before** the code block whose output answers it; each reveal cites that output's real numbers
+- [ ] Every solution card's `text` output was produced by actually running its code (Mode B: `[VERIFY]`)
+- [ ] 3-6 misconception cards in `## Common misconceptions` (after the results, before Discussion); each opens with **What is actually true.** and cites evidence from the post; the section opens with prose, not a list
+- [ ] Proof card (if any) sits right after the theorem statement and uses `^\top` for transposes
+- [ ] Interactive widget (if any) follows `.claude/docs/learning-components.md` § *Interactive widget pattern* (fingerprinted JS/CSS; no `pre`/`code`/`img`/`h2`/`h3`/`table`/`$` inside; works in light, dark and at 375px; clean console)
+- [ ] Rendered check: `check_learn_cards.cjs` (run from a scratch dir against the dev-server URL) reports OK in light, dark and 375px
+
 ## Narrative and writing
 
 - [ ] Discussion connects findings to case study question
 - [ ] Limitations and next steps section
-- [ ] Exercises (2-3 challenges)
+- [ ] Exercises: 3-8 graded Warm-up/Core/Stretch under `###` headings (one per exercise, or one per difficulty level with bold `**Exercise N — Title.**` lead-ins), each exercise followed by one solution card whose output came from running the code
 - [ ] Technical jargon defined on first use
 - [ ] At least 2 analogies for complex concepts
 - [ ] No sentence exceeds ~40 words

@@ -61,9 +61,10 @@ The homepage is a widget-based layout. Each file in `content/home/` is a section
 - **Page header override** (`layouts/partials/page_header.html`) — renders the featured image **above** the title (image-first). Data science posts use `image.placement: 3` (2560x2560 Fit); Colab/script/notebook buttons come from `links:` front matter, not the body; the image wrapper uses `mb-4`.
 - **Custom CSS** (`assets/scss/custom.scss`) — hero fix, iframe breakout, dashboard gallery grid, notebook-style post styling, Python syntax highlighting, left-side ToC. See `README.md` for the section breakdown.
 - **Dashboards gallery** (project page) — responsive screenshot-card grid linking out to GEE apps. Trigger: **"Add dashboard app: `<Access App URL>` — `<English title>`"**. See `.claude/docs/dashboards-gallery.md`.
-- **AI Podcast Player** — inline audio-player block appended to a post. Trigger: **"Add AI Podcast to `<post slug>`"**. See `.claude/docs/ai-podcast-player.md`.
+- **AI Podcast Player** — inline audio-player block appended to a post (raw audio file), or a Spotify embed above the Abstract (Spotify-hosted episode). Trigger: **"Add AI Podcast to `<post slug>`"**. See `.claude/docs/ai-podcast-player.md`.
 - **Post resource buttons** — the **Slides (PDF)**, **Slides (HTML)**, and tutorial **`.zip` bundle** `links:` entries (each has a specific relative-vs-absolute URL rule). Triggers: "Add slides to `<post>`" / a new `slides/` deck / a Quarto bundle. See `.claude/docs/post-resource-buttons.md`.
 - **AhaSlides interactive deck** — an existing Quarto reveal.js deck re-published on AhaSlides. **Content slides are images of the real slides** (render `slides.qmd` to PDF, import through the editor UI); AhaSlides supplies only the live audience layer (poll / quiz / word cloud / scale / open-ended via MCP). Never build content slides with the API's own text types or `content-v2` — see the doc for why. Trigger: **"Make an AhaSlides deck for `<post slug>`"**. See `.claude/docs/ahaslides.md`.
+- **Learning components** — predict-then-reveal checks, worked exercise solutions, common-misconception cards and collapsible proofs (`.learn-card` + `predict-card`/`solution-card`/`misconception-card`/`proof-card`; `custom.scss` §24; pure HTML `<details>`, no JS), plus the `fwl-lab` interactive shortcode (`layouts/shortcodes/fwl-lab.html` + `assets/js/fwl-lab.js` + `assets/css/fwl-lab.css`). Trigger: **"Add learning components to `<post slug>`"**. See `.claude/docs/learning-components.md`.
 
 # Curriculum Vitae (CV)
 
@@ -101,7 +102,7 @@ Standalone companions: `write-quarto-notebook`, `write-quarto-notebook-python`, 
 - Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
 - Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
 - PDF reference handling: delegate large PDFs to Explore agents; extract only relevant pages (5–15); clean up before committing
-- Reference posts (Python): `python_ml_random_forest` (ML), `python_dowhy` (causal inference), `python_fwl` (dark-theme figures, simulated data), `python_pyfixest` (panel/fixed effects), `python_esda2` (ESDA/LISA), `python_mgwr` (MGWR)
+- Reference posts (Python): `python_ml_random_forest` (ML), `python_dowhy` (causal inference), `python_fwl` (dark-theme figures, simulated data, learning components, interactive lab), `python_pyfixest` (panel/fixed effects), `python_esda2` (ESDA/LISA), `python_mgwr` (MGWR)
 - Reference posts (Stata): `stata_rct` (RCT panel data, RA/IPW/DR/DiD/DRDID, Mermaid diagrams, equations with analogies)
 
 # Internationalization (i18n)

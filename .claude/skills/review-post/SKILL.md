@@ -1,7 +1,7 @@
 ---
 name: review-post
 description: Comprehensive review of a data science blog post -- merges deep expert review with final proofreading into one thorough pass. Covers code execution, structure, equations, explanations, interpretations, writing, rigor, and deliverable consistency. Produces a scored report with priority action items. Read-only.
-argument-hint: "<post slug, e.g. python_doubleml> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images]"
+argument-hint: "<post slug, e.g. python_doubleml> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images | learning]"
 disable-model-invocation: true
 user-invocable: true
 ---
@@ -26,6 +26,7 @@ conversation without modifying any files.
 /project:review-post content/post/python_ml_random_forest/
 /project:review-post python_dowhy focus: code
 /project:review-post python_doubleml focus: math and interpretations
+/project:review-post python_fwl focus: learning
 ```
 
 ---
@@ -48,6 +49,7 @@ If omitted, run all 13 dimensions. Multiple keywords can be combined with
 | `grammar` | 9 (grammar/spelling subset only) |
 | `rigor` | 10 (Academic rigor), 11 (Narrative flow) |
 | `images` | 12 (Images, Mermaid, and deliverables) |
+| `learning` | 3 (subset: *Learning components* + *Interactive widget* checklists) + 1 (subset: step 8, solution-card code execution) |
 | `abstract` | 13 (Abstract) |
 | (omitted) | All 13 dimensions |
 
@@ -113,7 +115,9 @@ This is the single highest-impact check. A post with code that doesn't run
 is worse than no post at all for a beginner following along.
 
 1. **Extract all code blocks** from `index.md` in order. Concatenate them into
-   a single script (or use `script.py` if it exists).
+   a single script (or use `script.py` if it exists). Exclude code fences
+   inside `<details class="learn-card solution-card">` blocks — step 8 runs
+   those separately.
 2. **Run the script** using the system Python:
    ```bash
    python3 script.py
@@ -136,6 +140,15 @@ is worse than no post at all for a beginner following along.
 7. **Check for orphaned images:** List all PNGs in the post directory and verify
    each is referenced in `index.md`. Flag any unreferenced PNGs for deletion
    (exception: `featured.png` which is auto-detected by Hugo).
+8. **Run the solution-card code (if the post has learning components).**
+   Extract the code fences inside every `<details class="learn-card solution-card">`
+   block, run each one after the post's main code (in the same session, so
+   `df` and friends exist — or standalone if the snippet loads its own data),
+   and compare the printed output with the `text` fence in the same card.
+   Any substantive mismatch (different numbers, an error, a missing line) is
+   **HIGH** — a worked solution that does not reproduce is worse than none.
+   Also spot-check that numbers quoted in predict-card answers and
+   misconception cards match the output blocks they refer to (mismatch: HIGH).
 
 If `script.py` exists, run it as-is. If not, assemble the script from code
 blocks in `index.md`. If the code requires a dataset download, allow network
@@ -195,11 +208,14 @@ Verify the markdown is well-formed:
 
 For posts with a `python_*` slug:
 
-- [ ] A **Learning objectives** section exists after the Overview (either as a
-      `###` heading or bold label `**Learning objectives:**`)
-- [ ] Followed by a bulleted list with 3-6 items
+- [ ] A **Learning objectives** section exists after the Overview (a `###`
+      heading such as `### Learning objectives` or a numbered
+      `### 1.2 Learning objectives`, or a bold label `**Learning objectives:**`)
+- [ ] Followed by either a bulleted list with 3-6 items **or** a numbered list
+      with 3-7 items (the numbered form usually opens each item with a bold
+      Bloom verb, e.g. `1. **Explain** why ...`)
 - [ ] Items are action-oriented (start with verbs: "Understand", "Apply",
-      "Evaluate", "Implement", "Compare", etc.)
+      "Evaluate", "Implement", "Compare", "Explain", "Derive", etc.)
 
 ### Colab badge
 
@@ -238,6 +254,66 @@ If the section is missing entirely, this is **not** a defect — many posts
 do not introduce new vocabulary and should not be padded with token concepts.
 Only flag missing Key Concepts for tutorial-style posts that introduce 5+
 new terms used repeatedly in the body.
+
+### Learning components (if present)
+
+Predict / solution / misconception / proof cards styled by `custom.scss` §24
+(contract: `.claude/docs/learning-components.md`; reference post:
+`content/post/python_fwl/index.md`). Start with the linter — it catches most
+markup defects mechanically:
+
+```bash
+python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md
+```
+
+- [ ] Class names exact: `learn-card predict-card`, `learn-card solution-card`,
+      `learn-card misconception-card`, `learn-card proof-card`, and
+      `learn-card-reveal` for the predict card's inner `<details>`
+- [ ] Blank line after the predict card's kicker `<p>` and after every
+      `<summary>...</summary>`; blank line before every `</details>`; the
+      predict card's `</div>` directly follows its reveal's `</details>`
+- [ ] **Placement:** every predict card comes **before** the code block whose
+      output answers it (a predict card after its answer is **MEDIUM**); it
+      sits between the explanation paragraph and the code and does not count
+      as a broken sandwich in Dimension 5
+- [ ] Predict answers cite the post's real numbers (cross-check with
+      Dimension 1 step 8)
+- [ ] Exercises: 3-8, graded Warm-up / Core / Stretch under `###` headings —
+      either one `###` per exercise or one `###` per difficulty level with
+      bold `**Exercise N — Title.**` lead-ins (both layouts are valid) — and
+      each exercise followed by **exactly one** solution card
+- [ ] Misconception cards open with **What is actually true.** and cite
+      evidence the post shows (a number, figure or output block), in a
+      `## Common misconceptions` section after the results and before
+      Discussion that opens with prose (a list right after the `##` picks up
+      the §11F Learning-objectives styling)
+- [ ] Proof cards write transposes as `^\top` and follow Goldmark-safe
+      escaping (Dimension 7)
+- [ ] `<summary>` holds raw HTML only — no headings, no Markdown, no
+      backticks, no `\_` (use `<code>`); no headings anywhere inside a card;
+      no card nested in `.concept-pair`
+
+**Severity:** broken markup (missing blank line, wrong class, unclosed card,
+raw `**`/`$` visible on the page) -> **HIGH**; a predict card placed after
+the output it asks about -> **MEDIUM**; learning components **absent** from a
+tutorial -> **LOW** (a suggestion, never a blocker).
+
+### Interactive widget (if present)
+
+For a shortcode lab such as `{{< fwl-lab >}}` (pattern:
+`.claude/docs/learning-components.md` § *Interactive widget pattern*):
+
+- [ ] The shortcode loads its JS/CSS through Hugo Pipes with `fingerprint`
+      (the site caches `*.js`/`*.css` for 30 days), once per page
+- [ ] No `pre`, `code`, `img`, `h2`, `h3`, `table` or literal `$` inside the
+      widget markup (page CSS, copy-code, lightbox, TOC and MathJax would
+      grab them)
+- [ ] Works in light mode, dark mode and at 375px width without horizontal
+      overflow; controls are keyboard-operable
+- [ ] Browser console is clean (no errors) — run
+      `node .claude/skills/write-post/scripts/check_learn_cards.cjs <dev-server URL>`
+      from a scratch directory, then operate the controls once
+- [ ] At its default state the widget shows the same numbers as the post
 
 ---
 
@@ -627,6 +703,7 @@ Each dimension is scored 1-10:
 - [ ] Checked Mermaid style colors match site palette (if diagrams present)
 - [ ] Verified site conventions (em dashes, no emojis, colors)
 - [ ] Checked Key Concepts toggle-card structure (if present): blank lines around `<summary>`, both Example and Analogy cards present, real numbers in examples
+- [ ] Checked learning components (if present): `lint_learn_cards.py` exits 0, predict cards precede their outputs, solution-card code re-run and outputs match (Dimension 1 step 8), widget checklist done
 - [ ] Scanned source for the five fragile math constructs in the AVOID list (Dimension 7)
 - [ ] Confirmed blank lines after every `<summary>` and before every `</details>` in any HTML-in-Markdown block
 - [ ] All HIGH issues have full before/after rewrites
