@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-09-28">
   <title>Visualizing Regression with the FWL Theorem in R</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">September 28, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -444,10 +444,10 @@
 </section>
 <section id="the-bias-was-no-mystery-the-ovb-formula-predicted-it" class="slide level2 center">
 <h2>The bias was no mystery — the OVB formula predicted it</h2>
-<p><span class="math display">\[\text{bias}=\hat\gamma\times\hat\delta = 0.300\times(-0.494) = -0.148\]</span></p>
-<p><span class="takeaway fragment"><span class="math inline">\(\hat\gamma\)</span> = income’s effect on sales; <span class="math inline">\(\hat\delta\)</span> = slope of coupons on income. True <span class="math inline">\(+0.212\)</span> plus bias <span class="math inline">\(-0.148\)</span> ≈ the naive <span class="math inline">\(-0.093\)</span>.</span></p>
+<p><span class="math display">\[\text{bias}=\hat\gamma\times\hat\delta = 0.3004\times(-1.0174) \approx -0.3057\]</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\hat\gamma\)</span> = income’s coefficient in the full model; <span class="math inline">\(\hat\delta\)</span> = slope of income regressed <em>on</em> coupons. Controlled <span class="math inline">\(+0.2123\)</span> plus bias <span class="math inline">\(-0.3057\)</span> = the naive <span class="math inline">\(-0.0934\)</span>, exactly.</span></p>
 <aside class="notes">
-<p>Omitted-variable bias = (effect of omitted variable on outcome) × (slope of omitted on treatment) = 0.300 × (−0.494) = −0.148. True + bias = 0.212 − 0.148 = 0.064, close to the actual naive −0.093 (the gap is n = 200 sampling noise). The point: if you know the signs of the confounder’s two effects, you know which way the naive estimate tilts.</p>
+<p>Omitted-variable bias = (coefficient on the omitted variable in the full model) × (slope from regressing the omitted variable on the treatment) = 0.3004 × (−1.0174) ≈ −0.3057. Controlled + bias = 0.2123 − 0.3057 = −0.0934, the naive slope to machine precision: in-sample this is an identity, not an approximation. Direction matters — regress income ON coupons, not the reverse. In the DGP the population slope of income on coupons is −1.0, so the naive slope converges to 0.2 + 0.3 × (−1.0) = −0.10. The point: if you know the signs of the confounder’s two effects, you know which way the naive estimate tilts.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

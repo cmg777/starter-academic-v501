@@ -62,8 +62,10 @@ formulas_html: |
   fitting. <code>fwl_plot()</code> automates all of this and plots the residualized scatter (an added-variable
   plot) with the regression line overlaid.</p>
   <p><strong>Omitted variable bias</strong>: <code>bias = &gamma; &times; &delta;</code>, where <code>&gamma;</code>
-  is the effect of the omitted control on the outcome and <code>&delta;</code> is the slope of the omitted control
-  on the regressor. In the store data, <code>0.300 &times; (&minus;0.494) = &minus;0.148</code>.</p>
+  is the coefficient on the omitted control in the full model and <code>&delta;</code> is the slope from regressing
+  the omitted control <em>on</em> the regressor (income on coupons, not the reverse). In the store data,
+  <code>0.3004 &times; (&minus;1.0174) &asymp; &minus;0.3057</code>, which equals the naive slope (&minus;0.0934) minus the
+  controlled slope (+0.2123) exactly.</p>
 
 caveats:
   - "<strong>store_data is simulated.</strong> Values come from a known data-generating process (set.seed(42)); the true coupon effect is +0.2 by construction. It illustrates confounding and FWL, not a real retail market."

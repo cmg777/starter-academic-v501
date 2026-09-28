@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 <title>FWL Theorem — Interactive Lab</title>
 <meta name="description" content="Interactive companion to 'Visualizing Regression with the FWL Theorem in R'. A pedagogical web app where you slide confounding knobs and watch the naive vs FWL coefficient flip in real time.">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20260928">
 </head>
 <body>
 
@@ -82,7 +82,7 @@
         <div class="gloss-body">Replace each variable with the part <em>not</em> explained by the controls — the OLS residual. Wipe the fog off the window before looking through it.</div>
       </details>
       <details class="gloss"><summary>Omitted-variable bias (OVB)</summary>
-        <div class="gloss-body">If the confounder is omitted, the naive slope deviates from the truth by <em>γ × δ</em> — the confounder's effect on Y times its slope on the treatment. The bias is <em>predictable</em>.</div>
+        <div class="gloss-body">If the confounder is omitted, the naive slope differs from the controlled slope by exactly <em><span class="hat lo">γ</span> × <span class="hat">δ</span></em> — the confounder's coefficient on Y in the full model times the slope from regressing the <em>confounder on the treatment</em>. The bias is <em>predictable</em>.</div>
       </details>
       <details class="gloss"><summary>Added-variable plot</summary>
         <div class="gloss-body">Scatter of residualized Y vs residualized X<sub>1</sub>. The slope of this scatter <em>equals</em> the FWL coefficient. It is the picture the regression number describes.</div>
@@ -107,10 +107,10 @@
   <h2>Confounding Lab — when does the naive slope mislead?</h2>
   <p class="lede">
     The post simulates a store DGP with <code>true β = +0.2</code> for coupons
-    and an income confounder (γ = +0.3 on sales, δ = −0.5 on coupons). Slide
+    and an income confounder (γ = +0.3 on sales, π = −0.5 on coupons). Slide
     those three knobs and watch the naive slope (orange) drift away from the
     truth while the FWL slope (teal) stays anchored. When the confounding link
-    δ = 0, the naive and FWL slopes coincide — that's the regime where
+    π = 0, the naive and FWL slopes coincide on average — that is the regime where
     "controlling for" does nothing.
   </p>
 
@@ -118,22 +118,22 @@
     <div class="control">
       <label>Sample size n <span class="value" id="sim-n-val">200</span></label>
       <input type="range" id="sim-n" min="50" max="500" step="10" value="200">
-      <div class="hint">More stores = tighter cloud, less sampling noise around the truth.</div>
+      <div class="hint">More stores = tighter cloud; the slopes scatter less around their population values.</div>
     </div>
     <div class="control">
-      <label>True effect β (coupons → sales) <span class="value" id="sim-b-val">0.20</span></label>
+      <label><span>True effect <span class="sym">β</span> (coupons → sales)</span> <span class="value" id="sim-b-val">0.20</span></label>
       <input type="range" id="sim-b" min="-0.4" max="0.6" step="0.02" value="0.20">
       <div class="hint">The causal coefficient the FWL slope should recover.</div>
     </div>
     <div class="control">
-      <label>γ (income → sales) <span class="value" id="sim-g-val">0.30</span></label>
+      <label><span><span class="sym">γ</span> (income → sales)</span> <span class="value" id="sim-g-val">0.30</span></label>
       <input type="range" id="sim-g" min="-0.5" max="0.8" step="0.05" value="0.30">
       <div class="hint">How strongly the confounder raises sales directly.</div>
     </div>
     <div class="control">
-      <label>δ (income → coupons) <span class="value" id="sim-d-val">-0.50</span></label>
+      <label><span><span class="sym">π</span> (income → coupons)</span> <span class="value" id="sim-d-val">-0.50</span></label>
       <input type="range" id="sim-d" min="-1.0" max="1.0" step="0.05" value="-0.50">
-      <div class="hint">Slope of coupons on income. The confounding link. Set δ = 0 to switch off confounding entirely.</div>
+      <div class="hint">DGP slope of coupons on income — the confounding link. Set π = 0 to switch off confounding entirely. (Not the OVB <span class="hat">δ</span> below, which runs the other way: income on coupons.)</div>
     </div>
   </div>
 
@@ -141,22 +141,22 @@
 
   <div class="stat-row">
     <div class="stat">
-      <div class="stat-label">naive slope (β̂)</div>
+      <div class="stat-label">naive slope (<span class="hat">β</span>)</div>
       <div class="stat-value orange" id="sim-stat-naive">—</div>
       <div class="stat-sub">raw OLS of sales on coupons</div>
     </div>
     <div class="stat">
-      <div class="stat-label">FWL slope (β̂)</div>
+      <div class="stat-label">FWL slope (<span class="hat">β</span>)</div>
       <div class="stat-value teal" id="sim-stat-fwl">—</div>
       <div class="stat-sub">after partialling out income</div>
     </div>
     <div class="stat">
-      <div class="stat-label">OVB = γ × δ</div>
+      <div class="stat-label">OVB = <span class="hat lo">γ</span> × <span class="hat">δ</span></div>
       <div class="stat-value" id="sim-stat-ovb">—</div>
-      <div class="stat-sub">predicted bias</div>
+      <div class="stat-sub" id="sim-stat-ovb-sub">= naive − FWL (exact)</div>
     </div>
     <div class="stat">
-      <div class="stat-label">true β</div>
+      <div class="stat-label">true <span class="sym">β</span></div>
       <div class="stat-value" id="sim-stat-true">0.200</div>
       <div class="stat-sub">held by the slider above</div>
     </div>
@@ -167,10 +167,10 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Move δ to zero.</strong> The naive and FWL slopes converge — when the confounder does not predict the treatment, there is no bias to remove.</li>
-      <li><strong>Crank γ up.</strong> A stronger income effect on sales amplifies the OVB (γ × δ). The naive slope drifts further from truth; the FWL slope stays put.</li>
-      <li><strong>Flip the sign of β.</strong> Set β = -0.1, leave γ = 0.3 and δ = -0.5. The naive slope can still appear <em>positive</em> while the truth is negative — Simpson's paradox in action.</li>
-      <li><strong>OVB column.</strong> The predicted bias γ × δ matches the gap (naive − true) up to sampling noise. The mismatch shrinks as n grows.</li>
+      <li><strong>Move π to zero.</strong> The naive and FWL slopes converge — when the confounder does not predict the treatment, there is no bias to remove.</li>
+      <li><strong>Crank γ up.</strong> A stronger income effect on sales amplifies the OVB (<span class="hat lo">γ</span> × <span class="hat">δ</span>). The naive slope drifts further from truth; the FWL slope stays put.</li>
+      <li><strong>Flip the sign of β.</strong> Set β = −0.1, keep γ = 0.3 and move π to +0.5. Confounding is now positive, so the naive slope turns <em>positive</em> (about +0.2) while the truth is negative — Simpson's paradox in action.</li>
+      <li><strong>OVB card.</strong> <span class="hat lo">γ</span> × <span class="hat">δ</span> equals the gap naive − FWL <em>exactly</em> in every draw — an in-sample identity, where <span class="hat">δ</span> is the slope of income regressed on coupons. With the post defaults (π = −0.5) the population δ is −1.0, so the naive slope centers near 0.2 + 0.3 × (−1.0) = −0.10; the FWL slope scatters around the true β, more tightly as n grows.</li>
     </ul>
     <div class="note" style="margin-top:10px;">
       <button class="action secondary" id="sim-reseed">Reseed random draws</button>
@@ -186,10 +186,10 @@
     <div class="progress-bar" id="sim-progress"><div></div></div>
     <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
     <div class="stat-row" id="sim-hist-stats" style="display:none;">
-      <div class="stat"><div class="stat-label">Naive mean β̂</div><div class="stat-value orange" id="sim-naive-mean">—</div></div>
-      <div class="stat"><div class="stat-label">Naive sd(β̂)</div><div class="stat-value" id="sim-naive-sd">—</div></div>
-      <div class="stat"><div class="stat-label">FWL mean β̂</div><div class="stat-value teal" id="sim-fwl-mean">—</div></div>
-      <div class="stat"><div class="stat-label">FWL sd(β̂)</div><div class="stat-value" id="sim-fwl-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Naive mean <span class="hat">β</span></div><div class="stat-value orange" id="sim-naive-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Naive sd(<span class="hat">β</span>)</div><div class="stat-value" id="sim-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">FWL mean <span class="hat">β</span></div><div class="stat-value teal" id="sim-fwl-mean">—</div></div>
+      <div class="stat"><div class="stat-label">FWL sd(<span class="hat">β</span>)</div><div class="stat-value" id="sim-fwl-sd">—</div></div>
     </div>
   </div>
 
@@ -209,8 +209,8 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Store DGP (left).</strong> Naive β̂ = −0.093 (wrong sign!), + Income β̂ = +0.212 (close to truth +0.2), + Inc + Day β̂ = +0.222. The sign flip is the headline confounding result.</li>
-      <li><strong>Flights (center).</strong> Naive β̂ = −0.003 doubles to −0.006 once origin FE absorb airport-level delay levels. With 103 destinations partialled out as well, the SE balloons (CI now includes zero) — every cross-route comparison has been removed.</li>
+      <li><strong>Store DGP (left).</strong> Naive <span class="hat">β</span> = −0.093 (wrong sign!), + Income <span class="hat">β</span> = +0.212 (close to truth +0.2), + Inc + Day <span class="hat">β</span> = +0.222. The sign flip is the headline confounding result.</li>
+      <li><strong>Flights (center).</strong> Naive <span class="hat">β</span> = −0.003 doubles to −0.006 once origin FE absorb airport-level delay levels. With 103 destinations partialled out as well, the SE balloons (CI now includes zero) — every cross-route comparison has been removed.</li>
       <li><strong>Wages (right).</strong> Pooled exper effect is +0.105; with individual FE the within-person return jumps to +0.122. Ability-confounded pooled view <em>underestimates</em> the true return.</li>
       <li><strong>Hover any point</strong> for the SE, the 95% CI, and the number of controls/FE that estimator used.</li>
     </ul>
@@ -273,7 +273,10 @@
     experience. Click the toggle to demean each individual's exper and lwage
     by their own mean — that is FWL applied to individual dummies. The
     pooled slope is shallow (≈ 0.03); the within slope is roughly
-    <strong>4×</strong> steeper (≈ 0.12), matching the post's §7.3 finding.
+    <strong>4×</strong> steeper (≈ 0.12). The post's real wage panel moves in
+    the same direction: the §7.3 plot of 150 people steepens once individual
+    fixed effects are absorbed, and the full-sample table in §7.2 goes from
+    0.1050 (pooled OLS) to 0.1223 (individual FE).
   </p>
 
   <div class="controls">
@@ -343,9 +346,9 @@
 </footer>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="dgp.js"></script>
-<script src="lasso.js"></script>
-<script src="charts.js"></script>
-<script src="app.js"></script>
+<script src="dgp.js?v=20260928"></script>
+<script src="lasso.js?v=20260928"></script>
+<script src="charts.js?v=20260928"></script>
+<script src="app.js?v=20260928"></script>
 </body>
 </html>

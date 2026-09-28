@@ -172,12 +172,12 @@ This is not an approximation; it is an exact algebraic identity. The byte-for-by
 
 ## The bias was no mystery — the OVB formula predicted it
 
-$$\text{bias}=\hat\gamma\times\hat\delta = 0.300\times(-0.494) = -0.148$$
+$$\text{bias}=\hat\gamma\times\hat\delta = 0.3004\times(-1.0174) \approx -0.3057$$
 
-[$\hat\gamma$ = income's effect on sales; $\hat\delta$ = slope of coupons on income. True $+0.212$ plus bias $-0.148$ ≈ the naive $-0.093$.]{.takeaway .fragment}
+[$\hat\gamma$ = income's coefficient in the full model; $\hat\delta$ = slope of income regressed *on* coupons. Controlled $+0.2123$ plus bias $-0.3057$ = the naive $-0.0934$, exactly.]{.takeaway .fragment}
 
 ::: {.notes}
-Omitted-variable bias = (effect of omitted variable on outcome) × (slope of omitted on treatment) = 0.300 × (−0.494) = −0.148. True + bias = 0.212 − 0.148 = 0.064, close to the actual naive −0.093 (the gap is n = 200 sampling noise). The point: if you know the signs of the confounder's two effects, you know which way the naive estimate tilts.
+Omitted-variable bias = (coefficient on the omitted variable in the full model) × (slope from regressing the omitted variable on the treatment) = 0.3004 × (−1.0174) ≈ −0.3057. Controlled + bias = 0.2123 − 0.3057 = −0.0934, the naive slope to machine precision: in-sample this is an identity, not an approximation. Direction matters — regress income ON coupons, not the reverse. In the DGP the population slope of income on coupons is −1.0, so the naive slope converges to 0.2 + 0.3 × (−1.0) = −0.10. The point: if you know the signs of the confounder's two effects, you know which way the naive estimate tilts.
 :::
 
 ## Fixed effects are just FWL applied to group dummies — i.e. demeaning

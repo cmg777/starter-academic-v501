@@ -59,9 +59,17 @@
     document.getElementById("sim-stat-fwl").textContent   = slopes.fwl.toFixed(4);
     document.getElementById("sim-stat-true").textContent  = sim.true_alpha.toFixed(3);
 
-    // OVB = gamma * delta (approximate predicted bias on the naive slope).
-    const ovb = sim.gamma * sim.delta;
-    document.getElementById("sim-stat-ovb").textContent = ovb.toFixed(4);
+    // OVB identity, exact in every sample: naive = FWL + gamma_hat * delta_hat, where
+    //   gamma_hat = income coefficient in sales ~ coupons + income (FWL: partial coupons out)
+    //   delta_hat = slope from regressing the OMITTED variable (income) ON coupons.
+    // delta_hat is NOT the DGP slider sim.delta (pi: slope of coupons on income); in the
+    // population delta = 100*pi / (100*pi^2 + 25), e.g. pi = -0.5 gives delta = -1.0.
+    const ovb_parts = CHARTS.ovb_decomposition(data);
+    document.getElementById("sim-stat-ovb").textContent = ovb_parts.ovb.toFixed(4);
+    // innerHTML so the hats can be CSS-drawn spans (styles.css .hat); the
+    // interpolated values are numbers formatted here.
+    document.getElementById("sim-stat-ovb-sub").innerHTML =
+      `<span class="hat lo">γ</span> ${ovb_parts.gamma_hat.toFixed(3)} × <span class="hat">δ</span> ${ovb_parts.delta_hat.toFixed(3)} = naive − FWL`;
 
     sim.compare.update({
       naive: slopes.naive,

@@ -74,32 +74,34 @@ None found.
 
 | Slide datum                            | Value on slide          | Source location               | Match |
 |----------------------------------------|-------------------------|-------------------------------|-------|
-| Naive → controlled coupon slope        | −0.093 → +0.212         | index.md:341,351,382          | ✓     |
-| True coupon effect                     | +0.2                    | index.md:287                  | ✓     |
-| DGP coefficients                       | −0.5 / +0.3 / +0.2      | index.md:283–285,287          | ✓     |
-| corr coupons↔sales (raw)               | −0.166                  | index.md:324                  | ✓     |
-| corr income↔coupons                    | −0.709                  | index.md:325                  | ✓     |
-| corr income↔sales                      | +0.500                  | index.md:324                  | ✓     |
-| coupons coef Naive / Controlled        | −0.0934 / +0.2123       | index.md:373                  | ✓     |
-| income coef                            | +0.3004                 | index.md:374                  | ✓     |
-| R² naive / controlled                  | 0.028 / 0.321           | index.md:378,382              | ✓     |
-| Manual FWL coefficient                 | 0.212288                | index.md:410–411              | ✓     |
-| OVB = γ·δ                              | 0.300 × (−0.494) = −0.148 | index.md:443,448,701        | ✓     |
-| True + bias ≈ naive                    | 0.212 − 0.148 ≈ −0.093  | index.md:448                  | ✓     |
-| Flights observations                   | 317,578                 | index.md:506                  | ✓     |
-| air_time coef (No / Orig / Both FE)    | −0.0031 / −0.0061 / −0.0067 | index.md:549              | ✓     |
-| Within R² (Origin / Both)              | 0.00058 / 1.19e-5       | index.md:556                  | ✓     |
-| destination means count                | 103                     | index.md:531                  | ✓     |
-| wagepan panel size                     | 545 indiv / 8 yrs / 4,360 | index.md:565,577–579        | ✓     |
-| exper slope pooled → FE                | 0.03 → 0.122            | index.md:633,704              | ✓     |
-| R² pooled → FE                         | 0.148 → 0.617           | index.md:613,704              | ✓     |
-| Fig 1 (naive vs controlled)            | ../r_fwlplot_fig1_naive_vs_controlled.png | index.md:353  | ✓     |
-| Fig 3 (fixed effects)                  | ../r_fwlplot_fig3_fixed_effects.png | index.md:529        | ✓     |
-| Fig 4 (panel data)                     | ../r_fwlplot_fig4_panel_data.png | index.md:631           | ✓     |
-| FWL matrix equation                    | β̂₁=(X̃₁'X̃₁)⁻¹X̃₁'Ỹ …   | index.md:420                  | ✓     |
-| Residual-maker M_{X₂}                  | I − X₂(X₂'X₂)⁻¹X₂'      | index.md:422                  | ✓     |
+| Naive → controlled coupon slope        | −0.093 → +0.212         | index.md:343,353,384          | ✓     |
+| True coupon effect                     | +0.2                    | index.md:289                  | ✓     |
+| DGP coefficients                       | −0.5 / +0.3 / +0.2      | index.md:285–287,289          | ✓     |
+| corr coupons↔sales (raw)               | −0.166                  | index.md:326                  | ✓     |
+| corr income↔coupons                    | −0.709                  | index.md:327                  | ✓     |
+| corr income↔sales                      | +0.500                  | index.md:326                  | ✓     |
+| coupons coef Naive / Controlled        | −0.0934 / +0.2123       | index.md:375                  | ✓     |
+| income coef                            | +0.3004                 | index.md:376                  | ✓     |
+| R² naive / controlled                  | 0.028 / 0.321           | index.md:380,384              | ✓     |
+| Manual FWL coefficient                 | 0.212288                | index.md:412–413              | ✓     |
+| OVB = γ·δ                              | 0.3004 × (−1.0174) ≈ −0.3057 | index.md:454,461,714        | ✓ (corrected 2026-09-28; see Erratum) |
+| Controlled + bias = naive (exact)      | 0.2123 − 0.3057 = −0.0934 | index.md:461                  | ✓ (corrected 2026-09-28; see Erratum) |
+| Flights observations                   | 317,578                 | index.md:519                  | ✓     |
+| air_time coef (No / Orig / Both FE)    | −0.0031 / −0.0061 / −0.0067 | index.md:562              | ✓     |
+| Within R² (Origin / Both)              | 0.00058 / 1.19e-5       | index.md:569                  | ✓     |
+| destination means count                | 103                     | index.md:544                  | ✓     |
+| wagepan panel size                     | 545 indiv / 8 yrs / 4,360 | index.md:578,590–592        | ✓     |
+| exper slope pooled → FE                | 0.03 → 0.122            | index.md:646,717              | ✓     |
+| R² pooled → FE                         | 0.148 → 0.617           | index.md:626,717              | ✓     |
+| Fig 1 (naive vs controlled)            | ../r_fwlplot_fig1_naive_vs_controlled.png | index.md:355  | ✓     |
+| Fig 3 (fixed effects)                  | ../r_fwlplot_fig3_fixed_effects.png | index.md:542        | ✓     |
+| Fig 4 (panel data)                     | ../r_fwlplot_fig4_panel_data.png | index.md:644           | ✓     |
+| FWL matrix equation                    | β̂₁=(X̃₁'X̃₁)⁻¹X̃₁'Ỹ …   | index.md:422                  | ✓     |
+| Residual-maker M_{X₂}                  | I − X₂(X₂'X₂)⁻¹X₂'      | index.md:424                  | ✓     |
 
 All ✓ — no invented or altered values.
+
+*Line references refreshed 2026-09-28 against the current `index.md` (the Overview backlink paragraph and the expanded OVB section shifted later lines by 2–13).*
 
 ---
 
@@ -135,7 +137,7 @@ Read in order, the slide titles form the talk's abstract:
 - Slide 10's title "Manual FWL reproduces feols to six decimals — it is an exact identity" pairs with a single `[0.212288]{.bignum}` on a dark slide — the deck's strongest one-idea moment.
 - Slide 18 "Does FWL make a regression causal? No — it only makes it *visible*" is a genuine Devil's-Advocate slide that steelmans the objection then rebuts it precisely (algebraic identity ≠ identification).
 - The closing divider "Want to *see* a coefficient? Partial the controls out of both axes and plot the residuals." is one declarative sentence — not "Questions?" / "Thank you".
-- Fidelity is exact: all 24 ledger rows match, including signs (−0.0067, 1.19e-5) and the OVB arithmetic 0.300 × (−0.494) = −0.148.
+- Fidelity is exact: all 24 ledger rows match, including signs (−0.0067, 1.19e-5) and the OVB arithmetic (corrected 2026-09-28 to 0.3004 × (−1.0174) ≈ −0.3057; see Erratum).
 - Math renders cleanly (browser pass: 0 raw-LaTeX slides); the FWL residual-maker equation and OVB equation typeset on dark and light slides alike.
 
 ---
@@ -179,3 +181,15 @@ To re-check just the dimension you fixed:
 
 *Generated by `/project:review-slides`. Skill at `.claude/skills/review-slides/`.
 Read-only: this file is the only artifact written; the deck was not modified.*
+
+---
+
+## Erratum (2026-09-28)
+
+**The OVB auxiliary regression ran in the wrong direction, and this review did not catch it.** The deck, the post (`index.md`), `tutorial.qmd`, `analysis.R`, the web app, the data dictionary and the infographic brief all computed δ̂ as the slope of *coupons regressed on income* (about −0.49). That made the "bias" roughly half the actual gap and forced a false small-sample explanation for the remainder. For the in-sample identity naive = controlled + γ̂·δ̂ to hold, δ̂ must be the slope from regressing the **omitted variable (income) on the regressor of interest (coupons)**:
+
+- δ̂ = −1.0174 (`coef(lm(income ~ coupons))["coupons"]`), γ̂ = 0.3004 (income coefficient in `sales ~ coupons + income`)
+- OVB = 0.3004 × (−1.0174) = −0.3057 = naive (−0.0934) − controlled (0.2123), exactly (verified on the committed `store_data.csv`)
+- Population check: in the DGP the slope of income on coupons is −0.5 × 100 / 50 = −1.0, so the naive slope converges to 0.2 + 0.3 × (−1.0) = −0.10
+
+Dimension 2 ("OVB stated correctly") and the two OVB ledger rows checked arithmetic fidelity to the post, not the direction of the auxiliary regression, so they passed the error through; the rows above now carry the corrected values. **Fix applied 2026-09-28:** the slide "The bias was no mystery — the OVB formula predicted it" now shows bias = 0.3004 × (−1.0174) ≈ −0.3057 and "controlled +0.2123 plus bias −0.3057 = the naive −0.0934, exactly"; its speaker notes add the direction warning and the population check. `analysis.R` now asserts the identity with `stopifnot()`. The deck was re-rendered with Quarto 1.8.27, and one unreferenced stylesheet left over from an earlier render (`slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf….css`) was removed.

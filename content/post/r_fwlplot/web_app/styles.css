@@ -450,3 +450,32 @@ footer.app-footer {
 .method-row:last-child { border-bottom: none; }
 .method-row .label { color: var(--muted); }
 .method-row .val { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Greek symbols must not be upper-cased by label styles (β, not Β). */
+.sym { text-transform: none; }
+
+/* Estimator hats (β̂, γ̂, δ̂). A combining circumflex (U+0302) lands
+   off-center in the system sans stack, so the accent is drawn by CSS, centered
+   over the letter: <span class="hat">β</span>. Add "lo" for x-height letters
+   (γ) so the accent sits closer. The span also blocks the upper-casing of
+   .stat-label and similar labels. */
+.hat {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.hat::after {
+  content: "\02C6";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.36em;
+  text-align: center;
+  line-height: 1;
+  font-weight: 400;
+  font-style: normal;
+  pointer-events: none;
+}
+.hat.lo::after { top: -0.16em; }

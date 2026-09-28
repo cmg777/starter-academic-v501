@@ -56,7 +56,7 @@ diagram: true
 
 ## Abstract
 
-A recurring difficulty in applied regression is explaining what it means to "control for" a variable, since the multidimensional relationship a multiple-regression coefficient describes cannot be drawn on a 2D scatter plot. This tutorial addresses that gap by using the Frisch-Waugh-Lovell (FWL) theorem — which states that any regression coefficient equals the slope of a simple bivariate regression after partialling the other controls out of both axes — to render "controlling for X" as a picture. The objective is to build intuition progressively with the fwlplot R package (Butts & McDermott, 2024), built on fixest, across one simulated and two real datasets: an n=200 simulated retail panel, the nycflights13 data (317,578 cleaned flights from New York's three airports in 2013), and the Wooldridge wagepan panel (545 individuals over 8 years, 1980–1987, 4,360 observations). Using fwl_plot(), feols(), and manual residualization, the simulated case shows confounding by income reverse the naive coupon-on-sales slope from -0.093 to the controlled +0.212 (true effect +0.2), with the omitted-variable-bias formula predicting the bias as 0.300 × (-0.494) = -0.148 and manual FWL reproducing the feols coefficient to six decimals (0.212288). With fixed effects, the flights air-time coefficient moves from -0.003 to -0.007, and individual fixed effects steepen the within-person return to experience from 0.03 to 0.122 (R² rising from 0.148 to 0.617). The implication is that the residualized scatter is both an exact visual counterpart to every regression coefficient and a diagnostic that exposes confounding, nonlinearity, and weak identification that tables hide.
+A recurring difficulty in applied regression is explaining what it means to "control for" a variable, since the multidimensional relationship a multiple-regression coefficient describes cannot be drawn on a 2D scatter plot. This tutorial addresses that gap by using the Frisch-Waugh-Lovell (FWL) theorem — which states that any regression coefficient equals the slope of a simple bivariate regression after partialling the other controls out of both axes — to render "controlling for X" as a picture. The objective is to build intuition progressively with the fwlplot R package (Butts & McDermott, 2024), built on fixest, across one simulated and two real datasets: an n=200 simulated retail panel, the nycflights13 data (317,578 cleaned flights from New York's three airports in 2013), and the Wooldridge wagepan panel (545 individuals over 8 years, 1980–1987, 4,360 observations). Using fwl_plot(), feols(), and manual residualization, the simulated case shows confounding by income reverse the naive coupon-on-sales slope from -0.093 to the controlled +0.212 (true effect +0.2), with the omitted-variable-bias formula accounting for that gap exactly (the income coefficient, 0.3004, times the slope of income on coupons, -1.0174, gives -0.3057, precisely the naive-minus-controlled difference) and manual FWL reproducing the feols coefficient to six decimals (0.212288). With fixed effects, the flights air-time coefficient moves from -0.003 to -0.007, and individual fixed effects steepen the within-person return to experience from 0.03 to 0.122 (R² rising from 0.148 to 0.617). The implication is that the residualized scatter is both an exact visual counterpart to every regression coefficient and a diagnostic that exposes confounding, nonlinearity, and weak identification that tables hide.
 
 ## 1. Overview
 
@@ -67,6 +67,8 @@ The **Frisch-Waugh-Lovell (FWL) theorem** provides the answer. It says that the 
 The [fwlplot](https://cran.r-project.org/package=fwlplot) R package (Butts & McDermott, 2024) turns this into a one-liner. It uses the same formula syntax as [`fixest::feols()`](https://lrberge.github.io/fixest/reference/feols.html) --- including the `|` operator for fixed effects --- and produces a scatter plot of the residualized data with the regression line overlaid. The result is a visual answer to "what does controlling for X look like?"
 
 This tutorial builds intuition progressively. We start with simulated data where we *know* the true effect, show how confounding creates a misleading picture, and use `fwl_plot()` to reveal the truth. We then extend to real data with high-dimensional fixed effects --- first flights data (controlling for origin and destination airports) and then panel wage data (controlling for unobserved individual ability).
+
+This is the R edition of a three-language series. The [Stata edition](/post/stata_fwl/) loads the same store and wage-panel data, so its store results and its wage regression table match this post. Each edition draws its own random 150-person subsample for the wage scatter plot, so those scatter slopes differ, and the Stata flights section uses a 5,000-flight sample (`flights_sample.csv`), so its air-time coefficients differ from the full-data estimates here. The [Python edition](/post/python_fwl/) applies the identical FWL method to a different simulated sample of 50 stores, so its coefficients differ from the $n = 200$ store data used here even though every step of the recipe is the same.
 
 **Learning objectives:**
 
@@ -138,14 +140,14 @@ Wiping a foggy window before looking through it. The fog is the variation explai
 </details>
 </div>
 
-**4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$.
-The naive slope of $Y$ on $X\_1$ differs from the true slope by $\gamma \cdot \delta$, where $\gamma$ is the effect of the omitted $X\_2$ on $Y$ and $\delta$ is the slope of $X\_2$ on $X\_1$.
+**4. Omitted variable bias** $\mathrm{OVB} = \hat{\gamma} \cdot \hat{\delta}$.
+The naive slope of $Y$ on $X\_1$ differs from the controlled slope by exactly $\hat{\gamma} \cdot \hat{\delta}$, where $\hat{\gamma}$ is the estimated coefficient on the omitted $X\_2$ in the full model and $\hat{\delta}$ is the estimated slope from regressing $X\_2$ on $X\_1$ (the omitted variable on the regressor of interest, not the other way around). Because it is built from the estimates, this identity holds exactly in every sample.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-In our store data, $\gamma$ = +0.3004 (income coefficient on `sales` in the full model) and $\delta$ = -0.4937 (slope of `coupons` regressed on `income`). OVB = $\gamma \cdot \delta$ = -0.1483. The naive coupon slope is -0.093 vs the controlled +0.212; the gap is +0.305, which is `-OVB` exactly. The bias was *precisely* what FWL predicted.
+In our store data, $\hat{\gamma}$ = +0.3004 (income coefficient on `sales` in the full model) and $\hat{\delta}$ = -1.0174 (slope of `income` regressed on `coupons`). OVB = $\hat{\gamma} \cdot \hat{\delta}$ = -0.3057. The naive coupon slope is -0.0934 vs the controlled +0.2123, so the gap (naive minus controlled) is -0.3057 — the OVB exactly. The bias was *precisely* what the formula predicted.
 
 </details>
 
@@ -280,11 +282,13 @@ Income opens a "backdoor path" from coupons to sales: coupons ← income → sal
 
 $$\text{income} \sim N(50, 10)$$
 
-$$\text{coupons} = 60 - 0.5 \times \text{income} + \epsilon\_1, \quad \epsilon\_1 \sim N(0, 5)$$
+$$\text{coupons} = 60 - 0.5 \times \text{income} + \epsilon\_1$$
 
-$$\text{sales} = 10 + 0.2 \times \text{coupons} + 0.3 \times \text{income} + \epsilon\_2, \quad \epsilon\_2 \sim N(0, 3)$$
+$$\begin{aligned} \text{sales} = 10 &+ 0.2 \times \text{coupons} \\\\ &+ 0.3 \times \text{income} \\\\ &+ 0.5 \times \text{dayofweek} + \epsilon\_2 \end{aligned}$$
 
-In words, the true causal effect of coupons on sales is **+0.2**: each additional coupon increases sales by 0.2 units. But because income negatively drives coupons ($-0.5$) and positively drives sales ($+0.3$), a naive regression of sales on coupons alone will confound the coupon effect with the income effect, producing a biased estimate. The noise terms $\epsilon\_1$ and $\epsilon\_2$ correspond to the `rnorm()` calls in the code below.
+The noise terms are $\epsilon\_1 \sim N(0, 5)$ and $\epsilon\_2 \sim N(0, 3)$ (the second argument is a standard deviation, as in the `rnorm()` calls in the code below), and `dayofweek` is drawn uniformly from the integers 1 to 7, independently of income and coupons.
+
+In words, the true causal effect of coupons on sales is **+0.2**: each additional coupon increases sales by 0.2 units. But because income negatively drives coupons ($-0.5$) and positively drives sales ($+0.3$), a naive regression of sales on coupons alone will confound the coupon effect with the income effect, producing a biased estimate. The `dayofweek` term adds variation in sales but no confounding: it is independent of coupons in the data-generating process, so leaving it out does not change the population bias worked out in Section 5.3 (in any finite sample it is correlated with coupons only by chance, which Exercise 1 explores).
 
 ```r
 set.seed(42)
@@ -417,9 +421,9 @@ The coefficients match to six decimal places. This is not an approximation --- i
 
 For those who want the math, the FWL theorem states that in the regression $Y = X\_1 \beta\_1 + X\_2 \beta\_2 + \epsilon$, the coefficient $\hat{\beta}\_1$ equals:
 
-$$\hat{\beta}\_1 = (\tilde{X}\_1' \tilde{X}\_1)^{-1} \tilde{X}\_1' \tilde{Y}, \quad \text{where} \quad \tilde{Y} = M\_{X\_2} Y, \quad \tilde{X}\_1 = M\_{X\_2} X\_1$$
+$$\hat{\beta}\_1 = (\tilde{X}\_1' \tilde{X}\_1)^{-1} \tilde{X}\_1' \tilde{Y}$$
 
-Here $M\_{X\_2} = I - X\_2(X\_2'X\_2)^{-1}X\_2'$ is the "residual-maker" matrix that projects out the effect of $X\_2$. In our example, $Y$ is `sales`, $X\_1$ is `coupons`, and $X\_2$ is `income`. The tilded variables $\tilde{Y}$ and $\tilde{X}\_1$ are the residuals from the `resid()` calls above.
+where $\tilde{Y} = M\_{X\_2} Y$ and $\tilde{X}\_1 = M\_{X\_2} X\_1$. Here $M\_{X\_2} = I - X\_2(X\_2'X\_2)^{-1}X\_2'$ is the "residual-maker" matrix that projects out the effect of $X\_2$. In our example, $Y$ is `sales`, $X\_1$ is `coupons`, and $X\_2$ is `income`. The tilded variables $\tilde{Y}$ and $\tilde{X}\_1$ are the residuals from the `resid()` calls above.
 
 ### 5.3 Omitted variable bias: predicting the error
 
@@ -427,25 +431,36 @@ The confounding we saw is not mysterious --- the **omitted variable bias (OVB) f
 
 $$\text{bias} = \hat{\gamma} \times \hat{\delta}$$
 
-In words, the bias equals the effect of the omitted variable on the outcome ($\hat{\gamma}$) multiplied by the relationship between the omitted variable and the treatment ($\hat{\delta}$). Here $\hat{\gamma}$ is the effect of income on sales (in the full model) and $\hat{\delta}$ is the coefficient from regressing coupons on income.
+In words, the bias equals the effect of the omitted variable on the outcome ($\hat{\gamma}$) multiplied by the slope from an *auxiliary regression of the omitted variable on the treatment* ($\hat{\delta}$). Here $\hat{\gamma}$ is the income coefficient in the full model and $\hat{\delta}$ is the slope from regressing income on coupons. The direction of that auxiliary regression matters: $\hat{\delta}$ answers "how much higher or lower is income, on average, in a store with one more coupon?" — which is exactly the channel through which income's effect leaks into the coupon slope when income is left out. Written as an identity, $\hat{\beta}^{\text{naive}} = \hat{\beta}^{\text{full}} + \hat{\gamma} \times \hat{\delta}$ holds exactly in every sample, just like FWL itself.
 
 ```r
-gamma_hat <- coef(fe_full)["income"]       # 0.3004
-delta_hat <- coef(lm(coupons ~ income, data = store_data))["income"]  # -0.4937
-ovb <- gamma_hat * delta_hat               # -0.1483
+gamma_hat <- coef(fe_full)["income"]                                  # 0.3004
+delta_hat <- coef(lm(income ~ coupons, data = store_data))["coupons"]  # -1.0174
+ovb <- gamma_hat * delta_hat                                          # -0.3057
+naive_coef <- coef(fe_naive)["coupons"]
+full_coef  <- coef(fe_full)["coupons"]
+stopifnot(abs((naive_coef - full_coef) - gamma_hat * delta_hat) < 1e-8)
 
-cat("OVB = gamma * delta:", round(ovb, 4), "\n")
-cat("Naive ≈ True + OVB:", round(coef(fe_full)["coupons"] + ovb, 4), "\n")
-cat("Actual naive:", round(coef(fe_naive)["coupons"], 4), "\n")
+cat("gamma (income coef., full model):   ", round(gamma_hat, 4), "\n")
+cat("delta (slope of income on coupons): ", round(delta_hat, 4), "\n")
+cat("OVB = gamma * delta:                ", round(ovb, 4), "\n")
+cat("Naive coefficient:                  ", round(naive_coef, 4), "\n")
+cat("Controlled coefficient (feols):     ", round(full_coef, 4), "\n")
+cat("Naive - controlled:                 ", round(naive_coef - full_coef, 4), "\n")
+cat("Controlled + OVB (= naive, exact):  ", round(full_coef + ovb, 4), "\n")
 ```
 
 ```text
-OVB = gamma * delta: -0.1483
-Naive ≈ True + OVB: 0.064
-Actual naive: -0.0934
+gamma (income coef., full model):    0.3004
+delta (slope of income on coupons):  -1.0174
+OVB = gamma * delta:                 -0.3057
+Naive coefficient:                   -0.0934
+Controlled coefficient (feols):      0.2123
+Naive - controlled:                  -0.3057
+Controlled + OVB (= naive, exact):   -0.0934
 ```
 
-The OVB formula predicts a bias of -0.148: income's positive effect on sales ($\hat{\gamma} = 0.300$) times its negative relationship with coupons ($\hat{\delta} = -0.494$) produces a large negative bias. The predicted naive coefficient (true + bias = 0.212 + (-0.148) = 0.064) is close to the actual naive coefficient (-0.093) --- the small discrepancy comes from sampling variation with $n = 200$. The key insight: the bias is *predictable*. If you know the direction of the confounder's effects on both the treatment and the outcome, you know which way the naive estimate is biased.
+The OVB formula accounts for the entire gap: income's positive effect on sales ($\hat{\gamma} = 0.3004$) times the negative slope of income on coupons ($\hat{\delta} = -1.0174$) gives a bias of $-0.3057$, and the controlled coefficient plus that bias ($0.2123 + (-0.3057) = -0.0934$) *is* the naive coefficient, to machine precision. The `stopifnot()` line checks this identity every time the script runs. (Running the auxiliary regression the other way around — coupons on income — gives a different slope whose product with $\hat{\gamma}$ does not match the gap, which is a common slip.) The formula also tells us what to expect in repeated samples. In the data-generating process, income has variance $10^2 = 100$ and coupons have variance $0.5^2 \times 100 + 5^2 = 50$, so the population slope of income on coupons is $-0.5 \times 100 / 50 = -1.0$ and in large samples the naive slope converges to $0.2 + 0.3 \times (-1.0) = -0.10$ — close to the $-0.093$ we observe. The key insight: the bias is *predictable*. If you know the direction of the confounder's effects on both the treatment and the outcome, you know which way the naive estimate is biased.
 
 ### 5.4 Adding more controls
 
@@ -698,7 +713,7 @@ One limitation: the FWL theorem applies only to linear regression. For logistic 
 ## 10. Summary and Next Steps
 
 - **Confounding produces misleading regressions:** in our simulated data, the naive coupon coefficient was -0.093 (coupons "hurt" sales), while the true causal effect is +0.2. After controlling for income via `fwl_plot()`, the estimate was +0.212, recovering the true effect.
-- **The OVB formula predicts the bias exactly:** the bias was $0.300 \times (-0.494) = -0.148$, correctly predicting the negative direction and approximate magnitude of the confounding.
+- **The OVB formula predicts the bias exactly:** the bias was $0.3004 \times (-1.0174) \approx -0.3057$, where $-1.0174$ is the slope from regressing income (the omitted variable) on coupons. Adding it to the controlled $+0.2123$ reproduces the naive $-0.0934$ exactly — sign and magnitude.
 - **FWL is not an approximation --- it is an exact algebraic identity:** the coefficient from partialling out controls matches `feols()` to six decimal places. Every multiple regression coefficient *can* be visualized as a bivariate scatter plot.
 - **Fixed effects are FWL applied to group dummies:** the flights data showed how adding origin and destination FE progressively transformed the scatter. The air-time coefficient changed from -0.003 (no FE) to -0.007 (origin + destination FE).
 - **Panel FE reveal within-person effects:** the wage data showed that controlling for individual ability via FE steepened the bivariate experience slope from 0.03 (pooled, no controls) to 0.122 (within-person), more than tripling the estimated return to experience.
@@ -707,7 +722,7 @@ For further study, see the companion [Python FWL tutorial](/post/python_fwl/) th
 
 ## 11. Exercises
 
-1. **Omitted variable direction.** Use the OVB formula from Section 5.3 to predict what happens if you also omit `dayofweek` (in addition to income). Run the naive regression `lm(sales ~ coupons)` and compare the bias to $\hat{\gamma}\_{income} \times \hat{\delta}\_{income} + \hat{\gamma}\_{day} \times \hat{\delta}\_{day}$. Does the extended OVB formula still predict the direction correctly?
+1. **Omitted variable direction.** Use the OVB formula from Section 5.3 to predict what happens if you also omit `dayofweek` (in addition to income). Run the naive regression `lm(sales ~ coupons)` and compare its gap from the model with both controls to $\hat{\gamma}\_{income} \times \hat{\delta}\_{income} + \hat{\gamma}\_{day} \times \hat{\delta}\_{day}$, where the $\hat{\gamma}$ come from `lm(sales ~ coupons + income + dayofweek)` and each $\hat{\delta}$ is the slope from regressing that omitted variable on `coupons`. Does the extended OVB formula still reproduce the gap exactly?
 
 2. **Multiple controls.** Use `fwl_plot()` to visualize the coupon effect after controlling for both income and `dayofweek`. Compare this to controlling for income alone. Does the scatter change visually? Does the coefficient change?
 

@@ -123,20 +123,25 @@ cat("Match:", all.equal(coef(fe_full)["coupons"],
 
 # ---- 6. OVB Calculation -----------------------------------------------------
 
-# OVB = gamma * delta
-# gamma = effect of income on sales (in full model)
+# OVB = gamma * delta  (an exact in-sample identity: naive = full + gamma * delta)
+# gamma = coefficient on income (the omitted variable) in the full model
 gamma_hat <- coef(fe_full)["income"]
-# delta = coefficient from regressing coupons on income
-delta_hat <- coef(lm(coupons ~ income, data = store_data))["income"]
+# delta = slope from the auxiliary regression of the OMITTED variable (income)
+#         ON the regressor of interest (coupons) — this direction, not the reverse
+delta_hat <- coef(lm(income ~ coupons, data = store_data))["coupons"]
 ovb <- gamma_hat * delta_hat
+naive_coef <- coef(fe_naive)["coupons"]
+full_coef  <- coef(fe_full)["coupons"]
+stopifnot(abs((naive_coef - full_coef) - gamma_hat * delta_hat) < 1e-8)
 
 cat("\n--- Omitted Variable Bias ---\n")
-cat("gamma (income -> sales):", round(gamma_hat, 4), "\n")
-cat("delta (income -> coupons):", round(delta_hat, 4), "\n")
-cat("OVB = gamma * delta:", round(ovb, 4), "\n")
-cat("Naive coefficient:", round(coef(fe_naive)["coupons"], 4), "\n")
-cat("True coefficient (feols):", round(coef(fe_full)["coupons"], 4), "\n")
-cat("Naive ≈ True + OVB:", round(coef(fe_full)["coupons"] + ovb, 4), "\n")
+cat("gamma (income coef., full model):   ", round(gamma_hat, 4), "\n")
+cat("delta (slope of income on coupons): ", round(delta_hat, 4), "\n")
+cat("OVB = gamma * delta:                ", round(ovb, 4), "\n")
+cat("Naive coefficient:                  ", round(naive_coef, 4), "\n")
+cat("Controlled coefficient (feols):     ", round(full_coef, 4), "\n")
+cat("Naive - controlled:                 ", round(naive_coef - full_coef, 4), "\n")
+cat("Controlled + OVB (= naive, exact):  ", round(full_coef + ovb, 4), "\n")
 
 # ---- 7. Three-model comparison (Figure 2) -----------------------------------
 

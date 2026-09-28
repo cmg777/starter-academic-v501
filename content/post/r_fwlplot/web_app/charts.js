@@ -68,7 +68,8 @@
   //   x2     = income (confounder)
   //   true_alpha     := coefficient of x1 on y
   //   gamma          := coefficient of x2 on y
-  //   delta          := slope of x1 on x2 (negative confounding)
+  //   delta          := DGP slope of x1 on x2 (shown as pi in the UI; negative
+  //                     confounding). Not the OVB delta_hat — see ovb_decomposition.
   // ------------------------------------------------------------------
   function simulate_store(opts) {
     opts = opts || {};
@@ -117,6 +118,24 @@
     const out = new Array(n);
     for (let i = 0; i < n; i++) out[i] = a[i] - (intercept + slope * b[i]);
     return out;
+  }
+
+  // ------------------------------------------------------------------
+  // Omitted-variable-bias decomposition for the store DGP (exact in-sample):
+  //   naive slope (sales on coupons) = FWL slope (controlling for income)
+  //                                    + gamma_hat * delta_hat
+  //   gamma_hat := income coefficient in sales ~ coupons + income
+  //   delta_hat := slope from regressing the OMITTED variable (income) ON
+  //                coupons — not the DGP slope of coupons on income.
+  // ------------------------------------------------------------------
+  function ovb_decomposition(d) {
+    const naive = ols_xy(d.coupons, d.sales).slope;
+    const fwl = ols_xy(residualize(d.coupons, d.income),
+                       residualize(d.sales, d.income)).slope;
+    const gamma_hat = ols_xy(residualize(d.income, d.coupons),
+                             residualize(d.sales, d.coupons)).slope;
+    const delta_hat = ols_xy(d.coupons, d.income).slope;
+    return { naive, fwl, gamma_hat, delta_hat, ovb: gamma_hat * delta_hat };
   }
 
   // ------------------------------------------------------------------
@@ -554,7 +573,7 @@
             const rect = container.getBoundingClientRect();
             tooltip.html(
               `<div><strong style="color:${color}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>β̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><span class='tooltip-key'><span class="hat">β</span> =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(4)}, ${d.ci_hi.toFixed(4)}]</span></div>` +
               `<div><span class='tooltip-key'>controls/FE used =</span> <span class='tooltip-val'>${d.n_selected === null ? "—" : d.n_selected}</span></div>`
@@ -696,7 +715,7 @@
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated β̂ across 100 simulated datasets");
+        .text("Estimated coupon coefficient across 100 simulated datasets");
     }
     return { update };
   }
@@ -727,6 +746,7 @@
     simulate_store,
     residualize,
     ols_xy,
+    ovb_decomposition,
     C,
   };
 })();

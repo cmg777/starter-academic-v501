@@ -25,8 +25,10 @@
   "store_data": {
     "true_alpha": 0.2,
     "gamma_hat": 0.3004,
-    "delta_hat": -0.4937,
-    "ovb": -0.1483,
+    "delta_hat": -1.0174,
+    "_delta_hat_definition": "slope from regressing the omitted variable (income) ON coupons: coef(lm(income ~ coupons))['coupons']",
+    "ovb": -0.3057,
+    "naive_minus_controlled": -0.3057,
     "cor_sales_coupons": -0.166,
     "cor_sales_income": 0.500,
     "cor_coupons_income": -0.709,
