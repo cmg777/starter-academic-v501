@@ -26,14 +26,29 @@ from pathlib import Path
 
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 
+# Exact pins, chosen so that every one of them ships a prebuilt wheel for
+# CPython 3.10, 3.11, 3.12 AND 3.13 on macOS (Intel and Apple Silicon), Windows
+# and Linux. That is why numpy stays on 2.2.x and pandas on 2.3.x: numpy 2.3+
+# and pandas 3.x require Python 3.11+, and numpy 1.26 has no cp313 wheel.
+# Checked with `pip install --dry-run --only-binary=:all:` for all 16
+# Python x platform combinations on 2026-09-28. The post's own numbers were
+# produced with numpy 2.3.5 / pandas 3.0.1 on Python 3.13; this stack
+# reproduces them to every printed digit.
+#
+# statsmodels 0.14.x does not depend on numba, so no numba/llvmlite
+# Intel-wheel override is needed. pyfixest is not installed: the tutorial
+# never imports it, and cheatsheet_python.py skips its pyfixest check when
+# the package is missing.
 PINNED: dict[str, str] = {
-    "matplotlib":   "3.8.3",
-    "numpy":        "1.26.4",
-    "pandas":       "2.2.1",
-    "seaborn":      "0.13.2",
-    "statsmodels":  "0.14.1",
-    "jupyter":      "1.1.1",
-    "ipykernel":    "6.29.3",
+    "numpy":       "2.2.6",
+    "pandas":      "2.3.3",
+    "matplotlib":  "3.10.8",
+    "seaborn":     "0.13.2",
+    "statsmodels": "0.14.6",
+    # Exercise 8 loads the wage2 data from this package (bundled, no download).
+    "wooldridge":  "0.5.0",
+    "jupyter":     "1.1.1",
+    "ipykernel":   "7.2.0",
 }
 
 KERNEL_NAME = "python_fwl-tutorial"
@@ -128,10 +143,20 @@ def ensure_packages_in_venv() -> None:
     if not to_install:
         return
     print(f"  installing into venv: {' '.join(to_install)}")
-    subprocess.check_call(
-        [str(py), "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
-         *to_install]
-    )
+    # --prefer-binary: if the newest release of a transitive dependency (scipy,
+    # pillow, ...) has no wheel for this machine, take the newest one that does
+    # instead of attempting a source build.
+    pip = [str(py), "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
+           "--prefer-binary"]
+    try:
+        subprocess.check_call([*pip, *to_install])
+        return
+    except subprocess.CalledProcessError:
+        pass
+    # Every pin has a wheel for cp310-cp313, so a failure here is almost always
+    # a transient network problem. Retry once, then let the error surface.
+    print("  [WARN] install failed; retrying once.")
+    subprocess.check_call([*pip, *to_install])
 
 
 def register_kernel() -> None:
@@ -332,10 +357,9 @@ def preflight() -> None:
         print(
             f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
             f"You ran setup_env.py with Python {ver} at {sys.executable}.\n\n"
-            f"The pinned `numba`/`llvmlite` wheels (when present) cover\n"
-            f"cp310-cp313 only. Python 3.14 has no prebuilt numba wheels yet,\n"
-            f"and Python <=3.9 is below the minimum for modern data-science\n"
-            f"packages.\n\n"
+            f"The pinned numpy 2.2.6 ships wheels for cp310-cp313 only:\n"
+            f"Python 3.14 has none, and Python <=3.9 is below the minimum\n"
+            f"for numpy 2.2 and matplotlib 3.10.\n\n"
             f"Install a supported Python (any one):\n"
             f"  - miniforge:  brew install miniforge && conda create -n tut python=3.11 -y\n"
             f"  - python.org: https://www.python.org/downloads/\n"

@@ -1,0 +1,15 @@
+# Build and render artifacts for python_fwl (not source).
+
+# AhaSlides upload payload, regenerated on demand.
+ahaslides/payload.json
+
+# Local render of the Quarto bundle (setup_env.py + quarto render).
+references/.venv/
+references/.quarto/
+references/tutorial.html
+references/tutorial_files/
+**/*.quarto_ipynb
+
+# Python bytecode.
+__pycache__/
+*.pyc

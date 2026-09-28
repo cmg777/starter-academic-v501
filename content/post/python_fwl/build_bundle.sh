@@ -1,29 +1,44 @@
 #!/usr/bin/env bash
-# Build content/post/<SLUG>/<SLUG>.zip from the tutorial sources.
-# Re-run whenever tutorial.qmd, setup_env.py, _quarto.yml, script.py, the
-# render wrappers, or the bundle README.md changes, then commit the
-# regenerated zip.
-
+# Package the Quarto tutorial bundle for python_fwl.
+#
+#   bash content/post/python_fwl/build_bundle.sh
+#
+# Rerun and commit this in the SAME commit as any edit to references/*, to the
+# runnable companions, or to the data file below — otherwise the published .zip
+# goes stale against the post.
 set -euo pipefail
 
 POST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SLUG="$(basename "${POST_DIR}")"
-STAGE_DIR="$(mktemp -d)/${SLUG}"
-OUT_ZIP="${POST_DIR}/${SLUG}.zip"
+REF_DIR="${POST_DIR}/references"
+DATA_DIR="${POST_DIR}/data"
+ZIP_PATH="${POST_DIR}/${SLUG}.zip"
 
-mkdir -p "${STAGE_DIR}"
-cp "${POST_DIR}/references/tutorial.qmd"   "${STAGE_DIR}/"
-cp "${POST_DIR}/references/setup_env.py"   "${STAGE_DIR}/"
-cp "${POST_DIR}/references/_quarto.yml"    "${STAGE_DIR}/"
-cp "${POST_DIR}/references/README.md"      "${STAGE_DIR}/"
-cp "${POST_DIR}/references/render.command" "${STAGE_DIR}/"
-cp "${POST_DIR}/references/render.bat"     "${STAGE_DIR}/"
-cp "${POST_DIR}/script.py"                 "${STAGE_DIR}/"
-chmod +x "${STAGE_DIR}/render.command"
+STAGE="$(mktemp -d)"
+trap 'rm -rf "${STAGE}"' EXIT
+DEST="${STAGE}/${SLUG}"
+mkdir -p "${DEST}"
 
-rm -f "${OUT_ZIP}"
-( cd "$(dirname "${STAGE_DIR}")" && zip -rq "${OUT_ZIP}" "$(basename "${STAGE_DIR}")" )
-rm -rf "$(dirname "${STAGE_DIR}")"
+# From references/: the Quarto project itself.
+for f in tutorial.qmd setup_env.py _quarto.yml render.command render.bat README.md; do
+  cp "${REF_DIR}/${f}" "${DEST}/${f}"
+done
 
-echo "Built ${OUT_ZIP}"
-unzip -l "${OUT_ZIP}"
+# From the post root: the canonical script and the runnable companions.
+for f in script.py cheatsheet_python.py cheatsheet_R.R cheatsheet_stata.do analysis.do; do
+  cp "${POST_DIR}/${f}" "${DEST}/${f}"
+done
+
+# The dataset, flattened next to tutorial.qmd so the notebook (and the cheat
+# sheets) find it locally once the archive is unzipped.
+cp "${DATA_DIR}/fwl_store_data.csv" "${DEST}/fwl_store_data.csv"
+
+chmod +x "${DEST}/render.command"
+
+# `zip -r` APPENDS to an existing archive, which silently keeps deleted entries
+# alive across rebuilds. Remove first.
+rm -f "${ZIP_PATH}"
+( cd "${STAGE}" && zip -r -q -X "${ZIP_PATH}" "${SLUG}" -x '*.DS_Store' )
+
+echo "built ${ZIP_PATH}"
+unzip -l "${ZIP_PATH}"
