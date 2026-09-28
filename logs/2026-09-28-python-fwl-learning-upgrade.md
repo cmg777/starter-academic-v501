@@ -87,12 +87,14 @@ completeness critic. 63 findings from the first verification wave were fixed and
 
 ## Follow-ups (out of scope for this change)
 
-- `slides/ai-slides.pdf` (published as-is by the author's decision): slide 3 swaps the DAG effect
-  labels (Income → Coupons shows +0.3, Income → Sales −0.5; the DGP is the reverse); slide 5 labels
-  0.2673 "beta_true"/"True Effect" (it is the full-regression estimate; truth is 0.2); slides 4,
-  10 and 11 use illustrative scales/point counts; text glitches on slides 4, 6, 8 and 9. A follow-up
-  brief for another regeneration pass is in the session notes (items 1–4).
-
+- `slides/ai-slides.pdf`: the author kept the Gemini deck rather than regenerating it; on 2026-09-28 it
+  was annotated in place (vector overlays drawn on the unchanged page images, no slide regenerated): a
+  reader's note on slide 1 (linked to the tutorial); corrections on slides 2 (definition cell), 3 (swapped
+  DAG labels struck, corrected tags; "per 1%" = per percentage point), 5 (0.2673 is the full-regression
+  estimate, not the true effect), 11 (residual panel is not mean-scaled; estimate vs truth) and 13 (the
+  bias condition); typos struck on slides 4, 6 and 8; notes on illustrative chart scales (4, 10, 11), the
+  code shorthand (7), the post's five-line proof (9), the partial-association identity (12) and the
+  shortcut SE in the summary table (15). Checked by independent content and visual reviews.
 - `r_fwlplot`: the wage-panel "Panel B steepens to 0.122 / 3–4x" claim (the 150-person scatter's
   within slope is ≈ 0.059; 0.1223 is the full-sample quadratic model), the "Why steeper?" web-app text,
   and line ~522 on flights sampling; its data dictionary page overflows at 390 px (pre-existing).
