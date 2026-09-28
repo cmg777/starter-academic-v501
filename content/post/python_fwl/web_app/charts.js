@@ -1,8 +1,11 @@
 // charts.js — D3 chart builders for the FWL Interactive Lab.
 //
-// This bundle extends the write-app baseline with FWL-specific builders that
-// visualise residualisation, naive-vs-FWL coefficient comparisons, and the
-// summary forest plot from the post's table.
+// Every builder takes a container element and returns an object whose
+// update(...) / render(...) redraws from data. Charts size their viewBox to
+// the container's current width (clamped), so text keeps a readable pixel
+// size on phones; app.js re-renders the active pane on tab switch and resize.
+//
+// Depends on window.d3 and window.DGP (dgp.js). Exported as window.CHARTS.
 
 (function () {
   "use strict";
@@ -14,287 +17,334 @@
     orange:"#d97757",
     teal:  "#00d4c8",
     text:  "#e8ecf2",
+    soft:  "#c8d0e0",
     muted: "#8b9dc3",
-    line:  "rgba(232, 236, 242, 0.18)",
+    mint:  "#9bdcc3",
     grid:  "rgba(232, 236, 242, 0.08)",
-    faint: "rgba(232, 236, 242, 0.15)",
+    faint: "rgba(232, 236, 242, 0.25)",
   };
 
-  function ensureSVG(container, viewBoxW, viewBoxH) {
+  // Minus sign (U+2212) for negative numbers in chart text.
+  function num(x, dp) {
+    if (x === null || x === undefined || !Number.isFinite(x)) return "—";
+    const s = Math.abs(x).toFixed(dp);
+    return (x < 0 && +s !== 0 ? "−" : "") + s;
+  }
+
+  // Width in CSS pixels available to a chart, clamped to [min, max]. Hidden
+  // containers report 0, so fall back to the viewport width.
+  function chartWidth(container, min, max) {
+    let w = (container && container.clientWidth) || 0;
+    if (w && typeof getComputedStyle === "function") {
+      const cs = getComputedStyle(container);
+      w -= (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    }
+    if (!w && typeof document !== "undefined" && document.documentElement) {
+      w = (document.documentElement.clientWidth || 0) - 64;
+    }
+    if (!w || !Number.isFinite(w)) w = max;
+    return Math.max(min, Math.min(max, Math.round(w)));
+  }
+
+  function ensureSVG(container, viewBoxW, viewBoxH, label) {
     container.innerHTML = "";
     const svg = d3.select(container)
       .append("svg")
       .attr("viewBox", `0 0 ${viewBoxW} ${viewBoxH}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("role", "img");
+    if (label) svg.attr("aria-label", label);
     return svg;
   }
 
-  // ------------------------------------------------------------------
-  // FWL residualisation animation (Tab 1).
-  //   A scrolling demo of partialling-out: scatter of x_1 vs x_2 with the
-  //   regression line and growing dashed residuals; then a flip into the
-  //   residual space (tilde scatter) where the conditional slope appears.
-  //
-  //   No user input — the loop pulses between "raw view" and "residual view".
-  // ------------------------------------------------------------------
-  function fwl_residualisation_animation(container) {
-    const W = 720, H = 380;
-    // Extra top margin keeps both the title (titleLabel) and the live slope
-    // annotation (slopeNote) ABOVE the plot area, so neither overlaps points.
-    const margin = { top: 48, right: 28, bottom: 44, left: 56 };
-    const w = W - margin.left - margin.right;
-    const h = H - margin.top - margin.bottom;
-    const svg = ensureSVG(container, W, H);
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  function styleAxis(sel) {
+    sel.selectAll("text").attr("fill", C.muted).attr("font-size", 11);
+    sel.selectAll(".domain, .tick line").attr("stroke", C.muted);
+  }
 
-    // Pre-generate a tiny synthetic dataset where x2 (income) confounds x1 (coupons) -> y (sales).
-    // True causal effect of x1 on y = +0.6 (positive); marginal slope appears negative.
-    const N = 24;
-    const seedRng = (function () { let a = 11; return function () { a = (a * 9301 + 49297) % 233280; return a / 233280; }; })();
-    function normal() {
-      let u = 0, v = 0;
-      while (u === 0) u = seedRng();
-      while (v === 0) v = seedRng();
-      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-    }
-    const x2 = new Array(N), x1 = new Array(N), y = new Array(N);
-    for (let i = 0; i < N; i++) {
-      x2[i] = 50 + 10 * normal();                                  // income
-      x1[i] = 60 - 0.6 * x2[i] + 5 * normal();                     // coupons (income lowers coupons)
-      y[i]  = 10 + 0.4 * x1[i] + 0.45 * x2[i] + 3 * normal();      // sales (income raises sales)
-    }
-    // OLS slope of x1 on x2, and y on x2 (closed form).
-    function slope(yy, xx) {
-      let mx = 0, my = 0;
-      for (let i = 0; i < N; i++) { mx += xx[i]; my += yy[i]; }
-      mx /= N; my /= N;
-      let num = 0, den = 0;
-      for (let i = 0; i < N; i++) { num += (xx[i] - mx) * (yy[i] - my); den += (xx[i] - mx) ** 2; }
-      return { a: my - (num / den) * mx, b: num / den, mx, my };
-    }
-    const s_x1_x2 = slope(x1, x2);
-    const s_y_x2  = slope(y,  x2);
-    // Residuals.
-    const x1_tilde = x1.map((v, i) => v - (s_x1_x2.a + s_x1_x2.b * x2[i]));
-    const y_tilde  = y.map((v, i) => v - (s_y_x2.a  + s_y_x2.b  * x2[i]));
-    // Slope of y_tilde on x1_tilde (the FWL slope).
-    const sFWL = slope(y_tilde, x1_tilde);
-
-    // Two scales: raw view (x2 vs x1) and residual view (x1_tilde vs y_tilde).
-    const xRaw = d3.scaleLinear().domain(d3.extent(x2)).nice().range([0, w]);
-    const yRaw = d3.scaleLinear().domain(d3.extent(x1)).nice().range([h, 0]);
-    const xRes = d3.scaleLinear().domain(d3.extent(x1_tilde)).nice().range([0, w]);
-    const yRes = d3.scaleLinear().domain(d3.extent(y_tilde)).nice().range([h, 0]);
-
-    const xAxisG = g.append("g").attr("transform", `translate(0,${h})`);
-    const yAxisG = g.append("g");
-    const xLabel = g.append("text")
-      .attr("transform", `translate(${w / 2},${h + 36})`)
-      .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12);
-    const yLabel = g.append("text")
-      .attr("transform", `rotate(-90) translate(${-h / 2},${-40})`)
-      .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12);
-    const titleLabel = g.append("text")
-      .attr("x", w / 2).attr("y", -28)
-      .attr("text-anchor", "middle").attr("fill", C.teal)
-      .attr("font-size", 13).attr("font-weight", 600);
-
-    const pts = g.append("g").attr("class", "pts");
-    const fitLine = g.append("line")
-      .attr("stroke", C.orange).attr("stroke-width", 2.5).style("display", "none");
-    const resLines = g.append("g").attr("class", "reslines");
-    // Live slope annotation lives ABOVE the plot area (negative y in the top
-    // margin) so it cannot overlap the scatter points or fit line.
-    const slopeNote = g.append("text")
-      .attr("x", w - 8).attr("y", -10)
-      .attr("text-anchor", "end").attr("fill", C.muted).attr("font-size", 11);
-
-    function drawRaw(progress) {
-      // progress 0..1: 0 = bare scatter, 0.4 = fitted line drawn, 0.7+ = residuals appearing.
-      xAxisG.call(d3.axisBottom(xRaw).ticks(5)).selectAll("text").attr("fill", C.muted);
-      yAxisG.call(d3.axisLeft(yRaw).ticks(5)).selectAll("text").attr("fill", C.muted);
-      g.selectAll(".domain, .tick line").attr("stroke", C.muted);
-      xLabel.text("Income x₂  (the confounder)");
-      yLabel.text("Coupons x₁  (the treatment)");
-      titleLabel.text("Step 1 of FWL — regress treatment on the confounder");
-
-      const sel = pts.selectAll("circle").data(d3.range(N), d => d);
-      sel.exit().remove();
-      sel.enter().append("circle").merge(sel)
-        .attr("cx", i => xRaw(x2[i]))
-        .attr("cy", i => yRaw(x1[i]))
-        .attr("r", 5)
-        .attr("fill", C.steel).attr("stroke", "#fff").attr("stroke-width", 1);
-
-      if (progress > 0.4) {
-        fitLine.style("display", null)
-          .attr("x1", xRaw(xRaw.domain()[0])).attr("y1", yRaw(s_x1_x2.a + s_x1_x2.b * xRaw.domain()[0]))
-          .attr("x2", xRaw(xRaw.domain()[1])).attr("y2", yRaw(s_x1_x2.a + s_x1_x2.b * xRaw.domain()[1]))
-          .attr("opacity", Math.min(1, (progress - 0.4) * 3));
-      } else {
-        fitLine.style("display", "none");
-      }
-
-      const showRes = Math.max(0, (progress - 0.55) * (1 / 0.45));
-      const lines = resLines.selectAll("line").data(d3.range(N), d => d);
-      lines.exit().remove();
-      lines.enter().append("line").merge(lines)
-        .attr("x1", i => xRaw(x2[i]))
-        .attr("x2", i => xRaw(x2[i]))
-        .attr("y1", i => yRaw(x1[i]))
-        .attr("y2", i => yRaw(s_x1_x2.a + s_x1_x2.b * x2[i]))
-        .attr("stroke", C.teal)
-        .attr("stroke-width", 1.5)
-        .attr("stroke-dasharray", "3 3")
-        .attr("opacity", showRes);
-
-      slopeNote.text(`slope x₁ on x₂ = ${s_x1_x2.b.toFixed(2)}  (negative ⇒ confounding)`);
-    }
-
-    function drawResidual(progress) {
-      // progress 0..1: 0 = empty, 0.4 = scatter, 0.7 = line.
-      xAxisG.call(d3.axisBottom(xRes).ticks(5)).selectAll("text").attr("fill", C.muted);
-      yAxisG.call(d3.axisLeft(yRes).ticks(5)).selectAll("text").attr("fill", C.muted);
-      g.selectAll(".domain, .tick line").attr("stroke", C.muted);
-      xLabel.text("Residualised coupons  x̃₁");
-      yLabel.text("Residualised sales  ỹ");
-      titleLabel.text("Step 2 of FWL — regress the cleaned outcome on the cleaned treatment");
-
-      const showPts = Math.min(1, progress / 0.35);
-      const sel = pts.selectAll("circle").data(d3.range(N), d => d);
-      sel.exit().remove();
-      sel.enter().append("circle").merge(sel)
-        .attr("cx", i => xRes(x1_tilde[i]))
-        .attr("cy", i => yRes(y_tilde[i]))
-        .attr("r", 5)
-        .attr("fill", C.teal).attr("stroke", "#fff").attr("stroke-width", 1)
-        .attr("opacity", showPts);
-
-      resLines.selectAll("line").remove();
-
-      if (progress > 0.5) {
-        fitLine.style("display", null)
-          .attr("x1", xRes(xRes.domain()[0])).attr("y1", yRes(sFWL.a + sFWL.b * xRes.domain()[0]))
-          .attr("x2", xRes(xRes.domain()[1])).attr("y2", yRes(sFWL.a + sFWL.b * xRes.domain()[1]))
-          .attr("opacity", Math.min(1, (progress - 0.5) * 3));
-      } else {
-        fitLine.style("display", "none");
-      }
-      slopeNote.text(`slope ỹ on x̃₁ = ${sFWL.b.toFixed(2)}  (positive ⇒ true causal effect)`);
-    }
-
-    // Cycle: 0..1 raw build-up, 1..1.5 hold, 1.5..2.5 residual build-up, 2.5..3 hold.
-    let t0 = null;
-    function step(ts) {
-      if (t0 === null) t0 = ts;
-      const elapsed = (ts - t0) / 1000;
-      const cycleLen = 8;
-      const u = (elapsed % cycleLen) / cycleLen;       // 0..1
-      if (u < 0.5) {
-        const p = u / 0.5;                              // 0..1 within raw view
-        drawRaw(Math.min(1, p));
-      } else {
-        const p = (u - 0.5) / 0.5;                      // 0..1 within residual view
-        drawResidual(Math.min(1, p));
-      }
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+  function olsLine(y, x) {
+    const n = x.length;
+    let mx = 0, my = 0;
+    for (let i = 0; i < n; i++) { mx += x[i]; my += y[i]; }
+    mx /= n; my /= n;
+    let sxy = 0, sxx = 0;
+    for (let i = 0; i < n; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) ** 2; }
+    const b = sxy / sxx;
+    return { a: my - b * mx, b };
   }
 
   // ------------------------------------------------------------------
-  // Naive-vs-FWL bar chart (Tab 2).
-  //   Two horizontal bars: naive OLS slope and FWL slope, plus a vertical
-  //   line at the true causal effect.
+  // Tab 1 — FWL residualization animation on the post's 50 stores.
+  //   Phase 0: naive view, sales vs coupons (the slope has the wrong sign).
+  //   Phase 1: partial out income, coupons vs income with the fit and dashed
+  //            residuals (sales are residualized the same way, not drawn).
+  //   Phase 2: residuals on residuals, residualized sales vs residualized
+  //            coupons (the post's FWL Step 2). Phase labels avoid "Step 1":
+  //            the post's Step 1 regresses raw sales on residualized coupons.
+  //   sample: { sales, coupons, income } arrays (results.json "sample").
+  //   ui: { title, note } optional HTML elements for the phase text.
+  // ------------------------------------------------------------------
+  function fwl_residualization_animation(container, sample, ui) {
+    ui = ui || {};
+    const sales = Array.from(sample.sales);
+    const coupons = Array.from(sample.coupons);
+    const income = Array.from(sample.income);
+    const N = sales.length;
+    const fit = window.DGP.fit_fwl(sales, coupons, income);
+    const naiveLine = olsLine(sales, coupons);        // slope = fit.naive.b
+    const partialLine = olsLine(coupons, income);       // slope = fit.pi_hat
+    const cT = Array.from(fit.coupons_tilde);
+    const sT = Array.from(fit.sales_tilde);
+
+    const PHASES = [
+      {
+        key: "naive",
+        title: "Naive view — sales against coupons, income ignored",
+        note: () => `Slope of sales on coupons = ${num(fit.naive.b, 4)}: the wrong sign (the true effect is positive).`,
+        x: coupons, y: sales, xLab: "Coupon usage (%)", yLab: "Daily sales",
+        line: naiveLine, lineColor: C.orange, ptColor: C.steel,
+      },
+      {
+        key: "partial",
+        title: "Partial out income — regress coupons (and sales) on income; keep the residuals (dashed)",
+        note: () => `Slope of coupons on income = ${num(fit.pi_hat, 4)}: richer neighborhoods use fewer coupons. Sales are residualized on income the same way (not drawn).`,
+        x: income, y: coupons, xLab: "Neighborhood income", yLab: "Coupon usage (%)",
+        line: partialLine, lineColor: C.soft, ptColor: C.steel,
+      },
+      {
+        key: "resid",
+        title: "Residuals on residuals — regress residualized sales on residualized coupons (the post's Step 2)",
+        note: () => `Slope of sales residuals on coupon residuals = ${num(fit.fwl.b, 4)}: the same number as the full regression.`,
+        x: cT, y: sT, xLab: "Residualized coupons (income removed)", yLab: "Residualized sales",
+        line: { a: 0, b: fit.fwl.b }, lineColor: C.teal, ptColor: C.teal,
+      },
+    ];
+
+    let state = { phase: 0, progress: 0, playing: true, active: true, raf: null, t0: null, lastPhase: -1 };
+    const PHASE_SEC = 4.5;
+    const reduceMotion = typeof window !== "undefined" && window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) { state.playing = false; state.progress = 1; }
+
+    let W, H, g, w, h, xAxisG, yAxisG, xLabel, yLabel, pts, fitLine, resLines, xS, yS;
+
+    function build() {
+      W = chartWidth(container, 300, 1180);
+      H = Math.round(Math.max(260, Math.min(420, W * 0.5)));
+      const margin = { top: 14, right: 16, bottom: 46, left: W < 480 ? 46 : 58 };
+      w = W - margin.left - margin.right;
+      h = H - margin.top - margin.bottom;
+      const svg = ensureSVG(container, W, H,
+        "Animated scatter plots of the post's 50 stores: naive view, partialling out income, residuals on residuals");
+      g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+      xAxisG = g.append("g").attr("transform", `translate(0,${h})`);
+      yAxisG = g.append("g");
+      xLabel = g.append("text").attr("x", w / 2).attr("y", h + 38)
+        .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12);
+      yLabel = g.append("text")
+        .attr("transform", `rotate(-90) translate(${-h / 2},${-(margin.left - 14)})`)
+        .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12);
+      resLines = g.append("g").attr("class", "reslines");
+      pts = g.append("g").attr("class", "pts");
+      fitLine = g.append("line").attr("stroke-width", 2.5).style("display", "none");
+      state.lastPhase = -1;
+    }
+
+    function setPhaseChrome(p) {
+      const P = PHASES[p];
+      const pad = (ext) => { const d = (ext[1] - ext[0]) * 0.06 || 1; return [ext[0] - d, ext[1] + d]; };
+      xS = d3.scaleLinear().domain(pad(d3.extent(P.x))).nice().range([0, w]);
+      yS = d3.scaleLinear().domain(pad(d3.extent(P.y))).nice().range([h, 0]);
+      xAxisG.call(d3.axisBottom(xS).ticks(W < 480 ? 4 : 6)); styleAxis(xAxisG);
+      yAxisG.call(d3.axisLeft(yS).ticks(5)); styleAxis(yAxisG);
+      xLabel.text(P.xLab);
+      yLabel.text(P.yLab);
+      if (ui.title) ui.title.textContent = `${p + 1} / 3 · ${P.title}`;
+      if (ui.note) ui.note.textContent = P.note();
+      if (ui.onPhase) ui.onPhase(p);
+      const circles = pts.selectAll("circle").data(d3.range(N));
+      circles.enter().append("circle").attr("r", W < 480 ? 3.5 : 4.5)
+        .attr("stroke", "#0f1729").attr("stroke-width", 0.8)
+        .merge(circles)
+        .attr("cx", i => xS(P.x[i])).attr("cy", i => yS(P.y[i]))
+        .attr("fill", P.ptColor);
+      const lines = resLines.selectAll("line").data(p === 1 ? d3.range(N) : []);
+      lines.exit().remove();
+      lines.enter().append("line")
+        .attr("stroke", C.teal).attr("stroke-width", 1.3).attr("stroke-dasharray", "3 3")
+        .merge(lines)
+        .attr("x1", i => xS(income[i])).attr("x2", i => xS(income[i]))
+        .attr("y1", i => yS(coupons[i]))
+        .attr("y2", i => yS(partialLine.a + partialLine.b * income[i]));
+      state.lastPhase = p;
+    }
+
+    function draw(p, progress) {
+      if (p !== state.lastPhase) setPhaseChrome(p);
+      const P = PHASES[p];
+      pts.selectAll("circle").attr("opacity", Math.min(1, 0.15 + progress / 0.3));
+      if (progress > 0.3) {
+        const d = xS.domain();
+        fitLine.style("display", null)
+          .attr("stroke", P.lineColor)
+          .attr("x1", xS(d[0])).attr("y1", yS(P.line.a + P.line.b * d[0]))
+          .attr("x2", xS(d[1])).attr("y2", yS(P.line.a + P.line.b * d[1]))
+          .attr("opacity", Math.min(1, (progress - 0.3) * 4));
+      } else {
+        fitLine.style("display", "none");
+      }
+      resLines.selectAll("line").attr("opacity", Math.max(0, Math.min(1, (progress - 0.5) * 3)));
+    }
+
+    function frame(ts) {
+      state.raf = null;
+      if (!state.playing || !state.active) return;
+      if (state.t0 === null) state.t0 = ts - (state.phase + state.progress * 0.6) * PHASE_SEC * 1000;
+      const u = ((ts - state.t0) / 1000) / PHASE_SEC;
+      const total = u % 3;
+      state.phase = Math.floor(total);
+      // Build-up over the first 60% of a phase, then hold.
+      state.progress = Math.min(1, (total - state.phase) / 0.6);
+      draw(state.phase, state.progress);
+      state.raf = requestAnimationFrame(frame);
+    }
+
+    function kick() {
+      if (state.raf === null && state.playing && state.active && typeof requestAnimationFrame === "function") {
+        state.t0 = null;
+        state.raf = requestAnimationFrame(frame);
+      }
+    }
+
+    build();
+    draw(state.phase, state.progress);
+    kick();
+
+    return {
+      fit,
+      phases: PHASES.map(P => P.key),
+      setActive(on) {
+        state.active = !!on;
+        if (!on && state.raf !== null && typeof cancelAnimationFrame === "function") {
+          cancelAnimationFrame(state.raf); state.raf = null;
+        }
+        kick();
+      },
+      goTo(p) {
+        state.playing = false;
+        state.phase = Math.max(0, Math.min(2, p | 0));
+        state.progress = 1;
+        draw(state.phase, 1);
+      },
+      toggle() {
+        state.playing = !state.playing;
+        if (!state.playing && state.raf !== null && typeof cancelAnimationFrame === "function") {
+          cancelAnimationFrame(state.raf); state.raf = null;
+        }
+        kick();
+        return state.playing;
+      },
+      isPlaying() { return state.playing; },
+      render() { build(); draw(state.phase, state.progress); },
+    };
+  }
+
+  // ------------------------------------------------------------------
+  // Tab 2 — naive vs FWL bars with the true-effect reference line.
+  //   data: { naive, fwl, beta_true }
   // ------------------------------------------------------------------
   function naive_vs_fwl_bars(container) {
-    const W = 720, H = 240;
-    // Extra top margin reserves space for the "true α" annotation ABOVE the
-    // plot so it cannot overlap any bar value label inside the chart.
-    const margin = { top: 44, right: 48, bottom: 36, left: 130 };
-    const w = W - margin.left - margin.right;
-    const h = H - margin.top - margin.bottom;
-    const svg = ensureSVG(container, W, H);
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
+    let last = null;
     function update(data) {
-      g.selectAll("*").remove();
+      last = data;
+      const W = chartWidth(container, 300, 1180);
+      const narrow = W < 480;
+      const H = narrow ? 200 : 220;
+      const margin = { top: 40, right: narrow ? 44 : 56, bottom: 34, left: narrow ? 70 : 120 };
+      const w = W - margin.left - margin.right;
+      const h = H - margin.top - margin.bottom;
+      const svg = ensureSVG(container, W, H, "Bar chart comparing the naive and FWL coupon slopes with the true effect");
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
       const labels = [
-        { name: "Naive OLS",       v: data.naive,    color: C.orange },
-        { name: "FWL / Full OLS",  v: data.fwl,      color: C.teal   },
+        { name: narrow ? "Naive" : "Naive OLS", v: data.naive, color: C.orange },
+        { name: narrow ? "FWL" : "FWL / Full OLS", v: data.fwl, color: C.teal },
       ];
-      const allVals = labels.map(d => d.v).concat([data.alpha_true, 0]);
+      const allVals = labels.map(d => d.v).concat([data.beta_true, 0]).filter(Number.isFinite);
       const ext = d3.extent(allVals);
       const span = Math.max(0.5, ext[1] - ext[0]);
-      const pad = span * 0.18;
+      const pad = span * 0.2;
       const x = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([0, w]);
       const y = d3.scaleBand().domain(labels.map(d => d.name)).range([0, h]).padding(0.4);
 
-      // Zero line.
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
-      // True alpha line. Label lives in the top margin (y=-18) so it cannot
-      // collide with any in-plot bar value text.
-      g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
-        .attr("y1", 0).attr("y2", h)
-        .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true)).attr("y", -18)
-        .attr("text-anchor", "middle")
-        .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
-        .text(`true α = ${data.alpha_true.toFixed(2)}`);
+      g.append("line").attr("x1", x(data.beta_true)).attr("x2", x(data.beta_true))
+        .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
+      g.append("text").attr("x", x(data.beta_true)).attr("y", -16)
+        .attr("text-anchor", "middle").attr("fill", C.steel)
+        .attr("font-size", 11).attr("font-weight", 600)
+        .text(`true β = ${num(data.beta_true, 2)}`);
 
-      g.append("g").attr("transform", `translate(0,${h})`)
-        .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".2f")))
-        .selectAll("text").attr("fill", C.muted);
-      g.selectAll(".domain, .tick line").attr("stroke", C.muted);
+      const ax = g.append("g").attr("transform", `translate(0,${h})`)
+        .call(d3.axisBottom(x).ticks(narrow ? 4 : 6).tickFormat(d3.format(".2f")));
+      styleAxis(ax);
 
       labels.forEach(d => {
         const yc = y(d.name) + y.bandwidth() / 2;
         g.append("text").attr("x", -10).attr("y", yc + 4)
           .attr("text-anchor", "end").attr("fill", C.text).attr("font-size", 12)
           .text(d.name);
-        const x0 = x(0);
-        const x1 = x(d.v);
+        if (!Number.isFinite(d.v)) return;
+        const x0 = x(0), x1 = x(d.v);
         g.append("rect")
           .attr("x", Math.min(x0, x1))
-          .attr("y", yc - y.bandwidth() / 2 + y.bandwidth() * 0.15)
+          .attr("y", yc - y.bandwidth() * 0.35)
           .attr("width", Math.abs(x1 - x0))
           .attr("height", y.bandwidth() * 0.7)
           .attr("fill", d.color).attr("opacity", 0.85);
-        g.append("text").attr("x", x1 + (x1 >= x0 ? 6 : -6))
-          .attr("text-anchor", x1 >= x0 ? "start" : "end")
+        // Value label outside the bar end; moved inside the bar when it
+        // would run into the category labels or past the right edge.
+        const label = num(d.v, 3);
+        const tw = 7.5 * label.length;
+        const pos = x1 >= x0;
+        const outside = pos ? x1 + 6 + tw <= w + margin.right - 2 : x1 - 6 - tw >= -4;
+        const inside = outside ? false : Math.abs(x1 - x0) > tw + 10;
+        g.append("text")
+          .attr("x", outside ? x1 + (pos ? 6 : -6) : x1 + (pos ? -6 : 6))
+          .attr("text-anchor", (pos === outside) ? "start" : "end")
           .attr("y", yc + 4)
-          .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
-          .text(d.v.toFixed(3));
+          .attr("fill", inside ? "#0f1729" : C.text).attr("font-size", 12).attr("font-weight", 600)
+          .text(label);
       });
     }
-    return { update };
+    return { update, render() { if (last) update(last); } };
   }
 
   // ------------------------------------------------------------------
-  // Histograms of naive vs FWL estimates across simulated datasets (Tab 4).
-  //   data: { naive: number[], fwl: number[], alpha_true: number }
+  // Tab 4 — histograms of naive vs FWL estimates across simulated samples.
+  //   data: { naive: number[], fwl: number[], beta_true, plim }
+  //   plim = beta + gamma * delta, the value naive OLS converges to.
   // ------------------------------------------------------------------
   function naive_vs_fwl_histograms(container) {
-    const W = 720, H = 320;
-    // Extra top margin reserves space for the legend ABOVE the plot area
-    // so it never overlaps the histogram bars.
-    const margin = { top: 56, right: 24, bottom: 40, left: 50 };
-    const w = W - margin.left - margin.right;
-    const h = H - margin.top - margin.bottom;
-    const svg = ensureSVG(container, W, H);
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
+    let last = null;
     function update(data) {
-      g.selectAll("*").remove();
-      const all = data.naive.concat(data.fwl);
-      if (all.length === 0) return;
+      last = data;
+      const W = chartWidth(container, 300, 1180);
+      const narrow = W < 520;
+      const H = narrow ? 300 : 320;
+      const stack = (W - 58) / 4 < 195;   // legend items would collide in one row
+      const margin = { top: stack ? 84 : 50, right: 18, bottom: 42, left: 40 };
+      const w = W - margin.left - margin.right;
+      const h = H - margin.top - margin.bottom;
+      const svg = ensureSVG(container, W, H, "Histograms of naive and FWL estimates across simulated samples");
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+      const all = data.naive.concat(data.fwl, [data.beta_true, data.plim]).filter(Number.isFinite);
+      if (!data.naive.length && !data.fwl.length) return;
       const ext = d3.extent(all);
       const span = Math.max(0.4, ext[1] - ext[0]);
       const pad = span * 0.06;
       const x = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([0, w]);
-      const nBins = 26;
-      const bin = d3.bin().domain(x.domain()).thresholds(nBins);
+      const bin = d3.bin().domain(x.domain()).thresholds(narrow ? 18 : 26);
       const binsN = bin(data.naive);
       const binsF = bin(data.fwl);
       const maxC = d3.max(binsN.concat(binsF), d => d.length) || 1;
@@ -309,270 +359,172 @@
           .attr("fill", color).attr("opacity", opacity);
       }
       drawBars(binsN, C.orange, 0.65);
-      drawBars(binsF, C.teal,   0.85);
+      drawBars(binsF, C.teal, 0.8);
 
-      // Zero line (since naive can flip sign).
-      g.append("line").attr("x1", x(0)).attr("x2", x(0))
-        .attr("y1", 0).attr("y2", h)
+      g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
+      g.append("line").attr("x1", x(data.beta_true)).attr("x2", x(data.beta_true))
+        .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
+      if (Number.isFinite(data.plim)) {
+        g.append("line").attr("x1", x(data.plim)).attr("x2", x(data.plim))
+          .attr("y1", 0).attr("y2", h).attr("stroke", C.orange).attr("stroke-width", 2)
+          .attr("stroke-dasharray", "6 4");
+      }
 
-      // True alpha line. Label is rendered ABOVE the plot area (in the top
-      // margin) so it cannot overlap any histogram bar.
-      g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
-        .attr("y1", 0).attr("y2", h)
-        .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -6)
-        .attr("fill", C.steel).attr("font-size", 11)
-        .text(`true α = ${data.alpha_true.toFixed(2)}`);
-
-      g.append("g").attr("transform", `translate(0,${h})`)
-        .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
-        .selectAll("text").attr("fill", C.muted);
-      g.append("g").call(d3.axisLeft(y).ticks(5))
-        .selectAll("text").attr("fill", C.muted);
-      g.selectAll(".domain, .tick line").attr("stroke", C.muted);
-      g.append("text").attr("transform", `translate(${w / 2},${h + 34})`)
+      const ax = g.append("g").attr("transform", `translate(0,${h})`)
+        .call(d3.axisBottom(x).ticks(narrow ? 5 : 8).tickFormat(d3.format(".2f")));
+      styleAxis(ax);
+      styleAxis(g.append("g").call(d3.axisLeft(y).ticks(5)));
+      g.append("text").attr("x", w / 2).attr("y", h + 36)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated α̂ across simulated datasets");
+        .text(narrow ? "Coupon estimate in each sample" : "Estimated coupon coefficient across simulated samples");
 
-      // Legend — placed ABOVE the plot area (in the top margin) as an inline
-      // horizontal strip so it never overlaps histogram bars. Anchored to the
-      // top-left of the plot region, with two swatch+label groups separated by
-      // a small gap.
-      const lg = g.append("g").attr("transform", `translate(0,${-28})`);
-      // Swatch 1: Naive
-      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 14).attr("height", 10)
-        .attr("fill", C.orange).attr("opacity", 0.65);
-      lg.append("text").attr("x", 20).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
-        .text("Naive OLS (omits income)");
-      // Swatch 2: FWL — positioned to the right with a gap.
-      const naiveLabelWidth = 175; // approximate width including swatch
-      lg.append("rect").attr("x", naiveLabelWidth).attr("y", 0).attr("width", 14).attr("height", 10)
-        .attr("fill", C.teal).attr("opacity", 0.85);
-      lg.append("text").attr("x", naiveLabelWidth + 20).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
-        .text("FWL (controls for income)");
+      // Legend above the plot area (one item per row on narrow screens) so it never
+      // overlaps the bars.
+      const items = [
+        { kind: "rect", color: C.orange, opacity: 0.65, label: "Naive OLS (omits income)" },
+        { kind: "rect", color: C.teal, opacity: 0.8, label: "FWL (controls for income)" },
+        { kind: "line", color: C.steel, dash: null, label: `True β = ${num(data.beta_true, 2)}` },
+        { kind: "line", color: C.orange, dash: "6 4", label: "Predicted naive mean β + γ·δ" },
+      ];
+      const lg = g.append("g").attr("transform", `translate(0,${-margin.top + 8})`);
+      const colW = w / 4;
+      items.forEach((it, k) => {
+        const col = stack ? 0 : k;
+        const row = stack ? k : 0;
+        const gi = lg.append("g").attr("transform", `translate(${col * colW},${row * 17})`);
+        if (it.kind === "rect") {
+          gi.append("rect").attr("width", 14).attr("height", 10)
+            .attr("fill", it.color).attr("opacity", it.opacity);
+        } else {
+          gi.append("line").attr("x1", 0).attr("x2", 14).attr("y1", 5).attr("y2", 5)
+            .attr("stroke", it.color).attr("stroke-width", 2)
+            .attr("stroke-dasharray", it.dash);
+        }
+        gi.append("text").attr("x", 19).attr("y", 9).attr("fill", C.text)
+          .attr("font-size", narrow ? 10 : 11).text(it.label);
+      });
     }
-    return { update };
+    return { update, render() { if (last) update(last); } };
   }
 
   // ------------------------------------------------------------------
-  // Forest plot for FWL methods (Tab 3).
-  //   Single-outcome (sales) plot listing the 6 estimators from the post's
-  //   summary table with CIs and the vertical reference line at true α = 0.20.
+  // Tab 3 — forest plot of the post's estimates (results.json "estimates").
+  //   update(rows, activeMethods, trueEffect)
+  //   Wide screens: labels on the left. Narrow screens: label above each row.
   // ------------------------------------------------------------------
+  const FOREST_COLORS = {
+    "Naive OLS (no controls)":         C.orange,
+    "Full OLS (+ income)":             C.teal,
+    "FWL Step 1 (residualize X only)": C.steel,
+    "FWL Step 1 + intercept":          C.muted,
+    "FWL Step 2 (residualize both)":   C.teal,
+    "Full OLS (+ income + day)":       C.mint,
+    "FWL (+ income + day)":            C.mint,
+  };
+
   function fwl_forest_plot(container) {
-    const W = 820;
-    const margin = { top: 32, right: 28, bottom: 44, left: 220 };
-    const svg = d3.select(container).html("").append("svg")
-      .attr("viewBox", `0 0 ${W} 340`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
-
-    const colorMap = {
-      "Naive OLS (no controls)":     C.orange,
-      "Full OLS (+ income)":         C.teal,
-      "FWL Step 1 (residualise X)":  C.steel,
-      "FWL Step 2 (residualise both)": C.teal,
-      "Full OLS (+ income + day)":   "#9bdcc3",
-      "FWL (+ income + day)":        "#9bdcc3",
-    };
-
-    const tooltip = d3.select(container).append("div").attr("class", "tooltip");
-
-    function update(rows, activeMethods, alphaTrue) {
-      const methods = activeMethods.length ? activeMethods : rows.map(r => r.method);
-      const filtered = rows.filter(d => methods.includes(d.method));
-
-      const facetH = 34 * methods.length + 24;
-      const totalH = margin.top + facetH + margin.bottom;
+    let last = null;
+    function update(rows, activeMethods, trueEffect) {
+      last = [rows, activeMethods, trueEffect];
+      const methods = rows.map(r => r.method).filter(m => activeMethods.includes(m));
+      const filtered = methods.map(m => rows.find(r => r.method === m));
+      const W = chartWidth(container, 300, 1180);
+      const narrow = W < 560;
+      const rowH = narrow ? 50 : 36;
+      const margin = { top: 30, right: 20, bottom: 46, left: narrow ? 12 : 230 };
+      const facetH = Math.max(rowH, rowH * methods.length);
+      const H = margin.top + facetH + margin.bottom;
       const w = W - margin.left - margin.right;
 
-      svg.attr("viewBox", `0 0 ${W} ${totalH}`);
-      svg.selectAll("g.facet, text.title").remove();
+      container.innerHTML = "";
+      const svg = d3.select(container).append("svg")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("role", "img")
+        .attr("aria-label", "Forest plot of coupon coefficients with 95% confidence intervals");
+      const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
-      const ext = d3.extent(filtered.flatMap(d => [d.ci_lo, d.ci_hi, 0, alphaTrue]));
-      const xMin = ext[0];
-      const xMax = ext[1];
-      const pad = Math.max(0.05, (xMax - xMin) * 0.08);
-      const x = d3.scaleLinear().domain([xMin - pad, xMax + pad]).range([0, w]);
-      const y = d3.scaleBand().domain(methods).range([0, facetH]).padding(0.35);
+      if (!filtered.length) {
+        svg.append("text").attr("x", W / 2).attr("y", H / 2).attr("text-anchor", "middle")
+          .attr("fill", C.muted).attr("font-size", 13).text("Select at least one method above.");
+        return;
+      }
 
-      const facet = svg.append("g")
-        .attr("class", "facet")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+      const ext = d3.extent(filtered.flatMap(d => [d.ci_lo, d.ci_hi]).concat([0, trueEffect]));
+      const pad = Math.max(0.05, (ext[1] - ext[0]) * 0.06);
+      const x = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([0, w]);
+      const y = d3.scaleBand().domain(methods).range([0, facetH]).padding(narrow ? 0.1 : 0.3);
+      const facet = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Zero line.
-      facet.append("line")
-        .attr("x1", x(0)).attr("x2", x(0))
-        .attr("y1", 0).attr("y2", facetH)
-        .attr("stroke", C.faint).attr("stroke-width", 1).attr("stroke-dasharray", "3 4");
+      facet.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", facetH)
+        .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
+      facet.append("line").attr("x1", x(trueEffect)).attr("x2", x(trueEffect))
+        .attr("y1", 0).attr("y2", facetH).attr("stroke", C.steel).attr("stroke-width", 2);
+      facet.append("text").attr("x", x(trueEffect)).attr("y", -12)
+        .attr("text-anchor", "middle").attr("fill", C.steel).attr("font-size", 11)
+        .text(`true β = ${num(trueEffect, 2)}`);
 
-      // True alpha line.
-      facet.append("line")
-        .attr("x1", x(alphaTrue)).attr("x2", x(alphaTrue))
-        .attr("y1", 0).attr("y2", facetH)
-        .attr("stroke", C.steel).attr("stroke-width", 2);
-      facet.append("text").attr("x", x(alphaTrue) + 4).attr("y", -12)
-        .attr("fill", C.steel).attr("font-size", 11)
-        .text(`true α = ${alphaTrue.toFixed(2)}`);
-
-      // x axis.
-      facet.append("g").attr("transform", `translate(0,${facetH})`)
-        .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format(".2f")))
-        .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
-      facet.append("text")
-        .attr("transform", `translate(${w / 2},${facetH + 36})`)
+      const ax = facet.append("g").attr("transform", `translate(0,${facetH})`)
+        .call(d3.axisBottom(x).ticks(narrow ? 5 : 7).tickFormat(d3.format(".2f")));
+      styleAxis(ax);
+      facet.append("text").attr("x", w / 2).attr("y", facetH + 38)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated coupon coefficient α̂");
-      facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
+        .text("Coupon coefficient with 95% CI");
 
-      // Method labels (left).
-      methods.forEach(m => {
-        svg.append("text")
-          .attr("class", "facet")
-          .attr("x", margin.left - 10)
-          .attr("y", margin.top + y(m) + y.bandwidth() / 2 + 4)
-          .attr("text-anchor", "end")
-          .attr("fill", C.text)
-          .attr("font-size", 12)
-          .text(m);
-      });
-
-      // Bars + points.
       filtered.forEach(d => {
-        const yc = y(d.method) + y.bandwidth() / 2;
+        const col = FOREST_COLORS[d.method] || C.text;
+        const top = y(d.method);
+        const yc = narrow ? top + y.bandwidth() * 0.68 : top + y.bandwidth() / 2;
+        if (narrow) {
+          facet.append("text").attr("x", 0).attr("y", top + 12)
+            .attr("fill", C.text).attr("font-size", 11).text(d.method);
+        } else {
+          svg.append("text").attr("x", margin.left - 12).attr("y", margin.top + yc + 4)
+            .attr("text-anchor", "end").attr("fill", C.text).attr("font-size", 12)
+            .text(d.method);
+        }
         const grp = facet.append("g").attr("class", "row").style("cursor", "pointer");
-        const col = colorMap[d.method] || C.text;
-        grp.append("line")
-          .attr("x1", x(d.ci_lo)).attr("x2", x(d.ci_hi))
-          .attr("y1", yc).attr("y2", yc)
-          .attr("stroke", col).attr("stroke-width", 2);
-        grp.append("line")
-          .attr("x1", x(d.ci_lo)).attr("x2", x(d.ci_lo))
-          .attr("y1", yc - 5).attr("y2", yc + 5)
-          .attr("stroke", col).attr("stroke-width", 2);
-        grp.append("line")
-          .attr("x1", x(d.ci_hi)).attr("x2", x(d.ci_hi))
-          .attr("y1", yc - 5).attr("y2", yc + 5)
-          .attr("stroke", col).attr("stroke-width", 2);
-        grp.append("circle")
-          .attr("cx", x(d.estimate)).attr("cy", yc).attr("r", 5.5)
+        grp.append("rect").attr("x", 0).attr("width", w)
+          .attr("y", top).attr("height", y.bandwidth()).attr("fill", "transparent");
+        grp.append("line").attr("x1", x(d.ci_lo)).attr("x2", x(d.ci_hi))
+          .attr("y1", yc).attr("y2", yc).attr("stroke", col).attr("stroke-width", 2);
+        [d.ci_lo, d.ci_hi].forEach(v => grp.append("line")
+          .attr("x1", x(v)).attr("x2", x(v)).attr("y1", yc - 5).attr("y2", yc + 5)
+          .attr("stroke", col).attr("stroke-width", 2));
+        grp.append("circle").attr("cx", x(d.estimate)).attr("cy", yc).attr("r", 5.5)
           .attr("fill", col).attr("stroke", "#fff").attr("stroke-width", 1);
 
-        grp.on("mousemove", function (ev) {
+        function show(ev) {
           const rect = container.getBoundingClientRect();
           tooltip.html(
             `<div><strong style="color:${col}">${d.method}</strong></div>` +
-            `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
-            `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(3)}</span></div>` +
-            `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-            `<div><span class='tooltip-key'>p-value =</span> <span class='tooltip-val'>${d.p.toFixed(3)}</span></div>`
-          )
-          .classed("show", true)
-          .style("left", (ev.clientX - rect.left + 12) + "px")
-          .style("top",  (ev.clientY - rect.top  + 12) + "px");
-        }).on("mouseleave", function () { tooltip.classed("show", false); });
+            `<div><span class='tooltip-key'><span class="hat">β</span> =</span> <span class='tooltip-val'>${num(d.estimate, 4)}</span></div>` +
+            `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${num(d.se, 4)}</span></div>` +
+            `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${num(d.ci_lo, 3)}, ${num(d.ci_hi, 3)}]</span></div>` +
+            `<div><span class='tooltip-key'>p-value =</span> <span class='tooltip-val'>${num(d.p, 3)}</span></div>` +
+            `<div><span class='tooltip-key'>residual df =</span> <span class='tooltip-val'>${d.df_resid}</span></div>`
+          ).classed("show", true);
+          const left = Math.min(ev.clientX - rect.left + 12, rect.width - 250);
+          tooltip.style("left", Math.max(4, left) + "px")
+            .style("top", (ev.clientY - rect.top + 12) + "px");
+        }
+        // Mouse: hover shows, leaving hides. Touch/pen: a tap shows the
+        // tooltip and it stays until the next tap outside a row.
+        grp.on("pointermove", show).on("pointerdown", ev => { ev.stopPropagation(); show(ev); })
+          .on("pointerleave", ev => { if (ev.pointerType === "mouse") tooltip.classed("show", false); });
       });
+      svg.on("pointerdown", () => tooltip.classed("show", false));
     }
-    return { update };
-  }
-
-  // ------------------------------------------------------------------
-  // DGP helper for the FWL post (used by Tabs 2 and 4).
-  //   Generates a single sample mimicking the post's simulate_store_data():
-  //   income, coupons (negatively related to income), sales (positively
-  //   related to both income and coupons). Returns vectors plus closed-form
-  //   naive and FWL slopes.
-  //
-  //   gamma: income -> sales coefficient (default 0.3)
-  //   delta: income -> coupons slope (default -0.5)
-  //   alpha: TRUE coupons -> sales coefficient (default 0.2)
-  //   n: sample size
-  //   sigma_y: residual sd on sales (default 3)
-  //   sigma_c: residual sd on coupons (default 5)
-  // ------------------------------------------------------------------
-  function simulate_fwl_sample(opts) {
-    const n = Math.max(20, opts.n | 0);
-    const gamma = +opts.gamma;
-    const delta = +opts.delta;
-    const alpha = +opts.alpha;
-    const sigY = +opts.sigma_y || 3;
-    const sigC = +opts.sigma_c || 5;
-    const seed = (opts.seed >>> 0) || 1;
-    const rng = window.DGP.mulberry32(seed);
-    const normal = window.DGP.makeNormal(rng);
-
-    const income = new Float64Array(n);
-    const coupons = new Float64Array(n);
-    const sales = new Float64Array(n);
-    for (let i = 0; i < n; i++) {
-      income[i] = 50 + 10 * normal();
-      coupons[i] = 60 + delta * income[i] + sigC * normal();
-      sales[i] = 10 + alpha * coupons[i] + gamma * income[i] + sigY * normal();
-    }
-
-    // Slope of sales on coupons (NAIVE).
-    function slopeXY(yvec, xvec) {
-      let mx = 0, my = 0;
-      for (let i = 0; i < n; i++) { mx += xvec[i]; my += yvec[i]; }
-      mx /= n; my /= n;
-      let num = 0, den = 0;
-      for (let i = 0; i < n; i++) {
-        const dx = xvec[i] - mx;
-        num += dx * (yvec[i] - my);
-        den += dx * dx;
-      }
-      const b = num / den;
-      const a = my - b * mx;
-      // residual sd, se.
-      let ss = 0;
-      for (let i = 0; i < n; i++) {
-        const r = yvec[i] - (a + b * xvec[i]);
-        ss += r * r;
-      }
-      const sig2 = ss / Math.max(1, n - 2);
-      const se = Math.sqrt(sig2 / den);
-      return { b, a, se };
-    }
-    const naive = slopeXY(sales, coupons);
-
-    // FWL: residualise coupons on income and sales on income; slope of residuals.
-    const r_ci = slopeXY(coupons, income);                  // coupons = a + b*income
-    const r_si = slopeXY(sales, income);                    // sales   = a + b*income
-    const c_til = new Float64Array(n);
-    const s_til = new Float64Array(n);
-    for (let i = 0; i < n; i++) {
-      c_til[i] = coupons[i] - (r_ci.a + r_ci.b * income[i]);
-      s_til[i] = sales[i]   - (r_si.a + r_si.b * income[i]);
-    }
-    // Slope of s_til on c_til (no intercept, residuals are mean-zero by construction).
-    let num = 0, den = 0;
-    for (let i = 0; i < n; i++) { num += c_til[i] * s_til[i]; den += c_til[i] * c_til[i]; }
-    const bFWL = num / den;
-    let ss = 0;
-    for (let i = 0; i < n; i++) {
-      const r = s_til[i] - bFWL * c_til[i];
-      ss += r * r;
-    }
-    // For a two-control regression DOF = n - 3 (intercept, coupons, income).
-    const dof = Math.max(1, n - 3);
-    const sig2 = ss / dof;
-    const seFWL = Math.sqrt(sig2 / den);
-
-    return {
-      income, coupons, sales,
-      coupons_tilde: c_til, sales_tilde: s_til,
-      naive: { b: naive.b, se: naive.se },
-      fwl:   { b: bFWL, se: seFWL },
-      alpha_true: alpha,
-    };
+    return { update, render() { if (last) update.apply(null, last); } };
   }
 
   window.CHARTS = {
-    fwl_residualisation_animation,
+    fwl_residualization_animation,
     naive_vs_fwl_bars,
     naive_vs_fwl_histograms,
     fwl_forest_plot,
-    simulate_fwl_sample,
+    num,
     C,
   };
 })();

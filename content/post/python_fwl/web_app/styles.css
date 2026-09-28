@@ -7,6 +7,7 @@
   --teal: #00d4c8;
   --text: #e8ecf2;
   --muted: #8b9dc3;
+  --soft: #c8d0e0;
   --line: rgba(232, 236, 242, 0.12);
   --radius: 10px;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
@@ -189,6 +190,7 @@ p { margin: 0 0 12px; }
 }
 
 .chart-area {
+  position: relative;
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -196,7 +198,7 @@ p { margin: 0 0 12px; }
   margin-bottom: 18px;
 }
 .chart-area svg { width: 100%; height: auto; display: block; }
-.chart-area .chart-caption {
+.chart-caption {
   font-size: 12px;
   color: var(--muted);
   padding-top: 6px;
@@ -282,9 +284,6 @@ button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
 }
 .tag.rigorous { background: rgba(0, 212, 200, 0.18); color: var(--teal); }
 .tag.cv       { background: rgba(217, 119, 87, 0.20); color: var(--orange); }
-.tag.first    { background: rgba(106, 155, 204, 0.18); color: var(--steel); }
-.tag.ols      { background: rgba(232, 236, 242, 0.12); color: var(--muted); }
-.tag.psl      { background: rgba(155, 220, 195, 0.18); color: #9bdcc3; }
 
 details.gloss {
   margin: 8px 0;
@@ -342,16 +341,6 @@ details.gloss .gloss-body em { color: var(--teal); font-style: normal; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.cta-card h4 {
-  margin: 6px 0 6px;
-  font-size: 15px;
-  color: var(--text);
-}
-.cta-card p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted);
-}
 
 .tooltip {
   position: absolute;
@@ -372,12 +361,12 @@ details.gloss .gloss-body em { color: var(--teal); font-style: normal; }
 .tooltip .tooltip-key { color: var(--muted); }
 .tooltip .tooltip-val { color: var(--teal); font-variant-numeric: tabular-nums; }
 
-.outcome-toggle, .method-toggle {
+.method-toggle {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.outcome-toggle label, .method-toggle label {
+.method-toggle label {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
   padding: 6px 12px;
@@ -389,12 +378,7 @@ details.gloss .gloss-body em { color: var(--teal); font-style: normal; }
   gap: 6px;
   transition: all 0.15s;
 }
-.outcome-toggle input, .method-toggle input { accent-color: var(--orange); }
-.outcome-toggle label:has(input:checked) {
-  border-color: var(--teal);
-  background: rgba(0, 212, 200, 0.10);
-  color: var(--text);
-}
+.method-toggle input { accent-color: var(--orange); }
 .method-toggle label:has(input:checked) {
   border-color: var(--orange);
   background: rgba(217, 119, 87, 0.10);
@@ -450,3 +434,172 @@ footer.app-footer {
 .method-row:last-child { border-bottom: none; }
 .method-row .label { color: var(--muted); }
 .method-row .val { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---- Tab strip: keyboard focus ---- */
+nav.tab-strip button:focus-visible,
+button.action:focus-visible,
+.cta-card:focus-visible,
+details.gloss summary:focus-visible,
+.tab-pane:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+.tab-pane:focus:not(:focus-visible) { outline: none; }
+
+code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.92em;
+  color: var(--soft);
+}
+
+/* ---- Tab 1: animation chrome ---- */
+.anim-head { margin: 10px 0 8px; }
+.anim-title {
+  color: var(--teal);
+  font-weight: 600;
+  font-size: 14px;
+}
+.anim-note {
+  color: var(--soft);
+  font-size: 13px;
+  min-height: 2.6em;
+}
+.anim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.anim-controls button[aria-pressed="true"].secondary {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* ---- CTA cards are links ---- */
+a.cta-card, a.cta-card:hover { text-decoration: none; display: block; }
+.cta-card .cta-title {
+  display: block;
+  margin: 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.cta-card .cta-text {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+.cta-card .cta-tag { display: block; }
+
+/* ---- Tab 2: OVB card ---- */
+.subhead {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 4px;
+}
+.method-row { gap: 12px; }
+.method-row .val { white-space: nowrap; }
+
+/* ---- Tab 3: table view ---- */
+details.table-card summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--steel);
+}
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+.est-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.est-table th, .est-table td {
+  text-align: right;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.est-table th:first-child, .est-table tbody th { text-align: left; font-weight: 500; color: var(--text); }
+.est-table thead th { color: var(--muted); font-weight: 600; }
+
+/* ---- Tab 5: quiz ---- */
+.card.quiz h3 { font-size: 15px; }
+.quiz-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+.quiz-buttons button { text-align: left; }
+.quiz-buttons button.picked-right { border-color: var(--teal); color: var(--teal); }
+.quiz-buttons button.picked-wrong { border-color: var(--orange); color: var(--orange); }
+.quiz-feedback {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.quiz-feedback.right { color: var(--teal); }
+.quiz-feedback.wrong { color: var(--orange); }
+.quiz-score {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--teal);
+}
+
+.load-error { border-color: var(--orange); color: var(--orange); }
+
+/* Greek symbols must not be upper-cased by the label style. */
+.control label .sym { text-transform: none; font-size: 14px; }
+
+/* Estimator hats and residual tildes (β̂, γ̂, δ̂, x̃, ỹ). A combining accent
+   (U+0302, U+0303) lands off-center in the system sans stack, so the accent is
+   drawn by CSS, centered over the letter: <span class="hat">β</span>. Add "lo"
+   for x-height letters (γ, x, y) so the accent sits closer. The span also
+   blocks the upper-casing of .stat-label and similar labels. */
+.hat, .tilde {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.hat::after, .tilde::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  line-height: 1;
+  font-weight: 400;
+  font-style: normal;
+  pointer-events: none;
+}
+.hat::after      { content: "\02C6"; top: -0.36em; }
+.tilde::after    { content: "\02DC"; top: -0.34em; }
+.hat.lo::after   { top: -0.16em; }
+.tilde.lo::after { top: -0.14em; }
+
+/* ---- Phones ---- */
+@media (max-width: 600px) {
+  header.app-header { padding: 16px 16px 14px; }
+  header.app-header h1 { font-size: 19px; }
+  nav.tab-strip { padding: 0 8px; flex-wrap: wrap; overflow-x: visible; }
+  nav.tab-strip button { padding: 10px 10px; font-size: 13px; }
+  main { padding: 18px 16px; }
+  .card { padding: 14px 14px; }
+  .chart-area { padding: 10px 8px 6px; }
+  .lede { font-size: 15px; }
+  .method-row { flex-wrap: wrap; }
+  .control input[type="range"] { height: 24px; background: transparent; }
+  .control input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: rgba(232, 236, 242, 0.18); border-radius: 3px; }
+  .control input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -9px; }
+  button.action { min-height: 40px; }
+  .est-table .ci { display: none; }
+  .est-table tbody th { white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
