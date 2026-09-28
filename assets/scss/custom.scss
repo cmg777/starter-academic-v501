@@ -1352,9 +1352,16 @@ details.concept-card p:last-child {
   margin-bottom: 0;
 }
 
+/* Dark mode: recolor only the top/right/bottom edges. A `border-color`
+   shorthand here would also repaint the left edge and wipe out the teal
+   (.concept-example) and orange (.concept-analogy) accents: this selector
+   has the same specificity (0,2,1) as the accent rules above and comes
+   later in the file, so it wins by source order. */
 .dark details.concept-card {
   background: rgba(106, 155, 204, 0.08);
-  border-color: rgba(232, 236, 242, 0.2);
+  border-top-color: rgba(232, 236, 242, 0.2);
+  border-right-color: rgba(232, 236, 242, 0.2);
+  border-bottom-color: rgba(232, 236, 242, 0.2);
 }
 
 .dark details.concept-card[open] {
@@ -3213,3 +3220,173 @@ body.dark .mermaid {
 .dark .dashboard-card-title { color: #e8ecf2; }
 .dark .dashboard-card-cite  { color: #9fb0c9; }
 .dark .dashboard-card-access { color: #f0a589; }
+
+/* --- 24. Learning components (predict / solution / misconception / proof cards; companion to §20) ---
+   Pure-HTML <details> cards for tutorial posts — no JS. Markup contract and
+   authoring recipe: .claude/docs/learning-components.md.
+     .learn-card.predict-card        <div> with a <p class="learn-card-kicker">
+                                     and a nested details.learn-card-reveal
+     .learn-card.solution-card       <details> — worked exercise solution (teal)
+     .learn-card.misconception-card  <details> — myth vs. what is true (orange)
+     .learn-card.proof-card          <details> — collapsible proof (near black)
+   The theme sets `details { margin-bottom: 1rem }` and
+   `summary:focus { outline: none }`; the class-qualified selectors below
+   outrank both, and :focus-visible restores a keyboard focus ring.
+   Interactive widgets (e.g. fwl-lab) keep their own CSS in assets/css/. --- */
+.learn-card {
+  border: 1px solid rgba(20, 20, 19, 0.12);
+  border-left: 4px solid #6a9bcc;
+  border-radius: 0.25rem;
+  padding: 0.6rem 0.9rem;
+  margin: 1.25rem 0 1.75rem;
+  background: rgba(106, 155, 204, 0.04);
+}
+
+.learn-card.predict-card {
+  border-left-color: #6a9bcc;
+}
+
+.learn-card.solution-card {
+  border-left-color: #00d4c8;
+}
+
+.learn-card.misconception-card {
+  border-left-color: #d97757;
+}
+
+.learn-card.proof-card {
+  border-left-color: #141413;
+}
+
+.learn-card-kicker {
+  display: inline-block;
+  margin: 0 0.35rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.learn-card > p.learn-card-kicker {
+  display: block;
+  margin: 0 0 0.35rem;
+}
+
+.predict-card .learn-card-kicker {
+  color: #3a6ea5;
+}
+
+.solution-card .learn-card-kicker {
+  color: #00796f;
+}
+
+.misconception-card .learn-card-kicker {
+  color: #b4532f;
+}
+
+.proof-card .learn-card-kicker {
+  color: #141413;
+}
+
+details.learn-card > summary,
+details.learn-card-reveal > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #1a3a8a;
+  list-style: none;
+  padding: 0.15rem 0;
+}
+
+details.learn-card > summary::-webkit-details-marker,
+details.learn-card-reveal > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.learn-card > summary::before,
+details.learn-card-reveal > summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+details.learn-card[open] > summary::before,
+details.learn-card-reveal[open] > summary::before {
+  content: "▾ ";
+}
+
+details.learn-card > summary:focus-visible,
+details.learn-card-reveal > summary:focus-visible {
+  outline: 2px solid #00a99d;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+details.learn-card[open] {
+  background: rgba(106, 155, 204, 0.07);
+}
+
+details.learn-card-reveal {
+  margin: 0.5rem 0 0;
+}
+
+details.learn-card > *:not(summary),
+details.learn-card-reveal > *:not(summary) {
+  margin-top: 0.5rem;
+}
+
+.learn-card p:last-child {
+  margin-bottom: 0;
+}
+
+.learn-card pre {
+  margin: 0.75rem 0;
+}
+
+.learn-card mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* Dark mode — as in §20, recolor only top/right/bottom so the left accent survives */
+.dark .learn-card {
+  background: rgba(106, 155, 204, 0.08);
+  border-top-color: rgba(232, 236, 242, 0.2);
+  border-right-color: rgba(232, 236, 242, 0.2);
+  border-bottom-color: rgba(232, 236, 242, 0.2);
+}
+
+.dark details.learn-card[open] {
+  background: rgba(106, 155, 204, 0.14);
+}
+
+.dark .learn-card.proof-card {
+  border-left-color: #c8d0e0;
+}
+
+.dark details.learn-card > summary,
+.dark details.learn-card-reveal > summary {
+  color: #c8d0e0;
+}
+
+.dark .predict-card .learn-card-kicker {
+  color: #6a9bcc;
+}
+
+.dark .solution-card .learn-card-kicker {
+  color: #00d4c8;
+}
+
+.dark .misconception-card .learn-card-kicker {
+  color: #d97757;
+}
+
+.dark .proof-card .learn-card-kicker {
+  color: #c8d0e0;
+}
+
+.dark details.learn-card > summary:focus-visible,
+.dark details.learn-card-reveal > summary:focus-visible {
+  outline-color: #00d4c8;
+}
