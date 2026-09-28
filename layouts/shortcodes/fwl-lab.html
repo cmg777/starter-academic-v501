@@ -1,0 +1,159 @@
+{{- /*
+  fwl-lab.html — inline interactive Frisch–Waugh–Lovell (FWL) lab.
+
+  Usage:
+    {{< fwl-lab >}}                                 starts on python_fwl's 50 stores
+    {{< fwl-lab id="lab-two" preset="none" >}}      starts on a simulated sample
+  Params:
+    id      element id (default "fwl-lab-<ordinal>"); must be unique on the page
+    preset  "post" (default) or "none"
+
+  Assets: assets/css/fwl-lab.css and assets/js/fwl-lab.js are emitted ONCE per
+  page (Page.Scratch guard), minified and fingerprinted through Hugo Pipes.
+  Math symbols use TeX when the page or site enables math (MathJax typesets
+  them once at load); otherwise plain Unicode. The script only writes numbers
+  into [data-out] spans, never TeX. Keep this output free of blank lines,
+  code/pre/img/table/h2/h3 elements and the dollar character.
+*/ -}}
+{{- $id := .Get "id" | default (printf "fwl-lab-%d" .Ordinal) -}}
+{{- $preset := .Get "preset" | default "post" -}}
+{{- if not (in (slice "post" "none") $preset) -}}
+{{- errorf "fwl-lab: preset must be \"post\" or \"none\" (got %q) in %s" $preset .Position -}}
+{{- end -}}
+{{- $post := eq $preset "post" -}}
+{{- $tex := false -}}
+{{- if or .Page.Params.math site.Params.math -}}{{- $tex = true -}}{{- end -}}
+{{- $pi := cond $tex `\(\pi\)` `<i>π</i>` -}}
+{{- $b1 := cond $tex `\(\beta_1\)` `<i>β</i><sub>1</sub>` -}}
+{{- $b2 := cond $tex `\(\beta_2\)` `<i>β</i><sub>2</sub>` -}}
+{{- $gh := cond $tex `\(\hat\gamma\)` `<i class="fl-hat">γ</i>` -}}
+{{- $dh := cond $tex `\(\hat\delta\)` `<i class="fl-hat fl-hat-tall">δ</i>` -}}
+{{- $gd := cond $tex `\(\hat\gamma\,\hat\delta\)` `<i class="fl-hat">γ</i> · <i class="fl-hat fl-hat-tall">δ</i>` -}}
+{{- $plim := cond $tex `\(\beta_1 + \beta_2 \cdot 100\pi / (100\pi^2 + 25)\)` `<i>β</i><sub>1</sub> + <i>β</i><sub>2</sub> · 100<i>π</i> / (100<i>π</i><sup>2</sup> + 25)` -}}
+{{- if not (.Page.Scratch.Get "fwlLabAssets") -}}
+{{- .Page.Scratch.Set "fwlLabAssets" true -}}
+{{- $css := resources.Get "css/fwl-lab.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $js := resources.Get "js/fwl-lab.js" | js.Build (dict "minify" true "target" "es2017") | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}
+<section class="fwl-lab" id="{{ $id }}" data-fwl-lab data-preset="{{ $preset }}" aria-labelledby="{{ $id }}-title">
+<div class="fl-head">
+<p class="fl-title" id="{{ $id }}-title">Interactive FWL lab</p>
+<p class="fl-status" data-out="status">{{ if $post }}Showing the post’s 50 stores{{ else }}Simulated sample #1, n = 50{{ end }}</p>
+</div>
+<noscript><p class="fl-noscript">This interactive lab needs JavaScript. The static figures in this post show the same naive and partialled-out regressions.</p></noscript>
+<div class="fl-body">
+<p class="fl-intro">Change how strongly income drives coupons and sales, then compare the naive slope in the raw data with the FWL slope after income is partialled out of both variables.</p>
+<div class="fl-controls">
+<div class="fl-ctl">
+<div class="fl-ctl-top"><label for="{{ $id }}-pi">Income → coupons slope {{ $pi | safeHTML }}</label><output for="{{ $id }}-pi" data-param-out="pi">−0.50</output></div>
+<input type="range" id="{{ $id }}-pi" data-param="pi" min="-1.5" max="1.5" step="0.05" value="-0.5" autocomplete="off" aria-describedby="{{ $id }}-pi-help">
+<p class="fl-help" id="{{ $id }}-pi-help">Coupons per extra unit of income. Default −0.50: richer neighborhoods get fewer coupons.</p>
+</div>
+<div class="fl-ctl">
+<div class="fl-ctl-top"><label for="{{ $id }}-beta2">Income → sales effect {{ $b2 | safeHTML }}</label><output for="{{ $id }}-beta2" data-param-out="beta2">0.30</output></div>
+<input type="range" id="{{ $id }}-beta2" data-param="beta2" min="-1" max="1" step="0.05" value="0.3" autocomplete="off" aria-describedby="{{ $id }}-beta2-help">
+<p class="fl-help" id="{{ $id }}-beta2-help">Direct effect of income on sales. Default 0.30. Set it to 0 and income no longer confounds the naive slope.</p>
+</div>
+<div class="fl-ctl">
+<div class="fl-ctl-top"><label for="{{ $id }}-beta1">True coupon effect {{ $b1 | safeHTML }}</label><output for="{{ $id }}-beta1" data-param-out="beta1">0.20</output></div>
+<input type="range" id="{{ $id }}-beta1" data-param="beta1" min="-0.5" max="0.5" step="0.05" value="0.2" autocomplete="off" aria-describedby="{{ $id }}-beta1-help">
+<p class="fl-help" id="{{ $id }}-beta1-help">Extra sales from one more coupon, the causal effect a good estimator should recover. Default 0.20.</p>
+</div>
+<div class="fl-ctl">
+<div class="fl-ctl-top"><label for="{{ $id }}-n">Stores per sample</label><output for="{{ $id }}-n" data-param-out="n">50</output></div>
+<input type="range" id="{{ $id }}-n" data-param="n" min="0" max="5" step="1" value="1" autocomplete="off" aria-valuetext="50 stores" aria-describedby="{{ $id }}-n-help">
+<p class="fl-help" id="{{ $id }}-n-help">20, 50, 100, 200, 500 or 1000 stores. A new size draws a simulated sample from the same process.</p>
+</div>
+</div>
+<div class="fl-actions">
+<button type="button" class="fl-btn fl-btn-primary" data-act="draw">Draw a new sample</button>
+<button type="button" class="fl-btn" data-act="reset">{{ if $post }}Reset to the post’s stores{{ else }}Reset to defaults{{ end }}</button>
+</div>
+<div class="fl-plots">
+<div class="fl-plot">
+<p class="fl-cap">Raw data: the naive slope</p>
+<svg viewBox="0 0 300 220" role="img" aria-labelledby="{{ $id }}-raw-t" aria-describedby="{{ $id }}-raw-d" data-plot="raw">
+<title id="{{ $id }}-raw-t">Sales against coupons, raw data</title>
+<desc id="{{ $id }}-raw-d">Scatter of sales against coupons with the naive regression line and the true slope.</desc>
+<defs><clipPath id="{{ $id }}-raw-clip"><rect x="40" y="10" width="250" height="174"/></clipPath></defs>
+<g data-ticks="x"></g>
+<g data-ticks="y"></g>
+<rect class="fl-frame" x="40" y="10" width="250" height="174"/>
+<g clip-path="url(#{{ $id }}-raw-clip)">
+<g data-pts="pts"></g>
+<path class="fl-line fl-line-truth" data-line="truth" d="M40 97L290 97"/>
+<path class="fl-halo" data-line="naive" d="M40 97L290 97"/>
+<path class="fl-line fl-line-naive" data-line="naive" d="M40 97L290 97"/>
+</g>
+<text class="fl-axlab" x="165" y="213" text-anchor="middle">Coupons</text>
+<text class="fl-axlab" transform="translate(10 97) rotate(-90)" text-anchor="middle">Sales</text>
+</svg>
+</div>
+<div class="fl-plot">
+<p class="fl-cap">Income partialled out: the FWL slope</p>
+<svg viewBox="0 0 300 220" role="img" aria-labelledby="{{ $id }}-res-t" aria-describedby="{{ $id }}-res-d" data-plot="resid">
+<title id="{{ $id }}-res-t">Residualized sales against residualized coupons</title>
+<desc id="{{ $id }}-res-d">Scatter of sales against coupons after removing income from both, with the FWL line and the true slope.</desc>
+<defs><clipPath id="{{ $id }}-res-clip"><rect x="40" y="10" width="250" height="174"/></clipPath></defs>
+<g data-ticks="x"></g>
+<g data-ticks="y"></g>
+<path class="fl-zero" d="M165 10L165 184M40 97L290 97"/>
+<rect class="fl-frame" x="40" y="10" width="250" height="174"/>
+<g clip-path="url(#{{ $id }}-res-clip)">
+<g data-pts="pts"></g>
+<path class="fl-line fl-line-truth" data-line="truth" d="M40 97L290 97"/>
+<path class="fl-halo" data-line="fwl" d="M40 97L290 97"/>
+<path class="fl-line fl-line-fwl" data-line="fwl" d="M40 97L290 97"/>
+</g>
+<text class="fl-axlab" x="165" y="213" text-anchor="middle">Residualized coupons</text>
+<text class="fl-axlab" transform="translate(10 97) rotate(-90)" text-anchor="middle">Residualized sales</text>
+</svg>
+</div>
+</div>
+<div class="fl-mid">
+<div class="fl-strip-wrap">
+<p class="fl-cap">All three slopes on one scale</p>
+<svg class="fl-strip" viewBox="0 0 300 56" role="img" aria-labelledby="{{ $id }}-strip-t" aria-describedby="{{ $id }}-strip-d" data-strip="strip">
+<title id="{{ $id }}-strip-t">True, naive and FWL slopes on a common scale</title>
+<desc id="{{ $id }}-strip-d">Positions of the true effect, the naive slope and the FWL slope between −1.5 and 1.5.</desc>
+<path class="fl-strip-axis" d="M20 32L280 32"/>
+<path class="fl-strip-tick" d="M20 29L20 35M63.3 29L63.3 35M106.7 29L106.7 35M193.3 29L193.3 35M236.7 29L236.7 35M280 29L280 35"/>
+<path class="fl-zero" d="M150 20L150 42"/>
+<text x="20" y="52" text-anchor="middle">−1.5</text>
+<text x="63.3" y="52" text-anchor="middle">−1</text>
+<text x="106.7" y="52" text-anchor="middle">−0.5</text>
+<text x="150" y="52" text-anchor="middle">0</text>
+<text x="193.3" y="52" text-anchor="middle">0.5</text>
+<text x="236.7" y="52" text-anchor="middle">1</text>
+<text x="280" y="52" text-anchor="middle">1.5</text>
+<g class="fl-mk fl-mk-truth" data-mk="truth"><path d="M0 20L0 43"/></g>
+<g class="fl-mk fl-mk-naive" data-mk="naive"><circle cx="0" cy="32" r="5"/></g>
+<g class="fl-mk fl-mk-fwl" data-mk="fwl"><path d="M0 25.5L6.5 32L0 38.5L-6.5 32Z"/></g>
+<text class="fl-mk-label fl-mk-label-truth" data-mk-label="truth" x="0" y="13" text-anchor="middle">true</text>
+<text class="fl-mk-label fl-mk-label-naive" data-mk-label="naive" x="0" y="13" text-anchor="middle">naive</text>
+<text class="fl-mk-label fl-mk-label-fwl" data-mk-label="fwl" x="0" y="13" text-anchor="middle">FWL</text>
+</svg>
+</div>
+<ul class="fl-legend">
+<li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-halo" d="M2 7L28 7"/><path class="fl-line fl-line-naive" d="M2 7L28 7"/><circle class="fl-mk-naive-dot" cx="15" cy="7" r="3.5"/></svg><span>Naive OLS slope (raw data)</span></li>
+<li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-halo" d="M2 7L28 7"/><path class="fl-line fl-line-fwl" d="M2 7L28 7"/><path class="fl-mk-fwl-dot" d="M15 2.5L19.5 7L15 11.5L10.5 7Z"/></svg><span>FWL slope (income partialled out)</span></li>
+<li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-line fl-line-truth" d="M2 7L28 7"/></svg><span>True coupon effect {{ $b1 | safeHTML }}</span></li>
+<li><svg class="fl-sw fl-sw-dots" viewBox="0 0 38 14" aria-hidden="true" focusable="false"><circle class="fl-pt fl-t0" cx="6" cy="7" r="4"/><circle class="fl-pt fl-t1" cx="19" cy="7" r="4"/><circle class="fl-pt fl-t2" cx="32" cy="7" r="4"/></svg><span>Stores by income third: low, middle, high</span></li>
+</ul>
+</div>
+<dl class="fl-readout">
+<div class="fl-row fl-row-key"><dt><span class="fl-key fl-key-truth" aria-hidden="true"></span>True coupon effect {{ $b1 | safeHTML }}</dt><dd><span data-out="beta1">0.2000</span></dd></div>
+<div class="fl-row fl-row-key"><dt><span class="fl-key fl-key-naive" aria-hidden="true"></span>Naive slope<span class="fl-sub">sales on coupons only</span></dt><dd><span data-out="naive"></span></dd></div>
+<div class="fl-row fl-row-key"><dt><span class="fl-key fl-key-fwl" aria-hidden="true"></span>FWL slope<span class="fl-sub">= coupon coefficient in sales ~ coupons + income</span></dt><dd><span data-out="fwl"></span></dd></div>
+<div class="fl-row"><dt>Naive slope in a very large sample<span class="fl-sub">{{ $plim | safeHTML }}</span></dt><dd><span data-out="plim"></span></dd></div>
+<div class="fl-row"><dt>{{ $gh | safeHTML }} income coefficient<span class="fl-sub">in sales ~ coupons + income</span></dt><dd><span data-out="gamma"></span></dd></div>
+<div class="fl-row"><dt>{{ $dh | safeHTML }} slope of income on coupons<span class="fl-sub">auxiliary regression income ~ coupons</span></dt><dd><span data-out="delta"></span></dd></div>
+<div class="fl-row"><dt>Omitted-variable gap {{ $gd | safeHTML }}<span class="fl-sub">= naive − FWL, exactly, in this sample</span></dt><dd><span data-out="ovb"></span></dd></div>
+</dl>
+<p class="fl-flag" data-state="both"><span>Sign flip in this sample: <strong data-out="flipSample">yes</strong></span> · <span>in a very large sample: <strong data-out="flipPlim">yes</strong></span><span class="fl-sub" data-out="flipNote"></span></p>
+<p class="fl-sr" aria-live="polite" data-live></p>
+</div>
+</section>
+{{- /* end fwl-lab */ -}}

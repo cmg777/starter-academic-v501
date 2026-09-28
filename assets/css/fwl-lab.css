@@ -1,0 +1,552 @@
+/*
+ * fwl-lab.css — styles for the inline interactive FWL lab
+ * (layouts/shortcodes/fwl-lab.html + assets/js/fwl-lab.js).
+ *
+ * Every color is a CSS variable; SVG marks are styled by class, so switching
+ * Wowchemy's light/dark theme (the `dark` class on <body>) restyles the lab
+ * instantly without JavaScript. Contrast on the lab surface: text >= 4.5:1,
+ * graphics >= 3:1 in both themes.
+ */
+
+.fwl-lab {
+  --fl-text: #141413;
+  --fl-muted: #4a5568;
+  --fl-bg: rgba(106, 155, 204, 0.04);
+  --fl-surface: #f9fbfd;          /* solid twin of --fl-bg over a white page (halos) */
+  --fl-border: rgba(61, 110, 165, 0.35);
+  --fl-grid: rgba(20, 20, 19, 0.09);
+  --fl-frame: rgba(20, 20, 19, 0.28);
+  --fl-zero: rgba(20, 20, 19, 0.45);
+  --fl-naive: #c8643f;            /* warm orange, deepened: 3.8:1 on the light surface (graphics) */
+  --fl-fwl: #00897f;              /* deep teal: 4.1:1 (graphics) */
+  --fl-naive-ink: #a9522f;        /* text twins of the two series colors: 5.1:1 and 5.2:1 */
+  --fl-fwl-ink: #00776e;
+  --fl-truth: #141413;
+  --fl-t0: #6393c6;               /* income thirds, low -> high: 3.1, 5.6, 15.9:1; */
+  --fl-t1: #2a66ad;               /* neighbors differ by dE76 22 and 40 so the three */
+  --fl-t2: #0e1f38;               /* shades stay distinct at marker size */
+  --fl-accent: #2f639a;
+  --fl-accent-ink: #ffffff;
+  --fl-accent-soft: rgba(47, 99, 154, 0.1);
+  --fl-focus: #1a5fb4;
+  --fl-flag-bg: rgba(106, 155, 204, 0.08);
+  --fl-flag-both: #c8643f;
+  --fl-flag-mixed: #2f5f94;
+  --fl-flag-none: #00897f;
+  --fl-flag-na: #6b7280;
+
+  margin: 2rem 0;
+  padding: 1rem 1rem 1.1rem;
+  border: 1px solid var(--fl-border);
+  border-radius: 12px;
+  background: var(--fl-bg);
+  color: var(--fl-text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.dark .fwl-lab {
+  --fl-text: #e8ecf2;
+  --fl-muted: #c8d0e0;
+  --fl-bg: rgba(106, 155, 204, 0.06);
+  --fl-surface: #101a39;          /* solid twin of --fl-bg over the #0a1230 page */
+  --fl-border: rgba(106, 155, 204, 0.4);
+  --fl-grid: rgba(200, 208, 224, 0.11);
+  --fl-frame: rgba(200, 208, 224, 0.3);
+  --fl-zero: rgba(232, 236, 242, 0.5);
+  --fl-naive: #e8896a;
+  --fl-fwl: #00d4c8;
+  --fl-naive-ink: #e8896a;        /* 6.7:1 on the dark surface */
+  --fl-fwl-ink: #00d4c8;          /* 9.2:1 */
+  --fl-truth: #e8ecf2;
+  --fl-t0: #4f78ab;
+  --fl-t1: #8fb3de;
+  --fl-t2: #d6e4f7;
+  --fl-accent: #6a9bcc;
+  --fl-accent-ink: #0a1230;
+  --fl-accent-soft: rgba(106, 155, 204, 0.16);
+  --fl-focus: #00d4c8;
+  --fl-flag-bg: rgba(106, 155, 204, 0.1);
+  --fl-flag-both: #e8896a;
+  --fl-flag-mixed: #8fb3de;
+  --fl-flag-none: #00d4c8;
+  --fl-flag-na: #9aa5b8;
+}
+
+.fwl-lab *,
+.fwl-lab *::before,
+.fwl-lab *::after {
+  box-sizing: border-box;
+}
+
+/* Neutralize article typography that would otherwise leak in. */
+.fwl-lab p,
+.fwl-lab ul,
+.fwl-lab li,
+.fwl-lab dl,
+.fwl-lab dt,
+.fwl-lab dd,
+.fwl-lab label {
+  margin: 0;
+  padding: 0;
+}
+
+/* Until the script has drawn the lab, only the header and <noscript> show. */
+.fwl-lab[data-fwl-lab]:not([data-ready]) .fl-body {
+  display: none;
+}
+
+.fwl-lab[data-fwl-lab]:not([data-ready]) .fl-status {
+  visibility: hidden;
+}
+
+.fwl-lab .fl-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Header ---- */
+.fwl-lab .fl-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.fwl-lab .fl-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.fwl-lab .fl-status {
+  color: var(--fl-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.fwl-lab .fl-intro {
+  margin-top: 0.4rem;
+  color: var(--fl-muted);
+  font-size: 0.9rem;
+}
+
+.fwl-lab .fl-noscript {
+  margin-top: 0.5rem;
+  color: var(--fl-muted);
+}
+
+/* ---- Controls ---- */
+.fwl-lab .fl-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem 1.75rem;
+  margin-top: 1rem;
+}
+
+.fwl-lab .fl-ctl-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fwl-lab .fl-ctl label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+
+.fwl-lab .fl-ctl output {
+  flex: none;
+  min-width: 3.4em;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fwl-lab input[type="range"],
+.dark .fwl-lab input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 2.25rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  background: transparent;
+  accent-color: var(--fl-accent);
+  cursor: pointer;
+}
+
+.fwl-lab .fl-help {
+  color: var(--fl-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.fwl-lab .fl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.fwl-lab .fl-btn {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--fl-accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fl-text);
+  font: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.fwl-lab .fl-btn:hover {
+  background: var(--fl-accent-soft);
+}
+
+.fwl-lab .fl-btn-primary {
+  background: var(--fl-accent);
+  color: var(--fl-accent-ink);
+}
+
+.fwl-lab .fl-btn-primary:hover {
+  background: var(--fl-accent);
+  filter: brightness(1.08);
+}
+
+.fwl-lab input[type="range"]:focus-visible,
+.fwl-lab .fl-btn:focus-visible {
+  outline: 3px solid var(--fl-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Plots ---- */
+.fwl-lab .fl-plots {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem 1.25rem;
+  margin-top: 1.1rem;
+}
+
+.fwl-lab .fl-plot {
+  min-width: 0;
+}
+
+.fwl-lab .fl-cap {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.fwl-lab svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.fwl-lab svg text {
+  font-family: inherit;
+  font-size: 10.5px;
+  fill: var(--fl-muted);
+}
+
+.fwl-lab svg .fl-axlab {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--fl-text);
+}
+
+.fwl-lab .fl-frame {
+  fill: none;
+  stroke: var(--fl-frame);
+  stroke-width: 1;
+}
+
+.fwl-lab .fl-gridline {
+  stroke: var(--fl-grid);
+  stroke-width: 1;
+}
+
+.fwl-lab .fl-zero {
+  fill: none;
+  stroke: var(--fl-zero);
+  stroke-width: 1;
+}
+
+.fwl-lab .fl-pt {
+  stroke: var(--fl-surface);
+  stroke-width: 0.6;
+  fill-opacity: 0.92;
+}
+
+.fwl-lab svg[data-density="mid"] .fl-pt { fill-opacity: 0.8; stroke-width: 0.4; }
+.fwl-lab svg[data-density="hi"] .fl-pt { fill-opacity: 0.62; stroke-width: 0; }
+
+.fwl-lab .fl-t0 { fill: var(--fl-t0); }
+.fwl-lab .fl-t1 { fill: var(--fl-t1); }
+.fwl-lab .fl-t2 { fill: var(--fl-t2); }
+
+.fwl-lab .fl-line {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.fwl-lab .fl-halo {
+  fill: none;
+  stroke: var(--fl-surface);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-opacity: 0.9;
+}
+
+.fwl-lab .fl-line-naive { stroke: var(--fl-naive); }
+.fwl-lab .fl-line-fwl { stroke: var(--fl-fwl); }
+.fwl-lab .fl-line-truth {
+  stroke: var(--fl-truth);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+}
+
+/* ---- Slope strip + legend row ---- */
+.fwl-lab .fl-mid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem 1.25rem;
+  align-items: center;
+  margin-top: 1.1rem;
+}
+
+.fwl-lab .fl-strip-wrap {
+  min-width: 0;
+}
+
+.fwl-lab .fl-strip-axis {
+  fill: none;
+  stroke: var(--fl-frame);
+  stroke-width: 1.2;
+}
+
+.fwl-lab .fl-strip-tick {
+  fill: none;
+  stroke: var(--fl-frame);
+  stroke-width: 1;
+}
+
+.fwl-lab .fl-mk-naive circle { fill: var(--fl-naive); stroke: var(--fl-surface); stroke-width: 1.2; }
+.fwl-lab .fl-mk-fwl path { fill: var(--fl-fwl); stroke: var(--fl-surface); stroke-width: 1.2; }
+.fwl-lab .fl-mk-truth path { fill: none; stroke: var(--fl-truth); stroke-width: 2; stroke-dasharray: 3 2; }
+.fwl-lab .fl-mk-naive-dot { fill: var(--fl-naive); stroke: var(--fl-surface); stroke-width: 1; }
+.fwl-lab .fl-mk-fwl-dot { fill: var(--fl-fwl); stroke: var(--fl-surface); stroke-width: 1; }
+
+.fwl-lab svg .fl-mk-label {
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.fwl-lab svg .fl-mk-label-naive { fill: var(--fl-naive-ink); }
+.fwl-lab svg .fl-mk-label-fwl { fill: var(--fl-fwl-ink); }
+.fwl-lab svg .fl-mk-label-truth { fill: var(--fl-truth); }
+
+/* ---- Legend ---- */
+.fwl-lab ul.fl-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.fwl-lab ul.fl-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  list-style: none;
+}
+
+.fwl-lab ul.fl-legend li::before,
+.fwl-lab ul.fl-legend li::marker {
+  content: none;
+}
+
+.fwl-lab .fl-sw {
+  display: inline-block;
+  flex: none;
+  width: 30px;
+  height: 14px;
+  overflow: visible;
+}
+
+.fwl-lab .fl-sw-dots {
+  width: 38px;
+}
+
+/* ---- Readout ---- */
+.fwl-lab dl.fl-readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 1.75rem;
+  margin: 1rem 0 0;
+}
+
+.fwl-lab .fl-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--fl-grid);
+}
+
+.fwl-lab .fl-row dt {
+  font-weight: 400;
+  min-width: 0;
+}
+
+.fwl-lab .fl-row dd {
+  flex: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.fwl-lab .fl-row-key dd {
+  font-size: 1.05em;
+}
+
+.fwl-lab .fl-sub {
+  display: block;
+  color: var(--fl-muted);
+  font-size: 0.8125rem;
+}
+
+.fwl-lab .fl-key {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-right: 0.4em;
+  vertical-align: 0.02em;
+  border-radius: 2px;
+}
+
+.fwl-lab .fl-key-naive { background: var(--fl-naive); border-radius: 50%; }
+.fwl-lab .fl-key-fwl { background: var(--fl-fwl); transform: rotate(45deg) scale(0.85); }
+.fwl-lab .fl-key-truth {
+  width: 1em;
+  height: 0;
+  vertical-align: 0.3em;
+  border-top: 2.5px dashed var(--fl-truth);
+  border-radius: 0;
+}
+
+/* Unicode fallback for hatted symbols (pages without MathJax): a positioned
+   circumflex renders more reliably than a combining accent. */
+.fwl-lab .fl-hat {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.05em;
+}
+
+.fwl-lab .fl-hat::after {
+  content: "\02C6";
+  position: absolute;
+  top: 0.04em;
+  left: 58%;
+  transform: translateX(-50%);
+  font-style: normal;
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.fwl-lab .fl-hat-tall::after {
+  top: -0.16em;
+}
+
+/* ---- Sign-flip line: text states yes/no; the bar only reinforces it ---- */
+.fwl-lab .fl-flag {
+  margin-top: 1rem;
+  padding: 0.6rem 0.85rem;
+  border-left: 5px solid var(--fl-flag-mixed);
+  border-radius: 0 8px 8px 0;
+  background: var(--fl-flag-bg);
+  font-weight: 600;
+  transition: border-color 0.2s ease;
+}
+
+.fwl-lab .fl-flag[data-state="both"] { border-left-color: var(--fl-flag-both); }
+.fwl-lab .fl-flag[data-state="none"] { border-left-color: var(--fl-flag-none); }
+.fwl-lab .fl-flag[data-state="na"] { border-left-color: var(--fl-flag-na); }
+
+.fwl-lab .fl-flag strong {
+  font-weight: 800;
+}
+
+.fwl-lab .fl-flag .fl-sub {
+  margin-top: 0.15rem;
+  font-weight: 400;
+}
+
+/* ---- Motion ---- */
+.fwl-lab .fl-mk,
+.fwl-lab .fl-mk-label {
+  transition: transform 0.18s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fwl-lab .fl-mk,
+  .fwl-lab .fl-mk-label,
+  .fwl-lab .fl-flag {
+    transition: none;
+  }
+}
+
+/* ---- Layout: one column on phones, two columns from 576px ---- */
+@media (min-width: 576px) {
+  .fwl-lab {
+    padding: 1.25rem 1.4rem 1.35rem;
+  }
+
+  .fwl-lab .fl-controls,
+  .fwl-lab .fl-plots,
+  .fwl-lab .fl-mid,
+  .fwl-lab dl.fl-readout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* slopes in the first column, the omitted-variable-gap pieces in the second */
+  .fwl-lab dl.fl-readout {
+    grid-auto-flow: column;
+    grid-template-rows: repeat(4, auto);
+  }
+}
+
+@media print {
+  .fwl-lab .fl-actions,
+  .fwl-lab .fl-controls input[type="range"] {
+    display: none;
+  }
+}
