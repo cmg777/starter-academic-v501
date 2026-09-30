@@ -5,7 +5,7 @@ Executable companion to the blog post:
 > **The FWL Theorem: Making Multivariate Regressions Intuitive**
 > <https://carlos-mendez.org/post/python_fwl/>
 
-The notebook reproduces every number in the post from the same 50 simulated stores (seed 42): the naive slope of −0.1059, the controlled slope of +0.2673, the omitted-variable-bias identity 0.3836 × (−0.9730) = −0.3732, the FWL steps and their standard errors, the figures, and the solutions to all eight exercises. The interactive lab of section 16 runs only in the browser; the notebook links to it.
+The notebook reproduces every number in the post from the same 50 simulated fast-food restaurants (seed 42; January): the naive slope of −0.1059, the controlled slope of +0.2673, the omitted-variable-bias identity 0.3836 × (−0.9730) = −0.3732, the FWL steps and their standard errors, the figures, the solutions to all eight exercises, and the panel-data appendix (January + June). The interactive lab of section 16 runs only in the browser; the notebook links to it.
 
 ## What's inside
 
@@ -16,8 +16,9 @@ The notebook reproduces every number in the post from the same 50 simulated stor
 | `setup_env.py` | Builds a local `.venv/` with the pinned packages and registers the Jupyter kernel `python_fwl-tutorial`. |
 | `_quarto.yml` | Wires `setup_env.py` to Quarto's pre-render hook. |
 | `README.md` | This file. |
-| `fwl_store_data.csv` | The 50 stores used in the post (columns `sales`, `coupons`, `income`, `dayofweek`). The notebook loads it and checks that it is identical to `simulate_store_data(seed=42)`; without it, the notebook simulates the same data. |
-| `script.py` | The canonical script that produced the post's numbers and dark-theme figures. It also runs from this folder: it rewrites `fwl_results.json`, the five figures and `data/fwl_store_data.csv` (the same data as the CSV above). The web app's `results.json` is written only when the post's `web_app/data/` folder exists, so that step is skipped here. |
+| `fwl_store_data.csv` | The 50 restaurants used in the post, January (columns `sales` = monthly sales in thousands of dollars, `coupons` = redemption rate in % of the 100 coupons handed out, `income`, `dayofweek`). The notebook loads it and checks that it is identical to `simulate_store_data(seed=42)`; without it, the notebook simulates the same data. |
+| `fwl_restaurant_panel.csv` | The January + June panel of the appendix: 100 rows, `restaurant_id` (1–50), `period` (1 = January, 2 = June), `sales`, `coupons`, `income`, `dayofweek`. Its January rows equal `fwl_store_data.csv`. The notebook simulates it with `simulate_restaurant_panel()`; the CSV is for use in other software. |
+| `script.py` | The canonical script that produced the post's numbers and dark-theme figures. It also runs from this folder: it rewrites `fwl_results.json`, the five figures, `data/fwl_store_data.csv` (the same data as the CSV above), `data/fwl_restaurant_panel.csv` and the two interactive panel plots in `panel_plots/` (it needs expdpy). The web app's `results.json` is written only when the post's `web_app/data/` folder exists, so that step is skipped here. |
 | `cheatsheet_python.py` | A one-page Python cheat sheet: FWL, the OVB identity and the standard-error checks on the same CSV. Standalone; its header lists the packages it needs. |
 | `cheatsheet_R.R` | The R port of the cheat sheet (same sections, same comparison table). |
 | `cheatsheet_stata.do` | The Stata port of the cheat sheet. |
@@ -32,7 +33,7 @@ The cheat sheets and `analysis.do` read `fwl_store_data.csv` from this folder, a
 - [Positron](https://positron.posit.co/) is recommended; any terminal with `quarto` on PATH also works.
 - An internet connection for the first run only (to install the packages).
 
-Pinned packages (installed into `.venv/`, not into your system Python): numpy 2.2.6, pandas 2.3.3, matplotlib 3.10.8, seaborn 0.13.2, statsmodels 0.14.6, wooldridge 0.5.0 (the `wage2` data for Exercise 8), jupyter 1.1.1 and ipykernel 7.2.0. `pyfixest` is optional and not installed: the notebook never imports it, and `cheatsheet_python.py` skips its pyfixest check when the package is missing.
+Pinned packages (installed into `.venv/`, not into your system Python): numpy 2.2.6, pandas 2.3.3, matplotlib 3.10.8, seaborn 0.13.2, statsmodels 0.14.6, wooldridge 0.5.0 (the `wage2` data for Exercise 8), jupyter 1.1.1 and ipykernel 7.2.0. Optional: expdpy 0.5.2, which brings pyfixest and provides `analyze_fwl_plot` for the panel-data appendix. pyfixest ships no macOS wheel for Python 3.10, so on a Mac with Python 3.10 `setup_env.py` warns and the appendix skips its `analyze_fwl_plot` lines; the statsmodels routes still run. Use Python 3.11+ on macOS to run everything.
 
 ## How to render
 
@@ -67,7 +68,7 @@ Step 2 is only needed once per machine.
 ## Troubleshooting
 
 - **Wrapper refuses to open on macOS (Gatekeeper):** `render.command` is unsigned, so the first time you double-click it macOS may block it. Right-click → **Open** → confirm in the dialog. After that, double-clicking works normally. As a fallback, run `bash render.command` from a terminal.
-- **Auto-relaunch:** if `python3` on your PATH is unsupported (for example Python 3.14, or 3.9 and older), `setup_env.py` scans your machine for a compatible Python 3.10–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
+- **Auto-relaunch:** if `python3` on your PATH is unsupported (for example Python 3.14, or 3.9 and older), `setup_env.py` scans your machine for a compatible Python 3.10–3.13, picks the newest one it finds, and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
 - **Kernel not found:** if Render reports `Jupyter kernel 'python_fwl-tutorial' not found`, you skipped the setup step — run `python3 setup_env.py` in a terminal and try again. The one-click wrapper avoids this entirely.
 - **"Kernel is running outside the tutorial .venv":** Quarto picked a different Python. Render with the wrapper, or set `QUARTO_PYTHON` as in step 3 of the manual route.

@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-09-28">
+  <meta name="dcterms.date" content="2026-09-30">
   <title>The FWL Theorem: Making Multivariate Regressions Intuitive</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -205,22 +205,22 @@
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">+0.200</span><span class="kr-cap">true coupon effect (ATE)</span></div>
     <div class="kr"><span class="kr-num">+0.267</span><span class="kr-cap">FWL = full OLS, income held fixed</span></div>
-    <div class="kr"><span class="kr-num">50</span><span class="kr-cap">simulated stores</span></div>
+    <div class="kr"><span class="kr-num">50</span><span class="kr-cap">simulated restaurants</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">September 28, 2026</p>
+  <p class="date">September 30, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
 <h1>The Tension</h1>
 <p><span class="act">Act I</span></p>
 </section>
-<section id="we-planted-a-0.2-coupon-effect-in-50-stores-will-a-regression-find-it" class="slide level2 center">
-<h2>We planted a +0.2 coupon effect in 50 stores — will a regression find it?</h2>
-<p>A retail chain hands out discount coupons in 50 stores. <em>Do the coupons increase sales?</em></p>
+<section id="we-planted-a-0.2-coupon-effect-in-50-restaurants-will-a-regression-find-it" class="slide level2 center">
+<h2>We planted a +0.2 coupon effect in 50 restaurants — will a regression find it?</h2>
+<p>A fast-food chain: 50 restaurants, each hands out 100 coupons in one day and counts how many come back that month. <em>Does a higher redemption rate raise monthly sales?</em></p>
 <div class="fragment">
-<p>We simulated the stores, so we know the truth: <strong>+0.2</strong>. <em>Will the simplest regression find it?</em></p>
+<p>We simulated the restaurants, so we know the truth: <strong>+0.2</strong>. <em>Will the simplest regression find it?</em></p>
 <aside class="notes">
 <p>The hook: one dataset, one question, and — unusually — a known answer. Because we built the data, we can grade every estimator against the truth. Do not reveal the naive result yet; the next slide asks the room to predict it.</p>
 <style type="text/css">
@@ -259,7 +259,7 @@
 <section id="naive-regression-coupons-look-like-they-reduce-sales" class="slide level2 center">
 <h2>Naive regression: coupons look like they <em>reduce</em> sales</h2>
 
-<img data-src="../fwl_naive_regression.png" class="r-stretch quarto-figure-center"><p class="caption">Daily sales vs.&nbsp;coupon usage across 50 stores. The orange fit slopes down — coupons appear to hurt sales.</p><aside class="notes">
+<img data-src="../fwl_naive_regression.png" class="r-stretch quarto-figure-center"><p class="caption">Monthly sales vs.&nbsp;coupon redemption rate across 50 restaurants. The orange fit slopes down — coupons appear to hurt sales.</p><aside class="notes">
 <p>The answer to the vote: negative. The slope is −0.1059 even though we planted +0.2. Don’t explain the mechanism yet — just plant that the raw picture is negative and misleading. Income is the culprit; we earn the reversal in Act II and return to this picture in the side-by-side at the end.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -306,8 +306,8 @@
 <div class="columns">
 <div class="column" style="width:55%;">
 <ul>
-<li class="fragment"><strong>Income</strong> → fewer coupons (wealthier stores use fewer)</li>
-<li class="fragment"><strong>Income</strong> → more sales (wealthier stores spend more)</li>
+<li class="fragment"><strong>Income</strong> → fewer redemptions (wealthier neighborhoods redeem fewer)</li>
+<li class="fragment"><strong>Income</strong> → more sales (wealthier neighborhoods spend more)</li>
 <li class="fragment"><strong>Coupons</strong> → sales: true effect <strong>+0.2</strong></li>
 </ul>
 </div><div class="column" style="width:45%;">
@@ -333,13 +333,13 @@
 <span id="cb1-2"><a href=""></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
 <span id="cb1-3"><a href=""></a>    income    <span class="op">=</span> rng.normal(<span class="dv">50</span>, <span class="dv">10</span>, n)                    <span class="co"># the confounder</span></span>
 <span id="cb1-4"><a href=""></a>    dayofweek <span class="op">=</span> rng.integers(<span class="dv">1</span>, <span class="dv">8</span>, n)                    <span class="co"># day of week, 1 to 7</span></span>
-<span id="cb1-5"><a href=""></a>    coupons   <span class="op">=</span> <span class="dv">60</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> income <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">5</span>, n)  <span class="co"># income → fewer coupons</span></span>
+<span id="cb1-5"><a href=""></a>    coupons   <span class="op">=</span> <span class="dv">60</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> income <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">5</span>, n)  <span class="co"># income → fewer redemptions</span></span>
 <span id="cb1-6"><a href=""></a>    sales     <span class="op">=</span> (<span class="dv">10</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> coupons <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> income       <span class="co"># true effect = +0.2</span></span>
 <span id="cb1-7"><a href=""></a>                 <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> dayofweek <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">3</span>, n))</span>
 <span id="cb1-8"><a href=""></a>    <span class="cf">return</span> pd.DataFrame(...)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">We <em>plant</em> the answer (+0.2) in the data, then check whether each estimator finds it.</span></p>
 <aside class="notes">
-<p>Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 stores, income centered at $50K. Day of week is drawn uniformly from 1 to 7, independently of income and coupons. Coupons fall with income; sales rise with coupons, income, and day of week. The draw order (income, day of week, coupons, sales) matters for reproducing the seed-42 sample. The full function rounds each column to two decimals before returning the DataFrame.</p>
+<p>Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 restaurants, one per neighborhood, income centered at $50K. <code>coupons</code> is the redemption rate: the percentage of the restaurant’s 100 coupons redeemed during the month; <code>sales</code> is monthly sales in thousands of dollars. Day of week is drawn uniformly from 1 to 7, independently of income and coupons. Coupons fall with income; sales rise with coupons, income, and day of week. The draw order (income, day of week, coupons, sales) matters for reproducing the seed-42 sample. The full function rounds each column to two decimals before returning the DataFrame.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -374,7 +374,7 @@
 </table>
 <p><span class="takeaway fragment">Not just imprecise — the sign is <em>backwards</em> from the true +0.2. The confounder is pulling it down.</span></p>
 <aside class="notes">
-<p>Each extra percentage point of coupons is “associated with” $106 less in daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods use fewer coupons yet spend more, so the raw slope inherits income’s negative coupon link. This is the result the controls will fix.</p>
+<p>Each extra percentage point of coupons is “associated with” $106 less in monthly sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods redeem fewer coupons yet spend more, so the raw slope inherits income’s negative coupon link. This is the result the controls will fix.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -415,7 +415,7 @@
 </table>
 <p><span class="takeaway fragment">Conditioning on income blocks the backdoor: the estimate jumps to +0.267, close to the true +0.2.</span></p>
 <aside class="notes">
-<p>One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero. Income itself is strongly positive (+0.3836, p &lt; 0.001), confirming richer stores spend more — call it γ̂; we need it on the next slides. But how big is the bias, exactly, and what is the regression <em>doing</em> when it “controls for” income?</p>
+<p>One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero. Income itself is strongly positive (+0.3836, p &lt; 0.001), confirming richer neighborhoods spend more — call it γ̂; we need it on the next slides. But how big is the bias, exactly, and what is the regression <em>doing</em> when it “controls for” income?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -732,8 +732,8 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 <section id="partialling-out-drawn-residuals-are-what-a-straight-line-in-income-leaves-over" class="slide level2 center">
 <h2>Partialling-out, drawn: residuals are what a straight line in income leaves over</h2>
 
-<img data-src="../fwl_residuals_income.png" class="r-stretch quarto-figure-center"><p class="caption">Coupon usage vs.&nbsp;income; the orange line is the income→coupons fit, dashed lines are the residuals each store keeps.</p><aside class="notes">
-<p>Look at the dashed segments first. The downward fit confirms richer stores use fewer coupons. Each dashed line is a residual — how unusual a store’s coupon use is <em>given</em> its income. Partialling-out throws away the line and keeps only those segments: “among similar-income stores, who couponed more or less than expected?” By construction the residuals are uncorrelated with income — not independent of it. A curved dependence on income could still hide in them.</p>
+<img data-src="../fwl_residuals_income.png" class="r-stretch quarto-figure-center"><p class="caption">Coupon redemption rate vs.&nbsp;income; the orange line is the income→coupons fit, dashed lines are the residuals each restaurant keeps.</p><aside class="notes">
+<p>Look at the dashed segments first. The downward fit confirms richer neighborhoods redeem fewer coupons. Each dashed line is a residual — how unusual a restaurant’s redemption rate is <em>given</em> its income. Partialling-out throws away the line and keeps only those segments: “among restaurants in similar-income neighborhoods, which redeemed more or fewer coupons than expected?” By construction the residuals are uncorrelated with income — not independent of it. A curved dependence on income could still hide in them.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -750,7 +750,7 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 <h2>The hidden positive relationship the table couldn’t show you</h2>
 
 <img data-src="../fwl_partialled_out.png" class="r-stretch quarto-figure-center"><p class="caption">Residualized sales vs.&nbsp;residualized coupons. With income removed from both, the slope is the +0.267 conditional effect.</p><aside class="notes">
-<p>This is the payoff plot — the conditional relationship a multivariate regression captures but cannot draw. Stores that couponed more than expected also sold more than expected. The slope of this single line is exactly 0.2673, the full-regression coefficient, now visible to a non-technical audience.</p>
+<p>This is the payoff plot — the conditional relationship a multivariate regression captures but cannot draw. Restaurants that redeemed more coupons than expected also sold more than expected. The slope of this single line is exactly 0.2673, the full-regression coefficient, now visible to a non-technical audience.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -787,7 +787,7 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 <h2>Adding the means back keeps the slope but restores readable units</h2>
 
 <img data-src="../fwl_scaled_residuals.png" class="r-stretch quarto-figure-center"><p class="caption">Same residual scatter shifted by the sample means — axes now read ~34% coupons and ~$33.6K sales, slope still +0.267.</p><aside class="notes">
-<p>A residual of −5 doesn’t mean −5% coupon usage; it means 5 points below what income predicts. Adding each variable’s mean back shifts the axes into interpretable units without touching the slope (still 0.2673, p = 0.029). The SE moves slightly, 0.119 against Step 2’s 0.118 — degrees of freedom again: this regression estimates an intercept, so it has 48 residual df instead of 49. This is a display device for a slide or a stakeholder report; for inference, report the full-model SE of 0.1203.</p>
+<p>A residual of −5 doesn’t mean a −5% redemption rate; it means 5 points below what income predicts. Adding each variable’s mean back shifts the axes into interpretable units without touching the slope (still 0.2673, p = 0.029). The SE moves slightly, 0.119 against Step 2’s 0.118 — degrees of freedom again: this regression estimates an intercept, so it has 48 residual df instead of 49. This is a display device for a slide or a stakeholder report; for inference, report the full-model SE of 0.1203.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -888,7 +888,7 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 <section id="simpsons-paradox-resolved-the-slope-flips-from-0.106-to-0.267" class="slide level2 center">
 <h2>Simpson’s paradox, resolved: the slope flips from −0.106 to +0.267</h2>
 
-<img data-src="../fwl_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Left: naive negative slope. Right: positive slope after partialling out income. Same 50 stores.</p><aside class="notes">
+<img data-src="../fwl_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Left: naive negative slope. Right: positive slope after partialling out income. Same 50 restaurants.</p><aside class="notes">
 <p>The single most persuasive slide. Left panel is the confounded raw slope (−0.106), right panel is the conditional relationship (slope +0.267, an estimate of the true +0.2), and only the conditioning changed. A trend in the aggregate reverses once you condition on the relevant variable — the textbook definition of Simpson’s paradox. This is what FWL lets you <em>draw</em>.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -959,7 +959,7 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 </tbody>
 </table>
 <aside class="notes">
-<p>Every FWL variant matches its full-regression twin to four decimals, and plain NumPy returns 0.2673 too. The only thing that moves the coefficient is which controls you partial out, not how you do the algebra. Within each family (one control, two controls), the SEs differ for two reasons only: how much variation is left in the residuals (Step 1 leaves the sales mean and income’s share of sales in them) and the residual degrees of freedom. Across families, and for the naive row, the variation left in coupons after the controls also changes. +0.267 sits beside the true +0.200 — the difference is sampling noise in 50 stores.</p>
+<p>Every FWL variant matches its full-regression twin to four decimals, and plain NumPy returns 0.2673 too. The only thing that moves the coefficient is which controls you partial out, not how you do the algebra. Within each family (one control, two controls), the SEs differ for two reasons only: how much variation is left in the residuals (Step 1 leaves the sales mean and income’s share of sales in them) and the residual degrees of freedom. Across families, and for the naive row, the variation left in coupons after the controls also changes. +0.267 sits beside the true +0.200 — the difference is sampling noise in 50 restaurants.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1012,7 +1012,7 @@ Income’s coefficient in the full model: <span class="math inline">\(\hat\gamma
 </div></div>
 <p><span class="takeaway fragment">Same residualize-then-regress logic; swap OLS for cross-fitted flexible learners and you get a debiased estimate — causal only if no confounder is unmeasured.</span></p>
 <aside class="notes">
-<p>Chernozhukov et al.&nbsp;(2018). The whole DML estimator is FWL with the OLS partial-out replaced by cross-fitted machine learning: each store’s residuals come from models fit on the other folds, then the same residual-on-residual regression runs. It still needs no unmeasured confounding and learners that are good enough. It matters when the outcome depends on the controls in ways a linear control misses and those terms move with the treatment; a curve in the treatment equation alone is harmless for linear FWL. Master FWL and DML stops being mysterious — it is this same plot, learned with a smarter mop. The companion post python_doubleml runs it on a real experiment.</p>
+<p>Chernozhukov et al.&nbsp;(2018). The whole DML estimator is FWL with the OLS partial-out replaced by cross-fitted machine learning: each restaurant’s residuals come from models fit on the other folds, then the same residual-on-residual regression runs. It still needs no unmeasured confounding and learners that are good enough. It matters when the outcome depends on the controls in ways a linear control misses and those terms move with the treatment; a curve in the treatment equation alone is harmless for linear FWL. Master FWL and DML stops being mysterious — it is this same plot, learned with a smarter mop. The companion post python_doubleml runs it on a real experiment.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

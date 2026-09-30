@@ -166,3 +166,26 @@ create a replacement. The doc's *Rebuild an existing deck in place* section has 
 sequence. Slide IDs change when a slide's type is converted, so always re-fetch the
 authoritative list before deleting anything, and match slides on `order`, never on
 position in a returned array — `create_slides` does not return IDs in input order.
+
+## Rebuild log
+
+**2026-09-30 — fast-food reframe.** The post's story changed from a retail chain (stores,
+coupon usage, daily sales) to a fast-food chain (restaurants, the redemption rate of 100
+coupons handed out in one day, monthly sales); every number is unchanged. The deck was
+rebuilt in place, safest order first:
+
+1. Backup: `duplicate_presentation` → deck `10220004`, renamed
+   *"BACKUP 2026-09-30 (retail-store version) — The FWL Theorem"*.
+2. Rendered the re-rendered `slides.qmd` to a 34-page PDF from a local `hugo server` and
+   **imported it before deleting anything**. The 34 new images arrived as one contiguous,
+   page-ordered block at the end of the deck (checked against the AI alt-text of pages
+   1, 3, 22 and 34).
+3. Soft-deleted the 34 old image slides, then `move_slide` placed each of the seven
+   interactive slides (IDs unchanged) after its anchor image. Verified: 41 slides,
+   interactive at 5, 14, 20, 24, 29, 32, 40, images in page order; after a reload the
+   badge still reads **0 / 3** with the free-slide-limit notice, as before; the share
+   link returns 200.
+
+Not done: the AhaSlides-side speaker notes of interactive slides 6 and 7 still say "50
+stores" / "each store's residuals". `update_slide_content` replaces the whole quiz, so
+they were left alone; `deck.md` has the corrected wording and is the notes of record.

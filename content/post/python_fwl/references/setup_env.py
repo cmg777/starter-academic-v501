@@ -36,9 +36,7 @@ GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 # reproduces them to every printed digit.
 #
 # statsmodels 0.14.x does not depend on numba, so no numba/llvmlite
-# Intel-wheel override is needed. pyfixest is not installed: the tutorial
-# never imports it, and cheatsheet_python.py skips its pyfixest check when
-# the package is missing.
+# Intel-wheel override is needed.
 PINNED: dict[str, str] = {
     "numpy":       "2.2.6",
     "pandas":      "2.3.3",
@@ -49,6 +47,14 @@ PINNED: dict[str, str] = {
     "wooldridge":  "0.5.0",
     "jupyter":     "1.1.1",
     "ipykernel":   "7.2.0",
+}
+
+# Optional: expdpy provides analyze_fwl_plot for the panel-data appendix and
+# pulls in pyfixest 0.60, which ships wheels for CPython 3.10-3.13 on Windows
+# and Linux but only for 3.11+ on macOS. A failed install is reported, not
+# fatal: tutorial.qmd then skips the expdpy lines and still renders.
+OPTIONAL: dict[str, str] = {
+    "expdpy": "0.5.2",
 }
 
 KERNEL_NAME = "python_fwl-tutorial"
@@ -157,6 +163,22 @@ def ensure_packages_in_venv() -> None:
     # a transient network problem. Retry once, then let the error surface.
     print("  [WARN] install failed; retrying once.")
     subprocess.check_call([*pip, *to_install])
+
+
+def ensure_optional_packages_in_venv() -> None:
+    py = venv_python(VENV_DIR)
+    to_install = [f"{pkg}=={want}" for pkg, want in OPTIONAL.items()
+                  if installed_version(py, pkg) != want]
+    if not to_install:
+        return
+    print(f"  installing optional packages into venv: {' '.join(to_install)}")
+    result = subprocess.run(
+        [str(py), "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
+         "--only-binary=:all:", *to_install])
+    if result.returncode != 0:
+        print("  [WARN] could not install expdpy (no pyfixest wheel for this Python;"
+              " on macOS use Python 3.11+).\n"
+              "         The panel-data appendix will skip its analyze_fwl_plot lines.")
 
 
 def register_kernel() -> None:
@@ -278,8 +300,11 @@ def find_compatible_python() -> str | None:
                 if py.exists():
                     candidates.append(str(py))
 
-    # Skip the current executable to avoid an infinite re-launch loop.
+    # Skip the current executable to avoid an infinite re-launch loop. Among the
+    # candidates that pass the probe, take the NEWEST version (first found wins a
+    # tie): the optional expdpy/pyfixest stack has no macOS wheel for 3.10.
     here = os.path.realpath(sys.executable)
+    best: tuple[tuple[int, int], str] | None = None
     for cand in candidates:
         if not cand or cand in seen:
             continue
@@ -288,8 +313,22 @@ def find_compatible_python() -> str | None:
         if not real or real == here:
             continue
         if _probe_candidate(cand):
-            return cand
-    return None
+            version = _candidate_version(cand)
+            if version and (best is None or version > best[0]):
+                best = (version, cand)
+    return best[1] if best else None
+
+
+def _candidate_version(path: str) -> tuple[int, int] | None:
+    try:
+        result = subprocess.run(
+            [path, "-c", "import sys; print(*sys.version_info[:2])"],
+            capture_output=True, text=True, timeout=5,
+        )
+        major, minor = map(int, result.stdout.split())
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return None
+    return (major, minor)
 
 
 def preflight() -> None:
@@ -394,6 +433,7 @@ def main() -> None:
     ensure_venv()
     ensure_pip_in_venv()
     ensure_packages_in_venv()
+    ensure_optional_packages_in_venv()
     register_kernel()
     ensure_outer_jupyter()
     print("Setup complete. Quarto will now render the tutorial.")

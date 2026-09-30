@@ -5,7 +5,7 @@ Companion to https://carlos-mendez.org/post/python_fwl/
 Companions:  cheatsheet_R.R   cheatsheet_stata.do
              analysis.do (the full Stata port)   script.py (the post's script)
 
-Every snippet runs against the 50-store CSV that ships with the post, so the
+Every snippet runs against the 50-restaurant CSV that ships with the post, so the
 numbers printed here are the post's numbers, and the comparison table at the
 end is the same table the R and Stata cheat sheets print.
 
@@ -73,7 +73,9 @@ import statsmodels.formula.api as smf          # noqa: E402
 
 
 # ── 1. Load the data (local copy, then URL) or simulate it ───────────────────
-# 50 stores. income ~ N(50, 10), dayofweek ~ U{1..7},
+# 50 fast-food restaurants, one per neighborhood; each hands out 100 coupons in
+# one day. coupons = % of them redeemed that month; sales = monthly sales ($000).
+# income ~ N(50, 10), dayofweek ~ U{1..7},
 # coupons = 60 - 0.5 income + N(0, 5),
 # sales   = 10 + 0.2 coupons + 0.3 income + 0.5 dayofweek + N(0, 3).
 # The true coupon effect is +0.2.
@@ -243,12 +245,12 @@ b_scaled = smf.ols("ss ~ cs", pd.DataFrame({"cs": cs, "ss": ss})).fit().params["
 assert abs(b_scaled - full.params["coupons"]) < 1e-12
 
 fig, ax = plt.subplots(figsize=(7, 5))
-ax.scatter(cs, ss, color="#6a9bcc", edgecolor="#141413", label="Stores")
+ax.scatter(cs, ss, color="#6a9bcc", edgecolor="#141413", label="Restaurants")
 grid = np.linspace(cs.min(), cs.max(), 2)
 ax.plot(grid, ss.mean() + b_scaled * (grid - cs.mean()), color="#d97757",
         lw=2.5, label=f"slope = {b_scaled:.4f}")
-ax.set(xlabel="Coupon usage (%, income partialled out + mean)",
-       ylabel="Daily sales (thousands, income partialled out + mean)",
+ax.set(xlabel="Coupon redemption rate (%, income partialled out + mean)",
+       ylabel="Monthly sales (thousands, income partialled out + mean)",
        title="The FWL plot: what 'controlling for income' looks like")
 ax.legend()
 fig.tight_layout()
@@ -365,7 +367,7 @@ def cell(b, se):
     return f"{b:7.4f} ({se:6.4f})"
 
 
-print("\nCoupon coefficient (SE): 50 stores, one CSV, three languages")
+print("\nCoupon coefficient (SE): 50 restaurants, one CSV, three languages")
 print("-" * 78)
 print(f"{'Row':<24}{'Python':<18}{'R':<18}Stata")
 print("-" * 78)

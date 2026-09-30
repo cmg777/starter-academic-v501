@@ -100,7 +100,7 @@ seen the scatter. The Simpson's paradox side-by-side (slide 36) puts that same n
 
 ## 3 — Content
 
-**Title:** We planted a +0.2 coupon effect in 50 stores — will a regression find it?
+**Title:** We planted a +0.2 coupon effect in 50 restaurants — will a regression find it?
 
 **Image page:** 3 of 34
 
@@ -205,9 +205,11 @@ income. FWL is the elegant way to do exactly that and to picture it.
 
 **Image page:** 9 of 34
 
-**Notes:** Why simulate? Because the true causal effect is known by construction —
-exactly +0.2 — so we can grade every method against ground truth. 50 stores, income
-centered at \$50K. Day of week is drawn uniformly from 1 to 7, independently of income
+**Notes:** Why simulate? Because the true causal effect is known by construction — exactly
++0.2 — so we can grade every method against ground truth. 50 restaurants, one per
+neighborhood, income centered at \$50K. `coupons` is the redemption rate: the percentage
+of the restaurant's 100 coupons redeemed during the month; `sales` is monthly sales in
+thousands of dollars. Day of week is drawn uniformly from 1 to 7, independently of income
 and coupons. Coupons fall with income; sales rise with coupons, income, and day of week.
 The draw order (income, day of week, coupons, sales) matters for reproducing the seed-42
 sample. The full function rounds each column to two decimals before returning the
@@ -222,8 +224,8 @@ DataFrame.
 **Image page:** 10 of 34
 
 **Notes:** Each extra percentage point of coupons is "associated with" \$106 less in
-daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy
-neighborhoods use fewer coupons yet spend more, so the raw slope inherits income's
+monthly sales — but it is not significant and it contradicts the planted +0.2. Wealthy
+neighborhoods redeem fewer coupons yet spend more, so the raw slope inherits income's
 negative coupon link. This is the result the controls will fix.
 
 ---
@@ -235,9 +237,9 @@ negative coupon link. This is the result the controls will fix.
 **Image page:** 11 of 34
 
 **Notes:** One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero.
-Income itself is strongly positive (+0.3836, p < 0.001), confirming richer stores spend
-more — call it γ̂; we need it on the next slides. But how big is the bias, exactly, and
-what is the regression *doing* when it "controls for" income?
+Income itself is strongly positive (+0.3836, p < 0.001), confirming richer neighborhoods
+spend more — call it γ̂; we need it on the next slides. But how big is the bias, exactly,
+and what is the regression *doing* when it "controls for" income?
 
 ---
 
@@ -477,12 +479,13 @@ over
 
 **Image page:** 22 of 34
 
-**Notes:** Look at the dashed segments first. The downward fit confirms richer stores
-use fewer coupons. Each dashed line is a residual — how unusual a store's coupon use is
-*given* its income. Partialling-out throws away the line and keeps only those segments:
-"among similar-income stores, who couponed more or less than expected?" By construction
-the residuals are uncorrelated with income — not independent of it. A curved dependence
-on income could still hide in them.
+**Notes:** Look at the dashed segments first. The downward fit confirms richer
+neighborhoods redeem fewer coupons. Each dashed line is a residual — how unusual a
+restaurant's redemption rate is *given* its income. Partialling-out throws away the line
+and keeps only those segments: "among restaurants in similar-income neighborhoods, which
+redeemed more or fewer coupons than expected?" By construction the residuals are
+uncorrelated with income — not independent of it. A curved dependence on income could
+still hide in them.
 
 ---
 
@@ -493,9 +496,9 @@ on income could still hide in them.
 **Image page:** 23 of 34
 
 **Notes:** This is the payoff plot — the conditional relationship a multivariate
-regression captures but cannot draw. Stores that couponed more than expected also sold
-more than expected. The slope of this single line is exactly 0.2673, the full-regression
-coefficient, now visible to a non-technical audience.
+regression captures but cannot draw. Restaurants that redeemed more coupons than expected
+also sold more than expected. The slope of this single line is exactly 0.2673, the
+full-regression coefficient, now visible to a non-technical audience.
 
 ---
 
@@ -543,12 +546,12 @@ inference, still report the full-model 0.1203.
 
 **Image page:** 25 of 34
 
-**Notes:** A residual of −5 doesn't mean −5% coupon usage; it means 5 points below what
-income predicts. Adding each variable's mean back shifts the axes into interpretable
+**Notes:** A residual of −5 doesn't mean a −5% redemption rate; it means 5 points below
+what income predicts. Adding each variable's mean back shifts the axes into interpretable
 units without touching the slope (still 0.2673, p = 0.029). The SE moves slightly, 0.119
-against Step 2's 0.118 — degrees of freedom again: this regression estimates an
-intercept, so it has 48 residual df instead of 49. This is a display device for a slide
-or a stakeholder report; for inference, report the full-model SE of 0.1203.
+against Step 2's 0.118 — degrees of freedom again: this regression estimates an intercept,
+so it has 48 residual df instead of 49. This is a display device for a slide or a
+stakeholder report; for inference, report the full-model SE of 0.1203.
 
 ---
 
@@ -581,7 +584,7 @@ coupons and income. Does the coupon coefficient move?
 - C. A lot: day of week is a second confounder
 
 **Notes:** Answer: B — from 0.2673 to 0.2706, a shift of about 0.003. Independence in
-the DGP is a population statement; in a sample of 50 stores, day of week has a small
+the DGP is a population statement; in a sample of 50 restaurants, day of week has a small
 chance partial association with coupons given income (regress day of week on coupons and
 income: slope −0.0101; partial correlation −0.021), and the OVB identity accounts for
 the shift exactly: 0.2673 = 0.2706 + 0.3195 × (−0.0101). A is the tempting answer and
@@ -645,9 +648,9 @@ report is the full-model 0.1203.
 
 **Notes:** The single most persuasive slide. Left panel is the confounded raw slope
 (−0.106), right panel is the conditional relationship (slope +0.267, an estimate of the
-true +0.2), and only the conditioning changed. A trend in the aggregate reverses once
-you condition on the relevant variable — the textbook definition of Simpson's paradox.
-This is what FWL lets you *draw*.
+true +0.2), and only the conditioning changed. A trend in the aggregate reverses once you
+condition on the relevant variable — the textbook definition of Simpson's paradox. This is
+what FWL lets you *draw*.
 
 ---
 
@@ -664,7 +667,7 @@ two controls), the SEs differ for two reasons only: how much variation is left i
 residuals (Step 1 leaves the sales mean and income's share of sales in them) and the
 residual degrees of freedom. Across families, and for the naive row, the variation left
 in coupons after the controls also changes. +0.267 sits beside the true +0.200 — the
-difference is sampling noise in 50 stores.
+difference is sampling noise in 50 restaurants.
 
 ---
 
@@ -694,8 +697,8 @@ confounder is omitted, no amount of residualizing on income saves you.
 **Image page:** 33 of 34
 
 **Notes:** Chernozhukov et al. (2018). The whole DML estimator is FWL with the OLS
-partial-out replaced by cross-fitted machine learning: each store's residuals come from
-models fit on the other folds, then the same residual-on-residual regression runs. It
+partial-out replaced by cross-fitted machine learning: each restaurant's residuals come
+from models fit on the other folds, then the same residual-on-residual regression runs. It
 still needs no unmeasured confounding and learners that are good enough. It matters when
 the outcome depends on the controls in ways a linear control misses and those terms move
 with the treatment; a curve in the treatment equation alone is harmless for linear FWL.
@@ -720,7 +723,7 @@ mop. The companion post python_doubleml runs it on a real experiment.
 straight after the two-column comparison. Answer: A. DML keeps the
 residualize-then-regress logic and swaps only the mop: the outcome and the treatment are
 each residualized with flexible learners (a forest, a lasso) instead of OLS, and
-cross-fitting means each store's residuals come from models fit on the other folds. B is
+cross-fitting means each restaurant's residuals come from models fit on the other folds. B is
 the step DML leaves untouched — the final regression of residual y on residual d runs
 exactly as in FWL. C is the trap worth naming: nothing replaces the confounder. DML
 still needs every confounder measured, and it offers no protection against an unmeasured

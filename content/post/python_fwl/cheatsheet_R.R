@@ -63,7 +63,9 @@ p_of  <- function(fit, term) summary(fit)$coefficients[term, "Pr(>|t|)"]
 
 
 # ── 1. Load the data (local copy, then URL) or simulate it natively ──────────
-# 50 stores. income ~ N(50, 10), dayofweek ~ U{1..7},
+# 50 fast-food restaurants, one per neighborhood; each hands out 100 coupons in
+# one day. coupons = % of them redeemed that month; sales = monthly sales ($000).
+# income ~ N(50, 10), dayofweek ~ U{1..7},
 # coupons = 60 - 0.5 income + N(0, 5),
 # sales   = 10 + 0.2 coupons + 0.3 income + 0.5 dayofweek + N(0, 3).
 # The true coupon effect is +0.2.
@@ -71,7 +73,7 @@ p_of  <- function(fit, term) summary(fit)$coefficients[term, "Pr(>|t|)"]
 URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_fwl/data/fwl_store_data.csv"
 
 # NUMBERS WILL DIFFER. Same DGP, but R's Mersenne Twister is not numpy's PCG64,
-# so set.seed(42) here draws different stores from the post's. Use it to see
+# so set.seed(42) here draws different restaurants from the post's. Use it to see
 # that FWL holds in ANY sample, not to reproduce the post.
 simulate_store_data_r <- function(n = 50, seed = 42) {
   set.seed(seed)
@@ -248,8 +250,8 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   p <- ggplot(d, aes(cs, ss)) +
     geom_point(color = "#6a9bcc", size = 2.5) +
     geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#d97757") +
-    labs(x = "Coupon usage (%, income partialled out + mean)",
-         y = "Daily sales (thousands, income partialled out + mean)",
+    labs(x = "Coupon redemption rate (%, income partialled out + mean)",
+         y = "Monthly sales (thousands, income partialled out + mean)",
          title = "The FWL plot: what 'controlling for income' looks like",
          subtitle = paste("slope =", f4(b_scaled))) +
     theme_minimal()
@@ -371,7 +373,7 @@ LIVE <- rbind(c(coef(naive)[["coupons"]], se_of(naive, "coupons")),
 
 cell <- function(b, se) sprintf("%7.4f (%6.4f)", b, se)
 
-cat("\nCoupon coefficient (SE): 50 stores, one CSV, three languages\n")
+cat("\nCoupon coefficient (SE): 50 restaurants, one CSV, three languages\n")
 cat(strrep("-", 78), "\n", sep = "")
 cat(sprintf("%-24s%-18s%-18s%s\n", "Row", "Python", "R", "Stata"))
 cat(strrep("-", 78), "\n", sep = "")

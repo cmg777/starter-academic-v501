@@ -29,12 +29,12 @@
 
   var DEFAULTS = { pi: -0.5, beta2: 0.3, beta1: 0.2 };
   var N_STEPS = [20, 50, 100, 200, 500, 1000];
-  var DEFAULT_N_INDEX = 1; // 50 stores
+  var DEFAULT_N_INDEX = 1; // 50 restaurants
   var SEED_BASE = 20260314; // simulated sample #k uses seed SEED_BASE + k
   var MINUS = '−';
   var SVGNS = 'http://www.w3.org/2000/svg';
 
-  // The post's 50 stores, copied row for row from
+  // The post's 50 restaurants, copied row for row from
   // content/post/python_fwl/data/fwl_store_data.csv (written by
   // content/post/python_fwl/script.py, seed 42; columns sales, coupons, income, dayofweek -> dow).
   // Do not edit by hand. If the CSV changes, run this from the repo root and
@@ -86,8 +86,8 @@
   /* Data                                                                */
   /* ------------------------------------------------------------------ */
 
-  // The post's 50 stores, expressed as structural draws (income, day, errors),
-  // so any (pi, beta1, beta2) can be rebuilt on exactly the same stores.
+  // The post's 50 restaurants, expressed as structural draws (income, day, errors),
+  // so any (pi, beta1, beta2) can be rebuilt on exactly the same restaurants.
   function postDraws() {
     var P = POST_STORES;
     var n = P.income.length;
@@ -190,7 +190,7 @@
     };
   }
 
-  // Income third (0 = low, 1 = middle, 2 = high) of each store in the sample.
+  // Income third (0 = low, 1 = middle, 2 = high) of each restaurant in the sample.
   function terciles(I) {
     var n = I.length;
     var sorted = Array.prototype.slice.call(I).sort(function (a, b) { return a - b; });
@@ -404,7 +404,7 @@
   function Lab(el) {
     this.el = el;
     this.preset = el.getAttribute('data-preset') === 'none' ? 'none' : 'post';
-    this.sample = this.preset === 'post' ? 0 : 1; // 0 = the post's stores
+    this.sample = this.preset === 'post' ? 0 : 1; // 0 = the post's restaurants
     this.base = null;
     this.baseKey = '';
     this.terc = null;
@@ -517,11 +517,11 @@
     this.inputs.pi.setAttribute('aria-valuetext', fmt(p.pi, 2));
     this.inputs.beta2.setAttribute('aria-valuetext', fmt(p.beta2, 2));
     this.inputs.beta1.setAttribute('aria-valuetext', fmt(p.beta1, 2));
-    this.inputs.n.setAttribute('aria-valuetext', this.n + ' stores');
+    this.inputs.n.setAttribute('aria-valuetext', this.n + ' restaurants');
 
     // status line
     var status = this.sample === 0
-      ? (this.isDefault() ? 'Showing the post’s 50 stores' : 'The post’s 50 stores, rebuilt with your slopes')
+      ? (this.isDefault() ? 'Showing the post’s 50 restaurants' : 'The post’s 50 restaurants, rebuilt with your slopes')
       : 'Simulated sample #' + this.sample + ', n = ' + n;
     setText(this.out.status, status);
 
@@ -544,7 +544,7 @@
     // true slope drawn through the sample means
     var T = lineAcross(dx, sx, sy, r.meanS - p.beta1 * r.meanC, p.beta1);
     setLine(plot, 'truth', T[0], T[1], T[2], T[3]);
-    setText(plot.desc, d.n + ' stores. Sales against coupons, colored by income third. Naive OLS slope ' +
+    setText(plot.desc, d.n + ' restaurants. Sales against coupons, colored by income third. Naive OLS slope ' +
       fmt(r.naive, 4) + '; true coupon effect ' + fmt(p.beta1, 2) + '.');
   };
 
@@ -559,7 +559,7 @@
     setLine(plot, 'fwl', F[0], F[1], F[2], F[3]);
     var T = lineAcross(dx, sx, sy, 0, p.beta1);
     setLine(plot, 'truth', T[0], T[1], T[2], T[3]);
-    setText(plot.desc, r.n + ' stores after partialling out income from both sales and coupons. FWL slope ' +
+    setText(plot.desc, r.n + ' restaurants after partialling out income from both sales and coupons. FWL slope ' +
       fmt(r.fwl, 4) + '; true coupon effect ' + fmt(p.beta1, 2) + '.');
   };
 
@@ -632,7 +632,7 @@
     this.announceTimer = setTimeout(function () {
       var r = self.last, p = self.params, f = self.lastFlip;
       if (!r || !self.live) return;
-      var msg = (self.sample === 0 ? 'The post’s 50 stores. ' : 'Simulated sample ' + self.sample + ', ' + r.n + ' stores. ') +
+      var msg = (self.sample === 0 ? 'The post’s 50 restaurants. ' : 'Simulated sample ' + self.sample + ', ' + r.n + ' restaurants. ') +
         'Naive slope ' + fmt(r.naive, 3) + ', FWL slope ' + fmt(r.fwl, 3) +
         ', true effect ' + fmt(p.beta1, 2) + '. Sign flip in this sample: ' + f.sample + '.';
       self.live.textContent = msg;

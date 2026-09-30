@@ -1,4 +1,4 @@
-// dgp.js — seeded RNG and the store-level data-generating process shared by
+// dgp.js — seeded RNG and the restaurant-level data-generating process shared by
 // the Confounding Lab (Tab 2) and the Monte Carlo experiment (Tab 4).
 //
 // The simulator keeps the post's income and coupon equations from
@@ -132,7 +132,7 @@
     };
   }
 
-  // Simulate one sample of n stores and fit all three regressions.
+  // Simulate one sample of n restaurants and fit all three regressions.
   //   opts: { n, gamma, pi, beta, seed, sigma_y?, sigma_c? }
   function simulate_fwl_sample(opts) {
     const n = Math.max(20, opts.n | 0);

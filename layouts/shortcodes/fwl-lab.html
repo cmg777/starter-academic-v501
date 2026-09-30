@@ -2,7 +2,7 @@
   fwl-lab.html — inline interactive Frisch–Waugh–Lovell (FWL) lab.
 
   Usage:
-    {{< fwl-lab >}}                                 starts on python_fwl's 50 stores
+    {{< fwl-lab >}}                                 starts on python_fwl's 50 restaurants
     {{< fwl-lab id="lab-two" preset="none" >}}      starts on a simulated sample
   Params:
     id      element id (default "fwl-lab-<ordinal>"); must be unique on the page
@@ -40,7 +40,7 @@
 <section class="fwl-lab" id="{{ $id }}" data-fwl-lab data-preset="{{ $preset }}" aria-labelledby="{{ $id }}-title">
 <div class="fl-head">
 <p class="fl-title" id="{{ $id }}-title">Interactive FWL lab</p>
-<p class="fl-status" data-out="status">{{ if $post }}Showing the post’s 50 stores{{ else }}Simulated sample #1, n = 50{{ end }}</p>
+<p class="fl-status" data-out="status">{{ if $post }}Showing the post’s 50 restaurants{{ else }}Simulated sample #1, n = 50{{ end }}</p>
 </div>
 <noscript><p class="fl-noscript">This interactive lab needs JavaScript. The static figures in this post show the same naive and partialled-out regressions.</p></noscript>
 <div class="fl-body">
@@ -49,7 +49,7 @@
 <div class="fl-ctl">
 <div class="fl-ctl-top"><label for="{{ $id }}-pi">Income → coupons slope {{ $pi | safeHTML }}</label><output for="{{ $id }}-pi" data-param-out="pi">−0.50</output></div>
 <input type="range" id="{{ $id }}-pi" data-param="pi" min="-1.5" max="1.5" step="0.05" value="-0.5" autocomplete="off" aria-describedby="{{ $id }}-pi-help">
-<p class="fl-help" id="{{ $id }}-pi-help">Coupons per extra unit of income. Default −0.50: richer neighborhoods get fewer coupons.</p>
+<p class="fl-help" id="{{ $id }}-pi-help">Coupons per extra unit of income. Default −0.50: richer neighborhoods redeem fewer coupons.</p>
 </div>
 <div class="fl-ctl">
 <div class="fl-ctl-top"><label for="{{ $id }}-beta2">Income → sales effect {{ $b2 | safeHTML }}</label><output for="{{ $id }}-beta2" data-param-out="beta2">0.30</output></div>
@@ -62,14 +62,14 @@
 <p class="fl-help" id="{{ $id }}-beta1-help">Extra sales from one more coupon, the causal effect a good estimator should recover. Default 0.20.</p>
 </div>
 <div class="fl-ctl">
-<div class="fl-ctl-top"><label for="{{ $id }}-n">Stores per sample</label><output for="{{ $id }}-n" data-param-out="n">50</output></div>
-<input type="range" id="{{ $id }}-n" data-param="n" min="0" max="5" step="1" value="1" autocomplete="off" aria-valuetext="50 stores" aria-describedby="{{ $id }}-n-help">
-<p class="fl-help" id="{{ $id }}-n-help">20, 50, 100, 200, 500 or 1000 stores. A new size draws a simulated sample from the same process.</p>
+<div class="fl-ctl-top"><label for="{{ $id }}-n">Restaurants per sample</label><output for="{{ $id }}-n" data-param-out="n">50</output></div>
+<input type="range" id="{{ $id }}-n" data-param="n" min="0" max="5" step="1" value="1" autocomplete="off" aria-valuetext="50 restaurants" aria-describedby="{{ $id }}-n-help">
+<p class="fl-help" id="{{ $id }}-n-help">20, 50, 100, 200, 500 or 1000 restaurants. A new size draws a simulated sample from the same process.</p>
 </div>
 </div>
 <div class="fl-actions">
 <button type="button" class="fl-btn fl-btn-primary" data-act="draw">Draw a new sample</button>
-<button type="button" class="fl-btn" data-act="reset">{{ if $post }}Reset to the post’s stores{{ else }}Reset to defaults{{ end }}</button>
+<button type="button" class="fl-btn" data-act="reset">{{ if $post }}Reset to the post’s restaurants{{ else }}Reset to defaults{{ end }}</button>
 </div>
 <div class="fl-plots">
 <div class="fl-plot">
@@ -140,7 +140,7 @@
 <li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-halo" d="M2 7L28 7"/><path class="fl-line fl-line-naive" d="M2 7L28 7"/><circle class="fl-mk-naive-dot" cx="15" cy="7" r="3.5"/></svg><span>Naive OLS slope (raw data)</span></li>
 <li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-halo" d="M2 7L28 7"/><path class="fl-line fl-line-fwl" d="M2 7L28 7"/><path class="fl-mk-fwl-dot" d="M15 2.5L19.5 7L15 11.5L10.5 7Z"/></svg><span>FWL slope (income partialled out)</span></li>
 <li><svg class="fl-sw" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="fl-line fl-line-truth" d="M2 7L28 7"/></svg><span>True coupon effect {{ $b1 | safeHTML }}</span></li>
-<li><svg class="fl-sw fl-sw-dots" viewBox="0 0 38 14" aria-hidden="true" focusable="false"><circle class="fl-pt fl-t0" cx="6" cy="7" r="4"/><circle class="fl-pt fl-t1" cx="19" cy="7" r="4"/><circle class="fl-pt fl-t2" cx="32" cy="7" r="4"/></svg><span>Stores by income third: low, middle, high</span></li>
+<li><svg class="fl-sw fl-sw-dots" viewBox="0 0 38 14" aria-hidden="true" focusable="false"><circle class="fl-pt fl-t0" cx="6" cy="7" r="4"/><circle class="fl-pt fl-t1" cx="19" cy="7" r="4"/><circle class="fl-pt fl-t2" cx="32" cy="7" r="4"/></svg><span>Restaurants by income third: low, middle, high</span></li>
 </ul>
 </div>
 <dl class="fl-readout">

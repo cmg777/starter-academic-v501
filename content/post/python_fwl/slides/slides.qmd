@@ -14,7 +14,7 @@ key-results:
   - num: "+0.267"
     cap: "FWL = full OLS, income held fixed"
   - num: "50"
-    cap: "simulated stores"
+    cap: "simulated restaurants"
 format:
   revealjs:
     output-file: index.html
@@ -51,13 +51,13 @@ format:
 
 [Act I]{.act}
 
-## We planted a +0.2 coupon effect in 50 stores — will a regression find it?
+## We planted a +0.2 coupon effect in 50 restaurants — will a regression find it?
 
-A retail chain hands out discount coupons in 50 stores. *Do the coupons increase sales?*
+A fast-food chain: 50 restaurants, each hands out 100 coupons in one day and counts how many come back that month. *Does a higher redemption rate raise monthly sales?*
 
 . . .
 
-We simulated the stores, so we know the truth: **+0.2**. *Will the simplest regression find it?*
+We simulated the restaurants, so we know the truth: **+0.2**. *Will the simplest regression find it?*
 
 ::: {.notes}
 The hook: one dataset, one question, and — unusually — a known answer. Because we built the data, we can grade every estimator against the truth. Do not reveal the naive result yet; the next slide asks the room to predict it.
@@ -79,7 +79,7 @@ Ask the room: regress sales on coupons with no controls — what sign does the s
 
 ## Naive regression: coupons look like they *reduce* sales
 
-![Daily sales vs. coupon usage across 50 stores. The orange fit slopes down — coupons appear to hurt sales.](../fwl_naive_regression.png)
+![Monthly sales vs. coupon redemption rate across 50 restaurants. The orange fit slopes down — coupons appear to hurt sales.](../fwl_naive_regression.png)
 
 ::: {.notes}
 The answer to the vote: negative. The slope is −0.1059 even though we planted +0.2. Don't explain the mechanism yet — just plant that the raw picture is negative and misleading. Income is the culprit; we earn the reversal in Act II and return to this picture in the side-by-side at the end.
@@ -106,8 +106,8 @@ Built from the post's learning objectives. Teaching deck, so we signpost. Keep i
 :::: {.columns}
 ::: {.column width="55%"}
 ::: {.incremental}
-- **Income** → fewer coupons (wealthier stores use fewer)
-- **Income** → more sales (wealthier stores spend more)
+- **Income** → fewer redemptions (wealthier neighborhoods redeem fewer)
+- **Income** → more sales (wealthier neighborhoods spend more)
 - **Coupons** → sales: true effect **+0.2**
 :::
 :::
@@ -127,7 +127,7 @@ def simulate_store_data(n=50, seed=42):
     rng = np.random.default_rng(seed)
     income    = rng.normal(50, 10, n)                    # the confounder
     dayofweek = rng.integers(1, 8, n)                    # day of week, 1 to 7
-    coupons   = 60 - 0.5 * income + rng.normal(0, 5, n)  # income → fewer coupons
+    coupons   = 60 - 0.5 * income + rng.normal(0, 5, n)  # income → fewer redemptions
     sales     = (10 + 0.2 * coupons + 0.3 * income       # true effect = +0.2
                  + 0.5 * dayofweek + rng.normal(0, 3, n))
     return pd.DataFrame(...)
@@ -136,7 +136,7 @@ def simulate_store_data(n=50, seed=42):
 [We *plant* the answer (+0.2) in the data, then check whether each estimator finds it.]{.takeaway .fragment}
 
 ::: {.notes}
-Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 stores, income centered at \$50K. Day of week is drawn uniformly from 1 to 7, independently of income and coupons. Coupons fall with income; sales rise with coupons, income, and day of week. The draw order (income, day of week, coupons, sales) matters for reproducing the seed-42 sample. The full function rounds each column to two decimals before returning the DataFrame.
+Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 restaurants, one per neighborhood, income centered at \$50K. `coupons` is the redemption rate: the percentage of the restaurant's 100 coupons redeemed during the month; `sales` is monthly sales in thousands of dollars. Day of week is drawn uniformly from 1 to 7, independently of income and coupons. Coupons fall with income; sales rise with coupons, income, and day of week. The draw order (income, day of week, coupons, sales) matters for reproducing the seed-42 sample. The full function rounds each column to two decimals before returning the DataFrame.
 :::
 
 ## The naive slope is −0.106 — and points the wrong way (p = 0.365)
@@ -148,7 +148,7 @@ Why simulate? Because the true causal effect is known by construction — exactl
 [Not just imprecise — the sign is *backwards* from the true +0.2. The confounder is pulling it down.]{.takeaway .fragment}
 
 ::: {.notes}
-Each extra percentage point of coupons is "associated with" \$106 less in daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods use fewer coupons yet spend more, so the raw slope inherits income's negative coupon link. This is the result the controls will fix.
+Each extra percentage point of coupons is "associated with" \$106 less in monthly sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods redeem fewer coupons yet spend more, so the raw slope inherits income's negative coupon link. This is the result the controls will fix.
 :::
 
 ## Add income as a control and the slope flips to +0.267 (p = 0.031)
@@ -161,7 +161,7 @@ Each extra percentage point of coupons is "associated with" \$106 less in daily 
 [Conditioning on income blocks the backdoor: the estimate jumps to +0.267, close to the true +0.2.]{.takeaway .fragment}
 
 ::: {.notes}
-One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero. Income itself is strongly positive (+0.3836, p < 0.001), confirming richer stores spend more — call it γ̂; we need it on the next slides. But how big is the bias, exactly, and what is the regression *doing* when it "controls for" income?
+One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero. Income itself is strongly positive (+0.3836, p < 0.001), confirming richer neighborhoods spend more — call it γ̂; we need it on the next slides. But how big is the bias, exactly, and what is the regression *doing* when it "controls for" income?
 :::
 
 ## Before you look: which regression gives δ̂? {background-color="#1a3a8a"}
@@ -310,10 +310,10 @@ Line 2 of the proof says ỹ = x̃₁β̂₁ + e: the residual-on-residual regre
 
 ## Partialling-out, drawn: residuals are what a straight line in income leaves over
 
-![Coupon usage vs. income; the orange line is the income→coupons fit, dashed lines are the residuals each store keeps.](../fwl_residuals_income.png)
+![Coupon redemption rate vs. income; the orange line is the income→coupons fit, dashed lines are the residuals each restaurant keeps.](../fwl_residuals_income.png)
 
 ::: {.notes}
-Look at the dashed segments first. The downward fit confirms richer stores use fewer coupons. Each dashed line is a residual — how unusual a store's coupon use is *given* its income. Partialling-out throws away the line and keeps only those segments: "among similar-income stores, who couponed more or less than expected?" By construction the residuals are uncorrelated with income — not independent of it. A curved dependence on income could still hide in them.
+Look at the dashed segments first. The downward fit confirms richer neighborhoods redeem fewer coupons. Each dashed line is a residual — how unusual a restaurant's redemption rate is *given* its income. Partialling-out throws away the line and keeps only those segments: "among restaurants in similar-income neighborhoods, which redeemed more or fewer coupons than expected?" By construction the residuals are uncorrelated with income — not independent of it. A curved dependence on income could still hide in them.
 :::
 
 ## The hidden positive relationship the table couldn't show you
@@ -321,7 +321,7 @@ Look at the dashed segments first. The downward fit confirms richer stores use f
 ![Residualized sales vs. residualized coupons. With income removed from both, the slope is the +0.267 conditional effect.](../fwl_partialled_out.png)
 
 ::: {.notes}
-This is the payoff plot — the conditional relationship a multivariate regression captures but cannot draw. Stores that couponed more than expected also sold more than expected. The slope of this single line is exactly 0.2673, the full-regression coefficient, now visible to a non-technical audience.
+This is the payoff plot — the conditional relationship a multivariate regression captures but cannot draw. Restaurants that redeemed more coupons than expected also sold more than expected. The slope of this single line is exactly 0.2673, the full-regression coefficient, now visible to a non-technical audience.
 :::
 
 ## Before you look: does adding the means back change the slope? {background-color="#1a3a8a"}
@@ -343,7 +343,7 @@ Ask the room: adding the sample means back shifts every point up and to the righ
 ![Same residual scatter shifted by the sample means — axes now read ~34% coupons and ~\$33.6K sales, slope still +0.267.](../fwl_scaled_residuals.png)
 
 ::: {.notes}
-A residual of −5 doesn't mean −5% coupon usage; it means 5 points below what income predicts. Adding each variable's mean back shifts the axes into interpretable units without touching the slope (still 0.2673, p = 0.029). The SE moves slightly, 0.119 against Step 2's 0.118 — degrees of freedom again: this regression estimates an intercept, so it has 48 residual df instead of 49. This is a display device for a slide or a stakeholder report; for inference, report the full-model SE of 0.1203.
+A residual of −5 doesn't mean a −5% redemption rate; it means 5 points below what income predicts. Adding each variable's mean back shifts the axes into interpretable units without touching the slope (still 0.2673, p = 0.029). The SE moves slightly, 0.119 against Step 2's 0.118 — degrees of freedom again: this regression estimates an intercept, so it has 48 residual df instead of 49. This is a display device for a slide or a stakeholder report; for inference, report the full-model SE of 0.1203.
 :::
 
 ## Before you look: does a second control move the coupon coefficient? {background-color="#1a3a8a"}
@@ -391,7 +391,7 @@ Between the misleading naive −0.106 and the planted truth +0.200, the conditio
 
 ## Simpson's paradox, resolved: the slope flips from −0.106 to +0.267
 
-![Left: naive negative slope. Right: positive slope after partialling out income. Same 50 stores.](../fwl_comparison.png)
+![Left: naive negative slope. Right: positive slope after partialling out income. Same 50 restaurants.](../fwl_comparison.png)
 
 ::: {.notes}
 The single most persuasive slide. Left panel is the confounded raw slope (−0.106), right panel is the conditional relationship (slope +0.267, an estimate of the true +0.2), and only the conditioning changed. A trend in the aggregate reverses once you condition on the relevant variable — the textbook definition of Simpson's paradox. This is what FWL lets you *draw*.
@@ -410,7 +410,7 @@ The single most persuasive slide. Left panel is the confounded raw slope (−0.1
 | FWL (+ income + day) | +0.2706 | 0.1157 | 49 |
 
 ::: {.notes}
-Every FWL variant matches its full-regression twin to four decimals, and plain NumPy returns 0.2673 too. The only thing that moves the coefficient is which controls you partial out, not how you do the algebra. Within each family (one control, two controls), the SEs differ for two reasons only: how much variation is left in the residuals (Step 1 leaves the sales mean and income's share of sales in them) and the residual degrees of freedom. Across families, and for the naive row, the variation left in coupons after the controls also changes. +0.267 sits beside the true +0.200 — the difference is sampling noise in 50 stores.
+Every FWL variant matches its full-regression twin to four decimals, and plain NumPy returns 0.2673 too. The only thing that moves the coefficient is which controls you partial out, not how you do the algebra. Within each family (one control, two controls), the SEs differ for two reasons only: how much variation is left in the residuals (Step 1 leaves the sales mean and income's share of sales in them) and the residual degrees of freedom. Across families, and for the naive row, the variation left in coupons after the controls also changes. +0.267 sits beside the true +0.200 — the difference is sampling noise in 50 restaurants.
 :::
 
 ## Does FWL make this causal? No — it visualizes, it does not identify
@@ -447,7 +447,7 @@ Steelman, don't strawman. The estimate is causal here only because the simulatio
 [Same residualize-then-regress logic; swap OLS for cross-fitted flexible learners and you get a debiased estimate — causal only if no confounder is unmeasured.]{.takeaway .fragment}
 
 ::: {.notes}
-Chernozhukov et al. (2018). The whole DML estimator is FWL with the OLS partial-out replaced by cross-fitted machine learning: each store's residuals come from models fit on the other folds, then the same residual-on-residual regression runs. It still needs no unmeasured confounding and learners that are good enough. It matters when the outcome depends on the controls in ways a linear control misses and those terms move with the treatment; a curve in the treatment equation alone is harmless for linear FWL. Master FWL and DML stops being mysterious — it is this same plot, learned with a smarter mop. The companion post python_doubleml runs it on a real experiment.
+Chernozhukov et al. (2018). The whole DML estimator is FWL with the OLS partial-out replaced by cross-fitted machine learning: each restaurant's residuals come from models fit on the other folds, then the same residual-on-residual regression runs. It still needs no unmeasured confounding and learners that are good enough. It matters when the outcome depends on the controls in ways a linear control misses and those terms move with the treatment; a curve in the treatment equation alone is harmless for linear FWL. Master FWL and DML stops being mysterious — it is this same plot, learned with a smarter mop. The companion post python_doubleml runs it on a real experiment.
 :::
 
 # Don't read the coefficient — read the partialled-out scatter. {.divider background-color="#141413"}

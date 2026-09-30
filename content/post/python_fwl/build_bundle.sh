@@ -32,6 +32,7 @@ done
 # The dataset, flattened next to tutorial.qmd so the notebook (and the cheat
 # sheets) find it locally once the archive is unzipped.
 cp "${DATA_DIR}/fwl_store_data.csv" "${DEST}/fwl_store_data.csv"
+cp "${DATA_DIR}/fwl_restaurant_panel.csv" "${DEST}/fwl_restaurant_panel.csv"
 
 chmod +x "${DEST}/render.command"
 

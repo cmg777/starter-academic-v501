@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 <title>FWL Theorem — Interactive Lab</title>
-<meta name="description" content="Interactive companion to 'The FWL Theorem: Making Multivariate Regressions Intuitive': a residualization animation on the post's 50 stores, a confounding simulator with the omitted-variable-bias identity, the post's forest plot, a Monte Carlo experiment, and a quiz.">
-<link rel="stylesheet" href="styles.css?v=20260928">
+<meta name="description" content="Interactive companion to 'The FWL Theorem: Making Multivariate Regressions Intuitive': a residualization animation on the post's 50 restaurants, a confounding simulator with the omitted-variable-bias identity, the post's forest plot, a Monte Carlo experiment, and a quiz.">
+<link rel="stylesheet" href="styles.css?v=20260930">
 </head>
 <body>
 
@@ -42,7 +42,7 @@
     (<em>partialling out</em>).
   </p>
   <p class="lede">
-    In the post's retail example (<span data-fact="n_obs" data-dp="0">—</span> simulated stores),
+    In the post's fast-food example (<span data-fact="n_obs" data-dp="0">—</span> simulated restaurants, each handing out 100 coupons in one day and counting how many come back that month),
     ignoring neighborhood income gives a slope of sales on coupons of
     <span class="kbd" data-fact="naive_b" data-dp="4">—</span>
     (p = <span data-fact="naive_p" data-dp="3">—</span>): the wrong sign. After partialling income
@@ -54,11 +54,11 @@
   </p>
 
   <div class="card">
-    <h3>Partialling out on the post's 50 stores</h3>
+    <h3>Partialling out on the post's 50 restaurants</h3>
     <p>
-      The loop cycles through three views of the same stores. First the naive scatter of sales
+      The loop cycles through three views of the same restaurants. First the naive scatter of sales
       against coupons. Then partial out income: regress coupons on income and keep the residuals
-      (dashed lines), the part of coupon usage that income cannot explain; sales are residualized
+      (dashed lines), the part of coupon redemption that income cannot explain; sales are residualized
       on income the same way. Finally, regress the residuals on each other: residualized sales on
       residualized coupons, whose slope is the multiple-regression coefficient. That last
       regression is what the post calls FWL Step 2. The post's Step 1 residualizes coupons only
@@ -145,7 +145,7 @@
     60 + π · income + N(0, 5²), and sales = 10 + β · coupons + γ · income + N(0, 3²), with the true
     coupon effect fixed at β = 0.20 (the post's day-of-week term is left out: it is unrelated to
     coupons, so it cannot bias anything). The lab draws its own random samples, so its default
-    draw of 50 stores is not the post's sample (Tab 1 uses the post's exact stores). Move the
+    draw of 50 restaurants is not the post's sample (Tab 1 uses the post's exact restaurants). Move the
     sliders and compare the naive slope of sales on coupons with the FWL slope.
     <strong>Map out where the naive slope has the wrong sign — that is when ignoring income
     misleads the analyst — and notice that the FWL slope stays centered on 0.20 everywhere.</strong>
@@ -155,7 +155,7 @@
     <div class="control">
       <label for="lab-n">Sample size n <span class="value" id="lab-n-val">50</span></label>
       <input type="range" id="lab-n" min="20" max="500" step="10" value="50" aria-label="sample size n">
-      <div class="hint">More stores ⇒ smaller standard errors. The post uses 50.</div>
+      <div class="hint">More restaurants ⇒ smaller standard errors. The post uses 50.</div>
     </div>
     <div class="control">
       <label for="lab-g"><span><span class="sym">γ</span> — income → sales</span> <span class="value" id="lab-g-val">0.30</span></label>
@@ -165,7 +165,7 @@
     <div class="control">
       <label for="lab-d"><span><span class="sym">π</span> — DGP slope, income → coupons</span> <span class="value" id="lab-d-val">−0.50</span></label>
       <input type="range" id="lab-d" min="-1.0" max="1.0" step="0.05" value="-0.50" aria-label="pi, DGP slope of coupons on income">
-      <div class="hint">Negative ⇒ richer neighborhoods use fewer coupons. The OVB slope δ (income on coupons) is derived from π below.</div>
+      <div class="hint">Negative ⇒ richer neighborhoods redeem fewer coupons. The OVB slope δ (income on coupons) is derived from π below.</div>
     </div>
   </div>
 
@@ -214,7 +214,7 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Sign flip.</strong> At the defaults (γ = 0.30, π = −0.50) the population δ is <span data-fact="pop_delta" data-dp="2">—</span>, so the predicted bias is <span data-fact="pop_bias" data-dp="2">—</span> and naive OLS converges to <span data-fact="pop_plim" data-dp="2">—</span>: the wrong sign. A single sample of 50 stores is noisy, so the FWL slope in one draw can land well away from 0.20. Reseed a few times; Tab 4 shows it is centered on 0.20 across samples.</li>
+      <li><strong>Sign flip.</strong> At the defaults (γ = 0.30, π = −0.50) the population δ is <span data-fact="pop_delta" data-dp="2">—</span>, so the predicted bias is <span data-fact="pop_bias" data-dp="2">—</span> and naive OLS converges to <span data-fact="pop_plim" data-dp="2">—</span>: the wrong sign. A single sample of 50 restaurants is noisy, so the FWL slope in one draw can land well away from 0.20. Reseed a few times; Tab 4 shows it is centered on 0.20 across samples.</li>
       <li><strong>Two OVB numbers, two questions.</strong> The population γ · δ says where naive OLS is headed on average; in any one sample, naive <span class="hat">β</span> − true β differs from it by sampling noise. The in-sample identity <span class="hat lo">γ</span> · <span class="hat">δ</span> = naive <span class="hat">β</span> − FWL <span class="hat">β</span> holds <em>exactly</em> in every draw. Reseed and watch those two rows stay equal.</li>
       <li><strong>Direction matters.</strong> δ is the slope of income regressed <em>on</em> coupons, not the DGP slope π of coupons on income. At the defaults π = −0.50 while δ = <span data-fact="pop_delta" data-dp="2">—</span>. |δ| peaks at |π| = 0.5, where income explains half the variance of coupons, and shrinks toward zero on either side: try π = −1.00 or π = −0.10.</li>
       <li><strong>Turn off the confounding.</strong> Drag γ (or π) to 0. The predicted bias is zero, and the naive and FWL slopes differ only by <span class="hat lo">γ</span> · <span class="hat">δ</span>, which is now pure noise.</li>
@@ -310,7 +310,7 @@
     <div class="control">
       <label for="mc-n">Sample size n <span class="value" id="mc-n-val">100</span></label>
       <input type="range" id="mc-n" min="30" max="500" step="10" value="100" aria-label="sample size n per simulated sample">
-      <div class="hint">Each simulated sample has this many stores.</div>
+      <div class="hint">Each simulated sample has this many restaurants.</div>
     </div>
     <div class="control">
       <label for="mc-g"><span><span class="sym">γ</span> — income → sales</span> <span class="value" id="mc-g-val">0.30</span></label>
@@ -345,7 +345,7 @@
       <li><strong>Two distributions, not one.</strong> The teal histogram (FWL) centers near 0.20. The orange one (naive) centers near the dashed line β + γ · δ, which at the defaults is <span data-fact="pop_plim" data-dp="2">—</span>: on the wrong side of zero.</li>
       <li><strong>Bias versus variance.</strong> The FWL histogram is a little <em>wider</em> than the naive one: partialling out income discards the part of coupon variation that income explains. Unbiased but noisier beats precise but wrong. Push n to 500: both clusters tighten, the orange one around the wrong value.</li>
       <li><strong>Disable the bias.</strong> Set γ or π to 0. Both histograms center on 0.20 and the naive sign-flip rate falls to about zero.</li>
-      <li><strong>The sign-flip rate.</strong> At the default settings (n = 100, seeds 1000–1099) the naive slope is negative in <span class="kbd" id="mc-default-flip">—</span> of the 100 samples, computed live by this page. A naive analyst would almost always conclude that coupons hurt sales; the post's single sample of 50 stores is one such case (<span data-fact="naive_b" data-dp="4">—</span>).</li>
+      <li><strong>The sign-flip rate.</strong> At the default settings (n = 100, seeds 1000–1099) the naive slope is negative in <span class="kbd" id="mc-default-flip">—</span> of the 100 samples, computed live by this page. A naive analyst would almost always conclude that coupons hurt sales; the post's single sample of 50 restaurants is one such case (<span data-fact="naive_b" data-dp="4">—</span>).</li>
     </ul>
   </div>
 
@@ -451,8 +451,8 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
         integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
         crossorigin="anonymous"></script>
-<script src="dgp.js?v=20260928"></script>
-<script src="charts.js?v=20260928"></script>
-<script src="app.js?v=20260928"></script>
+<script src="dgp.js?v=20260930"></script>
+<script src="charts.js?v=20260930"></script>
+<script src="app.js?v=20260930"></script>
 </body>
 </html>

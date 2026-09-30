@@ -219,11 +219,99 @@
     }
   },
   "versions": {
-    "python": "3.13.11",
-    "numpy": "2.3.5",
-    "pandas": "3.0.1",
-    "statsmodels": "0.14.6",
-    "matplotlib": "3.10.8",
-    "seaborn": "0.13.2"
+    "python": "3.12.12",
+    "numpy": "2.5.3",
+    "pandas": "2.3.3",
+    "statsmodels": "0.15.0",
+    "matplotlib": "3.11.2",
+    "seaborn": "0.13.2",
+    "expdpy": "0.5.2"
+  },
+  "panel": {
+    "_comment": "January + June panel from simulate_restaurant_panel(). SEs clustered by restaurant_id. expdpy SEs follow pyfixest's small-sample correction (fixed effects nested in clusters are not counted); statsmodels LSDV SEs count every dummy.",
+    "dgp": {
+      "season": 3.0,
+      "income_shock_sd": 2.0,
+      "trait_to_coupons": 1.0,
+      "trait_sd": 3.0,
+      "june_coupons_noise_sd": 4.0,
+      "june_sales_noise_sd": 1.5
+    },
+    "n_restaurants": 50,
+    "n_periods": 2,
+    "n_obs": 100,
+    "means_by_period": {
+      "1": {
+        "sales": 33.6054,
+        "coupons": 33.8442,
+        "income": 50.9126
+      },
+      "2": {
+        "sales": 37.0694,
+        "coupons": 34.4966,
+        "income": 51.0466
+      }
+    },
+    "pooled": {
+      "method": "Pooled OLS + income + period",
+      "coef": 0.4495847947,
+      "se": 0.0813656758,
+      "p": 3.29e-08,
+      "ci_lo": 0.2901110005,
+      "ci_hi": 0.6090585888
+    },
+    "fe_lsdv": {
+      "method": "Restaurant FE (dummies)",
+      "coef": 0.213823108,
+      "se": 0.114776512,
+      "p": 0.0624690499,
+      "ci_lo": -0.0111347218,
+      "ci_hi": 0.4387809377
+    },
+    "fe_demeaned_coef": 0.213823108,
+    "fe_fwl": {
+      "slope": 0.213823108,
+      "se": 0.0807398195,
+      "r2_within": 0.1326377317,
+      "n_obs": 100
+    },
+    "twfe_lsdv": {
+      "method": "Two-way FE (dummies)",
+      "coef": 0.1394446713,
+      "se": 0.098805998,
+      "p": 0.1581568716,
+      "ci_lo": -0.0542115263,
+      "ci_hi": 0.3331008688
+    },
+    "twfe_fwl": {
+      "slope": 0.1394446713,
+      "se": 0.0691347858,
+      "r2_within": 0.2022008139,
+      "n_obs": 100
+    },
+    "fd": {
+      "coef": 0.1394446713,
+      "se_hc1": 0.0695126351,
+      "intercept": 3.3165067098,
+      "d_income_coef": 0.4217879605
+    },
+    "twfe_se_versions": {
+      "cluster_no_small_sample_factors": 0.0673950002,
+      "fd_hc0": 0.0673950002,
+      "expdpy_pyfixest_default": 0.0691347858,
+      "statsmodels_lsdv_cluster": 0.098805998
+    },
+    "monte_carlo": {
+      "n_panels": 500,
+      "seeds": "1000-1499",
+      "pooled_mean": 0.3762782011,
+      "pooled_sd": 0.0717163046,
+      "twfe_mean": 0.2032080907,
+      "twfe_sd": 0.042829803,
+      "twfe_mean_se_hc1": 0.0415404648,
+      "share_twfe_at_or_below_seed42": 0.066,
+      "sd_d_coupons_seed42": 5.5892091953,
+      "sd_d_coupons_population": 7.1414284285
+    }
   }
 }

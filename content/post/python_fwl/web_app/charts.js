@@ -74,7 +74,7 @@
   }
 
   // ------------------------------------------------------------------
-  // Tab 1 — FWL residualization animation on the post's 50 stores.
+  // Tab 1 — FWL residualization animation on the post's 50 restaurants.
   //   Phase 0: naive view, sales vs coupons (the slope has the wrong sign).
   //   Phase 1: partial out income, coupons vs income with the fit and dashed
   //            residuals (sales are residualized the same way, not drawn).
@@ -101,14 +101,14 @@
         key: "naive",
         title: "Naive view — sales against coupons, income ignored",
         note: () => `Slope of sales on coupons = ${num(fit.naive.b, 4)}: the wrong sign (the true effect is positive).`,
-        x: coupons, y: sales, xLab: "Coupon usage (%)", yLab: "Daily sales",
+        x: coupons, y: sales, xLab: "Coupon redemption rate (%)", yLab: "Monthly sales",
         line: naiveLine, lineColor: C.orange, ptColor: C.steel,
       },
       {
         key: "partial",
         title: "Partial out income — regress coupons (and sales) on income; keep the residuals (dashed)",
-        note: () => `Slope of coupons on income = ${num(fit.pi_hat, 4)}: richer neighborhoods use fewer coupons. Sales are residualized on income the same way (not drawn).`,
-        x: income, y: coupons, xLab: "Neighborhood income", yLab: "Coupon usage (%)",
+        note: () => `Slope of coupons on income = ${num(fit.pi_hat, 4)}: richer neighborhoods redeem fewer coupons. Sales are residualized on income the same way (not drawn).`,
+        x: income, y: coupons, xLab: "Neighborhood income", yLab: "Coupon redemption rate (%)",
         line: partialLine, lineColor: C.soft, ptColor: C.steel,
       },
       {
@@ -135,7 +135,7 @@
       w = W - margin.left - margin.right;
       h = H - margin.top - margin.bottom;
       const svg = ensureSVG(container, W, H,
-        "Animated scatter plots of the post's 50 stores: naive view, partialling out income, residuals on residuals");
+        "Animated scatter plots of the post's 50 restaurants: naive view, partialling out income, residuals on residuals");
       g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
       xAxisG = g.append("g").attr("transform", `translate(0,${h})`);
       yAxisG = g.append("g");

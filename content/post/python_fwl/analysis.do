@@ -11,11 +11,13 @@
 * Companions:      script.py            (the Python original)
 *                  cheatsheet_stata.do  cheatsheet_python.py  cheatsheet_R.R
 *
-* Data: 50 simulated stores (numpy default_rng(42)), 4 columns:
+* Data: 50 simulated fast-food restaurants, one per neighborhood (numpy
+* default_rng(42)); each hands out 100 coupons in one day. 4 columns:
 *   income    ~ N(50, 10)                 neighborhood income, thousands $
 *   dayofweek ~ U{1, ..., 7}
-*   coupons   = 60 - 0.5*income + N(0, 5)  coupon usage, %
+*   coupons   = 60 - 0.5*income + N(0, 5)  redemption rate, % of 100
 *   sales     = 10 + 0.2*coupons + 0.3*income + 0.5*dayofweek + N(0, 3)
+*                                         monthly sales, thousands $
 * The true effect of coupons on sales is +0.2.
 *
 * Usage (batch):
@@ -316,10 +318,10 @@ display as text %-46s "raw corr(dayofweek, coupons), for contrast" as result %10
 *==============================================================================
 twoway (scatter ss cs, mcolor("$BLUE") msize(medium))              ///
        (lfit ss cs, lcolor("$ORANGE") lwidth(thick)),               ///
-       xtitle("Coupon usage (%, income partialled out + mean)")     ///
-       ytitle("Daily sales (thousands USD, income partialled out + mean)") ///
+       xtitle("Coupon redemption rate (%, income partialled out + mean)") ///
+       ytitle("Monthly sales (thousands USD, income partialled out + mean)") ///
        title("Conditional relationship after partialling-out income") ///
-       legend(order(1 "Stores" 2 "Linear fit")) name(g_fwl, replace)
+       legend(order(1 "Restaurants" 2 "Linear fit")) name(g_fwl, replace)
 
 if $EXPORT == 1 {
     graph export "fwl_partialled_out_stata.png", name(g_fwl) width(1600) replace
@@ -347,7 +349,7 @@ display as text "All identities asserted above hold."
 *==============================================================================
 * 11. APPENDIX — THE SAME DGP, SIMULATED NATIVELY IN STATA
 *     Stata's random-number stream is not numpy's, so set seed 42 here gives
-*     DIFFERENT stores and DIFFERENT estimates from the post. The point is the
+*     DIFFERENT restaurants and DIFFERENT estimates from the post. The point is the
 *     recipe, not the digits: FWL still reproduces the full-model coefficient
 *     exactly, and the naive slope is still biased downward.
 *==============================================================================

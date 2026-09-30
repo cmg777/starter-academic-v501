@@ -2,7 +2,7 @@
 // Runs after window.d3, window.DGP and window.CHARTS are defined.
 //
 // Every number the page prints about the post comes from data/results.json
-// (written by ../script.py) or is computed live from the post's 50 stores or
+// (written by ../script.py) or is computed live from the post's 50 restaurants or
 // from the simulator; nothing is typed in by hand.
 
 (function () {
@@ -333,14 +333,14 @@
   // data-pick value to feedback text built from the facts F.
   const QUIZ_FEEDBACK = [
     { // Q1 naive sign
-      neg: F => `The naive slope is ${fmt(F.naive_b, 4)} (p = ${fmt(F.naive_p, 3)}). Richer neighborhoods use fewer coupons and spend more, so the raw slope mixes the coupon effect with income's effect and lands on the wrong side of zero.`,
+      neg: F => `The naive slope is ${fmt(F.naive_b, 4)} (p = ${fmt(F.naive_p, 3)}). Richer neighborhoods redeem fewer coupons and spend more, so the raw slope mixes the coupon effect with income's effect and lands on the wrong side of zero.`,
       pos: F => `The naive slope is ${fmt(F.naive_b, 4)}, negative. Income pushes coupons down and sales up, and that backdoor path outweighs the true effect of ${fmt(F.true_effect, 2, true)}.`,
       zero: F => `It is not significant (p = ${fmt(F.naive_p, 3)}), but the point estimate is ${fmt(F.naive_b, 4)}, and the problem is bias, not noise: in large samples the naive slope converges to ${fmt(F.true_effect, 2)} + γ · δ = ${fmt(F.pop_plim, 2)}.`,
     },
     { // Q2 add income
       pos: F => `The coupon coefficient becomes ${fmt(F.full_b, 4, true)} (SE ${fmt(F.full_se, 4)}, p = ${fmt(F.full_p, 3)}), and income's own coefficient is ${fmt(F.gamma_hat, 4, true)}. Holding income fixed closes the backdoor path.`,
       same: F => `Controlling for income changes everything: the coefficient moves from ${fmt(F.naive_b, 4)} to ${fmt(F.full_b, 4, true)}. The gap, ${fmt(F.naive_minus_full, 4)}, equals ${G_HAT} · ${D_HAT} exactly: the in-sample omitted-variable-bias term (measured against the full-regression estimate, not the true ${fmt(F.true_effect, 2)}).`,
-      exact: F => `Controlling for income removes the bias, not the noise. With ${F.n_obs} stores the estimate is ${fmt(F.full_b, 4, true)} (SE ${fmt(F.full_se, 4)}): within one standard error of ${fmt(F.true_effect, 2)}, but not equal to it.`,
+      exact: F => `Controlling for income removes the bias, not the noise. With ${F.n_obs} restaurants the estimate is ${fmt(F.full_b, 4, true)} (SE ${fmt(F.full_se, 4)}): within one standard error of ${fmt(F.true_effect, 2)}, but not equal to it.`,
     },
     { // Q3 OVB delta
       ionc: F => `Regressing income on coupons gives ${D_HAT} = ${fmt(F.delta_hat, 4)}, and ${G_HAT} · ${D_HAT} = ${fmt(F.gamma_hat, 4)} × (${fmt(F.delta_hat, 4)}) = ${fmt(F.ovb_product, 4)}, exactly naive − full = ${fmt(F.naive_b, 4)} − ${fmt(F.full_b, 4)}. The omitted variable goes on the left, the included regressor on the right.`,
@@ -363,7 +363,7 @@
       scale: F => `A slope is a ratio of covariance to variance, and adding constants changes neither. The slope stays ${fmt(F.scaled_b, 4)}; only the intercept absorbs the means.`,
     },
     { // Q7 DML
-      partial: () => `DML replaces the two OLS partialling-out regressions (coupons on income, sales on income) with flexible machine-learning learners such as random forests or gradient boosting, and uses cross-fitting so each store's residual comes from a model trained on other stores. The final step is still a residual-on-residual regression.`,
+      partial: () => `DML replaces the two OLS partialling-out regressions (coupons on income, sales on income) with flexible machine-learning learners such as random forests or gradient boosting, and uses cross-fitting so each restaurant's residual comes from a model trained on other restaurants. The final step is still a residual-on-residual regression.`,
       final: () => `The last step stays essentially the same: regress the residualized outcome on the residualized treatment. What changes is how the residuals are produced: flexible ML learners with cross-fitting instead of OLS.`,
       controls: () => `DML still needs every confounder to be measured and included as a control. It relaxes the functional form of the partialling-out regressions, replacing OLS with flexible ML learners and cross-fitting; it does not remove the need for controls.`,
     },

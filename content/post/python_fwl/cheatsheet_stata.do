@@ -75,7 +75,9 @@ end
 
 *-------------------------------------------------------------------------------
 * 1. LOAD THE DATA (LOCAL COPY, THEN URL) OR SIMULATE IT NATIVELY
-*    50 stores. income ~ N(50, 10), dayofweek ~ U{1..7},
+*    50 fast-food restaurants, one per neighborhood; each hands out 100
+*    coupons in one day. coupons = % redeemed that month; sales = monthly
+*    sales ($000). income ~ N(50, 10), dayofweek ~ U{1..7},
 *    coupons = 60 - 0.5 income + N(0, 5),
 *    sales   = 10 + 0.2 coupons + 0.3 income + 0.5 dayofweek + N(0, 3).
 *    The true coupon effect is +0.2.
@@ -83,7 +85,7 @@ end
 global url "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_fwl/data/fwl_store_data.csv"
 
 * NUMBERS WILL DIFFER. Same DGP, but Stata's random-number stream is not
-* numpy's, so set seed 42 draws different stores from the post's. Use it to see
+* numpy's, so set seed 42 draws different restaurants from the post's. Use it to see
 * that FWL holds in ANY sample, not to reproduce the post.
 capture program drop simulate_store_data
 program define simulate_store_data
@@ -122,7 +124,7 @@ else {
         local src "Stata simulation (offline)"
     }
 }
-display as text "Loaded: `src'  (" _N " stores)"
+display as text "Loaded: `src'  (" _N " restaurants)"
 assert _N == 50
 
 preserve
@@ -314,10 +316,10 @@ assert reldif(_b[coupons_sc], b_full) < 1e-8
 
 twoway (scatter sales_sc coupons_sc, mcolor("106 155 204"))            ///
        (lfit sales_sc coupons_sc, lcolor("217 119 87") lwidth(thick)), ///
-       xtitle("Coupon usage (%, income partialled out + mean)")        ///
-       ytitle("Daily sales (income partialled out + mean)")            ///
+       xtitle("Coupon redemption rate (%, income partialled out + mean)") ///
+       ytitle("Monthly sales (income partialled out + mean)")          ///
        title("The FWL plot: what controlling for income looks like")   ///
-       legend(order(1 "Stores" 2 "Linear fit")) name(fwl_plot, replace)
+       legend(order(1 "Restaurants" 2 "Linear fit")) name(fwl_plot, replace)
 if $EXPORT == 1 {
     graph export "fwl_partialled_out_stata.png", name(fwl_plot) width(1600) replace
 }
@@ -452,7 +454,7 @@ local r4 "Step 1 + intercept"
 local r5 "Step 2 (resid. both)"
 local r6 "Two controls (full)"
 
-display _n as text "Coupon coefficient (SE): 50 stores, one CSV, three languages"
+display _n as text "Coupon coefficient (SE): 50 restaurants, one CSV, three languages"
 display as text "{hline 78}"
 display as text %-24s "Row" %-18s "Python" %-18s "R" "Stata"
 display as text "{hline 78}"
