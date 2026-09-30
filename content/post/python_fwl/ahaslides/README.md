@@ -186,6 +186,10 @@ rebuilt in place, safest order first:
    badge still reads **0 / 3** with the free-slide-limit notice, as before; the share
    link returns 200.
 
-Not done: the AhaSlides-side speaker notes of interactive slides 6 and 7 still say "50
-stores" / "each store's residuals". `update_slide_content` replaces the whole quiz, so
-they were left alone; `deck.md` has the corrected wording and is the notes of record.
+4. Same day, follow-up: the AhaSlides-side speaker notes of interactive slides 6 and 7
+   (IDs 160499289, 160499310) still said "50 stores" / "each store's residuals".
+   `update_slide_content` resent both quizzes in full from `payload.json` (heading,
+   lettered options sent reversed, notes). IDs and orders (60.5, 67.5) are unchanged, the
+   options were recreated with orders 1 / 0.5 / 0.25 so they still display A, B, C, and
+   each quiz keeps exactly one correct option (B and A). Points and timer settings were
+   untouched.

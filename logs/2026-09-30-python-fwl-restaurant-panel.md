@@ -60,8 +60,9 @@ counts all 53 parameters, which gives 0.0988. Monte Carlo (500 panels): pooled 0
 
 Rebuilt in place: backup deck `10220004`, new 34-page PDF imported *before* deleting, old images
 soft-deleted, 7 interactive slides moved (positions 5/14/20/24/29/32/40 verified; badge 0 / 3 as
-before; share link 200). Not changed: the AhaSlides-side notes of interactive slides 6 and 7 still
-say "stores" (`deck.md` is corrected). See `ahaslides/README.md → Rebuild log`.
+before; share link 200). Follow-up: the notes of interactive slides 6 and 7 were updated with
+`update_slide_content` (full quiz resent; IDs, order, correct answers unchanged). See
+`ahaslides/README.md → Rebuild log`.
 
 ## Not regenerable
 
