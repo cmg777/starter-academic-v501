@@ -21,7 +21,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2023-2026"
+role: "PhD in International Development 2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -41,7 +41,7 @@ title: Restrepo Katerine (Colombia)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Doctoral students
+- Alumni doctoral graduates
 ---
 
 My research explores nutritional inequality in Latin America, with a particular focus on the dual burden of undernutrition and overnutrition using spatial econometric approaches.

@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Universidad de Nagoya
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Estudiante de doctorado 2022-2025"
+role: "Doctorado en Desarrollo Internacional 2025"
 social:
 - icon: address-card
   icon_pack: fa

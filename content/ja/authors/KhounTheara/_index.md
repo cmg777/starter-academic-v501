@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "博士課程学生 2022–2025"
+role: "国際開発学 博士 2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -34,7 +34,7 @@ title: Theara Khoun（カンボジア）
 # 所属するグループ（People ウィジェット用）。
 #   People ウィジェットを使わない場合は `[]` にするかコメントアウトしてください。
 user_groups:
-- 博士課程学生
+- Alumni doctoral graduates
 ---
 
 未定

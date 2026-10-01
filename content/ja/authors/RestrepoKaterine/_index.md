@@ -18,7 +18,7 @@ interests:
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "博士課程学生 2023–2026"
+role: "国際開発学 博士 2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -38,7 +38,7 @@ title: Restrepo Katerine（コロンビア）
 # 所属するグループ（People ウィジェット用）。
 #   People ウィジェットを使わない場合は `[]` にするかコメントアウトしてください。
 user_groups:
-- 博士課程学生
+- Alumni doctoral graduates
 ---
 
 私の研究は、ラテンアメリカにおける栄養格差を探究するものであり、特に低栄養と過栄養という二重負荷に着目し、空間計量経済学的アプローチを用いて分析しています。

@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "博士課程学生 2022-2025"
+role: "国際開発学 博士 2025"
 social:
 - icon: address-card
   icon_pack: fa

@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Universidad de Nagoya
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Estudiante de doctorado 2022-2025"
+role: "Doctorado en Desarrollo Internacional 2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -34,7 +34,7 @@ title: Theara Khoun (Camboya)
 # Grupos a los que perteneces (para el widget People).
 #   Establece esto en `[]` o coméntalo si no usas el widget People.
 user_groups:
-- Estudiantes de doctorado
+- Alumni doctoral graduates
 ---
 
 Por definir
