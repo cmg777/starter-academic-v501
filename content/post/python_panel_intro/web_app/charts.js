@@ -49,22 +49,24 @@
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Three workers, two periods each: (union_status, lwage).
-    // Workers chosen so that POLS slope differs strongly from FE slope.
+    // Chosen so the drawn slopes match the post: POLS 0.07 on the raw points,
+    // FE 0.21 on the demeaned points. Bob is a low-wage worker who joins a
+    // union (negative selection), which is what pulls POLS below FE.
     const workers = [
       {
-        name: "Alice (high-wage, always non-union)",
+        name: "Alice (always non-union)",
         color: C.steel,
-        raw:  [[0, 3.9], [0, 4.0]],
+        raw:  [[0, 3.40], [0, 3.50]],
       },
       {
-        name: "Bob (switcher: non-union to union)",
+        name: "Bob (low-wage switcher: joins a union)",
         color: C.teal,
-        raw:  [[0, 2.9], [1, 3.2]],
+        raw:  [[0, 2.90], [1, 3.11]],
       },
       {
-        name: "Carla (low-wage, always union)",
+        name: "Carla (always union)",
         color: C.orange,
-        raw:  [[1, 2.4], [1, 2.5]],
+        raw:  [[1, 3.40], [1, 3.50]],
       },
     ];
 
@@ -74,6 +76,20 @@
       const my = (wk.raw[0][1] + wk.raw[1][1]) / 2;
       wk.dem = wk.raw.map(p => [p[0] - mx, p[1] - my]);
     });
+
+    // OLS slopes computed from the points themselves, so lines and labels
+    // always agree with what is drawn.
+    function olsFit(pts, intercept) {
+      const n = pts.length;
+      const mx = intercept ? d3.mean(pts, p => p[0]) : 0;
+      const my = intercept ? d3.mean(pts, p => p[1]) : 0;
+      const sxy = d3.sum(pts, p => (p[0] - mx) * (p[1] - my));
+      const sxx = d3.sum(pts, p => (p[0] - mx) * (p[0] - mx));
+      const b = sxy / sxx;
+      return { b, a: my - b * mx, n };
+    }
+    const polsFit = olsFit(workers.flatMap(wk => wk.raw), true);
+    const feFit = olsFit(workers.flatMap(wk => wk.dem), false);
 
     // Static scales: union jittered slightly for visibility.
     const x = d3.scaleLinear().domain([-1.0, 1.5]).range([0, w]);
@@ -100,7 +116,7 @@
     const caption = g.append("text").attr("class", "phase-label")
       .attr("x", 8).attr("y", -14)
       .attr("fill", C.text).attr("font-size", 13).attr("font-weight", 600)
-      .text("Raw data — POLS slope is shallow (~0.07): between-worker differences dominate");
+      .text("Raw data: POLS slope is shallow (~0.07); between-worker differences dominate");
 
     // Pre-create one circle + one line per worker (the line connects t=2010 to t=2012).
     const elems = workers.map(wk => ({
@@ -133,7 +149,7 @@
     const feLabel = g.append("text").attr("fill", C.orange)
       .attr("font-size", 11).attr("font-weight", 600)
       .attr("x", legendX).attr("y", 28).attr("text-anchor", "start")
-      .text("FE slope = 0.21");
+      .text(`FE slope = ${feFit.b.toFixed(2)}`);
 
     // Animation loop: interpolate between raw and demeaned across a 10s cycle.
     let t0 = null;
@@ -142,10 +158,10 @@
       const cyc = ((ts - t0) / 1000) % 10;
       let u, label;
       if (cyc < 1) {
-        u = 0; label = "Raw data — POLS slope is shallow (~0.07): between-worker differences dominate";
+        u = 0; label = "Raw data: POLS slope is shallow (~0.07); between-worker differences dominate";
       } else if (cyc < 4) {
         // hold raw
-        u = 0; label = "Raw data — POLS slope is shallow (~0.07): between-worker differences dominate";
+        u = 0; label = "Raw data: POLS slope is shallow (~0.07); between-worker differences dominate";
       } else if (cyc < 5) {
         u = (cyc - 4); // 0 to 1 transition
         label = "Subtracting each worker's mean (the within transformation) ...";
@@ -177,18 +193,17 @@
         el.label.attr("x", x(p1[0] + jit) + 8).attr("y", y(p1[1]) - 4);
       });
 
-      // POLS line: pass through (0, ~3.4) with slope 0.075 — barely tilted.
-      // Visible only when looking at raw data (u~0).
-      const polsB = 3.4, polsA = 0.075;
+      // POLS line through the raw points. Visible only on raw data (u~0).
+      const polsB = polsFit.a, polsA = polsFit.b;
       const polsAlpha = (1 - u);
       polsLine.attr("opacity", 0.75 * polsAlpha)
         .attr("x1", x(-1.0)).attr("y1", y(polsB + polsA * -1.0))
         .attr("x2", x(1.5)).attr("y2", y(polsB + polsA * 1.5));
       polsLabel.attr("opacity", polsAlpha)
-        .text("POLS slope = 0.07");
+        .text(`POLS slope = ${polsFit.b.toFixed(2)}`);
 
-      // FE line: through origin in demeaned coords with slope 0.21. Visible when u~1.
-      const feA = 0.21;
+      // FE line: through the origin in demeaned coords. Visible when u~1.
+      const feA = feFit.b;
       const feAlpha = u;
       feLine.attr("opacity", 0.85 * feAlpha)
         .attr("x1", x(-0.6)).attr("y1", y(feA * -0.6))
@@ -452,7 +467,7 @@
 
   // ------------------------------------------------------------------
   // forest_plot (Tab 3) — multi-method horizontal CI bars, faceted by
-  // outcome. The 6-method comparison is the post's headline figure.
+  // outcome. The basic-model comparison is the post's headline figure.
   // ------------------------------------------------------------------
   function forest_plot(container) {
     const W = 720;

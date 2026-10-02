@@ -12,6 +12,7 @@ Executable companion to the blog post:
 - `setup_env.py` — bootstraps a local `.venv/` with pinned packages on first render.
 - `_quarto.yml` — wires `setup_env.py` to Quarto's pre-render hook.
 - `script.py` — the canonical companion script, kept for reference.
+- `cheatsheet_python.py`, `cheatsheet_R.R`, `cheatsheet_stata.do` — one-page cheat sheets: the seven estimators, the T = 2 identities, two Hausman tests and the traps, in Python, R and Stata. Each reads the data from GitHub and ends with the same comparison table. Run them directly (`python cheatsheet_python.py`, `Rscript cheatsheet_R.R`, or `do cheatsheet_stata.do`).
 - `README.md` — this file.
 
 ## Prerequisites

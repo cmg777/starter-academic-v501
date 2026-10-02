@@ -14,15 +14,16 @@ study:
     (<code>isds/wage_panel_bob4.dta</code>). The cross-sectional estimators report a union premium of
     7&ndash;11 log points; once unobserved worker traits are netted out, the within estimators report
     roughly 21 log points &mdash; a near-tripling that illustrates selection on unobservables. The
-    Hausman test fails to reject random effects (H&nbsp;=&nbsp;1.79, p&nbsp;=&nbsp;0.180) while the
-    Mundlak term (&minus;0.144, p&nbsp;=&nbsp;0.072) hints at negative selection; both point toward
-    CRE/Mundlak as the specification to lead with.
+    textbook Hausman test rejects random effects (H&nbsp;=&nbsp;5.62, p&nbsp;=&nbsp;0.018) under
+    classical errors, while the robust Mundlak term (&minus;0.144, p&nbsp;=&nbsp;0.072) is borderline;
+    both hint at negative selection and point toward CRE/Mundlak as the specification to lead with.
   panel_structure: >
     <strong>Two files.</strong> <code>raw_data</code> is the full NLSY-style download &mdash; one row
     per worker &times; year, five waves (2010, 2012, 2014, 2016, 2018), 2,209 workers, balanced.
     <code>data_panel</code> is the tutorial's analysis sample: the same data restricted to
     <strong>2010 and 2012 only</strong> so that <em>T</em>&nbsp;=&nbsp;2 and the first-difference and
-    within estimators coincide; rows with missing <code>lwage</code>/<code>union</code>/<code>age</code>/<code>schooling</code>
+    within estimators are exactly linked (FD without an intercept equals FE; FD with an intercept equals
+    two-way FE); rows with missing <code>lwage</code>/<code>union</code>/<code>age</code>/<code>schooling</code>
     are dropped (2,199 workers &times; 2 years = 4,398 observations, balanced) and a <code>female</code>
     dummy is added.
   kpis:
@@ -58,10 +59,11 @@ formulas_html: |
   <p><strong>Between/within variance decomposition</strong> (per variable): between SD is
   <code>SD(&xbar;_i)</code>, within SD is <code>SD(x_it &minus; &xbar;_i)</code>, and the between
   share is <code>between&sup2; / (between&sup2; + within&sup2;)</code>. <strong>Hausman</strong>:
-  <code>H = (&beta;_FE &minus; &beta;_RE)&sup2; / (V_FE &minus; V_RE) ~ &chi;&sup2;(1)</code>.</p>
+  <code>H = (&beta;_FE &minus; &beta;_RE)&sup2; / (V_FE &minus; V_RE) ~ &chi;&sup2;(1)</code>, with
+  classical (non-robust) variances; with robust errors use the Mundlak test instead.</p>
 
 caveats:
-  - "<strong>Two periods only in the analysis panel.</strong> <code>data_panel</code> keeps just 2010 and 2012 (<em>T</em>&nbsp;=&nbsp;2) so the first-difference and within estimators coincide; with only two waves the fixed-effects estimate is power-limited and the Hausman test has low power. <code>raw_data</code> retains all five waves for extensions."
+  - "<strong>Two periods only in the analysis panel.</strong> <code>data_panel</code> keeps just 2010 and 2012 (<em>T</em>&nbsp;=&nbsp;2) so the first-difference and within estimators are exactly linked; with only two waves and 73 switchers the fixed-effects estimate is imprecise and the FE-versus-RE tests have little power. <code>raw_data</code> retains all five waves for extensions."
   - "<strong>Thin within variation.</strong> Union status is 93.9% between-worker and only 6.1% within; schooling has zero within-variation in the two-period window, so fixed effects mechanically drops it."
   - "<strong>10 workers dropped.</strong> The analysis panel keeps 2,199 of the 2,209 raw workers; ten are dropped for missing values in <code>lwage</code>/<code>union</code>/<code>age</code>/<code>schooling</code>."
   - "<strong>Estimands differ.</strong> Within estimators (FDFE/FE/TWFE/CRE) identify the effect for union <em>switchers</em> under strict exogeneity; POLS/Between report a population-weighted association without a causal interpretation absent unconfoundedness."
@@ -109,7 +111,7 @@ files:
     coverage: "2,199 US workers (balanced, 2 waves)"
     key: "ID x year"
     purpose: "Estimation sample for all seven panel estimators (POLS / Between / FDFE / FE / TWFE / RE / CRE)."
-    note: "Analysis subset of raw_data.csv restricted to 2010 and 2012 so that T=2 and first-differences coincide with the within estimator. Rows missing lwage/union/age/schooling are dropped (2,199 of 2,209 workers retained), year is cast to integer, and a female dummy is added. Perfectly balanced: every worker contributes exactly two observations."
+    note: "Analysis subset of raw_data.csv restricted to 2010 and 2012 so that T=2 and first differences without an intercept coincide with the within estimator. Rows missing lwage/union/age/schooling are dropped (2,199 of 2,209 workers retained), year is cast to integer, and a female dummy is added. Perfectly balanced: every worker contributes exactly two observations."
 
 columns:
   ID:

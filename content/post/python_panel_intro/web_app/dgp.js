@@ -1,16 +1,8 @@
-// dgp.js — seeded RNG and simulated data-generating processes for the LASSO app.
+// dgp.js — seeded RNG helpers for the panel-data app.
 //
-// Two DGPs:
-//   simulate_lasso({n, p, signal, seed})        used in Tab 2 (LASSO Lab)
-//     y = X * theta + epsilon, theta has the first k_signal entries nonzero.
-//     The first column of X is the "treatment" (true coefficient = ALPHA_TRUE).
-//
-//   simulate_dl({n, p, signal, asymmetry, seed}) used in Tab 3 (Penalty Showdown)
-//     y = alpha * d + X * theta + epsilon
-//     d = X * pi + v
-//     "asymmetry" controls how much controls predict d vs y.
-//
-// All helpers are exported as window.DGP.{rng, randn, simulate_lasso, simulate_dl}.
+// Exports window.DGP.{rng, randn, ...}. The panel simulator in app.js uses
+// the seeded generator (mulberry32) and the normal sampler (makeNormal);
+// the remaining helpers are unused leftovers from the app template.
 
 (function () {
   "use strict";

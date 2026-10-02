@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build content/post/<SLUG>/<SLUG>.zip from the tutorial sources.
 # Re-run whenever tutorial.qmd, setup_env.py, _quarto.yml, script.py, the
-# render wrappers, or the bundle README.md changes, then commit the
-# regenerated zip.
+# render wrappers, the cheat sheets, or the bundle README.md changes, then
+# commit the regenerated zip.
 
 set -euo pipefail
 
@@ -19,6 +19,9 @@ cp "${POST_DIR}/references/README.md"      "${STAGE_DIR}/"
 cp "${POST_DIR}/references/render.command" "${STAGE_DIR}/"
 cp "${POST_DIR}/references/render.bat"     "${STAGE_DIR}/"
 cp "${POST_DIR}/script.py"                 "${STAGE_DIR}/"
+cp "${POST_DIR}/cheatsheet_python.py"      "${STAGE_DIR}/"
+cp "${POST_DIR}/cheatsheet_R.R"            "${STAGE_DIR}/"
+cp "${POST_DIR}/cheatsheet_stata.do"       "${STAGE_DIR}/"
 chmod +x "${STAGE_DIR}/render.command"
 
 rm -f "${OUT_ZIP}"

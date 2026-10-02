@@ -42,6 +42,8 @@ content/post/stata_sdid_staggered/reference/
 
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
 content/post/stata_iv/stata.log
+# Stata batch logs of the cheat sheets (they include license details)
+content/post/*/cheatsheet_stata.log
 
 # Python venv for python_iv post (build artifact, not source)
 content/post/python_iv/.venv/

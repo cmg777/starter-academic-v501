@@ -2,7 +2,7 @@
 
 **Status:** Script executed successfully
 **Language:** Python
-**Last run:** 2026-04-28
+**Last run:** 2026-10-02
 
 ## Overview
 
@@ -10,10 +10,16 @@ Beginner-friendly tour of the standard panel data estimators on a two-period wag
 
 ## Pipeline Progress
 
-- [x] Script (`script.py`) -- executed
-- [ ] Results report (`results_report.md`) -- pending
-- [ ] Blog post (`index.md`) -- pending
-- [ ] Infographic (`infographic_instructions.md`) -- pending
+- [x] Script (`script.py`) -- executed (`execution_log.txt`, `panel_intro_results.json`)
+- [x] Results report (`results_report.md`)
+- [x] Blog post (`index.md`), with notebook (`notebook.ipynb`) and Quarto bundle (`references/tutorial.qmd` → `python_panel_intro.zip`, built by `build_bundle.sh`)
+- [x] Infographic brief (`infographic_instructions.md`)
+- [x] Slides (`slides/slides.qmd` → `slides/index.html`)
+- [x] Web app (`web_app/`)
+- [x] Data dictionary (`data/`, built by `data/build_data_dictionary.py`)
+- [x] Cheat sheets (`cheatsheet_python.py`, `cheatsheet_R.R`, `cheatsheet_stata.do`)
+
+`notebook.ipynb` and `references/tutorial.qmd` are generated from `index.md`; edit the post first, then regenerate them.
 
 ## Generated Figures
 
@@ -22,7 +28,7 @@ Beginner-friendly tour of the standard panel data estimators on a two-period wag
 | 1 | `panel_intro_variation.png` | Between vs within variance decomposition for lwage, union, age, schooling |
 | 2 | `panel_intro_trajectories.png` | Spaghetti plot of individual wage paths for 30 sampled workers, colored by union status — placed early as motivation |
 | 3 | `panel_intro_demeaning.png` | Two-panel scatter: raw data (POLS slope) vs demeaned data (FE slope) — visualizes the within transformation |
-| 4 | `panel_intro_coef_comparison.png` | Union coefficient across 6 estimators (POLS, Between, FDFE, FE, RE, CRE) with 95% CI; Hausman χ² in caption |
+| 4 | `panel_intro_coef_comparison.png` | Union coefficient across 6 estimators (POLS, Between, FDFE, FE, RE, CRE) with 95% CI; classical Hausman χ² annotated in the figure |
 | 5 | `panel_intro_extended_models.png` | Coefficient comparison across extended models (POLS, TWFE, RE, CRE) for union, age, schooling, female |
 
 ## Generated Tables (CSV)

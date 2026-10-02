@@ -396,14 +396,16 @@
   // TAB 4 — Hausman vs Mundlak explorer.
   // ------------------------------------------------------------------
   const hs = {
-    bfe: 0.2103, bre: 0.1092, sfe: 0.0812, sre: 0.0299,
+    // Classical (non-robust) SEs: the textbook Hausman test needs them.
+    bfe: 0.2103, bre: 0.1092, sfe: 0.0509, sre: 0.0278,
     chart: CHARTS.hausman_explorer(document.getElementById("hs-chart")),
   };
 
   // chi-square(1) survival function via the Phi-based identity.
   function chi2Sf1(x) {
     if (x <= 0) return 1;
-    const z = Math.sqrt(x);
+    // P(chi2_1 > x) = 2 * (1 - Phi(sqrt(x))), and Phi(z) = (1 + erf(z / sqrt 2)) / 2.
+    const z = Math.sqrt(x) / Math.SQRT2;
     // erf approximation (Abramowitz & Stegun 7.1.26).
     const t = 1 / (1 + 0.3275911 * z);
     const erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z);
@@ -463,7 +465,7 @@
     hs_render();
   });
   document.getElementById("hs-snap").addEventListener("click", () => {
-    hs.bfe = 0.2103; hs.bre = 0.1092; hs.sfe = 0.0812; hs.sre = 0.0299;
+    hs.bfe = 0.2103; hs.bre = 0.1092; hs.sfe = 0.0509; hs.sre = 0.0278;
     document.getElementById("hs-bfe").value = hs.bfe;
     document.getElementById("hs-bre").value = hs.bre;
     document.getElementById("hs-sfe").value = hs.sfe;

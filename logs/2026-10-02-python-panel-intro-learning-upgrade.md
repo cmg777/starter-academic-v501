@@ -74,3 +74,36 @@ and Playwright checks (both tabs, keyboard, aria-live, coexistence with fwl-lab)
   corrected `infographic_instructions.md` if so.
 - Pre-existing: `python_fwl` shows horizontal overflow in `check_learn_cards.cjs` (30px at 1280,
   349px at 375); not caused by this change.
+
+## Addendum: Python, R and Stata cheat sheets
+
+`cheatsheet_python.py`, `cheatsheet_R.R`, `cheatsheet_stata.do` (python_fwl pattern: local-first
+loader with raw-GitHub fallback, 15 sections, traps, one comparison table). Linked from the front
+matter (three `bolt` buttons after "Python script") and shipped in `python_panel_intro.zip`
+(`build_bundle.sh` and the bundle README updated; zip rebuilt).
+
+- Sections: vocabulary; structure and switchers; between/within shares; POLS and between; FD;
+  FE three ways (absorbed, by hand, 2,199 dummies) with the df trap (by-hand iid SE 0.0360 ×
+  √(4397/2198) = 0.0509); TWFE and both T = 2 identities (asserted); RE as OLS on quasi-demeaned
+  data (θ = 0.6091; θ = 0 → POLS, θ = 1 → FE); two Hausman tests; CRE (RE and clustered pooled);
+  controls; the within picture; five waves; 13 traps.
+- Every row of the comparison table is asserted in each language against the post's numbers.
+  R uses `fixest` + `plm` (RE SE = `vcovHC(method = "white1", type = "HC1")`); Stata uses only
+  built-ins (`re_white` program: quasi-demeaned `regress, vce(robust)`), `reghdfe` cross-checked
+  if installed. Run times: Python ~35 s, R ~20 s, Stata ~40 s (the 2,199-dummy regression).
+- One row differs by design: RE + controls is 0.0861 in `linearmodels` (θ 0.5513) and 0.0862 in
+  `plm`/Stata Swamy–Arora (θ 0.5515), all SE 0.0258 (trap 11).
+
+Facts surfaced (not changed in the post):
+
+- The textbook Hausman test (classical variances: Stata `hausman`, `plm::phtest`, identical in all
+  three) gives **H = 5.62, p = 0.018 and rejects RE**. The post's H = 1.79, p = 0.180 plugs robust
+  SEs into the classical formula, which is not a valid Hausman test (Stata's `hausman` refuses
+  `vce(robust)` fits with r(198)). The classical RE Mundlak term also rejects (p = 0.018); the
+  robust versions do not (0.072 RE-White, 0.106 clustered pooled). The abstract's "Neither
+  specification test rejects random effects" holds only for the robust versions.
+- Stata pitfalls: `xtset id year` without `delta(2)` makes every `D.` missing ("no observations");
+  `xtreg ..., vce(robust)` clusters (RE SE 0.0314, not 0.0299); `xtreg, be` is classical (0.0332).
+- pyfixest 0.50 and fixest 0.14 both default to iid SEs for `lwage ~ union | ID` (0.0509).
+
+> Superseded in part by `2026-10-02-python-panel-intro-full-audit.md`: the post now reports the textbook Hausman test, RE/CRE with controls include a year effect, and the comparison table rows agree in all three languages.

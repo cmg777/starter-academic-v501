@@ -234,7 +234,7 @@
 <section id="six-estimators-on-one-panel-disagree-by-a-factor-of-three" class="slide level2 center">
 <h2>Six estimators on one panel disagree by a factor of three</h2>
 
-<img data-src="../panel_intro_coef_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Six panel estimators with 95% CIs. POLS / Between / RE cluster near 0.07–0.11; FDFE / FE / CRE cluster near 0.21. The Hausman test is annotated.</p><aside class="notes">
+<img data-src="../panel_intro_coef_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Six panel estimators with 95% CIs. POLS / Between / RE cluster near 0.07–0.11; FDFE / FE / CRE cluster near 0.21. The classical Hausman test is annotated.</p><aside class="notes">
 <p>The spoiler figure. Don’t explain every bar yet — just plant that the estimators split into two camps roughly three-fold apart, and that we come back to this picture in Act III. Cross-sectional methods (POLS 0.075, Between 0.066, RE 0.109) on one side; within methods (FDFE 0.211, FE 0.210, CRE 0.210) on the other.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -266,7 +266,7 @@
 <h2>The lab: 2,199 workers, two years, a perfectly balanced T = 2 panel</h2>
 <ul>
 <li class="fragment"><strong>Outcome</strong> — log hourly wage (<span class="math inline">\(\bar y = 3.11\)</span>, SD 0.60)</li>
-<li class="fragment"><strong>Treatment</strong> — union membership; only <strong>16.3%</strong> unionized in any period</li>
+<li class="fragment"><strong>Treatment</strong> — union membership; only <strong>16.3%</strong> of worker-years unionized</li>
 <li class="fragment"><strong>Window</strong> — restricted to <strong>2010 and 2012</strong>, so <span class="math inline">\(T = 2\)</span> and the panel is balanced</li>
 </ul>
 <p><span class="takeaway fragment">With <span class="math inline">\(T = 2\)</span>, every worker contributes exactly two rows — the cleanest setting to see that first-differences and the within estimator are the <em>same thing</em>.</span></p>
@@ -306,7 +306,7 @@
 </div></div>
 <p><span class="takeaway fragment">Hausman and the Mundlak term are the formal tests for choosing between the two camps.</span></p>
 <aside class="notes">
-<p>This columns slide replaces the post’s Mermaid decision diagram (Quarto revealjs does not bundle mermaid.js, so a fenced mermaid block would render as raw text). The left side leans on between-worker variation; the right side on within-worker variation. CRE/Mundlak sits in the middle and recovers both. We will run both specification tests and they agree.</p>
+<p>This columns slide replaces the post’s Mermaid decision diagram (Quarto revealjs does not bundle mermaid.js, so a fenced mermaid block would render as raw text). The left side leans on between-worker variation; the right side on within-worker variation. CRE/Mundlak sits in the middle and recovers both. We will run both specification tests, and they disagree: the reason (which errors each test assumes) is part of the lesson.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -468,13 +468,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-hausman-test-fails-to-reject-re-but-only-because-fe-is-noisy" class="slide level2 center">
-<h2>The Hausman test fails to reject RE — but only because FE is noisy</h2>
+<section id="the-textbook-hausman-test-rejects-re-if-the-errors-are-classical" class="slide level2 center">
+<h2>The textbook Hausman test rejects RE, if the errors are classical</h2>
 <p><span class="math display">\[H = (\hat\beta_{\mathrm{FE}} - \hat\beta_{\mathrm{RE}})'\,[V_{\mathrm{FE}} - V_{\mathrm{RE}}]^{-1}\,(\hat\beta_{\mathrm{FE}} - \hat\beta_{\mathrm{RE}}) \sim \chi^2(k)\]</span></p>
-<p>If FE and RE disagree a lot, <span class="math inline">\(H\)</span> is large and RE is suspect. Here <span class="math inline">\(H = 1.79\)</span>, <span class="math inline">\(p = 0.180\)</span> — <em>fail to reject</em>.</p>
-<p><span class="takeaway fragment">But <span class="math inline">\(H\)</span> has low power exactly when within variation is thin: a noisy FE inflates <span class="math inline">\(V_{\mathrm{FE}}\)</span> and shrinks <span class="math inline">\(H\)</span> mechanically.</span></p>
+<p>With classical variances (SE 0.0509 for FE, 0.0278 for RE): <span class="math inline">\(H = 5.62\)</span>, <span class="math inline">\(p = 0.018\)</span>, so we <em>reject</em> RE at 5%.</p>
+<p><span class="takeaway fragment">Plugging the robust SEs into the same formula gives <span class="math inline">\(H = 1.79\)</span>, <span class="math inline">\(p = 0.180\)</span>, but that is not a valid test: <span class="math inline">\(V_{\mathrm{FE}} - V_{\mathrm{RE}}\)</span> is the variance of the difference only when RE is efficient.</span></p>
 <aside class="notes">
-<p>β_FE − β_RE = +0.101, a real gap, yet H = 1.79 on 1 df gives p = 0.180 &gt; 0.05, so the textbook script says “use RE.” Take that verdict with a grain of salt: the large V_FE in the denominator is doing the work, not RE’s consistency. The Mundlak alternative tells the same story with more nuance, next.</p>
+<p>β_FE − β_RE = +0.101. The textbook test (Stata’s hausman fe re, R’s phtest) uses classical variances because its formula relies on RE being fully efficient under the null. That gives H = 5.62 on 1 df, p = 0.018: reject. The robust SEs are much larger, especially for FE (0.0812 vs 0.0509), which suggests the classical assumption is doubtful. Plugging them in flips the verdict (H = 1.79, p = 0.180), but the result has no chi-square distribution. With robust errors, the valid check is the Mundlak test, next.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -493,7 +493,7 @@
 <p>Add each worker’s <strong>mean</strong> union exposure <span class="math inline">\(\bar{x}_i\)</span>, then run RE. The within coefficient <span class="math inline">\(\beta\)</span> equals FE; the mean coefficient <span class="math inline">\(\gamma\)</span> tests whether <span class="math inline">\(\alpha_i\)</span> correlates with <span class="math inline">\(x\)</span>.</p>
 <p><span class="takeaway fragment">CRE within <span class="math inline">\(= 0.2103\)</span> (matches FE exactly); Mundlak term <span class="math inline">\(\gamma = -0.144\)</span>, <span class="math inline">\(p = 0.072\)</span> — borderline, hinting at negative selection.</span></p>
 <aside class="notes">
-<p>Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. Same direction as Hausman, but it reaches the borderline zone because it doesn’t fight the same noise penalty.</p>
+<p>Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. In this balanced panel γ is exactly Between minus FE (0.0662 − 0.2103). Unlike the plug-in Hausman number, this test stays valid with robust SEs; clustered by worker it gives p = 0.106. So: the textbook test rejects, the robust test is borderline.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -516,7 +516,7 @@
 <p><span class="bignum">0.210</span></p>
 <p><span class="bignum-label"><span class="math inline">\(\hat\beta_{\mathrm{FE}}\)</span> on union (SE 0.081) — vs pooled OLS 0.075; FDFE, TWFE, and CRE all agree near 0.21</span></p>
 <aside class="notes">
-<p>The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to <em>joining</em> a union.</p>
+<p>The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to <em>joining</em> a union. Caveat for Q&amp;A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -581,7 +581,7 @@
 </table>
 <p><span class="takeaway fragment">Cross-sectional 7–11% · within ~21%. Standard errors swing inversely — the within camp is noisier but causally cleaner.</span></p>
 <aside class="notes">
-<p>The payoff table. The six methods cluster into two camps roughly three-fold apart. Cross-sectional methods are 2–3× more precise but identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.</p>
+<p>The payoff table. The six methods cluster into two camps roughly three-fold apart. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -594,11 +594,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="adding-controls-leaves-the-four-camp-gap-intact" class="slide level2 center">
-<h2>Adding controls leaves the four-camp gap intact</h2>
+<section id="adding-controls-leaves-the-two-camp-gap-intact" class="slide level2 center">
+<h2>Adding controls leaves the two-camp gap intact</h2>
 
 <img data-src="../panel_intro_extended_models.png" class="r-stretch quarto-figure-center"><p class="caption">Extended models — union, age, schooling, female across POLS / TWFE / RE / CRE. The within premium survives controls.</p><aside class="notes">
-<p>With age, schooling, female, and year dummies, POLS drops to 0.057 (controls absorb some confounding), but TWFE and CRE still report ~0.21. Schooling (+11.1%/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The TWFE age coefficient flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship.</p>
+<p>With age, schooling, female, and year effects in every model, POLS drops to 0.057 (controls absorb some confounding) and RE to 0.088, but TWFE and CRE both report 0.213; CRE reproduces the TWFE coefficients exactly. Schooling (+11.1 log pts/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The within age coefficient (TWFE and CRE) flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -631,12 +631,12 @@
       }</style></aside>
 </div>
 </section>
-<section id="in-low-power-settings-lead-with-cremundlak-it-dominates-hausman" class="slide level2 center" data-background-color="#141413">
-<h2>In low-power settings, lead with CRE/Mundlak — it dominates Hausman</h2>
+<section id="with-robust-errors-lead-with-cremundlak-and-its-built-in-test" class="slide level2 center" data-background-color="#141413">
+<h2>With robust errors, lead with CRE/Mundlak and its built-in test</h2>
 <p><span class="bignum">p = 0.072</span></p>
-<p><span class="bignum-label">Mundlak term — borderline, more honest than Hausman’s confident p = 0.180 “fail to reject”</span></p>
+<p><span class="bignum-label">Robust Mundlak term (0.106 clustered): borderline. The textbook Hausman rejects (p = 0.018) only under classical errors.</span></p>
 <aside class="notes">
-<p>CRE/Mundlak gives you three things in one regression: the FE coefficient on the time-varying treatment, the RE framework that retains schooling and gender, and a built-in specification test (the t-stat on the Mundlak term) that beats Hausman when within variation is thin. The cost — one extra regressor per time-varying covariate — is essentially free in modern software.</p>
+<p>CRE/Mundlak gives you three things in one regression: the FE coefficient on the time-varying treatment, the RE framework that retains schooling and gender, and a built-in specification test (the t-stat on the Mundlak term) that can be made robust to heteroskedasticity and clustering, which the Hausman formula cannot. Here the two tests disagree because they assume different errors; the honest summary is that the evidence against RE is suggestive, not conclusive. The cost — one extra regressor per time-varying covariate — is essentially free in modern software.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

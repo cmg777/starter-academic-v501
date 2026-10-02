@@ -19,7 +19,7 @@ save "raw_data.dta", replace
 * ---- data_panel.dta ----
 use "data_panel.dta", clear
 label data "Analysis panel: 2010 & 2012 only (T=2), with female dummy"
-note _dta: Analysis subset of raw_data.csv restricted to 2010 and 2012 so that T=2 and first-differences coincide with the within estimator. Rows missing lwage/union/age/schooling are dropped (2,199 of 2,209 workers retained), year is cast to integer, and a female dummy is added. Perfectly balanced: every worker contributes exactly two observations.
+note _dta: Analysis subset of raw_data.csv restricted to 2010 and 2012 so that T=2 and first differences without an intercept coincide with the within estimator. Rows missing lwage/union/age/schooling are dropped (2,199 of 2,209 workers retained), year is cast to integer, and a female dummy is added. Perfectly balanced: every worker contributes exactly two observations.
 note ID: Unique person ID; the panel cross-sectional (unit) dimension.. Construction: From the source NLSY-style file; stored as a float in the CSV.. Units: integer id. Source: quarcs-lab data-open
 note year: Calendar year of the observation; the panel time dimension.. Construction: From the source file; raw has 2010-2018 (biennial), the panel keeps 2010 and 2012.. Units: year. Source: quarcs-lab data-open
 note age: Worker age in years at the survey wave.. Construction: From the source file.. Units: years. Source: quarcs-lab data-open

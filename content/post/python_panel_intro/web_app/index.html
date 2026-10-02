@@ -95,7 +95,7 @@
     <div class="cta-card" data-goto="pane-forest">
       <div class="cta-tag">Tab 3</div>
       <h4>Seven-Method Forest Plot</h4>
-      <p>The post's headline figure, interactively. Toggle outcomes and methods. POLS/Between/RE land at 7-11%; FDFE/FE/TWFE/CRE land at 21%. Three-fold gap, one dataset.</p>
+      <p>The post's headline figure, interactively. Toggle outcomes and methods. POLS/Between/RE land at 7-11 log points; FDFE/FE/TWFE/CRE land at 21. Three-fold gap, one dataset.</p>
     </div>
     <div class="cta-card" data-goto="pane-hausman">
       <div class="cta-tag">Tab 4</div>
@@ -117,7 +117,7 @@
         <div class="gloss-body">OLS on the demeaned data. Identifies beta from within-unit changes only. Drops time-invariant regressors (schooling, gender) mechanically.</div>
       </details>
       <details class="gloss"><summary>First differences (FDFE)</summary>
-        <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2, FD without an intercept gives the same coefficient as FE, and FD with an intercept equals two-way FE. With T &gt; 2 the two diverge under serially correlated errors.</div>
+        <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2, FD without an intercept gives the same coefficient as FE, and FD with an intercept equals two-way FE. With T &gt; 2 the two estimators differ in general; serial correlation of the errors decides which one is more efficient.</div>
       </details>
       <details class="gloss"><summary>Two-way FE (TWFE)</summary>
         <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. With T = 2 it equals FD with an intercept exactly (0.2113); one-way FE (0.2103) equals FD without an intercept, and the 0.001 gap is the common time trend.</div>
@@ -194,9 +194,9 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Slide unit heterogeneity to 2.0</strong>. POLS drifts above 0.30 because high-FE workers cluster at high x; the bias is the post's omitted-variable bias made visible.</li>
+      <li><strong>Slide unit heterogeneity to 2.0</strong>. POLS drifts far above the truth because high-FE workers cluster at high x. This is omitted-variable bias made visible; in this simulator the bias is upward, whereas in the post's data it is downward (POLS 0.075 below FE 0.21), because there low-wage workers select into unions.</li>
       <li><strong>Slide selection &rho; to 0</strong>. POLS becomes unbiased — the two methods agree. This is the RE assumption: no correlation between alpha_i and x.</li>
-      <li><strong>Slide T to 8</strong>. FE's within R squared rises sharply; the FE estimate's confidence shrinks. With T = 2 (the post's choice), FE is consistent but high-variance.</li>
+      <li><strong>Slide T to 8</strong>. More periods give FE more within variation to work with, so the spread of the FE estimates shrinks. With T = 2 (the post's choice), FE is consistent but high-variance.</li>
       <li><strong>True coefficient</strong> 0.21 is the dashed grey line. POLS scatters above the truth; FE clusters near it.</li>
     </ul>
     <div class="note" style="margin-top:10px;">
@@ -225,12 +225,13 @@
 <!-- ====================== TAB 3: SEVEN-METHOD FOREST PLOT ====================== -->
 <section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
 
-  <h2>The post's seven-method forest plot — interactively</h2>
+  <h2>The post's forest plot, interactively</h2>
   <p class="lede">
     These numbers come straight from <code>basic_models_comparison.csv</code>
     and <code>extended_models_comparison.csv</code> in the post's folder.
-    Six methods on the basic model (union as the lone regressor) and four
-    methods with controls (age, schooling, female, year dummies). Toggle
+    Seven methods on the basic model (union as the lone regressor) and four
+    methods with controls (age, schooling, female, year effects; TWFE
+    absorbs schooling and female). Toggle
     outcomes and methods to compare. Hover any point for SE, 95% CI, and
     sample size.
   </p>
@@ -238,10 +239,10 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Two clear camps on "union (basic)"</strong>. POLS/Between/RE land at 6–11%; FDFE/FE/CRE land at 21%. That factor-of-three gap is the empirical signature of selection on unobservables.</li>
+      <li><strong>Two clear camps on "union (basic)"</strong>. POLS/Between/RE land at 7–11 log points; FDFE/FE/TWFE/CRE land at 21. That factor-of-three gap is the empirical signature of selection on unobservables.</li>
       <li><strong>CRE equals FE exactly</strong> (0.2103 to four decimals). Mundlak's algebra is exact: add the unit means and RE recovers the within coefficient on the original variable.</li>
       <li><strong>Schooling is absorbed under TWFE</strong>. No row appears for TWFE on schooling because schooling has zero within-variation. The other three methods recover 0.111.</li>
-      <li><strong>The age coefficient flips sign under TWFE</strong> (+0.021 in POLS/RE, &minus;0.058 in TWFE). Age is not exactly collinear with the year dummy (it rose by 2 years for 1,885 workers, by 1 for 164, and by 3 for 150), so the TWFE age coefficient is identified only from the 314 workers whose age did not rise by exactly two years — a fragile estimate, not a real age–wage profile.</li>
+      <li><strong>The age coefficient flips sign in the within models</strong> (+0.021 in POLS and RE, &minus;0.058 in TWFE and CRE; with year effects CRE reproduces TWFE exactly). Age is not exactly collinear with the year dummy (it rose by 2 years for 1,885 workers, by 1 for 164, and by 3 for 150), so the TWFE age coefficient is identified only from the 314 workers whose age did not rise by exactly two years — a fragile estimate, not a real age–wage profile.</li>
     </ul>
   </div>
 
@@ -300,9 +301,10 @@
     The Hausman statistic compares the FE and RE coefficient estimates,
     weighted by the difference in their variances:
     <code>H = (beta_FE &minus; beta_RE)&sup2; / (V_FE &minus; V_RE)</code>.
-    Large H ⇒ FE and RE disagree ⇒ reject RE. <strong>The catch: when
-    within-variation is thin, V_FE is large and the test becomes mechanically
-    underpowered.</strong> The Mundlak alternative escapes this trap.
+    Large H ⇒ FE and RE disagree ⇒ reject RE. <strong>The catch: the
+    formula is valid only with classical (non-robust) variances</strong>,
+    because V_FE − V_RE is the variance of the difference only when RE is
+    efficient. With robust errors, use the Mundlak test instead.
   </p>
 
   <div class="controls">
@@ -317,14 +319,14 @@
       <div class="hint">Post estimate: 0.1092.</div>
     </div>
     <div class="control">
-      <label>FE standard error <span class="value" id="hs-sfe-val">0.0812</span></label>
-      <input type="range" id="hs-sfe" min="0.005" max="0.20" step="0.001" value="0.0812" aria-label="FE standard error">
-      <div class="hint">Post estimate: 0.0812. Slide down to see the test pick up power.</div>
+      <label>FE standard error <span class="value" id="hs-sfe-val">0.0509</span></label>
+      <input type="range" id="hs-sfe" min="0.005" max="0.20" step="0.001" value="0.0509" aria-label="FE standard error">
+      <div class="hint">Classical SE: 0.0509 (robust: 0.0812). Slide up to see the test lose power.</div>
     </div>
     <div class="control">
-      <label>RE standard error <span class="value" id="hs-sre-val">0.0299</span></label>
-      <input type="range" id="hs-sre" min="0.005" max="0.10" step="0.001" value="0.0299" aria-label="RE standard error">
-      <div class="hint">Post estimate: 0.0299. RE is always more efficient.</div>
+      <label>RE standard error <span class="value" id="hs-sre-val">0.0278</span></label>
+      <input type="range" id="hs-sre" min="0.005" max="0.10" step="0.001" value="0.0278" aria-label="RE standard error">
+      <div class="hint">Classical SE: 0.0278 (robust: 0.0299). Under H₀ with classical errors, RE is the more efficient estimator.</div>
     </div>
   </div>
 
@@ -356,10 +358,10 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Snap to post values</strong> (β̂_FE = 0.2103, β̂_RE = 0.1092, SE_FE = 0.0812, SE_RE = 0.0299). H = 1.79, p = 0.18. The test fails to reject RE — but only because SE_FE is huge.</li>
-      <li><strong>Halve SE_FE to 0.04.</strong> Same coefficient gap, but now H jumps above 50 and p collapses to essentially zero. The "fail to reject" verdict was a power problem, not a signal that RE is correct.</li>
+      <li><strong>Snap to post values</strong> (β̂_FE = 0.2103, β̂_RE = 0.1092, classical SE_FE = 0.0509, SE_RE = 0.0278). H = 5.62, p = 0.018: the textbook test rejects RE.</li>
+      <li><strong>Plug in the robust SEs</strong> (SE_FE = 0.0812, SE_RE = 0.0299; the sliders land on 0.081 and 0.030). H falls to about 1.8 and p rises to about 0.18, so the verdict flips. That number is not a valid test, because with robust errors V_FE − V_RE is no longer the variance of the difference; it does show how a larger SE_FE drains the test of power.</li>
       <li><strong>Set β̂_FE = β̂_RE.</strong> H drops to 0 and p = 1. When the two estimators agree, there is no evidence against RE — which is exactly the test's logic.</li>
-      <li><strong>The Mundlak alternative</strong> (post §13) reaches p = 0.072 on the same data, telling a more nuanced story than Hausman's 0.18 because it does not pay the same noise penalty.</li>
+      <li><strong>The Mundlak alternative</strong> (post §14) is valid with robust errors: p = 0.072 with White SEs and p = 0.106 clustered by worker. Borderline, not a rejection at 5%.</li>
     </ul>
     <div class="note" style="margin-top:10px;">
       <button class="action secondary" id="hs-snap">Snap to post estimates</button>
@@ -368,23 +370,26 @@
   </div>
 
   <div class="card">
-    <h3>Why does Mundlak beat Hausman in low-power settings?</h3>
+    <h3>Why lead with Mundlak when the errors are not classical?</h3>
     <p>
       Mundlak's specification adds <code>x_bar</code> (the unit mean of the
       time-varying regressor) to an RE regression. The coefficient on
       <code>x_bar</code> is a direct test of correlation between the unit
-      effect and the regressor — the very assumption RE relies on. Crucially,
-      Mundlak's standard error does not contain the <code>V_FE − V_RE</code>
-      term that makes Hausman noisy in thin-within-variation panels.
+      effect and the regressor — the very assumption RE relies on. Under
+      classical errors it is equivalent to the Hausman test; its advantage
+      is that its standard error can be made robust to heteroskedasticity
+      and clustering, which the Hausman formula cannot.
     </p>
     <p>
-      In the post's data, Hausman gives p = 0.18 (fail to reject); Mundlak's
-      t-stat on <code>union_bar</code> gives p = 0.072 (borderline reject).
-      Same data, same direction of effect — different precision.
+      In the post's data, the textbook Hausman test gives p = 0.018 (reject),
+      but it assumes classical errors. The robust Mundlak test on
+      <code>union_bar</code> gives p = 0.072 (0.106 clustered): borderline.
+      In this balanced panel the Mundlak coefficient, −0.144, is exactly the
+      between estimate minus the FE estimate.
       <strong>For a practitioner, CRE/Mundlak is usually the right
       specification to lead with</strong>: you get the FE coefficient on
       time-varying treatments, the RE structure for keeping schooling and
-      gender, and a built-in spec test that beats Hausman.
+      gender, and a built-in spec test that stays valid with robust errors.
     </p>
   </div>
 
@@ -393,10 +398,10 @@
     <p>
       The Tab 2 simulator lets you drive the FE-vs-POLS bias through the
       <em>selection ρ</em> slider. The Hausman test on that simulated data
-      would reject RE if ρ is large enough — but only if you also have enough
-      within-variation (high T) to make SE_FE small. Cranking ρ up while
-      keeping T = 2 reproduces exactly the post's "Hausman fails to reject
-      but the FE-RE gap is huge" situation.
+      would reject RE if ρ is large enough, and more easily when SE_FE is
+      small. The simulator does not compute the test itself; the explorer
+      above shows how the verdict depends on SE_FE for a fixed coefficient
+      gap.
     </p>
   </div>
 

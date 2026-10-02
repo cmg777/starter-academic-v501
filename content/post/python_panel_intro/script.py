@@ -226,7 +226,7 @@ for i, (b, w) in enumerate(zip(between_vals, within_vals)):
     if b > 8:
         ax.text(b/2, i, f"{b:.0f}%", ha="center", va="center",
                 fontsize=11, fontweight="bold", color=WHITE_TEXT)
-    if w > 8:
+    if w > 4:
         ax.text(b + w/2, i, f"{w:.0f}%", ha="center", va="center",
                 fontsize=11, fontweight="bold", color=WHITE_TEXT)
 
@@ -296,7 +296,8 @@ print(f"Union coefficient: {pols_coef:.4f}  (SE {pols_se:.4f})")
 # ── 6. Between Estimator ──────────────────────────────────────────────────────
 section("6. Between Estimator")
 
-# Stata: xtreg lwage union, be
+# Stata: collapse (mean) lwage union, by(ID); regress lwage union, vce(robust)
+#        (xtreg lwage union, be gives the same coefficient with a classical SE)
 # Collapse each worker to their mean across years, then run OLS across workers.
 # Uses ONLY between-individual variation — the mirror image of FE.
 df_between = df.groupby("ID")[["lwage", "union"]].mean().reset_index()
@@ -311,7 +312,7 @@ print(f"Sample collapsed to {len(df_between)} individual averages — "
 # ── 7. First-Differences (FDFE) ───────────────────────────────────────────────
 section("7. First-Differences")
 
-# Stata: bysort ID: gen d_lwage = lwage - L.lwage; reg d_lwage d_union, robust
+# Stata: xtset ID year, delta(2); regress D.lwage D.union, vce(robust)
 # Differencing within each worker eliminates the time-invariant individual effect.
 df_diff = (df.sort_values(["ID", "year"])
              .groupby("ID")[["lwage", "union"]]
@@ -336,7 +337,8 @@ print(f"FD slope without intercept:  {fd_noint_coef:.4f}")
 # ── 8. Within / Fixed Effects (FE) ────────────────────────────────────────────
 section("8. Within / Fixed Effects")
 
-# Stata: xtreg lwage union, fe robust   (or)   reghdfe lwage union, absorb(ID)
+# Stata: areg lwage union, absorb(ID) vce(robust)   (HC1, as below)
+#        xtreg lwage union, fe vce(robust) clusters by ID instead
 # Subtract each worker's mean from each variable (the "within transformation"),
 # then run OLS on the demeaned data.
 
@@ -426,7 +428,9 @@ print("Schooling and gender are absorbed (time-invariant) — TWFE cannot identi
 # ── 10. Random Effects (RE) ───────────────────────────────────────────────────
 section("10. Random Effects")
 
-# Stata: xtreg lwage union, re robust
+# Stata: xtreg lwage union, re   (same coefficient; vce(robust) there clusters
+#        by ID, SE 0.0314, whereas linearmodels "robust" is White on the
+#        quasi-demeaned data, SE 0.0299)
 # Treats individual effects as random draws, *uncorrelated with regressors*.
 # Efficient if assumption holds; inconsistent if it fails.
 df_re = df.set_index(["ID", "year"])
@@ -444,25 +448,39 @@ section("11. Hausman Test")
 # H0: individual effects are uncorrelated with regressors → RE consistent + efficient.
 # H1: correlated → only FE is consistent.
 # Statistic: H = (β_FE − β_RE)' [V_FE − V_RE]^(-1) (β_FE − β_RE)  ~  χ²(k)
+# V_FE − V_RE is the variance of the difference only when RE is efficient
+# under H0, so the textbook test uses CLASSICAL (non-robust) variances.
+# Stata: xtreg lwage union, fe; estimates store fe
+#        xtreg lwage union, re; estimates store re; hausman fe re
+fit_fe_iid = pf.feols("lwage ~ union | ID", data=df, vcov="iid")
+fit_re_iid = RandomEffects(df_re["lwage"], exog).fit()
 b_diff = np.array([fe_coef - re_coef])
-v_diff = np.array([[fe_se ** 2 - re_se ** 2]])
+v_diff = np.array([[fit_fe_iid.se()["union"] ** 2 - fit_re_iid.std_errors["union"] ** 2]])
 
 # Pseudo-inverse keeps things stable when V_FE − V_RE is near-singular.
 H = float(b_diff @ np.linalg.pinv(v_diff) @ b_diff)
 df_h = len(b_diff)
-p_h = 1 - chi2.cdf(H, df=df_h)
+p_h = chi2.sf(H, df=df_h)
+print(f"Classical SEs: FE {fit_fe_iid.se()['union']:.4f}, RE {fit_re_iid.std_errors['union']:.4f}")
 print(f"H statistic: {H:.4f}   df = {df_h}   p-value = {p_h:.4f}")
 print(f"β_FE − β_RE = {b_diff[0]:+.4f}")
 if p_h < 0.05:
-    print("Reject H0 → use FE; RE is inconsistent.")
+    print("Reject H0 at 5% → RE assumption rejected (under classical errors).")
 else:
-    print("Fail to reject H0 → RE acceptable (more efficient than FE).")
+    print("Fail to reject H0 at 5%.")
+
+# Plugging the robust SEs into the same formula is NOT a valid test: with
+# heteroskedastic errors RE is no longer efficient. Shown for comparison only;
+# the robust check is the Mundlak test in the next section.
+H_plugin = float((fe_coef - re_coef) ** 2 / (fe_se ** 2 - re_se ** 2))
+p_plugin = chi2.sf(H_plugin, df=1)
+print(f"Robust SEs plugged in (invalid): H = {H_plugin:.4f}   p = {p_plugin:.4f}")
 
 
 # ── 12. Correlated Random Effects (CRE / Mundlak) ────────────────────────────
 section("12. Correlated Random Effects")
 
-# Stata: bysort ID: egen union_bar = mean(union); xtreg lwage union union_bar, re robust
+# Stata: bysort ID: egen union_bar = mean(union); xtreg lwage union union_bar, re
 # RE plus the within-person mean of each time-varying regressor.
 # Mundlak (1978): the CRE coefficient on union equals the FE coefficient.
 # A significant union_bar ≡ rejecting RE in favor of FE — the modern Mundlak alternative
@@ -478,10 +496,18 @@ mundlak_p = fit_cre.pvalues["union_bar"]
 print(f"Union (within) coefficient: {cre_coef:.4f}  (SE {cre_se:.4f})")
 print(f"Mundlak term (union_bar):   {mundlak_coef:+.4f}  (p = {mundlak_p:.4f})")
 print(f"CRE within ≈ FE: {cre_coef:.4f} vs {fe_coef:.4f}  ✓")
+print(f"Mundlak term = Between − FE: {between_coef - fe_coef:+.4f}")
+
+# Cluster-robust Mundlak test: pooled OLS with union_bar, clustered by worker.
+# Stata: regress lwage union union_bar, vce(cluster ID)
+fit_mundlak_clu = pf.feols("lwage ~ union + union_bar", data=df, vcov={"CRV1": "ID"})
+mundlak_p_clu = fit_mundlak_clu.pvalue()["union_bar"]
+print(f"Pooled Mundlak, clustered: union_bar {fit_mundlak_clu.coef()['union_bar']:+.4f}"
+      f"  (SE {fit_mundlak_clu.se()['union_bar']:.4f}, p = {mundlak_p_clu:.4f})")
 if mundlak_p < 0.05:
-    print("Mundlak term is significant → individual effects correlate with union → use FE.")
+    print("Mundlak term is significant at 5% → individual effects correlate with union.")
 else:
-    print("Mundlak term is not significant → RE assumption is plausible.")
+    print("Mundlak term is not significant at 5% (borderline evidence against RE).")
 
 
 # ── 13. Method Comparison ─────────────────────────────────────────────────────
@@ -509,9 +535,11 @@ ax.set_yticks(y_pos)
 ax.set_yticklabels(methods, fontsize=13, color=LIGHT_TEXT)
 ax.set_xlabel("Coefficient on Union", fontsize=13, color=LIGHT_TEXT)
 ax.axvline(x=0, color=LIGHT_TEXT, linewidth=0.5, linestyle="--", alpha=0.5)
+# Leave room on the right for the value labels.
+ax.set_xlim(right=max(c + 1.96 * s for c, s in zip(coefs, ses)) + 0.08)
 ax.set_title("Effect of Union on Log Wages: Six Panel Estimators",
              fontsize=15, fontweight="bold", color=WHITE_TEXT)
-ax.text(0.99, 0.02, f"Hausman: χ²={H:.2f}, p={p_h:.3f}",
+ax.text(0.99, 0.02, f"Hausman (classical): χ²={H:.2f}, p={p_h:.3f}",
         transform=ax.transAxes, ha="right", va="bottom",
         fontsize=10, color=LIGHT_TEXT, style="italic")
 save_dark("panel_intro_coef_comparison.png")
@@ -548,14 +576,17 @@ fit_pols_x = pf.feols(
 fit_twfe_x = pf.feols("lwage ~ union + age | ID + year",
                       data=df, vcov={"CRV1": "ID"})
 
-# RE + controls
+# RE + controls, with a 2012 dummy so every model has year effects.
+df["y2012"] = (df["year"] == 2012).astype(float)
 df_rx = df.set_index(["ID", "year"])
-exog_rx = sm.add_constant(df_rx[["union", "age", "schooling", "female"]])
+exog_rx = sm.add_constant(df_rx[["union", "age", "schooling", "female", "y2012"]])
 fit_re_x = RandomEffects(df_rx["lwage"], exog_rx).fit(cov_type="robust")
 
-# CRE + controls — adds within-means of time-varying regressors.
+# CRE + controls — adds within-means of time-varying regressors. The mean of
+# y2012 is 0.5 for everyone, so it needs no Mundlak term. With year effects
+# the CRE union and age coefficients equal TWFE exactly.
 exog_cx = sm.add_constant(df_rx[["union", "union_bar", "age", "age_bar",
-                                  "schooling", "female"]])
+                                  "schooling", "female", "y2012"]])
 fit_cre_x = RandomEffects(df_rx["lwage"], exog_cx).fit(cov_type="robust")
 
 # Pretty comparison table.
@@ -622,9 +653,12 @@ for ax_idx, var in enumerate(plot_vars):
                     edgecolor=DARK_NAVY, linewidth=0.5, capsize=3,
                     error_kw={"ecolor": WHITE_TEXT, "capthick": 1})
         else:
-            ax.text(0, i, "absorbed", ha="center", va="center", fontsize=9,
-                    color=LIGHT_TEXT, style="italic")
+            # Centre the label in the panel (x in axes units, y in data units).
+            ax.text(0.5, i, "absorbed", ha="center", va="center", fontsize=10,
+                    color=LIGHT_TEXT, style="italic",
+                    transform=ax.get_yaxis_transform())
     ax.axvline(0, color=LIGHT_TEXT, lw=0.5, ls="--", alpha=0.5)
+    ax.locator_params(axis="x", nbins=4)   # avoid overlapping tick labels
     ax.set_title(var.title(), fontsize=13, fontweight="bold", color=WHITE_TEXT)
     if ax_idx == 0:
         ax.set_yticks(range(4))
@@ -655,7 +689,8 @@ print("\nKey takeaways:")
 print(f"  1. POLS ({pols_coef:.4f}) and Between ({between_coef:.4f}) use cross-sectional variation.")
 print(f"  2. FE = DVFE = {fe_coef:.4f}; FDFE = TWFE = {twfe_coef:.4f}. With T = 2, FD with an intercept equals FE with year effects.")
 print(f"  3. RE ({re_coef:.4f}) is a weighted average; CRE ({cre_coef:.4f}) recovers the FE coefficient.")
-print(f"  4. Hausman (χ²={H:.2f}, p={p_h:.3f}) and Mundlak term (p={mundlak_p:.3f}) agree on the FE-vs-RE choice.")
+print(f"  4. Textbook Hausman (χ²={H:.2f}, p={p_h:.3f}) rejects RE; the robust Mundlak tests "
+      f"(p={mundlak_p:.3f} RE, p={mundlak_p_clu:.3f} clustered) are borderline.")
 
 # ── 16. Results JSON (single source of truth for the post) ──────────────────
 def r4(x):
@@ -682,10 +717,16 @@ results = {
         "TWFE": {"coef": r4(twfe_coef), "se": r4(twfe_se)},
         "RE": {"coef": r4(re_coef), "se": r4(re_se)},
         "CRE": {"coef": r4(cre_coef), "se": r4(cre_se),
-                "mundlak_coef": r4(mundlak_coef), "mundlak_p": r4(mundlak_p)},
+                "mundlak_coef": r4(mundlak_coef), "mundlak_p": r4(mundlak_p),
+                "mundlak_p_cluster": r4(mundlak_p_clu),
+                "mundlak_se_cluster": r4(fit_mundlak_clu.se()["union_bar"])},
     },
     "figure_slopes": {"pols_polyfit": r4(b_pols), "fe_polyfit": r4(b_fe)},
-    "hausman": {"H": r4(H), "p": r4(p_h), "diff": r4(b_diff[0])},
+    "hausman": {"H": r4(H), "p": r4(p_h), "diff": r4(b_diff[0]),
+                "fe_se_classical": r4(fit_fe_iid.se()["union"]),
+                "re_se_classical": r4(fit_re_iid.std_errors["union"]),
+                "H_robust_plugin_invalid": r4(H_plugin),
+                "p_robust_plugin_invalid": r4(p_plugin)},
     "extended": ext_json,
 }
 with open("panel_intro_results.json", "w") as fh:
