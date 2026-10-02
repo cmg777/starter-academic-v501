@@ -95,6 +95,8 @@ segs.append(("md", body[pos:]))
 
 
 def fix_prose(t):
+    # the podcast embed above the Abstract belongs to the web page only
+    t = re.sub(r'<div style="background:#0e1545;[^>]*>\s*<iframe[^>]*open\.spotify\.com[^>]*></iframe>\s*</div>\n*', "", t)
     t = t.replace("\\_", "_")                       # Goldmark escapes -> raw LaTeX
     t = t.replace("](/post/", "](https://carlos-mendez.org/post/")
     t = t.replace("](web_app/index.html)", "](" + SITE + "web_app/index.html)")

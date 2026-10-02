@@ -200,7 +200,7 @@
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">0.075</span><span class="kr-cap">pooled OLS — cross-sectional</span></div>
     <div class="kr"><span class="kr-num">0.210</span><span class="kr-cap">fixed effects — within-worker</span></div>
-    <div class="kr"><span class="kr-num">6.1%</span><span class="kr-cap">of union variance is within</span></div>
+    <div class="kr"><span class="kr-num">73</span><span class="kr-cap">of 2,199 workers switch status</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
@@ -256,6 +256,19 @@
 <li class="fragment">Seven estimators, escalating discipline: POLS → Between → FD → FE → TWFE → RE → CRE</li>
 <li class="fragment">Hausman and Mundlak — choosing between fixed and random effects</li>
 </ul>
+<aside class="notes">
+<p>Teaching deck, so we signpost. Seven “Before you look” slides along the way ask the room to predict before each reveal; on AhaSlides each one is followed by a live quiz.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
 <section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
@@ -319,11 +332,31 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="before-you-look-how-much-of-unions-variance-is-within-workers" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: how much of union’s variance is <em>within</em> workers?</h2>
+<p>Union status has an overall SD of 0.369 and a mean of 16.3%. What share of its variance comes from workers who change status between 2010 and 2012?</p>
+<p><strong>A.</strong>&nbsp; Less than 10%</p>
+<p><strong>B.</strong>&nbsp; About 25%</p>
+<p><strong>C.</strong>&nbsp; About 50%</p>
+<aside class="notes">
+<p>Ask the room to commit before the decomposition. Give 20 seconds, then take the vote. Answer on the next slide: A, only 6.1% is within. The within SD (0.0911) is not a share; the share is its square over the sum of the squared between and within SDs. Just 73 of 2,199 workers switch. (AhaSlides interactive I1 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="of-union-variation-is-between-workers-only-6.1-is-within" class="slide level2 center">
 <h2>94% of union variation is <em>between</em> workers — only 6.1% is within</h2>
 
 <img data-src="../panel_intro_variation.png" class="r-stretch quarto-figure-center"><p class="caption">Between vs within variance shares for the four key variables. Union is 93.9% between; schooling is 100% between (zero within).</p><aside class="notes">
-<p>Fixed effects only use the within part. For union that is a thin 6.1% slice of total variance. Schooling has zero within-variation (nobody’s education changes across two years), so FE mechanically drops it. The consequence: FE standard errors will be much larger than POLS — the FE-vs-RE choice is about precision as much as bias.</p>
+<p>The answer to the vote: A. Fixed effects only use the within part. For union that is a thin 6.1% slice of total variance. Schooling has zero within-variation (nobody’s education changes across two years), so FE mechanically drops it. The consequence: FE standard errors will be much larger than POLS — the FE-vs-RE choice is about precision as much as bias.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -373,13 +406,33 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="before-you-look-smaller-the-same-or-larger-than-pooled-ols" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: smaller, the same, or larger than pooled OLS?</h2>
+<p>Pooled OLS gave 0.0750 (SE 0.0231). Now subtract each worker’s 2010 values from the 2012 values and regress the change in log wage on the change in union status.</p>
+<p><strong>A.</strong>&nbsp; Smaller than 0.075</p>
+<p><strong>B.</strong>&nbsp; About the same</p>
+<p><strong>C.</strong>&nbsp; Larger, with a larger standard error</p>
+<aside class="notes">
+<p>Ask: which way does first-differencing move the estimate, and what happens to its precision? Answer on the next slide: C. FD gives 0.2113 with SE 0.0792, about 3.4 times the POLS SE: differencing removes the fixed traits that depress the cross-sectional comparison but keeps only the 73 switchers. (AhaSlides interactive I2 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="first-differencing-erases-alpha_i-and-triples-the-estimate-to-0.211" class="slide level2 center">
 <h2>First-differencing erases <span class="math inline">\(\alpha_i\)</span> and triples the estimate to 0.211</h2>
 <p><span class="math display">\[y_{i,2012} - y_{i,2010} = \beta\,(x_{i,2012} - x_{i,2010}) + (u_{i,2012} - u_{i,2010})\]</span></p>
 <p>The worker-specific effect <span class="math inline">\(\alpha_i\)</span> — ability, schooling, gender — <em>cancels in the subtraction</em>. What is left is identified only by workers who <strong>changed</strong> union status.</p>
 <p><span class="takeaway fragment">FDFE <span class="math inline">\(= 0.2113\)</span> (SE 0.079); the SE is <span class="math inline">\(3.4\times\)</span> larger than POLS — the switcher-only signature.</span></p>
 <aside class="notes">
-<p>Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that excludes zero but also contains the POLS 0.075, so the upward revision is large in size but not statistically decisive on its own. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.</p>
+<p>The answer to the vote: C. Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that excludes zero but also contains the POLS 0.075, so the upward revision is large in size but not statistically decisive on its own. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -409,6 +462,26 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="before-you-look-does-fixed-effects-match-fds-0.2113" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: does fixed effects match FD’s 0.2113?</h2>
+<p>With only two periods, demeaning and differencing use the same 73 switchers. Will the within (FE) estimate equal the FD estimate of 0.2113?</p>
+<p><strong>A.</strong>&nbsp; Exactly equal</p>
+<p><strong>B.</strong>&nbsp; Slightly different</p>
+<p><strong>C.</strong>&nbsp; Very different</p>
+<aside class="notes">
+<p>Ask, and as a follow-up: if it differs, which feature of the FD regression could explain the gap? Answer on the next slide: B. FE gives 0.2103, a gap of 0.001, because the FD regression has an intercept that absorbs the common wage growth of 0.0727. Without the intercept FD returns exactly 0.2103. (AhaSlides interactive I3 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="three-recipes-one-number-fd-demeaning-and-dummy-fe-all-give-0.2103" class="slide level2 center">
 <h2>Three recipes, one number: FD, demeaning, and dummy FE all give 0.2103</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1|2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>fit_fe   <span class="op">=</span> pf.feols(<span class="st">"lwage ~ union | ID"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span><span class="st">"HC1"</span>)        <span class="co"># absorbed FE</span></span>
@@ -416,7 +489,27 @@
 <span id="cb2-3"><a href=""></a><span class="co"># Both → 0.2103;  FDFE → 0.2113 (the +0.001 is an intercept-driven year trend)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Within transformation, first-differences, and dummy-variable FE are three recipes for the <strong>same dish</strong>. Absorption (<code>| ID</code>) is just the fast one.</span></p>
 <aside class="notes">
-<p>DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: about 2,200 dummies still run fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.</p>
+<p>The answer to the vote: B, slightly different. DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: about 2,200 dummies still run fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-where-does-two-way-fe-land" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: where does two-way FE land?</h2>
+<p>FE gave 0.2103 and FD gave 0.2113. Adding year effects to FE allows a common wage trend.</p>
+<p><strong>A.</strong>&nbsp; Exactly equal to FD, 0.2113</p>
+<p><strong>B.</strong>&nbsp; Equal to FE, 0.2103</p>
+<p><strong>C.</strong>&nbsp; Somewhere else</p>
+<aside class="notes">
+<p>Ask the room to pick before the code. Answer on the next slide: A. With T = 2 the year effect plays exactly the role of the FD intercept, so two-way FE equals FD with an intercept to six decimals. (AhaSlides interactive I4 follows.)</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -435,7 +528,7 @@
 <span id="cb3-2"><a href=""></a><span class="co"># Union coefficient: 0.2113  (SE 0.0792)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Absorbing the year effect removes the aggregate wage trend FD’s intercept was capturing. Time-invariant regressors (schooling, female) are <em>silently absorbed</em>.</span></p>
 <aside class="notes">
-<p>TWFE = 0.2113, identical to FD with an intercept: with T = 2 the two coincide exactly, while one-way FE (0.2103) equals FD without an intercept. The 0.001 gap is the common time trend that the year effect and FD’s intercept both absorb. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables.</p>
+<p>The answer to the vote: A. TWFE = 0.2113, identical to FD with an intercept: with T = 2 the two coincide exactly, while one-way FE (0.2103) equals FD without an intercept. The 0.001 gap is the common time trend that the year effect and FD’s intercept both absorb. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -468,13 +561,53 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="before-you-look-what-do-robust-ses-do-to-the-hausman-statistic" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: what do robust SEs do to the Hausman statistic?</h2>
+<p>The textbook test uses classical SEs: 0.0509 for FE and 0.0278 for RE. The robust SEs are larger, 0.0812 and 0.0299. Plug the robust ones into the same formula, and H will…</p>
+<p><strong>A.</strong>&nbsp; Rise, so the test rejects more strongly</p>
+<p><strong>B.</strong>&nbsp; Fall enough to flip the verdict</p>
+<p><strong>C.</strong>&nbsp; Fall, but still reject at 5%</p>
+<aside class="notes">
+<p>Ask: the robust FE SE grows much more than the robust RE SE, so what happens to the denominator V_FE − V_RE? Answer on the next slide: B. H falls from 5.62 (p = 0.018) to 1.79 (p = 0.180). But the plug-in number is not a valid test, because with robust errors V_FE − V_RE is no longer the variance of the difference. (AhaSlides interactive I5 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="the-textbook-hausman-test-rejects-re-if-the-errors-are-classical" class="slide level2 center">
 <h2>The textbook Hausman test rejects RE, if the errors are classical</h2>
 <p><span class="math display">\[H = (\hat\beta_{\mathrm{FE}} - \hat\beta_{\mathrm{RE}})'\,[V_{\mathrm{FE}} - V_{\mathrm{RE}}]^{-1}\,(\hat\beta_{\mathrm{FE}} - \hat\beta_{\mathrm{RE}}) \sim \chi^2(k)\]</span></p>
 <p>With classical variances (SE 0.0509 for FE, 0.0278 for RE): <span class="math inline">\(H = 5.62\)</span>, <span class="math inline">\(p = 0.018\)</span>, so we <em>reject</em> RE at 5%.</p>
 <p><span class="takeaway fragment">Plugging the robust SEs into the same formula gives <span class="math inline">\(H = 1.79\)</span>, <span class="math inline">\(p = 0.180\)</span>, but that is not a valid test: <span class="math inline">\(V_{\mathrm{FE}} - V_{\mathrm{RE}}\)</span> is the variance of the difference only when RE is efficient.</span></p>
 <aside class="notes">
-<p>β_FE − β_RE = +0.101. The textbook test (Stata’s hausman fe re, R’s phtest) uses classical variances because its formula relies on RE being fully efficient under the null. That gives H = 5.62 on 1 df, p = 0.018: reject. The robust SEs are much larger, especially for FE (0.0812 vs 0.0509), which suggests the classical assumption is doubtful. Plugging them in flips the verdict (H = 1.79, p = 0.180), but the result has no chi-square distribution. With robust errors, the valid check is the Mundlak test, next.</p>
+<p>The answer to the vote: B, the verdict flips, but only in an invalid test. β_FE − β_RE = +0.101. The textbook test (Stata’s hausman fe re, R’s phtest) uses classical variances because its formula relies on RE being fully efficient under the null. That gives H = 5.62 on 1 df, p = 0.018: reject. The robust SEs are much larger, especially for FE (0.0812 vs 0.0509), which suggests the classical assumption is doubtful. Plugging them in flips the verdict (H = 1.79, p = 0.180), but the result has no chi-square distribution. With robust errors, the valid check is the Mundlak test, next.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-what-happens-to-the-union-coefficient-in-cre" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: what happens to the union coefficient in CRE?</h2>
+<p>Random effects gave 0.1092. Now add each worker’s mean union status, union_bar, as a regressor and re-estimate random effects.</p>
+<p><strong>A.</strong>&nbsp; It equals the FE value, 0.2103</p>
+<p><strong>B.</strong>&nbsp; It stays near 0.11</p>
+<p><strong>C.</strong>&nbsp; It moves between 0.11 and 0.21</p>
+<aside class="notes">
+<p>Ask the room to commit. Answer on the next slide: A, exactly 0.2103. Once the worker mean of union status is controlled for, the only variation left in union is within variation, so RE has nothing else to use; this holds for any RE weight θ. (AhaSlides interactive I6 follows.)</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -493,7 +626,7 @@
 <p>Add each worker’s <strong>mean</strong> union exposure <span class="math inline">\(\bar{x}_i\)</span>, then run RE (random worker effect <span class="math inline">\(a_i\)</span>). The within coefficient <span class="math inline">\(\beta\)</span> equals FE; the mean coefficient <span class="math inline">\(\gamma\)</span> tests whether <span class="math inline">\(\alpha_i\)</span> correlates with <span class="math inline">\(x\)</span>.</p>
 <p><span class="takeaway fragment">CRE within <span class="math inline">\(= 0.2103\)</span> (matches FE exactly); Mundlak term <span class="math inline">\(\gamma = -0.144\)</span>, <span class="math inline">\(p = 0.072\)</span> — borderline, hinting at negative selection.</span></p>
 <aside class="notes">
-<p>Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. In this balanced panel γ is exactly Between minus FE (0.0662 − 0.2103). Unlike the plug-in Hausman number, this test stays valid with robust SEs; clustered by worker it gives p = 0.106. So: the textbook test rejects, the robust test is borderline.</p>
+<p>The answer to the vote: A. Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. In this balanced panel γ is exactly Between minus FE (0.0662 − 0.2103). Unlike the plug-in Hausman number, this test stays valid with robust SEs; clustered by worker it gives p = 0.106. So: the textbook test rejects, the robust test is borderline.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -600,11 +733,31 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="before-you-look-what-happens-to-the-age-coefficient-under-two-way-fe" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: what happens to the age coefficient under two-way FE?</h2>
+<p>With controls, each extra year of age raises log wages by about 0.02 in pooled OLS. Two-way FE absorbs both worker and year effects. Under two-way FE, the age coefficient will…</p>
+<p><strong>A.</strong>&nbsp; Stay near +0.02</p>
+<p><strong>B.</strong>&nbsp; Change sign</p>
+<p><strong>C.</strong>&nbsp; Shrink toward zero</p>
+<aside class="notes">
+<p>Ask, then hint: between 2010 and 2012 most workers age by exactly two years. Answer on the next slide: B, it turns negative (−0.0576). The year effect absorbs the two-year step for 1,885 workers, so the coefficient rests on the 314 whose interviews were not exactly two years apart: fragile, not an age profile. (AhaSlides interactive I7 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="adding-controls-leaves-the-two-camp-gap-intact" class="slide level2 center">
 <h2>Adding controls leaves the two-camp gap intact</h2>
 
 <img data-src="../panel_intro_extended_models.png" class="r-stretch quarto-figure-center"><p class="caption">Extended models — union, age, schooling, female across POLS / TWFE / RE / CRE. The within premium survives controls.</p><aside class="notes">
-<p>With age, schooling, female, and year effects in every model, POLS drops to 0.057 (controls absorb some confounding) and RE to 0.088, but TWFE and CRE both report 0.213; CRE reproduces the TWFE coefficients exactly. Schooling (+11.1 log pts/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The within age coefficient (TWFE and CRE) flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship.</p>
+<p>The answer to the vote: B, the within age coefficient turns negative. With age, schooling, female, and year effects in every model, POLS drops to 0.057 (controls absorb some confounding) and RE to 0.088, but TWFE and CRE both report 0.213; CRE reproduces the TWFE coefficients exactly. Schooling (+11.1 log pts/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The within age coefficient (TWFE and CRE) flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

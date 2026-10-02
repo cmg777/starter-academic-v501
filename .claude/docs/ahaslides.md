@@ -18,6 +18,10 @@ this file is the procedure:
 - `content/post/python_fwl/ahaslides/` (deck `10198190`) — the third. Its generators also
   check speaker notes and each quiz's options against the cue slides, and they letter and
   reverse the options (see *Hard constraints*). Copy these generators for new decks.
+- `content/post/python_panel_intro/ahaslides/` (deck `10245137`) — the fourth. Its
+  "Before you look" cues were added to `slides.qmd` for the deck (mirroring the post's
+  predict cards), and `make_deck_md.py` generates `deck.md` from `slides.qmd` plus the quiz
+  definitions instead of hand-writing it.
 
 ---
 
@@ -98,7 +102,12 @@ through the editor UI:
 4. Select **"Import slides"**. **Not** "Import and generate slides with AI" or "Generate
    interactive slides" — those rewrite the content, defeating the entire purpose.
 5. Click **Start**, wait for *"Your slides are ready!"* (about a minute, plus an AI pass
-   adding alt-text).
+   adding alt-text). **Wait for the upload spinner to finish first** — the dialog
+   re-renders when the upload completes, and a Start click during that transition is
+   silently lost (no slides, no error). Click Start by element ref, then confirm the
+   slide count with `get_presentation_detail_tool` before doing anything else.
+6. **Spread the correct letters** across the quizzes before rendering the cue slides; a
+   deck whose answers are mostly one letter teaches the room the pattern.
 
 Limits on the free plan: **50 MB and 100 slides** per import. Each page becomes a slide
 holding one Image block at exactly **1280×720** — genuinely edge to edge.

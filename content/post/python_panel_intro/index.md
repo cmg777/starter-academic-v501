@@ -13,6 +13,14 @@ image:
   focal_point: Smart
   placement: 3
 links:
+  - icon: spotify
+    icon_pack: fab
+    name: "Podcast"
+    url: https://open.spotify.com/episode/3ohA0ZYXNmUuIU8aX5dh1d
+  - icon: youtube
+    icon_pack: fab
+    name: "Video overview"
+    url: https://www.youtube.com/watch?v=pkBumNyJ_ss
   - icon: chalkboard-teacher
     icon_pack: fas
     name: "Slides (HTML)"
@@ -21,6 +29,10 @@ links:
     icon_pack: fas
     name: "AI Slides (PDF)"
     url: https://carlos-mendez.org/post/python_panel_intro/slides/ai-slides.pdf
+  - icon: poll
+    icon_pack: fas
+    name: "Interactive slides (AhaSlides)"
+    url: https://presenter.ahaslides.com/share/1790911128481-t7x8a80cw2
   - icon: laptop-code
     icon_pack: fas
     name: "Web app"
@@ -79,6 +91,10 @@ url_video: ""
 toc: true
 diagram: true
 ---
+
+<div style="background:#0e1545; border-radius:12px; padding:8px;">
+<iframe style="border-radius:8px" src="https://open.spotify.com/embed/episode/3ohA0ZYXNmUuIU8aX5dh1d?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
 
 ## Abstract
 
