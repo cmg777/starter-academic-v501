@@ -84,22 +84,26 @@ The diagram below summarizes the synthetic control pipeline at a glance.
 
 ```mermaid
 flowchart TD
-    A["Treated unit<br/>(Basque Country)"] --> C["Pre-treatment<br/>predictors X1, Z1"]
-    B["Donor pool<br/>(16 other Spanish regions)"] --> D["Pre-treatment<br/>predictors X0, Z0"]
-    C --> E["Inner: solve W*<br/>given V"]
+    A("Treated unit<br/>(Basque Country)") --> C("Pre-treatment<br/>predictors X1, Z1")
+    B("Donor pool<br/>(16 other Spanish regions)") --> D("Pre-treatment<br/>predictors X0, Z0")
+    C --> E("Inner: solve W*<br/>given V")
     D --> E
-    E --> F["Outer: solve V*<br/>that minimizes pre-1970 MSPE"]
-    F --> G["Synthetic Basque<br/>= weighted recipe of donors"]
-    A --> H["Actual post-1970 path"]
-    G --> I["Counterfactual post-1970 path"]
-    H --> J["Gap = ATT estimate"]
+    E --> F("Outer: solve V*<br/>that minimizes pre-1970 MSPE")
+    F --> G("Synthetic Basque<br/>= weighted recipe of donors")
+    A --> H("Actual post-1970 path")
+    G --> I("Counterfactual post-1970 path")
+    H --> J("Gap = ATT estimate")
     I --> J
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style G fill:#6a9bcc,stroke:#141413,color:#141413
-    style H fill:#d97757,stroke:#141413,color:#141413
-    style I fill:#f5f5f5,stroke:#141413,color:#141413,stroke-dasharray:5 5
-    style J fill:#00d4c8,stroke:#141413,color:#141413
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray_dash fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,H orange
+    class C,D,E,F gray
+    class B,G blue
+    class I gray_dash
+    class J teal
 ```
 
 In words: the algorithm has two nested optimization problems. The inner problem finds the donor weights $W$ that best match the treated unit's pre-treatment predictors. The outer problem finds the predictor weights $V$ that, when fed back into the inner problem, produce the lowest pre-treatment outcome error. The dashed-border node represents the unobserved counterfactual --- the GDP path the Basque Country would have followed without conflict, which we estimate but never actually see. The result is a synthetic counterfactual whose pre-period fits the data tightly, so any post-period divergence is informative about the treatment.

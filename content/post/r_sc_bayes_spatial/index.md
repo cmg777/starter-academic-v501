@@ -201,16 +201,20 @@ The analysis follows a natural progression: start from the simplest synthetic co
 
 ```mermaid
 graph LR
-    A["<b>Stage 1</b><br/>Classical SCM<br/>simplex weights"] --> B["<b>Stage 2</b><br/>Bayesian SCM<br/>horseshoe prior"]
-    B --> C["<b>Stage 3</b><br/>Bayesian Spatial SCM<br/>SAR + horseshoe"]
-    C --> D["<b>Diagnostics</b><br/>prior predictive<br/>spillovers"]
-    D --> E["<b>Cross-stage</b><br/>ATT comparison<br/>4 → 23 → 27 donors"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#1a3a8a,stroke:#141413,color:#fff
-    style E fill:#141413,stroke:#6a9bcc,color:#fff
+    A("<b>Stage 1</b><br/>classical SCM<br/>simplex weights") --> B("<b>Stage 2</b><br/>Bayesian SCM<br/>horseshoe prior")
+    B --> C("<b>Stage 3</b><br/>Bayesian spatial SCM<br/>SAR + horseshoe")
+    C --> D("<b>Diagnostics</b><br/>prior predictive<br/>spillovers")
+    D --> E("<b>Cross-stage</b><br/>ATT comparison<br/>4 → 23 → 27 donors")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D key
+    class E anchor
 ```
 
 Read the arrows as "relaxing assumptions". Stage 1 imposes a simplex and SUTVA; Stage 2 relaxes the simplex to a heavy-tailed prior but keeps SUTVA; Stage 3 also relaxes SUTVA. The diagnostics box confirms that the prior used in Stages 2 and 3 is compatible with the data, and the cross-stage panel surfaces how the active-donor count grows from 4 → 23 → 27 as the prior structure relaxes. We will revisit the same ATT four times — once per stage and once in the comparison table — and the central pedagogical point is what *moves* between them.

@@ -203,25 +203,22 @@ The diagram below is the roadmap for everything that follows. The script (and th
 
 ```mermaid
 flowchart TD
-  A["Step 1<br/>Toy ring geometry"] --> B["Step 2<br/>2×2 DiD recap"]
-  B --> C["Step 3<br/>Simulated DGP<br/>true τ-curve known"]
-  C --> D["Step 4<br/>Parametric ring DiD<br/>one number per ring"]
-  C --> E["Step 5<br/>Ring-choice fragility<br/>same data, 3 answers"]
-  C --> F["Step 6<br/>Nonparametric ring DiD<br/>whole TE curve"]
-  D --> G["Step 7<br/>Linden-Rockoff data<br/>9,092 home sales"]
+  A("Step 1<br/>toy ring geometry") --> B("Step 2<br/>2×2 DiD recap")
+  B --> C("Step 3<br/>simulated DGP<br/>true τ-curve known")
+  C --> D("Step 4<br/>parametric ring DiD<br/>one number per ring")
+  C --> E("Step 5<br/>ring-choice fragility<br/>same data, 3 answers")
+  C --> F("Step 6<br/>Nonparametric ring DiD<br/>whole TE curve")
+  D --> G("Step 7<br/>Linden-Rockoff data<br/>9,092 home sales")
   E --> G
   F --> G
-  G --> H["Steps 8–10<br/>Bandwidth, parametric,<br/>nonparametric on real data"]
-  H --> I["Result<br/>−5.78% parametric<br/>−20.6% nonparametric (bin 1)"]
-  style A fill:#6a9bcc,stroke:#141413,color:#141413
-  style B fill:#6a9bcc,stroke:#141413,color:#141413
-  style C fill:#d97757,stroke:#141413,color:#141413
-  style D fill:#6a9bcc,stroke:#141413,color:#141413
-  style E fill:#d97757,stroke:#141413,color:#141413
-  style F fill:#00d4c8,stroke:#141413,color:#141413
-  style G fill:#d97757,stroke:#141413,color:#141413
-  style H fill:#6a9bcc,stroke:#141413,color:#141413
-  style I fill:#00d4c8,stroke:#141413,color:#141413
+  G --> H("Steps 8–10<br/>Bandwidth, parametric,<br/>nonparametric on real data")
+  H --> I("Result<br/>−5.78% parametric<br/>−20.6% nonparametric (bin 1)")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B,D,H blue
+    class C,E,G orange
+    class F,I teal
 ```
 
 The first two steps build the spatial intuition and recall the textbook 2 × 2 DiD so we can re-cast the ring DiD as the same machinery with distance-defined groups. Steps 3–6 use a simulated data-generating process (DGP) where we know the true treatment-effect curve, so the estimators can be judged against ground truth. Steps 7–10 carry the same estimators onto the Linden-Rockoff data and reconcile what the two estimators say about a real neighborhood.

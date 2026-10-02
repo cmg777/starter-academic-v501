@@ -235,20 +235,20 @@ The tutorial follows a six-stage pipeline, moving from data preparation through 
 
 ```mermaid
 graph LR
-    A["Data & W<br/>(Section 3-4)"] --> B["Bayesian<br/>Comparison<br/>(Section 5)"]
-    B --> B2["Non-Spatial<br/>Baseline<br/>(Section 6)"]
-    B2 --> C["Static SAR<br/>(Section 7)"]
-    C --> D["Static SDM<br/>(Section 8)"]
-    D --> E["Dynamic SDM<br/>(Section 9)"]
-    E --> F["Impact<br/>Decomposition<br/>(Section 10)"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style B2 fill:#141413,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#d97757,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
+    A("Data & W<br/>(Section 3-4)") --> B("Bayesian<br/>comparison<br/>(Section 5)")
+    B --> B2("Non-spatial<br/>Baseline<br/>(Section 6)")
+    B2 --> C("Static SAR<br/>(Section 7)")
+    C --> D("Static SDM<br/>(Section 8)")
+    D --> E("Dynamic SDM<br/>(Section 9)")
+    E --> F("Impact<br/>decomposition<br/>(Section 10)")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,C,D blue
+    class B,E orange
+    class B2 anchor
+    class F teal
 ```
 
 Each stage builds on the previous one. The Bayesian comparison tells us *which* model family fits the data best. The static models establish baseline spatial effects. The dynamic models add habit persistence and separate short-run from long-run responses. The impact decomposition translates all of this into policy-relevant direct and spillover effects.
@@ -441,26 +441,25 @@ In words, the outcome $y\_t$ can depend on neighbors' outcomes (through $\rho$),
 
 ```mermaid
 graph TD
-    GNS["General Nesting<br/>ρ, θ, λ"] -->|"λ = 0"| SDM["SDM<br/>ρ, θ"]
-    GNS -->|"θ = 0"| SAC["SAC<br/>ρ, λ"]
-    GNS -->|"ρ = 0"| SDEM["SDEM<br/>θ, λ"]
-    SDM -->|"θ = 0"| SAR["SAR<br/>ρ"]
-    SDM -->|"ρ = 0"| SLX["SLX<br/>θ"]
+    GNS("General nesting<br/>ρ, θ, λ") -->|"λ = 0"| SDM("SDM<br/>ρ, θ")
+    GNS -->|"θ = 0"| SAC("SAC<br/>ρ, λ")
+    GNS -->|"ρ = 0"| SDEM("SDEM<br/>θ, λ")
+    SDM -->|"θ = 0"| SAR("SAR<br/>ρ")
+    SDM -->|"ρ = 0"| SLX("SLX<br/>θ")
     SAC -->|"λ = 0"| SAR
-    SDEM -->|"ρ = 0"| SEM["SEM<br/>λ"]
+    SDEM -->|"ρ = 0"| SEM("SEM<br/>λ")
     SDEM -->|"λ = 0"| SLX
-    SAR -->|"ρ = 0"| OLS["OLS<br/>No spatial"]
+    SAR -->|"ρ = 0"| OLS("OLS<br/>No spatial")
     SEM -->|"λ = 0"| OLS
     SLX -->|"θ = 0"| OLS
-
-    style SDM fill:#d97757,stroke:#141413,color:#141413
-    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
-    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
-    style SDEM fill:#6a9bcc,stroke:#141413,color:#141413
-    style SLX fill:#6a9bcc,stroke:#141413,color:#141413
-    style OLS fill:#141413,stroke:#141413,color:#fff
-    style GNS fill:#00d4c8,stroke:#141413,color:#141413
-    style SAC fill:#00d4c8,stroke:#141413,color:#141413
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class GNS,SAC teal
+    class SDM orange
+    class SDEM,SAR,SLX,SEM blue
+    class OLS anchor
 ```
 
 | Model | Equation | Key Parameters | Interpretation |

@@ -220,18 +220,17 @@ Looking at the shore from a moving boat. The shoreline appears to drift one way,
 
 ```mermaid
 graph LR
-    A["Simulated<br/>Data<br/>(Section 3)"] --> B["fwl_plot()<br/>Naive vs. FWL<br/>(Section 4)"]
-    B --> C["Manual FWL<br/>Verification<br/>(Section 5)"]
-    C --> D["Fixed Effects<br/>Flights Data<br/>(Section 6)"]
-    D --> E["Panel Data<br/>Wages<br/>(Section 7)"]
-    E --> F["ggplot2<br/>& Recipe<br/>(Section 8)"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
+    A("Simulated<br/>data<br/>(Section 3)") --> B("fwl_plot()<br/>naive vs. FWL<br/>(Section 4)")
+    B --> C("Manual FWL<br/>verification<br/>(Section 5)")
+    C --> D("Fixed effects<br/>flights data<br/>(Section 6)")
+    D --> E("Panel data<br/>wages<br/>(Section 7)")
+    E --> F("ggplot2<br/>& recipe<br/>(Section 8)")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,D,E blue
+    class B,C orange
+    class F teal
 ```
 
 We start where the answer is known (simulated data), see the result with `fwl_plot()` first, then peek under the hood with manual FWL verification. From there we apply the same one-liner to increasingly complex real-world settings.
@@ -265,17 +264,21 @@ The causal structure looks like this:
 
 ```mermaid
 graph TD
-    Income["Income<br/>(confounder)"]
-    Coupons["Coupons<br/>(treatment)"]
-    Sales["Sales<br/>(outcome)"]
+    Income("Income<br/>(confounder)")
+    Coupons("Coupons<br/>(treatment)")
+    Sales("Sales<br/>(outcome)")
 
     Income -->|"-0.5<br/>(fewer coupons<br/>to rich areas)"| Coupons
     Income -->|"+0.3<br/>(rich areas<br/>buy more)"| Sales
     Coupons -->|"+0.2<br/>(true causal<br/>effect)"| Sales
-
-    style Income fill:#d97757,stroke:#141413,color:#141413
-    style Coupons fill:#6a9bcc,stroke:#141413,color:#141413
-    style Sales fill:#00d4c8,stroke:#141413,color:#141413
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Income orange
+    class Coupons blue
+    class Sales teal
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
 Income opens a "backdoor path" from coupons to sales: coupons ← income → sales. Unless we block this path by controlling for income, the naive estimate will be biased. The data generating process is:

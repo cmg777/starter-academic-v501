@@ -121,37 +121,34 @@ The roadmap below is the shape of the post. Read it as a sequence of complaints:
 
 ```mermaid
 flowchart TD
-    D["<b>Data</b><br/>24 OECD economies<br/>1995Q1-2020Q4<br/>log real GDP"] --> Q0{"How much should<br/>each donor country<br/>count?"}
-    Q0 -->|"all the same"| DID["<b>1. DiD</b><br/>omega = 1/J<br/>parallel trends"]
-    Q0 -->|"let the data decide"| SC["<b>2. SC</b><br/>omega on the simplex<br/>match level AND trend"]
+    D("<b>Data</b><br/>24 OECD economies<br/>1995Q1-2020Q4<br/>log real GDP") --> Q0{"How much should<br/>each donor country<br/>count?"}
+    Q0 -->|"all the same"| DID("<b>1. DiD</b><br/>omega = 1/J<br/>parallel trends")
+    Q0 -->|"let the data decide"| SC("<b>2. SC</b><br/>omega on the simplex<br/>match level AND trend")
     SC --> Q1{"Must the blend sit at<br/>the same LEVEL<br/>as the UK?"}
-    Q1 -->|"no, absorb the gap"| DSC["<b>3. DSC</b><br/>demeaned omega<br/>+ constant adjustment"]
+    Q1 -->|"no, absorb the gap"| DSC("<b>3. DSC</b><br/>demeaned omega<br/>+ constant adjustment")
     DSC --> Q2{"Should every<br/>pre-treatment quarter<br/>count the same?"}
-    Q2 -->|"no, weight them too"| SDID["<b>4. SDID</b><br/>omega AND lambda<br/>three variants"]
-    SDID --> BIAS["<b>The pivot</b><br/>extrapolation bias<br/>vs interpolation bias"]
-    BIAS --> MASC["<b>5. MASC</b><br/>trade the two off<br/>by cross-validation"]
-    BIAS --> ASCM["<b>6. ASCM</b><br/>de-bias imperfect fit<br/>with a ridge leash"]
-    MASC --> R["<b>Results</b><br/>2.7 to 3.1 per cent<br/>at 2018Q4"]
+    Q2 -->|"no, weight them too"| SDID("<b>4. SDID</b><br/>omega AND lambda<br/>three variants")
+    SDID --> BIAS("<b>The pivot</b><br/>extrapolation bias<br/>vs interpolation bias")
+    BIAS --> MASC("<b>5. MASC</b><br/>trade the two off<br/>by cross-validation")
+    BIAS --> ASCM("<b>6. ASCM</b><br/>de-bias imperfect fit<br/>with a ridge leash")
+    MASC --> R("<b>Results</b><br/>2.7 to 3.1 per cent<br/>at 2018Q4")
     ASCM --> R
-    R --> SEL["<b>Which one?</b><br/>in-sample placebo<br/>over 20 fake dates"]
-    SEL --> INF["<b>Inference</b><br/>beyond the paper"]
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef sty_Q0 fill:#f5f5f5,stroke:#141413,color:#141413
+    R --> SEL("<b>Which one?</b><br/>in-sample placebo<br/>over 20 fake dates")
+    SEL --> INF("<b>Inference</b><br/>beyond the paper")
+    classDef sty_Q0 fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class Q0 sty_Q0
-    classDef sty_Q1 fill:#f5f5f5,stroke:#141413,color:#141413
+    classDef sty_Q1 fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class Q1 sty_Q1
-    classDef sty_Q2 fill:#f5f5f5,stroke:#141413,color:#141413
+    classDef sty_Q2 fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class Q2 sty_Q2
-    style DID fill:#d97757,stroke:#141413,color:#141413
-    style SC fill:#6a9bcc,stroke:#141413,color:#141413
-    style DSC fill:#6a9bcc,stroke:#141413,color:#141413
-    style SDID fill:#00d4c8,stroke:#141413,color:#141413
-    style BIAS fill:#141413,stroke:#00d4c8,color:#fff
-    style MASC fill:#d97757,stroke:#141413,color:#141413
-    style ASCM fill:#d97757,stroke:#141413,color:#141413
-    style R fill:#6a9bcc,stroke:#141413,color:#141413
-    style SEL fill:#00d4c8,stroke:#141413,color:#141413
-    style INF fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class D,SC,DSC,R blue
+    class DID,MASC,ASCM orange
+    class SDID,SEL teal
+    class BIAS,INF anchor
 ```
 
 Notice that the dark node in the middle is not an estimator. It is the section that explains why the last two branches exist at all, and it is the part of this material that transfers to problems that have nothing to do with Brexit.
@@ -441,30 +438,28 @@ The entire ladder is a table of settings for that one expression:
 
 ```mermaid
 graph TD
-    OBJ["<b>One weighted two-way regression</b><br/>minimise the sum of<br/>(y - alpha - beta - w*tau)^2 * omega * lambda"]
-    OBJ --> A["<b>omega uniform</b><br/><b>lambda uniform</b><br/>alpha included"]
-    OBJ --> B["<b>omega optimised</b><br/><b>no lambda</b><br/>alpha SUPPRESSED"]
-    OBJ --> C["<b>omega optimised</b><br/><b>lambda uniform</b><br/>alpha included"]
-    OBJ --> E["<b>omega optimised</b><br/><b>lambda optimised</b><br/>alpha included"]
-    A --> A1["DiD"]
-    B --> B1["SC and SC(B)"]
-    C --> C1["DSC"]
-    E --> E1["SDID"]
-    B1 --> F["<b>Change the feasible set<br/>instead of the weights</b>"]
-    F --> F1["MASC<br/>cap omega at 1/m,<br/>then blend"]
-    F --> F2["ASCM<br/>drop non-negativity,<br/>add a ridge pull"]
-    style OBJ fill:#141413,stroke:#00d4c8,color:#fff
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style A1 fill:#f5f5f5,stroke:#141413,color:#141413
-    style B1 fill:#f5f5f5,stroke:#141413,color:#141413
-    style C1 fill:#f5f5f5,stroke:#141413,color:#141413
-    style E1 fill:#f5f5f5,stroke:#141413,color:#141413
-    style F fill:#141413,stroke:#d97757,color:#fff
-    style F1 fill:#d97757,stroke:#141413,color:#141413
-    style F2 fill:#d97757,stroke:#141413,color:#141413
+    OBJ("<b>One weighted two-way regression</b><br/>minimise the sum of<br/>(y - alpha - beta - w*tau)^2 * omega * lambda")
+    OBJ --> A("<b>omega uniform</b><br/><b>lambda uniform</b><br/>alpha included")
+    OBJ --> B("<b>omega optimised</b><br/><b>no lambda</b><br/>alpha SUPPRESSED")
+    OBJ --> C("<b>omega optimised</b><br/><b>lambda uniform</b><br/>alpha included")
+    OBJ --> E("<b>omega optimised</b><br/><b>lambda optimised</b><br/>alpha included")
+    A --> A1("DiD")
+    B --> B1("SC and SC(B)")
+    C --> C1("DSC")
+    E --> E1("SDID")
+    B1 --> F("<b>Change the feasible set<br/>instead of the weights</b>")
+    F --> F1("MASC<br/>cap omega at 1/m,<br/>then blend")
+    F --> F2("ASCM<br/>drop non-negativity,<br/>add a ridge pull")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class OBJ,F anchor
+    class A,F1,F2 orange
+    class B,C blue
+    class E teal
+    class A1,B1,C1,E1 gray
 ```
 
 Two things are worth pausing on. First, synthetic control is the only stage that switches the unit fixed effect *off*, and that single omission is what forces it to match the UK's level as well as its shape. Second, MASC and ASCM hang off a different branch: they do not re-weight the regression, they change what counts as an admissible weight vector.
@@ -862,26 +857,26 @@ In words, one recipe puts the blend at the right place on the horizontal axis an
 
 ```mermaid
 graph LR
-    T["<b>Total bias</b><br/>true UK outcome minus<br/>weighted donor outcome"] --> X["<b>Extrapolation bias</b><br/>same function,<br/>WRONG PLACE"]
-    T --> I["<b>Interpolation bias</b><br/>right place,<br/>CURVED FUNCTION"]
-    X --> XA["<b>omega weights</b><br/>minimise pre-treatment<br/>prediction error"]
-    I --> IA["<b>lambda weights</b><br/>find pre-periods that<br/>resemble the treatment period"]
-    XA --> SC2["SC: yes"]
-    XA --> NN2["Matching: no"]
-    IA --> SC3["SC: only if y is linear in x"]
-    IA --> NN3["Matching: yes, by construction"]
-    XA --> SD["<b>SDID: yes</b>"]
+    T("<b>Total bias</b><br/>true UK outcome minus<br/>weighted donor outcome") --> X("<b>Extrapolation bias</b><br/>same function,<br/>WRONG PLACE")
+    T --> I("<b>Interpolation bias</b><br/>right place,<br/>CURVED FUNCTION")
+    X --> XA("<b>omega weights</b><br/>minimise pre-treatment<br/>prediction error")
+    I --> IA("<b>lambda weights</b><br/>find pre-periods that<br/>resemble the treatment period")
+    XA --> SC2("SC: yes")
+    XA --> NN2("Matching: no")
+    IA --> SC3("SC: only if y is linear in x")
+    IA --> NN3("Matching: yes, by construction")
+    XA --> SD("<b>SDID: yes</b>")
     IA --> SD
-    style T fill:#141413,stroke:#00d4c8,color:#fff
-    style X fill:#6a9bcc,stroke:#141413,color:#141413
-    style I fill:#d97757,stroke:#141413,color:#141413
-    style XA fill:#6a9bcc,stroke:#141413,color:#141413
-    style IA fill:#d97757,stroke:#141413,color:#141413
-    style SC2 fill:#f5f5f5,stroke:#141413,color:#141413
-    style NN2 fill:#f5f5f5,stroke:#141413,color:#141413
-    style SC3 fill:#f5f5f5,stroke:#141413,color:#141413
-    style NN3 fill:#f5f5f5,stroke:#141413,color:#141413
-    style SD fill:#00d4c8,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class T anchor
+    class X,XA blue
+    class I,IA orange
+    class SC2,NN2,SC3,NN3 gray
+    class SD teal
 ```
 
 Only one node has two arrows pointing into it. Synthetic control minimises extrapolation bias by construction, because it is the argmin of the pre-treatment fit. Matching minimises interpolation bias by construction, because it never blends. **SDID's unit weights do the first job and its time weights do the second**, which is the source paper's headline claim and the reason it recommends the method.
@@ -1038,16 +1033,17 @@ In words, across twenty artificial treatment dates, how far off is the counterfa
 
 ```mermaid
 flowchart LR
-    A["<b>Pick a fake<br/>treatment date</b><br/>2010Q1 ... 2014Q4<br/>20 of them"] --> B["<b>Fit on 1995Q1<br/>up to that date</b><br/>all seven estimators"]
-    B --> C["<b>Predict h quarters<br/>ahead</b>"]
-    C --> D["<b>Compare to what<br/>actually happened</b><br/>true effect is zero"]
-    D --> E["<b>Score</b><br/>RMSE, mean and median<br/>absolute error"]
+    A("<b>Pick a fake<br/>treatment date</b><br/>2010Q1 ... 2014Q4<br/>20 of them") --> B("<b>Fit on 1995Q1<br/>up to that date</b><br/>all seven estimators")
+    B --> C("<b>Predict h quarters<br/>ahead</b>")
+    C --> D("<b>Compare to what<br/>actually happened</b><br/>true effect is zero")
+    D --> E("<b>Score</b><br/>RMSE, mean and median<br/>absolute error")
     E --> A
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B blue
+    class C,D orange
+    class E teal
 ```
 
 ### 15.2 The published table, reproduced

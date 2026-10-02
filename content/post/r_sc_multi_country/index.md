@@ -120,26 +120,24 @@ The diagram below maps the three functions onto one pipeline.
 
 ```mermaid
 flowchart TD
-    P["Panel of countries<br/>(unit, time, outcome, treatment)"] --> D{"How many treated units?<br/>How many outcomes?"}
-    D -->|one unit, one outcome| S["single_augsynth"]
-    D -->|many units, staggered| M["multisynth"]
-    D -->|one unit, many outcomes| O["augsynth_multiout"]
-    S --> W["SCM weights W<br/>(convex recipe of donors)"]
+    P("Panel of countries<br/>(unit, time, outcome, treatment)") --> D{"How many treated units?<br/>how many outcomes?"}
+    D -->|one unit, one outcome| S("single_augsynth")
+    D -->|many units, staggered| M("multisynth")
+    D -->|one unit, many outcomes| O("augsynth_multiout")
+    S --> W("SCM weights W<br/>(convex recipe of donors)")
     M --> W
     O --> W
-    W --> R["+ Ridge outcome model<br/>(bias correction)"]
-    R --> A["ATT = actual − synthetic"]
-    A --> I["Inference<br/>jackknife+ / conformal / bootstrap"]
-    style P fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef sty_D fill:#f5f5f5,stroke:#141413,color:#141413
+    W --> R("+ Ridge outcome model<br/>(bias correction)")
+    R --> A("ATT = actual − synthetic")
+    A --> I("Inference<br/>jackknife+ / conformal / bootstrap")
+    classDef sty_D fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class D sty_D
-    style S fill:#d97757,stroke:#141413,color:#141413
-    style M fill:#d97757,stroke:#141413,color:#141413
-    style O fill:#d97757,stroke:#141413,color:#141413
-    style W fill:#6a9bcc,stroke:#141413,color:#141413
-    style R fill:#00d4c8,stroke:#141413,color:#141413
-    style A fill:#00d4c8,stroke:#141413,color:#141413
-    style I fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class P,W,I blue
+    class S,M,O orange
+    class R,A teal
 ```
 
 The routing is by *shape*, not difficulty: count the treated units and the outcomes, and the

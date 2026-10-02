@@ -85,25 +85,21 @@ Why does this matter? Wide regional gaps are not just an accounting curiosity. I
 
 ```mermaid
 graph LR
-    A["Simulate regional GDP"] --> B["Compute WCV"]
-    B --> C["Cross-section OLS<br/>Table 2"]
-    B --> D["Two-way FE<br/>Table 3"]
-    C --> E["Turning points"]
-    E --> J["Discriminant test"]
-    C --> F["Robinson semiparametric<br/>Fig 4"]
-    D --> G["Baltagi–Li semiparametric<br/>Fig 5"]
-    B --> H["Sectoral channel<br/>Table 6"]
-    B --> I["Robustness"]
-    style A fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style J fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style B fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style C fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style D fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style E fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style F fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style G fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style H fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style I fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    A("Simulate regional GDP") --> B("Compute WCV")
+    B --> C("Cross-section OLS<br/>Table 2")
+    B --> D("Two-way FE<br/>Table 3")
+    C --> E("Turning points")
+    E --> J("Discriminant test")
+    C --> F("Robinson semiparametric<br/>Fig 4")
+    D --> G("Baltagi–Li semiparametric<br/>Fig 5")
+    B --> H("Sectoral channel<br/>Table 6")
+    B --> I("Robustness")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A,C,E,F,I blue
+    class B,J,H teal
+    class D,G orange
 ```
 
 The pipeline above is the whole post in one picture: simulate regions, compute the inequality index, then estimate the development–inequality relationship four ways (parametric and semiparametric, cross-section and panel), and probe the sectoral channel and robustness.

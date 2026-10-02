@@ -91,29 +91,27 @@ The roadmap below shows the path we will take. The branch point is the *quality 
 
 ```mermaid
 flowchart TD
-    P["Kansas panel<br/>50 states, 1990-2016<br/>log GDP per capita"] --> Q{"Can donors match<br/>Kansas before 2012?"}
-    Q -->|"fit is good"| S["Classic SCM<br/>progfunc = None"]
-    Q -->|"fit imperfect<br/>(the mid-2000s gap)"| R["Ridge ASCM<br/>progfunc = Ridge"]
-    S --> W["SCM weights<br/>(convex recipe, 7 donors)"]
-    W --> B["+ Ridge outcome model<br/>estimate &amp; subtract bias"]
+    P("Kansas panel<br/>50 states, 1990-2016<br/>log GDP per capita") --> Q{"Can donors match<br/>Kansas before 2012?"}
+    Q -->|"fit is good"| S("Classic SCM<br/>progfunc = None")
+    Q -->|"fit imperfect<br/>(the mid-2000s gap)"| R("Ridge ASCM<br/>progfunc = Ridge")
+    S --> W("SCM weights<br/>(convex recipe, 7 donors)")
+    W --> B("+ Ridge outcome model<br/>estimate &amp; subtract bias")
     R --> B
     B --> Z{"Add covariates?"}
-    Z -->|"yes"| C["Covariate ASCM<br/>y ~ trt | Z"]
-    Z -->|"no"| A["ATT = actual - synthetic"]
+    Z -->|"yes"| C("Covariate ASCM<br/>y ~ trt | Z")
+    Z -->|"no"| A("ATT = actual - synthetic")
     C --> A
-    A --> I["Inference<br/>placebo · conformal · jackknife+ · jackknife"]
-    style P fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef sty_Q fill:#f5f5f5,stroke:#141413,color:#141413
+    A --> I("Inference<br/>placebo · conformal · jackknife+ · jackknife")
+    classDef sty_Q fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class Q sty_Q
-    classDef sty_Z fill:#f5f5f5,stroke:#141413,color:#141413
+    classDef sty_Z fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
     class Z sty_Z
-    style S fill:#d97757,stroke:#141413,color:#141413
-    style R fill:#d97757,stroke:#141413,color:#141413
-    style W fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#00d4c8,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style A fill:#00d4c8,stroke:#141413,color:#141413
-    style I fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class P,W,I blue
+    class S,R orange
+    class B,C,A teal
 ```
 
 ## 2. Key concepts

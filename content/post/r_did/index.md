@@ -328,22 +328,25 @@ where $\Delta Y\_{t^{\ast}}$ is the change in outcomes from the pre-treatment pe
 
 ```mermaid
 graph TD
-    subgraph "Before Treatment"
-        A["Treated Group<br/>Pre-treatment Y"]
-        B["Control Group<br/>Pre-treatment Y"]
+    subgraph SG1["Before treatment"]
+        A("Treated group<br/>Pre-treatment Y")
+        B("Control group<br/>Pre-treatment Y")
     end
-    subgraph "After Treatment"
-        C["Treated Group<br/>Post-treatment Y"]
-        D["Control Group<br/>Post-treatment Y"]
+    subgraph SG2["After treatment"]
+        C("Treated group<br/>post-treatment Y")
+        D("Control group<br/>post-treatment Y")
     end
     A -->|"ΔY treated"| C
     B -->|"ΔY control"| D
-    C -.->|"ATT = ΔY treated − ΔY control"| E["Causal Effect"]
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
+    C -.->|"ATT = ΔY treated − ΔY control"| E("Causal effect")
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,C orange
+    class B,D blue
+    class E teal
 ```
 
 In the textbook case with exactly two periods and two groups, the TWFE regression $Y\_{it} = \theta\_t + \eta\_i + \alpha D\_{it} + v\_{it}$ delivers an estimate of $\alpha$ that is numerically identical to the simple DID estimator, even in the presence of treatment effect heterogeneity. Here, $\theta\_t$ represents time fixed effects (captured by `year` in the regression), $\eta\_i$ represents unit fixed effects (captured by `id`), $D\_{it}$ is the treatment indicator (`post`), and $v\_{it}$ are idiosyncratic unobservables.
