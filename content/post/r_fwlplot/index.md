@@ -226,12 +226,12 @@ graph LR
     D --> E["Panel Data<br/>Wages<br/>(Section 7)"]
     E --> F["ggplot2<br/>& Recipe<br/>(Section 8)"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 We start where the answer is known (simulated data), see the result with `fwl_plot()` first, then peek under the hood with manual FWL verification. From there we apply the same one-liner to increasingly complex real-world settings.
@@ -273,9 +273,9 @@ graph TD
     Income -->|"+0.3<br/>(rich areas<br/>buy more)"| Sales
     Coupons -->|"+0.2<br/>(true causal<br/>effect)"| Sales
 
-    style Income fill:#d97757,stroke:#141413,color:#fff
-    style Coupons fill:#6a9bcc,stroke:#141413,color:#fff
-    style Sales fill:#00d4c8,stroke:#141413,color:#fff
+    style Income fill:#d97757,stroke:#141413,color:#141413
+    style Coupons fill:#6a9bcc,stroke:#141413,color:#141413
+    style Sales fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 Income opens a "backdoor path" from coupons to sales: coupons ← income → sales. Unless we block this path by controlling for income, the naive estimate will be biased. The data generating process is:

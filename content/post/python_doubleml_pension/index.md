@@ -248,9 +248,9 @@ graph LR
     D -->|"causal effect?"| Y
     P -->|"causal effect?"| Y
 
-    style X fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style P fill:#00d4c8,stroke:#141413,color:#fff
+    style X fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style P fill:#00d4c8,stroke:#141413,color:#141413
     style Y fill:#141413,stroke:#141413,color:#fff
 ```
 
@@ -271,11 +271,11 @@ graph TD
     B --> IIVM["<b>IIVM</b><br/>Instrument: eligibility<br/>Estimand: LATE"]
 
     style Q fill:#141413,stroke:#141413,color:#fff
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#00d4c8,stroke:#141413,color:#fff
-    style PLR fill:#6a9bcc,stroke:#141413,color:#fff
-    style IRM fill:#d97757,stroke:#141413,color:#fff
-    style IIVM fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#00d4c8,stroke:#141413,color:#141413
+    style PLR fill:#6a9bcc,stroke:#141413,color:#141413
+    style IRM fill:#d97757,stroke:#141413,color:#141413
+    style IIVM fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 | Model | Treatment | Estimand | Key assumption | Approach |

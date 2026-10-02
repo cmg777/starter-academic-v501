@@ -144,12 +144,12 @@ flowchart TD
     ASCM --> SEL
     SEL --> INF["<b>Inference</b><br/>six methods, one flag"]
     style D fill:#141413,stroke:#6a9bcc,color:#fff
-    style DID fill:#8b9dc3,stroke:#141413,color:#fff
-    style SC fill:#6a9bcc,stroke:#141413,color:#fff
+    style DID fill:#8b9dc3,stroke:#141413,color:#141413
+    style SC fill:#6a9bcc,stroke:#141413,color:#141413
     style DSC fill:#00d4c8,stroke:#141413,color:#141413
-    style SDID fill:#d97757,stroke:#141413,color:#fff
-    style MASC fill:#6a9bcc,stroke:#141413,color:#fff
-    style ASCM fill:#6a9bcc,stroke:#141413,color:#fff
+    style SDID fill:#d97757,stroke:#141413,color:#141413
+    style MASC fill:#6a9bcc,stroke:#141413,color:#141413
+    style ASCM fill:#6a9bcc,stroke:#141413,color:#141413
     style PIVOT fill:#141413,stroke:#d97757,color:#fff
     style SEL fill:#1a3a8a,stroke:#141413,color:#fff
     style INF fill:#1a3a8a,stroke:#141413,color:#fff
@@ -637,13 +637,13 @@ graph TD
     E --> F["blend with m-nearest-neighbour matching<br/><b>MASC</b>"]
     E --> G["allow negative weights, penalise them<br/><b>ASCM</b>"]
     style R fill:#141413,stroke:#6a9bcc,color:#fff
-    style A fill:#8b9dc3,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#8b9dc3,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#141413,stroke:#d97757,color:#fff
-    style F fill:#6a9bcc,stroke:#141413,color:#fff
-    style G fill:#6a9bcc,stroke:#141413,color:#fff
+    style F fill:#6a9bcc,stroke:#141413,color:#141413
+    style G fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 The diagram splits the ladder into two families. The first four stages change *which weights* the same regression uses. The last two change *what weights are allowed at all* — MASC by mixing in a different estimator, ASCM by relaxing the simplex. That distinction is why the ladder branches rather than continuing upward, and it is the reason section 16's tournament cannot simply declare the top stage the winner.
@@ -1264,10 +1264,10 @@ flowchart LR
     C --> D["Compare with<br/>what happened.<br/>True effect = 0"]
     D --> E["Score:<br/>RMSE, MAB"]
     E --> A
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
     style B fill:#141413,stroke:#6a9bcc,color:#fff
     style C fill:#141413,stroke:#6a9bcc,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

@@ -109,10 +109,10 @@ flowchart LR
 
     A --> B --> C --> D --> E
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
-    classDef naive fill:#d97757,stroke:#141413,color:#fff
+    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef naive fill:#d97757,stroke:#141413,color:#141413
     classDef ate fill:#00d4c8,stroke:#141413,color:#141413
-    classDef gate fill:#d97757,stroke:#141413,color:#fff
+    classDef gate fill:#d97757,stroke:#141413,color:#141413
     classDef diag fill:#141413,stroke:#d97757,color:#fff
 ```
 
@@ -315,11 +315,11 @@ flowchart LR
     D --> G["categraph gateplot<br/>estat gatetest"]:::post
     E --> H["estat heterogeneity<br/>estat ate"]:::post
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
     classDef main fill:#141413,stroke:#141413,color:#fff
     classDef iate fill:#00d4c8,stroke:#141413,color:#141413
-    classDef gate fill:#d97757,stroke:#141413,color:#fff
-    classDef ate fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef gate fill:#d97757,stroke:#141413,color:#141413
+    classDef ate fill:#6a9bcc,stroke:#141413,color:#141413
     classDef post fill:#f5f5f5,stroke:#141413,color:#141413
 ```
 
@@ -546,9 +546,9 @@ graph TD
     T --> C10
     T --> C21
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
     classDef f1 fill:#00d4c8,stroke:#141413,color:#141413
-    classDef f2 fill:#d97757,stroke:#141413,color:#fff
+    classDef f2 fill:#d97757,stroke:#141413,color:#141413
 ```
 
 | Contrast | Comparison | Finding | Ground Truth |

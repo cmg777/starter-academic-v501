@@ -250,8 +250,8 @@ flowchart LR
     X["X: maternal traits<br/>(age, education, marital,<br/>prenatal care, etc.)"] --> D["D: maternal smoking<br/>(mbsmoke)"]
     X --> Y["Y: birth weight<br/>(bweight)"]
     D --> Y
-    style X fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
-    style D fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style X fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    style D fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
     style Y fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
     linkStyle 0,1,2 stroke:#d97757,stroke-width:2.5px
 ```
@@ -295,8 +295,8 @@ flowchart LR
     end
     M --> O["We observe<br/>only ONE"]
     O --> Q["Other is<br/>missing → must<br/>be estimated"]
-    style Y1 fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
-    style Y0 fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style Y1 fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
+    style Y0 fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
     style M fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
     style O fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
     style Q fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
@@ -418,14 +418,14 @@ flowchart TD
     Both --> AIPW["4. AIPW"]
     Direct --> NNM["5. Nearest-Neighbor<br/>Matching (NNM)"]
 
-    style Start fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
-    style Outcome fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
-    style Treatment fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style Start fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    style Outcome fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    style Treatment fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
     style Both fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
     style Direct fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
-    style RA fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
-    style IPW fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
-    style PSM fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style RA fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    style IPW fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
+    style PSM fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
     style IPWRA fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
     style AIPW fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
     style NNM fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
@@ -711,11 +711,11 @@ flowchart LR
     P --> N["Find non-smoker<br/>with closest e(X)"]
     N --> C["Compare<br/>outcomes"]
     C --> A["Average<br/>across all<br/>smokers"]
-    style S fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
-    style P fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
-    style N fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style S fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
+    style P fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    style N fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
     style C fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style A fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style A fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
     linkStyle 0,1,2,3 stroke:#d97757,stroke-width:2.5px
 ```
 

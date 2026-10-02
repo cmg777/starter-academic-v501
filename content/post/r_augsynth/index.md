@@ -102,16 +102,18 @@ flowchart TD
     Z -->|"no"| A["ATT = actual - synthetic"]
     C --> A
     A --> I["Inference<br/>placebo · conformal · jackknife+ · jackknife"]
-    style P fill:#6a9bcc,stroke:#141413,color:#fff
-    style Q fill:#f5f5f5,stroke:#141413,color:#141413
-    style Z fill:#f5f5f5,stroke:#141413,color:#141413
-    style S fill:#d97757,stroke:#141413,color:#fff
-    style R fill:#d97757,stroke:#141413,color:#fff
-    style W fill:#6a9bcc,stroke:#141413,color:#fff
+    style P fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_Q fill:#f5f5f5,stroke:#141413,color:#141413
+    class Q sty_Q
+    classDef sty_Z fill:#f5f5f5,stroke:#141413,color:#141413
+    class Z sty_Z
+    style S fill:#d97757,stroke:#141413,color:#141413
+    style R fill:#d97757,stroke:#141413,color:#141413
+    style W fill:#6a9bcc,stroke:#141413,color:#141413
     style B fill:#00d4c8,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style A fill:#00d4c8,stroke:#141413,color:#fff
-    style I fill:#6a9bcc,stroke:#141413,color:#fff
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    style A fill:#00d4c8,stroke:#141413,color:#141413
+    style I fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 ## 2. Key concepts

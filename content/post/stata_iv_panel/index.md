@@ -256,8 +256,8 @@ graph TD
     CONF -->|"Reverse causality"| ECON
     ME -->|"Attenuation bias"| ECON
 
-    style ECON fill:#6a9bcc,stroke:#141413,color:#fff
-    style CONF fill:#d97757,stroke:#141413,color:#fff
+    style ECON fill:#6a9bcc,stroke:#141413,color:#141413
+    style CONF fill:#d97757,stroke:#141413,color:#141413
     style U fill:#141413,stroke:#d97757,color:#fff
     style ME fill:#141413,stroke:#6a9bcc,color:#fff
     style REV fill:#141413,stroke:#00d4c8,color:#fff
@@ -287,8 +287,8 @@ graph LR
     L -->|"Second stage"| C
     W -.->|"Excluded"| C
 
-    style W fill:#6a9bcc,stroke:#141413,color:#fff
-    style L fill:#d97757,stroke:#141413,color:#fff
+    style W fill:#6a9bcc,stroke:#141413,color:#141413
+    style L fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

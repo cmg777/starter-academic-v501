@@ -83,10 +83,10 @@ graph LR
     A["<b>1. ATE</b><br/>Population<br/>average effect"] --> B["<b>2. GATE</b><br/>Effect by<br/>subgroup"]
     B --> C["<b>3. IATE</b><br/>Effect for<br/>each individual"]
     C --> D["<b>4. Policy</b><br/>Welfare-optimal<br/>assignment rule"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#999999,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    style D fill:#999999,stroke:#141413,color:#141413
 ```
 
 The arrows are not just decorative. Each step *builds* on the previous one: a credible average effect is the floor on which any subgroup analysis stands, and credible group effects are the floor on which any individual analysis stands. Skipping the first step and jumping straight to a fancy heterogeneity model is the most common mistake in applied CML. We will resist that temptation by starting from the simplest possible baseline and only adding complexity when the data warrant it.

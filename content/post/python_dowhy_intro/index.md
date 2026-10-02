@@ -260,10 +260,10 @@ graph LR
     A["1. Model<br/>Define causal graph"] --> B["2. Identify<br/>Find estimand"]
     B --> C["3. Estimate<br/>Compute effect"]
     C --> D["4. Refute<br/>Test robustness"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#8b5cf6,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    style D fill:#a78bfa,stroke:#141413,color:#141413
 ```
 
 | Step | Question | What you do |
@@ -416,11 +416,11 @@ graph LR
     C --> Y
     Z["Subway Disruption<br/>(Instrument)"] --> T
     T --> Y
-    style I fill:#999,stroke:#141413,color:#fff
-    style C fill:#999,stroke:#141413,color:#fff
-    style Z fill:#00d4c8,stroke:#141413,color:#fff
-    style T fill:#d97757,stroke:#141413,color:#fff
-    style Y fill:#6a9bcc,stroke:#141413,color:#fff
+    style I fill:#999,stroke:#141413,color:#141413
+    style C fill:#999,stroke:#141413,color:#141413
+    style Z fill:#00d4c8,stroke:#141413,color:#141413
+    style T fill:#d97757,stroke:#141413,color:#141413
+    style Y fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 Three types of variables appear in our DAG:

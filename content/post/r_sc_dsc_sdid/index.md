@@ -135,18 +135,21 @@ flowchart TD
     ASCM --> R
     R --> SEL["<b>Which one?</b><br/>in-sample placebo<br/>over 20 fake dates"]
     SEL --> INF["<b>Inference</b><br/>beyond the paper"]
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style Q0 fill:#f5f5f5,stroke:#141413,color:#141413
-    style Q1 fill:#f5f5f5,stroke:#141413,color:#141413
-    style Q2 fill:#f5f5f5,stroke:#141413,color:#141413
-    style DID fill:#d97757,stroke:#141413,color:#fff
-    style SC fill:#6a9bcc,stroke:#141413,color:#fff
-    style DSC fill:#6a9bcc,stroke:#141413,color:#fff
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_Q0 fill:#f5f5f5,stroke:#141413,color:#141413
+    class Q0 sty_Q0
+    classDef sty_Q1 fill:#f5f5f5,stroke:#141413,color:#141413
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#f5f5f5,stroke:#141413,color:#141413
+    class Q2 sty_Q2
+    style DID fill:#d97757,stroke:#141413,color:#141413
+    style SC fill:#6a9bcc,stroke:#141413,color:#141413
+    style DSC fill:#6a9bcc,stroke:#141413,color:#141413
     style SDID fill:#00d4c8,stroke:#141413,color:#141413
     style BIAS fill:#141413,stroke:#00d4c8,color:#fff
-    style MASC fill:#d97757,stroke:#141413,color:#fff
-    style ASCM fill:#d97757,stroke:#141413,color:#fff
-    style R fill:#6a9bcc,stroke:#141413,color:#fff
+    style MASC fill:#d97757,stroke:#141413,color:#141413
+    style ASCM fill:#d97757,stroke:#141413,color:#141413
+    style R fill:#6a9bcc,stroke:#141413,color:#141413
     style SEL fill:#00d4c8,stroke:#141413,color:#141413
     style INF fill:#141413,stroke:#6a9bcc,color:#fff
 ```
@@ -451,17 +454,17 @@ graph TD
     F --> F1["MASC<br/>cap omega at 1/m,<br/>then blend"]
     F --> F2["ASCM<br/>drop non-negativity,<br/>add a ridge pull"]
     style OBJ fill:#141413,stroke:#00d4c8,color:#fff
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
     style A1 fill:#f5f5f5,stroke:#141413,color:#141413
     style B1 fill:#f5f5f5,stroke:#141413,color:#141413
     style C1 fill:#f5f5f5,stroke:#141413,color:#141413
     style E1 fill:#f5f5f5,stroke:#141413,color:#141413
     style F fill:#141413,stroke:#d97757,color:#fff
-    style F1 fill:#d97757,stroke:#141413,color:#fff
-    style F2 fill:#d97757,stroke:#141413,color:#fff
+    style F1 fill:#d97757,stroke:#141413,color:#141413
+    style F2 fill:#d97757,stroke:#141413,color:#141413
 ```
 
 Two things are worth pausing on. First, synthetic control is the only stage that switches the unit fixed effect *off*, and that single omission is what forces it to match the UK's level as well as its shape. Second, MASC and ASCM hang off a different branch: they do not re-weight the regression, they change what counts as an admissible weight vector.
@@ -870,10 +873,10 @@ graph LR
     XA --> SD["<b>SDID: yes</b>"]
     IA --> SD
     style T fill:#141413,stroke:#00d4c8,color:#fff
-    style X fill:#6a9bcc,stroke:#141413,color:#fff
-    style I fill:#d97757,stroke:#141413,color:#fff
-    style XA fill:#6a9bcc,stroke:#141413,color:#fff
-    style IA fill:#d97757,stroke:#141413,color:#fff
+    style X fill:#6a9bcc,stroke:#141413,color:#141413
+    style I fill:#d97757,stroke:#141413,color:#141413
+    style XA fill:#6a9bcc,stroke:#141413,color:#141413
+    style IA fill:#d97757,stroke:#141413,color:#141413
     style SC2 fill:#f5f5f5,stroke:#141413,color:#141413
     style NN2 fill:#f5f5f5,stroke:#141413,color:#141413
     style SC3 fill:#f5f5f5,stroke:#141413,color:#141413
@@ -1040,10 +1043,10 @@ flowchart LR
     C --> D["<b>Compare to what<br/>actually happened</b><br/>true effect is zero"]
     D --> E["<b>Score</b><br/>RMSE, mean and median<br/>absolute error"]
     E --> A
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

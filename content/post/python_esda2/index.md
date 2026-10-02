@@ -247,10 +247,10 @@ graph LR
     E --> F["<b>Step 6</b><br/>Space-Time<br/>Dynamics"]
 
     style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#00d4c8,stroke:#141413,color:#141413
     style F fill:#1a3a8a,stroke:#141413,color:#fff
 ```
 

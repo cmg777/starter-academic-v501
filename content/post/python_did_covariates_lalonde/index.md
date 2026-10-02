@@ -221,16 +221,17 @@ graph TD
     S --> FIX
     P --> FIX
     FIX -.->|recovers| BENCH["RCT benchmark<br/>ATT = 1,794"]
-    style Q fill:#d97757,stroke:#141413,color:#fff
-    style INERT fill:#9aa0a6,stroke:#141413,color:#fff
-    style FIX fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef sty_Q fill:#d97757,stroke:#141413,color:#141413
+    class Q sty_Q
+    style INERT fill:#9aa0a6,stroke:#141413,color:#141413
+    style FIX fill:#6a9bcc,stroke:#141413,color:#141413
     style BENCH fill:#141413,stroke:#141413,color:#fff
-    style N fill:#9aa0a6,stroke:#141413,color:#fff
-    style L fill:#9aa0a6,stroke:#141413,color:#fff
-    style E fill:#9aa0a6,stroke:#141413,color:#fff
-    style T fill:#6a9bcc,stroke:#141413,color:#fff
-    style S fill:#6a9bcc,stroke:#141413,color:#fff
-    style P fill:#6a9bcc,stroke:#141413,color:#fff
+    style N fill:#9aa0a6,stroke:#141413,color:#141413
+    style L fill:#9aa0a6,stroke:#141413,color:#141413
+    style E fill:#9aa0a6,stroke:#141413,color:#141413
+    style T fill:#6a9bcc,stroke:#141413,color:#141413
+    style S fill:#6a9bcc,stroke:#141413,color:#141413
+    style P fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 ## Setup and imports

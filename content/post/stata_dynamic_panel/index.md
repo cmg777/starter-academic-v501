@@ -106,10 +106,10 @@ graph TD
     M4 --> LR
     M4 --> DIAG
 
-    style DATA fill:#6a9bcc,stroke:#141413,color:#fff
-    style CLEAN fill:#d97757,stroke:#141413,color:#fff
-    style EDA fill:#6a9bcc,stroke:#141413,color:#fff
-    style XTSET fill:#d97757,stroke:#141413,color:#fff
+    style DATA fill:#6a9bcc,stroke:#141413,color:#141413
+    style CLEAN fill:#d97757,stroke:#141413,color:#141413
+    style EDA fill:#6a9bcc,stroke:#141413,color:#141413
+    style XTSET fill:#d97757,stroke:#141413,color:#141413
     style M1 fill:#00d4c8,stroke:#141413,color:#141413
     style M2 fill:#00d4c8,stroke:#141413,color:#141413
     style M3 fill:#00d4c8,stroke:#141413,color:#141413

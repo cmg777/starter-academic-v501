@@ -86,11 +86,11 @@ graph LR
     D --> E["<b>Read the network</b><br/>links, chords,<br/>multipliers"]
     E --> F["<b>Benchmark</b><br/>estimated W vs<br/>contiguity and 7-NN"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#1a3a8a,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
     style F fill:#141413,stroke:#6a9bcc,color:#fff
 ```
 
@@ -499,10 +499,10 @@ graph TD
     C2 --> Q["<b>Same data</b><br/>90 regions x 19 years<br/>= 1,710 observations"]
     E2 --> Q
 
-    style C1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style C2 fill:#6a9bcc,stroke:#141413,color:#fff
-    style E1 fill:#d97757,stroke:#141413,color:#fff
-    style E2 fill:#d97757,stroke:#141413,color:#fff
+    style C1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style C2 fill:#6a9bcc,stroke:#141413,color:#141413
+    style E1 fill:#d97757,stroke:#141413,color:#141413
+    style E2 fill:#d97757,stroke:#141413,color:#141413
     style Q fill:#141413,stroke:#00d4c8,color:#fff
 ```
 
@@ -568,9 +568,9 @@ graph TD
     D -->|"iterations 101 to 200:<br/>keep"| K["<b>Retained output</b><br/>postw, postb,<br/>posts, postr"]
 
     style S fill:#141413,stroke:#00d4c8,color:#fff
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
     style D fill:#00d4c8,stroke:#141413,color:#141413
     style K fill:#1a3a8a,stroke:#141413,color:#fff
 ```
@@ -1074,11 +1074,11 @@ graph TD
     SEM -->|"rho = 0"| OLS
     SLX -->|"beta2 = 0"| OLS
 
-    style SDM fill:#d97757,stroke:#141413,color:#fff
-    style SDEM fill:#d97757,stroke:#141413,color:#fff
+    style SDM fill:#d97757,stroke:#141413,color:#141413
+    style SDEM fill:#d97757,stroke:#141413,color:#141413
     style SAR fill:#00d4c8,stroke:#141413,color:#141413
-    style SEM fill:#6a9bcc,stroke:#141413,color:#fff
-    style SLX fill:#6a9bcc,stroke:#141413,color:#fff
+    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
+    style SLX fill:#6a9bcc,stroke:#141413,color:#141413
     style OLS fill:#141413,stroke:#141413,color:#fff
 ```
 

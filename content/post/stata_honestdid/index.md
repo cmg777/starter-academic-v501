@@ -244,8 +244,8 @@ graph LR
     B --> C["<b>Event Study</b><br/>Estimation"]
     C --> D["<b>Sensitivity</b><br/>RM + Smoothness"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#141413,stroke:#d97757,color:#fff
 ```
@@ -382,9 +382,9 @@ graph TD
 
     style PRE_T fill:#00d4c8,stroke:#141413,color:#141413
     style POST_T fill:#00d4c8,stroke:#141413,color:#141413
-    style PRE_C fill:#6a9bcc,stroke:#141413,color:#fff
-    style POST_C fill:#6a9bcc,stroke:#141413,color:#fff
-    style DID fill:#d97757,stroke:#141413,color:#fff
+    style PRE_C fill:#6a9bcc,stroke:#141413,color:#141413
+    style POST_C fill:#6a9bcc,stroke:#141413,color:#141413
+    style DID fill:#d97757,stroke:#141413,color:#141413
 ```
 
 To see the four means that define the 2x2 DiD, we create a post-treatment indicator and compute group averages.
@@ -528,9 +528,9 @@ graph LR
     C --> D["<b>Robust CIs</b><br/>for each M"]
     D --> E["<b>Breakdown Value</b><br/>CI first includes zero"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
     style D fill:#00d4c8,stroke:#141413,color:#141413
     style E fill:#141413,stroke:#d97757,color:#fff
 ```
@@ -706,9 +706,9 @@ graph TD
     HONEST --> RESULT_H
 
     style PT fill:#141413,stroke:#d97757,color:#fff
-    style CONV fill:#d97757,stroke:#141413,color:#fff
+    style CONV fill:#d97757,stroke:#141413,color:#141413
     style HONEST fill:#00d4c8,stroke:#141413,color:#141413
-    style RESULT_C fill:#d97757,stroke:#141413,color:#fff
+    style RESULT_C fill:#d97757,stroke:#141413,color:#141413
     style RESULT_H fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

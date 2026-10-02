@@ -113,11 +113,11 @@ graph LR
     C --> D
     F --> G
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
-    style I fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
+    style I fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 The study uses panel data: the same 35 schools are observed at two time points (pre- and post-program), giving us 70 school-period observations. For the event study extension, we use an expanded dataset with 8 time periods (280 observations), allowing us to test for parallel pre-trends and examine dynamic treatment effects.

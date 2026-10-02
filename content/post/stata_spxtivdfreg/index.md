@@ -260,12 +260,12 @@ graph TD
     F -.->|"λ<sub>i</sub>"| Y
     Z -.->|"IV"| X
 
-    style Y fill:#d97757,stroke:#141413,color:#fff
-    style WY fill:#6a9bcc,stroke:#141413,color:#fff
-    style LY fill:#6a9bcc,stroke:#141413,color:#fff
+    style Y fill:#d97757,stroke:#141413,color:#141413
+    style WY fill:#6a9bcc,stroke:#141413,color:#141413
+    style LY fill:#6a9bcc,stroke:#141413,color:#141413
     style X fill:#00d4c8,stroke:#141413,color:#141413
     style F fill:#141413,stroke:#d97757,color:#fff
-    style Z fill:#6a9bcc,stroke:#141413,color:#fff
+    style Z fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 The spatial lag ($W \cdot NPL$) creates endogeneity because bank $i$'s credit risk depends on bank $j$'s credit risk, and vice versa --- a simultaneity problem. The temporal lag ($NPL\_{i,t-1}$) is endogenous because it correlates with the bank-specific fixed effect. The endogenous regressor (operational inefficiency, $INEFF$) is correlated with the error term. And the common factors ($f\_t$) enter both the regressors and the error, inducing cross-sectional dependence and omitted variable bias.
@@ -354,8 +354,8 @@ graph LR
     B --> C
     C --> D
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#141413,stroke:#d97757,color:#fff
     style D fill:#00d4c8,stroke:#141413,color:#141413
 ```
@@ -575,12 +575,12 @@ graph LR
     D --> Tot
     I --> Tot
 
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style T fill:#d97757,stroke:#141413,color:#fff
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style T fill:#d97757,stroke:#141413,color:#141413
     style D fill:#00d4c8,stroke:#141413,color:#141413
-    style S fill:#d97757,stroke:#141413,color:#fff
+    style S fill:#d97757,stroke:#141413,color:#141413
     style I fill:#141413,stroke:#d97757,color:#fff
-    style Tot fill:#6a9bcc,stroke:#141413,color:#fff
+    style Tot fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 ```stata
@@ -723,13 +723,13 @@ graph TD
     FULL --> MG
 
     style START fill:#141413,stroke:#d97757,color:#fff
-    style JTEST fill:#6a9bcc,stroke:#141413,color:#fff
+    style JTEST fill:#6a9bcc,stroke:#141413,color:#141413
     style FACTORS fill:#00d4c8,stroke:#141413,color:#141413
-    style NOFACT fill:#d97757,stroke:#141413,color:#fff
-    style SPLAG fill:#6a9bcc,stroke:#141413,color:#fff
+    style NOFACT fill:#d97757,stroke:#141413,color:#141413
+    style SPLAG fill:#6a9bcc,stroke:#141413,color:#141413
     style FULL fill:#00d4c8,stroke:#141413,color:#141413
-    style NOSPL fill:#d97757,stroke:#141413,color:#fff
-    style MG fill:#6a9bcc,stroke:#141413,color:#fff
+    style NOSPL fill:#d97757,stroke:#141413,color:#141413
+    style MG fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 The J-test is the first and most important diagnostic: in our application, it unambiguously rejects the no-factor specification (p < 0.001), confirming that common factors must be included. With factors, the spatial lag is highly significant ($\psi = 0.394$, z = 4.65), supporting the full model. The MG estimator provides a robustness check that reveals potential slope heterogeneity, but its insignificant spatial lag should be interpreted cautiously --- it may indicate genuine absence of spillovers, or it may reflect the difficulty of estimating bank-specific spatial parameters with only 35 time periods.

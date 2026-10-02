@@ -480,10 +480,14 @@ flowchart TD
     style Pred fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
     style O fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
     style L fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style Q1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q2 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q3 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q4 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    classDef sty_Q1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q2 sty_Q2
+    classDef sty_Q3 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q3 sty_Q3
+    classDef sty_Q4 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    class Q4 sty_Q4
 ```
 
 One more piece of intuition justifies the post-OLS refit step in DL (and PSL). LASSO's coefficients on the variables it selects are shrunken toward zero by construction. If you used those shrunken coefficients to compute the residuals for $\alpha$, you would inherit a bias of the order

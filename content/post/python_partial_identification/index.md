@@ -241,9 +241,9 @@ graph LR
     U -->|"affects hiring"| Y["Y<br/>(Got a Job)"]
     X -->|"causal effect<br/>(what we want)"| Y
 
-    style U fill:#999999,stroke:#141413,color:#fff,stroke-dasharray: 5 5
-    style X fill:#6a9bcc,stroke:#141413,color:#fff
-    style Y fill:#d97757,stroke:#141413,color:#fff
+    style U fill:#999999,stroke:#141413,color:#141413,stroke-dasharray: 5 5
+    style X fill:#6a9bcc,stroke:#141413,color:#141413
+    style Y fill:#d97757,stroke:#141413,color:#141413
 ```
 
 The dashed border on $U$ signals it is unmeasured. Because we cannot condition on $U$, the backdoor criterion fails and **point identification is impossible**. This is precisely when partial identification becomes valuable: we can still bound the causal effect using only the observable joint distribution of $X$ and $Y$. The next section sets up our simulated data so we can see exactly how this works.
@@ -627,10 +627,10 @@ graph TD
     IV -->|"No"| PART["<b>Partial Identification</b><br/>Compute bounds"]
 
     style Q fill:#141413,stroke:#141413,color:#fff
-    style PI fill:#6a9bcc,stroke:#141413,color:#fff
+    style PI fill:#6a9bcc,stroke:#141413,color:#141413
     style IV fill:#141413,stroke:#141413,color:#fff
-    style IVPI fill:#6a9bcc,stroke:#141413,color:#fff
-    style PART fill:#d97757,stroke:#141413,color:#fff
+    style IVPI fill:#6a9bcc,stroke:#141413,color:#141413
+    style PART fill:#d97757,stroke:#141413,color:#141413
 ```
 
 ### ATE bounds comparison

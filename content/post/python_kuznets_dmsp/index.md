@@ -123,9 +123,9 @@ flowchart LR
   B --> C["Population-weighted<br/>inequality indices<br/>(Table 2)"]
   C --> D["Regional Kuznets<br/>curve (Table 3)"]
   C --> E["Determinants &<br/>robustness (Tables 4, B.4)"]
-  style A fill:#6a9bcc,stroke:#141413,color:#fff
-  style B fill:#6a9bcc,stroke:#141413,color:#fff
-  style C fill:#d97757,stroke:#141413,color:#fff
+  style A fill:#6a9bcc,stroke:#141413,color:#141413
+  style B fill:#6a9bcc,stroke:#141413,color:#141413
+  style C fill:#d97757,stroke:#141413,color:#141413
   style D fill:#00d4c8,stroke:#141413,color:#141413
   style E fill:#00d4c8,stroke:#141413,color:#141413
 ```

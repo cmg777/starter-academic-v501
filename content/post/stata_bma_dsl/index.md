@@ -252,8 +252,8 @@ graph LR
     D --> E["<b>Comparison</b><br/>Check against<br/>answer key"]
 
     style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
     style D fill:#00d4c8,stroke:#141413,color:#141413
     style E fill:#1a3a8a,stroke:#141413,color:#fff
 ```
@@ -381,10 +381,10 @@ graph TD
     IN --> P3["<b>Phase 3: Declining</b><br/>Wealthy countries"]
 
     style EKC fill:#141413,stroke:#141413,color:#fff
-    style IU fill:#6a9bcc,stroke:#141413,color:#fff
-    style IN fill:#d97757,stroke:#141413,color:#fff
+    style IU fill:#6a9bcc,stroke:#141413,color:#141413
+    style IN fill:#d97757,stroke:#141413,color:#141413
     style P1 fill:#00d4c8,stroke:#141413,color:#141413
-    style P2 fill:#d97757,stroke:#141413,color:#fff
+    style P2 fill:#d97757,stroke:#141413,color:#141413
     style P3 fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -514,8 +514,8 @@ graph TD
     Post --> PIP["<b>PIPs</b><br/>Inclusion probability<br/>for each variable"]
 
     style Start fill:#141413,stroke:#141413,color:#fff
-    style MCMC fill:#6a9bcc,stroke:#141413,color:#fff
-    style Post fill:#d97757,stroke:#141413,color:#fff
+    style MCMC fill:#6a9bcc,stroke:#141413,color:#141413
+    style Post fill:#d97757,stroke:#141413,color:#141413
     style Avg fill:#00d4c8,stroke:#141413,color:#141413
     style PIP fill:#00d4c8,stroke:#141413,color:#141413
 ```
@@ -775,8 +775,8 @@ graph TD
     Union --> OLS["<b>Step 4: Final OLS</b><br/>CO2 ~ GDP + GDP² + GDP³ + X̂<br/>Standard OLS with valid<br/>inference on GDP terms"]
 
     style Controls fill:#141413,stroke:#141413,color:#fff
-    style Step1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style Step2 fill:#d97757,stroke:#141413,color:#fff
+    style Step1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style Step2 fill:#d97757,stroke:#141413,color:#141413
     style Union fill:#1a3a8a,stroke:#141413,color:#fff
     style OLS fill:#00d4c8,stroke:#141413,color:#141413
 ```

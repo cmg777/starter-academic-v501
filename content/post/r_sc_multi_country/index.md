@@ -130,15 +130,16 @@ flowchart TD
     W --> R["+ Ridge outcome model<br/>(bias correction)"]
     R --> A["ATT = actual − synthetic"]
     A --> I["Inference<br/>jackknife+ / conformal / bootstrap"]
-    style P fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#f5f5f5,stroke:#141413,color:#141413
-    style S fill:#d97757,stroke:#141413,color:#fff
-    style M fill:#d97757,stroke:#141413,color:#fff
-    style O fill:#d97757,stroke:#141413,color:#fff
-    style W fill:#6a9bcc,stroke:#141413,color:#fff
+    style P fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_D fill:#f5f5f5,stroke:#141413,color:#141413
+    class D sty_D
+    style S fill:#d97757,stroke:#141413,color:#141413
+    style M fill:#d97757,stroke:#141413,color:#141413
+    style O fill:#d97757,stroke:#141413,color:#141413
+    style W fill:#6a9bcc,stroke:#141413,color:#141413
     style R fill:#00d4c8,stroke:#141413,color:#141413
-    style A fill:#00d4c8,stroke:#141413,color:#fff
-    style I fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#00d4c8,stroke:#141413,color:#141413
+    style I fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 The routing is by *shape*, not difficulty: count the treated units and the outcomes, and the

@@ -266,11 +266,11 @@ graph TD
 
     style GNS fill:#141413,stroke:#d97757,color:#fff
     style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SDEM fill:#6a9bcc,stroke:#141413,color:#fff
-    style SAC fill:#6a9bcc,stroke:#141413,color:#fff
-    style SAR fill:#d97757,stroke:#141413,color:#fff
-    style SEM fill:#d97757,stroke:#141413,color:#fff
-    style SLX fill:#d97757,stroke:#141413,color:#fff
+    style SDEM fill:#6a9bcc,stroke:#141413,color:#141413
+    style SAC fill:#6a9bcc,stroke:#141413,color:#141413
+    style SAR fill:#d97757,stroke:#141413,color:#141413
+    style SEM fill:#d97757,stroke:#141413,color:#141413
+    style SLX fill:#d97757,stroke:#141413,color:#141413
     style OLS fill:#141413,stroke:#6a9bcc,color:#fff
 ```
 
@@ -481,8 +481,8 @@ graph TD
     LM -->|"Both significant?"| RLM
     RLM -->|"Error > Lag"| SEM_d
 
-    style MI fill:#6a9bcc,stroke:#141413,color:#fff
-    style LM fill:#d97757,stroke:#141413,color:#fff
+    style MI fill:#6a9bcc,stroke:#141413,color:#141413
+    style LM fill:#d97757,stroke:#141413,color:#141413
     style RLM fill:#00d4c8,stroke:#141413,color:#141413
     style SEM_d fill:#141413,stroke:#d97757,color:#fff
 ```
@@ -784,9 +784,9 @@ graph TD
     SDM -->|"LR ≈ 4.0, 2 df"| SEM
 
     style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SLX fill:#d97757,stroke:#141413,color:#fff
-    style SAR fill:#6a9bcc,stroke:#141413,color:#fff
-    style SEM fill:#6a9bcc,stroke:#141413,color:#fff
+    style SLX fill:#d97757,stroke:#141413,color:#141413
+    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
+    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 The specification tests tell a nuanced story. Both the SAR restriction ($\theta = 0$) and the SEM common factor restriction ($\theta + \rho\beta = 0$) cannot be rejected at the 5% level. Only the SLX restriction ($\rho = 0$) is rejected, confirming that the spatial autoregressive parameter $\rho$ is essential. This leaves both SAR and SEM as statistically adequate simplifications. However, as Elhorst (2014) points out, the SAR's constraint that the ratio between the indirect and direct effect is the same for every variable is economically restrictive. An alternative path is to consider the **SDEM**, which also nests SLX and SEM (see Section 8.1).

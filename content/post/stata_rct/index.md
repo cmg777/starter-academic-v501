@@ -265,15 +265,15 @@ graph TD
     COMP3 --> END
     COMP4 --> END
 
-    style POP fill:#6a9bcc,stroke:#141413,color:#fff
-    style STRAT fill:#d97757,stroke:#141413,color:#fff
+    style POP fill:#6a9bcc,stroke:#141413,color:#141413
+    style STRAT fill:#d97757,stroke:#141413,color:#141413
     style TRT fill:#00d4c8,stroke:#141413,color:#141413
-    style CTL fill:#6a9bcc,stroke:#141413,color:#fff
-    style BASE fill:#6a9bcc,stroke:#141413,color:#fff
-    style END fill:#d97757,stroke:#141413,color:#fff
+    style CTL fill:#6a9bcc,stroke:#141413,color:#141413
+    style BASE fill:#6a9bcc,stroke:#141413,color:#141413
+    style END fill:#d97757,stroke:#141413,color:#141413
     style COMP1 fill:#00d4c8,stroke:#141413,color:#141413
     style COMP2 fill:#141413,stroke:#d97757,color:#fff
-    style COMP3 fill:#d97757,stroke:#141413,color:#fff
+    style COMP3 fill:#d97757,stroke:#141413,color:#141413
     style COMP4 fill:#141413,stroke:#6a9bcc,color:#fff
 ```
 
@@ -314,8 +314,8 @@ graph LR
     B --> C
     C --> D
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#141413,stroke:#d97757,color:#fff
 ```
@@ -624,11 +624,11 @@ graph TD
     P1 --> ATE
 
     style DATA fill:#141413,stroke:#6a9bcc,color:#fff
-    style M0 fill:#6a9bcc,stroke:#141413,color:#fff
-    style M1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style P0 fill:#6a9bcc,stroke:#141413,color:#fff
-    style P1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style ATE fill:#6a9bcc,stroke:#141413,color:#fff
+    style M0 fill:#6a9bcc,stroke:#141413,color:#141413
+    style M1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style P0 fill:#6a9bcc,stroke:#141413,color:#141413
+    style P1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style ATE fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 **The RA estimator.** Formally, the ATE under regression adjustment is:
@@ -676,11 +676,11 @@ graph TD
     WCT --> ATE
 
     style DATA fill:#141413,stroke:#d97757,color:#fff
-    style PS fill:#d97757,stroke:#141413,color:#fff
-    style WT fill:#d97757,stroke:#141413,color:#fff
-    style WTR fill:#d97757,stroke:#141413,color:#fff
-    style WCT fill:#d97757,stroke:#141413,color:#fff
-    style ATE fill:#d97757,stroke:#141413,color:#fff
+    style PS fill:#d97757,stroke:#141413,color:#141413
+    style WT fill:#d97757,stroke:#141413,color:#141413
+    style WTR fill:#d97757,stroke:#141413,color:#141413
+    style WCT fill:#d97757,stroke:#141413,color:#141413
+    style ATE fill:#d97757,stroke:#141413,color:#141413
 ```
 
 **The propensity score.** The propensity score is estimated via logistic regression:
@@ -735,10 +735,10 @@ graph TD
     CORRECT --> DR
 
     style DATA fill:#141413,stroke:#00d4c8,color:#fff
-    style RA_C fill:#6a9bcc,stroke:#141413,color:#fff
-    style IPW_C fill:#d97757,stroke:#141413,color:#fff
-    style RESID fill:#6a9bcc,stroke:#141413,color:#fff
-    style CORRECT fill:#d97757,stroke:#141413,color:#fff
+    style RA_C fill:#6a9bcc,stroke:#141413,color:#141413
+    style IPW_C fill:#d97757,stroke:#141413,color:#141413
+    style RESID fill:#6a9bcc,stroke:#141413,color:#141413
+    style CORRECT fill:#d97757,stroke:#141413,color:#141413
     style DR fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -788,8 +788,8 @@ graph LR
     RA --> DR
     IPW --> DR
 
-    style RA fill:#6a9bcc,stroke:#141413,color:#fff
-    style IPW fill:#d97757,stroke:#141413,color:#fff
+    style RA fill:#6a9bcc,stroke:#141413,color:#141413
+    style IPW fill:#d97757,stroke:#141413,color:#141413
     style DR fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -1088,8 +1088,8 @@ graph LR
     PRE -->|"Treated group<br/>change = effect + trend"| POST
     PRE -->|"Control group<br/>change = trend only"| POST
 
-    style PRE fill:#6a9bcc,stroke:#141413,color:#fff
-    style POST fill:#d97757,stroke:#141413,color:#fff
+    style PRE fill:#6a9bcc,stroke:#141413,color:#141413
+    style POST fill:#d97757,stroke:#141413,color:#141413
 ```
 
 ### 9.2 Why does DiD estimate ATT and not ATE?
@@ -1210,10 +1210,10 @@ graph TD
     IPW_W --> DRDID
 
     style DY fill:#141413,stroke:#00d4c8,color:#fff
-    style OR fill:#6a9bcc,stroke:#141413,color:#fff
-    style PS fill:#d97757,stroke:#141413,color:#fff
-    style RES fill:#6a9bcc,stroke:#141413,color:#fff
-    style IPW_W fill:#d97757,stroke:#141413,color:#fff
+    style OR fill:#6a9bcc,stroke:#141413,color:#141413
+    style PS fill:#d97757,stroke:#141413,color:#141413
+    style RES fill:#6a9bcc,stroke:#141413,color:#141413
+    style IPW_W fill:#d97757,stroke:#141413,color:#141413
     style DRDID fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

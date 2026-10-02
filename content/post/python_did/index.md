@@ -227,10 +227,10 @@ graph TB
     A -->|"Change in<br/>treated"| C
     B -->|"Change in<br/>control"| D
 
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 ### The DiD estimator
@@ -1263,13 +1263,16 @@ graph TD
     F -->|No| H["<b>Sun-Abraham / Stacked DiD</b><br/>SunAbraham() / StackedDiD()<br/><i>(not covered here)</i>"]
 
     style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#6a9bcc,stroke:#141413,color:#fff
-    style G fill:#00d4c8,stroke:#141413,color:#fff
-    style H fill:#d97757,stroke:#141413,color:#fff
+    classDef sty_B fill:#6a9bcc,stroke:#141413,color:#141413
+    class B sty_B
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    classDef sty_D fill:#6a9bcc,stroke:#141413,color:#141413
+    class D sty_D
+    style E fill:#00d4c8,stroke:#141413,color:#141413
+    classDef sty_F fill:#6a9bcc,stroke:#141413,color:#141413
+    class F sty_F
+    style G fill:#00d4c8,stroke:#141413,color:#141413
+    style H fill:#d97757,stroke:#141413,color:#141413
 ```
 
 The following table summarizes when to use each estimator:

@@ -91,9 +91,9 @@ graph LR
     E --> F["<b>Comparison</b><br/>Pooled vs<br/>group-specific"]
 
     style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
     style F fill:#1a3a8a,stroke:#141413,color:#fff
 ```

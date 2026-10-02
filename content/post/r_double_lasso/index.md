@@ -585,10 +585,14 @@ flowchart TD
     style Pred fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
     style O fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
     style L fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style Q1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q2 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q3 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style Q4 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    classDef sty_Q1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q2 sty_Q2
+    classDef sty_Q3 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    class Q3 sty_Q3
+    classDef sty_Q4 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    class Q4 sty_Q4
 ```
 
 The thresholds are rough. Fitzgerald et al. (2026) section 3.2 shows DL's advantage shrinks rapidly as $n$ grows at fixed $p$; by $n = 3{,}000$ in their Monte Carlo, OLS is essentially indistinguishable from DL. The $p / n > 0.3$ cutoff is informal — it corresponds to the regime where $(X'X)^{-1}$ starts having visible numerical instability — but it is a reasonable diagnostic.

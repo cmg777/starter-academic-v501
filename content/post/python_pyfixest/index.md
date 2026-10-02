@@ -404,9 +404,9 @@ graph LR
     A -->|"affects"| Y["<b>Y</b><br/>(outcome)"]
     X -->|"causal effect β = ?"| Y
     FE["<b>Fixed Effects</b><br/>(absorbs A)"] -.->|"blocks backdoor"| A
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style X fill:#6a9bcc,stroke:#141413,color:#fff
-    style Y fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style X fill:#6a9bcc,stroke:#141413,color:#141413
+    style Y fill:#00d4c8,stroke:#141413,color:#141413
     style FE fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
 ```
 
@@ -1218,13 +1218,13 @@ graph LR
     AB -.-> W
     MK -.->|"recovers γ"| ED
     MK -.->|"recovers γ"| RC
-    style ED fill:#d97757,stroke:#141413,color:#fff,stroke-dasharray: 5 5
-    style AB fill:#d97757,stroke:#141413,color:#fff,stroke-dasharray: 5 5
-    style RC fill:#d97757,stroke:#141413,color:#fff,stroke-dasharray: 5 5
-    style UN fill:#6a9bcc,stroke:#141413,color:#fff
-    style MA fill:#6a9bcc,stroke:#141413,color:#fff
-    style OC fill:#6a9bcc,stroke:#141413,color:#fff
-    style W fill:#00d4c8,stroke:#141413,color:#fff
+    style ED fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
+    style AB fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
+    style RC fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
+    style UN fill:#6a9bcc,stroke:#141413,color:#141413
+    style MA fill:#6a9bcc,stroke:#141413,color:#141413
+    style OC fill:#6a9bcc,stroke:#141413,color:#141413
+    style W fill:#00d4c8,stroke:#141413,color:#141413
     style MK fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
 ```
 

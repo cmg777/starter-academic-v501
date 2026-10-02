@@ -94,12 +94,12 @@ flowchart TD
     G --> I["Counterfactual post-1970 path"]
     H --> J["Gap = ATT estimate"]
     I --> J
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style G fill:#6a9bcc,stroke:#141413,color:#fff
-    style H fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style G fill:#6a9bcc,stroke:#141413,color:#141413
+    style H fill:#d97757,stroke:#141413,color:#141413
     style I fill:#f5f5f5,stroke:#141413,color:#141413,stroke-dasharray:5 5
-    style J fill:#00d4c8,stroke:#141413,color:#fff
+    style J fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 In words: the algorithm has two nested optimization problems. The inner problem finds the donor weights $W$ that best match the treated unit's pre-treatment predictors. The outer problem finds the predictor weights $V$ that, when fed back into the inner problem, produce the lowest pre-treatment outcome error. The dashed-border node represents the unobserved counterfactual --- the GDP path the Basque Country would have followed without conflict, which we estimate but never actually see. The result is a synthetic counterfactual whose pre-period fits the data tightly, so any post-period divergence is informative about the treatment.

@@ -210,9 +210,9 @@ graph LR
   E --> F[2xT event study<br/>2014 cohort dynamics]
   F --> G[GxT staggered design<br/>all 4 cohorts pooled]
   G --> H[HonestDiD<br/>parallel-trends sensitivity]
-  style A fill:#6a9bcc,stroke:#141413,color:#fff
-  style B fill:#d97757,stroke:#141413,color:#fff
-  style C fill:#d97757,stroke:#141413,color:#fff
+  style A fill:#6a9bcc,stroke:#141413,color:#141413
+  style B fill:#d97757,stroke:#141413,color:#141413
+  style C fill:#d97757,stroke:#141413,color:#141413
   style D fill:#1a3a8a,stroke:#141413,color:#fff
   style E fill:#1a3a8a,stroke:#141413,color:#fff
   style F fill:#00d4c8,stroke:#141413,color:#141413

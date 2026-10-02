@@ -95,11 +95,11 @@ graph LR
     F --> E["<b>Step 7</b><br/>Compare<br/>all six"]
 
     style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style G fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
+    style G fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#00d4c8,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
     style E fill:#1a3a8a,stroke:#141413,color:#fff
 ```
 
@@ -137,10 +137,10 @@ graph LR
     end
 
     classDef hidden fill:#0f1729,stroke:#d97757,color:#fff,stroke-dasharray: 4 3
-    style X1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style Y1 fill:#00d4c8,stroke:#141413,color:#fff
-    style X2 fill:#6a9bcc,stroke:#141413,color:#fff
-    style Y2 fill:#00d4c8,stroke:#141413,color:#fff
+    style X1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style Y1 fill:#00d4c8,stroke:#141413,color:#141413
+    style X2 fill:#6a9bcc,stroke:#141413,color:#141413
+    style Y2 fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 In **Figure 2A**, spatial context only touches $Y$ directly — there is no backdoor path from $X$ to $Y$ through $SC$, and MGWR's coefficient estimates can be read causally (under the usual exogeneity assumption). In **Figure 2B** — the realistic structure — $SC$ is a parent of *both* $X$ and $Y$. There is now a non-causal backdoor path $X \leftarrow SC \rightarrow Y$ that opens whenever $SC$ is left unconditioned-upon. That open path is what biases the MGWR estimates.

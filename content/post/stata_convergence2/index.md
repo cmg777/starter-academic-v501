@@ -93,8 +93,8 @@ graph LR
     B --> C
     C --> D
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#141413,stroke:#d97757,color:#fff
 ```

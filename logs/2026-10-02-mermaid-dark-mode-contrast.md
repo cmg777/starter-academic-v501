@@ -47,8 +47,29 @@ WCAG contrast probe on every node and edge label, dark mode, live (before) vs lo
 Remaining values near 3 are author-chosen inline fills (white text on steel blue or orange), not
 touched by this rule. Production build exit 0; `check_learn_cards.cjs` OK on python_panel_intro.
 
-## Open items (pre-existing, not changed)
+## Follow-up (same day): per-post source fixes, both themes
 
-- Light mode: unstyled decision diamonds in `python_double_lasso` (and similar posts) measure
-  contrast about 1.0 in light mode; §23 is dark-only.
-- Several posts use white text on `#6a9bcc` / `#d97757` fills (contrast about 2.7–3.1).
+Both items left open by the first pass are now fixed in the Mermaid source of each page, using a
+one-off script (idempotent; a second run changes nothing):
+
+- **Non-rectangular nodes with a `style` line.** In this Mermaid version a `style X fill:…` reaches
+  only rectangles; for diamonds (`{}`), circles, and other polygons the text color applied but the
+  fill did not, so light text sat on the default lavender (contrast 1.02 in light mode, for example
+  in `python_double_lasso`). 34 such `style` lines were converted to an equivalent
+  `classDef sty_X …` plus `class X sty_X`, which Mermaid applies to every shape.
+- **Text on styled fills below 4.5:1.** 490 `style`/`classDef` text colors were switched to
+  whichever of `#141413` or `#ffffff` contrasts more with the fill; the fills themselves are
+  unchanged. Almost all cases were white text on steel blue `#6a9bcc` (2.93), orange `#d97757`
+  (3.12), or teal `#00d4c8` (1.87); they now use `#141413` (5.9 to 12.3).
+- **Violet `#8b5cf6`** (DoWhy "Refute" box in `python_dowhy` and `python_dowhy_intro`) passes with
+  neither text color (4.35 / 4.23), so its fill was lightened to `#a78bfa` with dark text (5.9).
+- 67 files across 66 posts and one publication, including its ES and JA counterparts.
+
+Full audit afterwards: all 70 pages with Mermaid diagrams, every node and edge label, in dark and
+light mode on the local server. Every node is at least 5.90:1 and every edge label at least
+10.31:1 (light) / 15.08:1 (dark). Note for future audits: Hugo lowercases URLs (`/post/r_sdpdmod/`),
+and some diagrams put label text in a bare `div` (no `span.nodeLabel`), so a probe must read
+`foreignObject div`.
+
+Convention for new diagrams: prefer `classDef` over `style` for non-rectangular nodes, and pick text
+colors with at least 4.5:1 contrast against the fill (dark text on steel blue, orange, and teal).

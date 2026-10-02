@@ -131,12 +131,12 @@ graph LR
     B --> I
     C --> J
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
-    style G fill:#00d4c8,stroke:#141413,color:#fff
-    style J fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
+    style G fill:#00d4c8,stroke:#141413,color:#141413
+    style J fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 The key idea the diagram encodes is that one estimand — the ATT — threads through everything. The naive 2×2 is the cartoon version; TWFE and its event-study view are the workhorse; and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing. Each box maps onto a section below, and the gender finding (the teal "Empowerment" box) is where the analysis lands.

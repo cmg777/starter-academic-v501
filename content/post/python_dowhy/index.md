@@ -261,10 +261,10 @@ graph LR
     B --> C["<b>3. Estimate</b><br/>Compute the<br/>causal effect"]
     C --> D["<b>4. Refute</b><br/>Stress-test<br/>the result"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#8b5cf6,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    style D fill:#a78bfa,stroke:#141413,color:#141413
 ```
 
 Each step answers a specific question and builds on the previous one:
@@ -518,9 +518,9 @@ graph TD
     C -->|"affects"| Y["Outcome"]
     T -.->|"causal effect"| Y
 
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style T fill:#6a9bcc,stroke:#141413,color:#fff
-    style Y fill:#d97757,stroke:#141413,color:#fff
+    style C fill:#00d4c8,stroke:#141413,color:#141413
+    style T fill:#6a9bcc,stroke:#141413,color:#141413
+    style Y fill:#d97757,stroke:#141413,color:#141413
 ```
 
 - **Confounders** (common causes) --- A variable that affects *both* the treatment and the outcome. For example, prior earnings (`re74`) may influence whether someone enrolls in training *and* how much they earn later. Confounders create a spurious association between treatment and outcome. **You must adjust for confounders** to isolate the causal effect.
@@ -530,9 +530,9 @@ graph LR
     T["Treatment"] -->|"causes"| M["<b>Mediator</b><br/>(e.g., skills)"]
     M -->|"causes"| Y["Outcome"]
 
-    style T fill:#6a9bcc,stroke:#141413,color:#fff
-    style M fill:#00d4c8,stroke:#141413,color:#fff
-    style Y fill:#d97757,stroke:#141413,color:#fff
+    style T fill:#6a9bcc,stroke:#141413,color:#141413
+    style M fill:#00d4c8,stroke:#141413,color:#141413
+    style Y fill:#d97757,stroke:#141413,color:#141413
 ```
 
 - **Mediators** --- A variable that lies *on* the causal path from treatment to outcome. For example, if job training increases skills, and skills increase earnings, then `skills` is a mediator. **You should NOT adjust for mediators** --- doing so would block the very causal pathway you are trying to measure, attenuating or eliminating the estimated effect.
@@ -543,9 +543,9 @@ graph TD
     Y["Outcome"] -->|"affects"| Col
     T -.->|"causal effect"| Y
 
-    style T fill:#6a9bcc,stroke:#141413,color:#fff
-    style Col fill:#00d4c8,stroke:#141413,color:#fff
-    style Y fill:#d97757,stroke:#141413,color:#fff
+    style T fill:#6a9bcc,stroke:#141413,color:#141413
+    style Col fill:#00d4c8,stroke:#141413,color:#141413
+    style Y fill:#d97757,stroke:#141413,color:#141413
 ```
 
 - **Colliders** --- A variable that is *caused by* both the treatment and the outcome (or by variables on both sides). For example, if both training and high earnings make someone likely to appear in a follow-up survey, then `in_survey` is a collider. **You should NOT condition on colliders** --- doing so can create a spurious association between treatment and outcome even where none exists (a phenomenon called *collider bias* or *selection bias*).
@@ -653,14 +653,14 @@ graph TD
     DR_cat --> DR["AIPW"]
 
     style Root fill:#141413,stroke:#141413,color:#fff
-    style OM fill:#6a9bcc,stroke:#141413,color:#fff
-    style TM fill:#d97757,stroke:#141413,color:#fff
-    style DR_cat fill:#00d4c8,stroke:#141413,color:#fff
-    style RA fill:#6a9bcc,stroke:#141413,color:#fff
-    style IPW fill:#d97757,stroke:#141413,color:#fff
-    style PSS fill:#d97757,stroke:#141413,color:#fff
-    style PSM fill:#d97757,stroke:#141413,color:#fff
-    style DR fill:#00d4c8,stroke:#141413,color:#fff
+    style OM fill:#6a9bcc,stroke:#141413,color:#141413
+    style TM fill:#d97757,stroke:#141413,color:#141413
+    style DR_cat fill:#00d4c8,stroke:#141413,color:#141413
+    style RA fill:#6a9bcc,stroke:#141413,color:#141413
+    style IPW fill:#d97757,stroke:#141413,color:#141413
+    style PSS fill:#d97757,stroke:#141413,color:#141413
+    style PSM fill:#d97757,stroke:#141413,color:#141413
+    style DR fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 Understanding these paradigms helps clarify why different methods can give somewhat different estimates and why comparing across paradigms is a powerful robustness check. The key trade-offs are:

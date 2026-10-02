@@ -140,10 +140,10 @@ graph TD
     E --> F["<b>See it</b><br/>Residual plots, rescaled axes,<br/>and a second control"]
     F --> G["<b>Break it yourself</b><br/>Interactive lab: flip the sign,<br/>switch confounding off"]
     G --> H["<b>Beyond OLS</b><br/>Misconceptions, fixed effects,<br/>Double Machine Learning"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
     style F fill:#00d4c8,stroke:#141413,color:#141413
     style G fill:#c8d0e0,stroke:#141413,color:#141413
@@ -308,8 +308,8 @@ graph LR
     I -->|"Higher income<br/>→ more spending"| S["<b>Sales</b><br/>(monthly)"]
     C -->|"True causal<br/>effect: +0.2"| S
 
-    style I fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style I fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
     style S fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

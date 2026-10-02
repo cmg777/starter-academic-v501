@@ -206,9 +206,9 @@ graph LR
     C --> D["<b>Diagnostics</b><br/>prior predictive<br/>spillovers"]
     D --> E["<b>Cross-stage</b><br/>ATT comparison<br/>4 → 23 → 27 donors"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#1a3a8a,stroke:#141413,color:#fff
     style E fill:#141413,stroke:#6a9bcc,color:#fff
 ```

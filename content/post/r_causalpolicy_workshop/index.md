@@ -134,8 +134,8 @@ flowchart LR
     SRC5["Method 5: weighted blend of donor states"] -.-> CF
     SRC6["Method 6: Bayesian time-series fit on donors"] -.-> CF
 
-    style OBS fill:#d97757,stroke:#141413,color:#fff
-    style CF fill:#6a9bcc,stroke:#141413,color:#fff
+    style OBS fill:#d97757,stroke:#141413,color:#141413
+    style CF fill:#6a9bcc,stroke:#141413,color:#141413
     style EFF fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -160,15 +160,18 @@ flowchart TB
 
     NAIVE["Naive pre-post<br/>(this tutorial: §5)<br/><br/>Use only as a baseline.<br/>Never as a causal estimate."] -.->|"baseline for everyone"| Q1
 
-    style Q1 fill:#1f2b5e,stroke:#141413,color:#fff
-    style Q2 fill:#1f2b5e,stroke:#141413,color:#fff
-    style Q3 fill:#1f2b5e,stroke:#141413,color:#fff
-    style DiD fill:#6a9bcc,stroke:#141413,color:#fff
-    style SCM fill:#d97757,stroke:#141413,color:#fff
-    style CI fill:#d97757,stroke:#141413,color:#fff
-    style RDD fill:#6a9bcc,stroke:#141413,color:#fff
-    style ITS fill:#6a9bcc,stroke:#141413,color:#fff
-    style NAIVE fill:#7a8395,stroke:#141413,color:#fff
+    classDef sty_Q1 fill:#1f2b5e,stroke:#141413,color:#fff
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#1f2b5e,stroke:#141413,color:#fff
+    class Q2 sty_Q2
+    classDef sty_Q3 fill:#1f2b5e,stroke:#141413,color:#fff
+    class Q3 sty_Q3
+    style DiD fill:#6a9bcc,stroke:#141413,color:#141413
+    style SCM fill:#d97757,stroke:#141413,color:#141413
+    style CI fill:#d97757,stroke:#141413,color:#141413
+    style RDD fill:#6a9bcc,stroke:#141413,color:#141413
+    style ITS fill:#6a9bcc,stroke:#141413,color:#141413
+    style NAIVE fill:#7a8395,stroke:#141413,color:#141413
 ```
 
 The orange terminal nodes (Synthetic Control, CausalImpact) are the most defensible families when a donor pool exists — and they happen to be the methods that produce the consensus estimate later in this tutorial. The blue nodes are valid choices in their respective data situations but carry stronger identifying assumptions. The grey naive-pre-post node is the universal baseline that *everyone* should compute first — never as the final answer, always as the bias yardstick.
@@ -642,10 +645,10 @@ flowchart TB
     CA_d --> DD["DiD ATT =<br/>(−27.0) − (−21.3) = −5.7"]
     NV_d --> DD
 
-    style CA_pre fill:#d97757,stroke:#141413,color:#fff
-    style CA_post fill:#d97757,stroke:#141413,color:#fff
-    style NV_pre fill:#6a9bcc,stroke:#141413,color:#fff
-    style NV_post fill:#6a9bcc,stroke:#141413,color:#fff
+    style CA_pre fill:#d97757,stroke:#141413,color:#141413
+    style CA_post fill:#d97757,stroke:#141413,color:#141413
+    style NV_pre fill:#6a9bcc,stroke:#141413,color:#141413
+    style NV_post fill:#6a9bcc,stroke:#141413,color:#141413
     style DD fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -928,10 +931,10 @@ flowchart LR
     C --> D["4. generate_control()<br/>build synthetic California<br/>and post-period gap series"]
     D --> E["5. plot_/grab_ helpers<br/>trends, weights,<br/>placebos, MSPE ratio,<br/>Fisher exact p-value"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -1271,11 +1274,11 @@ flowchart TB
     ERR --> Y
     Y --> CMP["Observed y₁ₜ − ŷ₁ₜ<br/>= policy effect (with credible band)"]
 
-    style TREND fill:#6a9bcc,stroke:#141413,color:#fff
+    style TREND fill:#6a9bcc,stroke:#141413,color:#141413
     style REG fill:#00d4c8,stroke:#141413,color:#141413
-    style ERR fill:#7a8395,stroke:#141413,color:#fff
+    style ERR fill:#7a8395,stroke:#141413,color:#141413
     style Y fill:#1f2b5e,stroke:#141413,color:#fff
-    style CMP fill:#d97757,stroke:#141413,color:#fff
+    style CMP fill:#d97757,stroke:#141413,color:#141413
 ```
 
 The trend $\mu\_t$ absorbs the dynamics that no control series can explain; the regression term $\beta^\top x\_t$ borrows information from the donor pool. After the model is fit on $t \le t^*$, it is projected forward and the posterior over $y\_{1t} - \hat{y}\_{1t}$ gives the credible interval for the policy effect.

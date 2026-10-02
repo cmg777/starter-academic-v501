@@ -133,8 +133,8 @@ graph TD
     K --> M["OLS4: beta_price=-0.060<br/>beta_tax=-0.186"]
     K --> N["IV oil: beta_tax=-0.186<br/>tax response ~3x price response"]
     O["disentangling_data.dta"] --> P["Carbon-tax-only<br/>contribution"]
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
-    style H fill:#d97757,stroke:#141413,color:#fff
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    style H fill:#d97757,stroke:#141413,color:#141413
     style N fill:#00d4c8,stroke:#141413,color:#000
 ```
 

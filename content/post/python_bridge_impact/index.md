@@ -138,10 +138,10 @@ graph TD
     F --> G["<b>Robustness</b><br/>Placebos, HonestDiD,<br/>public-goods placebo"]
     G --> H["<b>Verdict</b><br/>Density rises, so backwash fails.<br/>Comparative advantage survives"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#00d4c8,stroke:#141413,color:#141413
     style F fill:#00d4c8,stroke:#141413,color:#141413
     style G fill:#141413,stroke:#141413,color:#fff
@@ -364,10 +364,10 @@ graph LR
     J1 --> ATT["<b>ATT</b><br/>treated change minus<br/>comparison change"]
     CF --> ATT
 
-    style J0 fill:#6a9bcc,stroke:#141413,color:#fff
-    style J1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style P0 fill:#d97757,stroke:#141413,color:#fff
-    style P1 fill:#d97757,stroke:#141413,color:#fff
+    style J0 fill:#6a9bcc,stroke:#141413,color:#141413
+    style J1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style P0 fill:#d97757,stroke:#141413,color:#141413
+    style P1 fill:#d97757,stroke:#141413,color:#141413
     style CF fill:#141413,stroke:#141413,color:#fff
     style ATT fill:#00d4c8,stroke:#141413,color:#141413
 ```
@@ -398,16 +398,18 @@ graph TD
     E2 -->|"Rose, plus 5.9 percent<br/>in the long run"| OUT3["<b>Backwash rejected</b><br/>Comparative advantage survives"]
 
     style Q fill:#141413,stroke:#141413,color:#fff
-    style T1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style T2 fill:#d97757,stroke:#141413,color:#fff
+    style T1 fill:#6a9bcc,stroke:#141413,color:#141413
+    style T2 fill:#d97757,stroke:#141413,color:#141413
     style T3 fill:#00d4c8,stroke:#141413,color:#141413
     style P1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
     style P2 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
     style P3 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style E1 fill:#141413,stroke:#141413,color:#fff
-    style E2 fill:#141413,stroke:#141413,color:#fff
-    style OUT1 fill:#d97757,stroke:#141413,color:#fff
-    style OUT2 fill:#d97757,stroke:#141413,color:#fff
+    classDef sty_E1 fill:#141413,stroke:#141413,color:#fff
+    class E1 sty_E1
+    classDef sty_E2 fill:#141413,stroke:#141413,color:#fff
+    class E2 sty_E2
+    style OUT1 fill:#d97757,stroke:#141413,color:#141413
+    style OUT2 fill:#d97757,stroke:#141413,color:#141413
     style OUT3 fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -1027,12 +1029,12 @@ graph TD
     NEG --> REG
     REG --> DR["<b>Doubly robust ATT</b><br/>consistent if EITHER the weight model<br/>OR the outcome model is right"]
 
-    style Z fill:#6a9bcc,stroke:#141413,color:#fff
-    style L fill:#6a9bcc,stroke:#141413,color:#fff
-    style P fill:#6a9bcc,stroke:#141413,color:#fff
-    style TR fill:#d97757,stroke:#141413,color:#fff
-    style W1 fill:#d97757,stroke:#141413,color:#fff
-    style NEG fill:#d97757,stroke:#141413,color:#fff
+    style Z fill:#6a9bcc,stroke:#141413,color:#141413
+    style L fill:#6a9bcc,stroke:#141413,color:#141413
+    style P fill:#6a9bcc,stroke:#141413,color:#141413
+    style TR fill:#d97757,stroke:#141413,color:#141413
+    style W1 fill:#d97757,stroke:#141413,color:#141413
+    style NEG fill:#d97757,stroke:#141413,color:#141413
     style W2 fill:#00d4c8,stroke:#141413,color:#141413
     style REG fill:#141413,stroke:#141413,color:#fff
     style DR fill:#00d4c8,stroke:#141413,color:#141413
@@ -1558,10 +1560,10 @@ graph LR
     E --> F["The regression runs on<br/>treated units only<br/>N = 868, 124 upazilas"]
     F --> G["<b>treat_yr = 1.064, se 0.710</b><br/>an unidentified number<br/>that still prints"]
 
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
     style E fill:#141413,stroke:#141413,color:#fff
     style F fill:#141413,stroke:#141413,color:#fff
     style G fill:#141413,stroke:#141413,color:#fff

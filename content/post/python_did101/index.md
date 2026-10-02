@@ -119,11 +119,11 @@ graph LR
     C --> D
     F --> G
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
-    style I fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
+    style I fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 The data has a clean **panel structure**: each of the 35 schools is observed in two time periods (pre and post), giving us 70 observations for the 2×2 design. A second dataset extends this to 8 periods (280 observations) for the event study analysis.

@@ -138,11 +138,11 @@ graph LR
     D --> H
     F --> I
 
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style H fill:#00d4c8,stroke:#141413,color:#fff
-    style I fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style H fill:#00d4c8,stroke:#141413,color:#141413
+    style I fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 Read the diagram left to right: the tsunami splits districts into treated and control; we observe two outcomes (district GDP and finer sub-district night-lights); and we deploy four causal tools — DiD and its event-study view, an independent synthetic control, and the spatial standard errors that keep our confidence honest. Each maps onto a section below.

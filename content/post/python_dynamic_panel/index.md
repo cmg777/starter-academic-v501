@@ -113,11 +113,11 @@ flowchart TD
     F --> G["System GMM, collapsed<br/>rho = 0.927 (SE 0.079)<br/>AR(2) p = 0.994, Hansen p = 0.462"]
     G --> H["Diagnostics + proliferation grid<br/>+ exact replication check"]
     style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style B fill:#999999,stroke:#141413,color:#fff
-    style C fill:#999999,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
+    style B fill:#999999,stroke:#141413,color:#141413
+    style C fill:#999999,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
     style E fill:#6a9bcc,stroke:#141413,color:#141413
-    style F fill:#d97757,stroke:#141413,color:#fff
+    style F fill:#d97757,stroke:#141413,color:#141413
     style G fill:#00d4c8,stroke:#141413,color:#141413
     style H fill:#1f2b5e,stroke:#6a9bcc,color:#fff
 ```

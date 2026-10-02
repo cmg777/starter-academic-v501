@@ -1562,9 +1562,12 @@ graph TD
     Q2 -->|"No, or the pre-fit is poor"| BSC["<b>Bayesian SC</b><br/>BSCM or scspill at rho=0<br/>extrapolation allowed"]
     Q3 -->|Yes| SAR["<b>Bayesian spatial SC</b><br/>SCSPILL method='sar'<br/>two estimands"]
     Q3 -->|"No, but you can name<br/>the affected units"| ALT["<b>Screen or net out</b><br/>SPOTSYNTH, ISCM<br/>SPILLSYNTH method='cd'"]
-    style Q1 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style Q2 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style Q3 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    classDef sty_Q1 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    class Q2 sty_Q2
+    classDef sty_Q3 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    class Q3 sty_Q3
     style SC fill:#6a9bcc,stroke:#6a9bcc,color:#141413
     style BSC fill:#1a3a8a,stroke:#1a3a8a,color:#e8ecf2
     style SAR fill:#00d4c8,stroke:#00d4c8,color:#141413

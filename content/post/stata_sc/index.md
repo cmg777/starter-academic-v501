@@ -97,12 +97,12 @@ graph TD
     SCM --> TIME
     SCM --> LOO
 
-    style DATA fill:#6a9bcc,stroke:#141413,color:#fff
-    style RAW fill:#6a9bcc,stroke:#141413,color:#fff
-    style SCM fill:#d97757,stroke:#141413,color:#fff
-    style SPACE fill:#00d4c8,stroke:#141413,color:#fff
-    style TIME fill:#00d4c8,stroke:#141413,color:#fff
-    style LOO fill:#00d4c8,stroke:#141413,color:#fff
+    style DATA fill:#6a9bcc,stroke:#141413,color:#141413
+    style RAW fill:#6a9bcc,stroke:#141413,color:#141413
+    style SCM fill:#d97757,stroke:#141413,color:#141413
+    style SPACE fill:#00d4c8,stroke:#141413,color:#141413
+    style TIME fill:#00d4c8,stroke:#141413,color:#141413
+    style LOO fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 The baseline SCM (orange) produces the core treatment effect estimate. The three inference tools (teal) each test the estimate's credibility from a different angle: the in-space placebo asks "is this effect unusual compared to other states?", the in-time placebo asks "does a fake treatment produce similar results?", and the leave-one-out analysis asks "does any single donor state drive the results?"

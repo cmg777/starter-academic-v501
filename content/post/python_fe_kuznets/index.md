@@ -91,12 +91,12 @@ graph TD
     E --> F["<b>Turning Points</b><br/>3 development phases"]
     E --> G["<b>Determinants</b><br/>What drives inequality?"]
     G --> H["<b>Robustness</b><br/>Coefficient stability"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#d97757,stroke:#141413,color:#141413
+    style E fill:#00d4c8,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
     style G fill:#1a3a8a,stroke:#141413,color:#fff
     style H fill:#1a3a8a,stroke:#141413,color:#fff
 ```

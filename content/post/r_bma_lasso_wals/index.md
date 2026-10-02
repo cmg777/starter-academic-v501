@@ -82,9 +82,9 @@ graph TD
     WALS["<b>WALS</b><br/>Frequentist averaging<br/>t-statistics"] --> R
 
     style Q fill:#141413,stroke:#141413,color:#fff
-    style BMA fill:#6a9bcc,stroke:#141413,color:#fff
-    style LASSO fill:#d97757,stroke:#141413,color:#fff
-    style WALS fill:#00d4c8,stroke:#141413,color:#fff
+    style BMA fill:#6a9bcc,stroke:#141413,color:#141413
+    style LASSO fill:#d97757,stroke:#141413,color:#141413
+    style WALS fill:#00d4c8,stroke:#141413,color:#141413
     style R fill:#1a3a8a,stroke:#141413,color:#fff
 ```
 

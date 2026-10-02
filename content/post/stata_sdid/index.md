@@ -163,8 +163,8 @@ graph LR
     SYN["<b>Synthetic California</b><br/>counterfactual Y(0)"]
     POOL -->|weighted average ω| SYN
     CA -->|compare after 1989| SYN
-    style POOL fill:#6a9bcc,stroke:#141413,color:#fff
-    style CA fill:#d97757,stroke:#141413,color:#fff
+    style POOL fill:#6a9bcc,stroke:#141413,color:#141413
+    style CA fill:#d97757,stroke:#141413,color:#141413
     style SYN fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -245,8 +245,8 @@ graph TD
     OBJ --> SC["<b>Synthetic control</b><br/>ω optimized, no λ<br/><b>no</b> unit FE α<br/><i>match level AND trend</i>"]
     OBJ --> SDID["<b>SDID</b><br/>ω optimized + λ optimized<br/>α included<br/><i>match trend, allow level gap</i>"]
     style OBJ fill:#141413,stroke:#6a9bcc,color:#fff
-    style DID fill:#d97757,stroke:#141413,color:#fff
-    style SC fill:#6a9bcc,stroke:#141413,color:#fff
+    style DID fill:#d97757,stroke:#141413,color:#141413
+    style SC fill:#6a9bcc,stroke:#141413,color:#141413
     style SDID fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -475,11 +475,12 @@ graph TD
     Q -->|"Many — e.g. staggered adoption"| BJ["Bootstrap or jackknife<br/><i>asymptotics in number of treated units</i>"]
     PL --> THIS["this tutorial<br/>vce(placebo)"]
     BJ --> OOS["out of scope<br/>(needs another design)"]
-    style Q fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef sty_Q fill:#141413,stroke:#6a9bcc,color:#fff
+    class Q sty_Q
     style PL fill:#00d4c8,stroke:#141413,color:#141413
-    style THIS fill:#6a9bcc,stroke:#141413,color:#fff
-    style BJ fill:#6a9bcc,stroke:#141413,color:#fff
-    style OOS fill:#d97757,stroke:#141413,color:#fff
+    style THIS fill:#6a9bcc,stroke:#141413,color:#141413
+    style BJ fill:#6a9bcc,stroke:#141413,color:#141413
+    style OOS fill:#d97757,stroke:#141413,color:#141413
 ```
 
 So we run placebo inference, the appropriate choice for a comparative case study.

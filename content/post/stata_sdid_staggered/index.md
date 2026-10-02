@@ -98,13 +98,13 @@ graph TD
         S3["cohorts 2003 to 2013"] --> SATT
         SC["110 never-treated<br/>controls"] -.donor pool.-> SATT
     end
-    style B1 fill:#d97757,stroke:#141413,color:#fff
-    style B2 fill:#6a9bcc,stroke:#141413,color:#fff
+    style B1 fill:#d97757,stroke:#141413,color:#141413
+    style B2 fill:#6a9bcc,stroke:#141413,color:#141413
     style BATT fill:#00d4c8,stroke:#141413,color:#141413
-    style S1 fill:#d97757,stroke:#141413,color:#fff
-    style S2 fill:#d97757,stroke:#141413,color:#fff
-    style S3 fill:#d97757,stroke:#141413,color:#fff
-    style SC fill:#6a9bcc,stroke:#141413,color:#fff
+    style S1 fill:#d97757,stroke:#141413,color:#141413
+    style S2 fill:#d97757,stroke:#141413,color:#141413
+    style S3 fill:#d97757,stroke:#141413,color:#141413
+    style SC fill:#6a9bcc,stroke:#141413,color:#141413
     style SATT fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
@@ -370,10 +370,10 @@ graph LR
     POOL --> C1 --> T1 --> ATT
     POOL --> C2 --> T2 --> ATT
     POOL --> CD --> TD --> ATT
-    style POOL fill:#6a9bcc,stroke:#141413,color:#fff
-    style C1 fill:#d97757,stroke:#141413,color:#fff
-    style C2 fill:#d97757,stroke:#141413,color:#fff
-    style CD fill:#d97757,stroke:#141413,color:#fff
+    style POOL fill:#6a9bcc,stroke:#141413,color:#141413
+    style C1 fill:#d97757,stroke:#141413,color:#141413
+    style C2 fill:#d97757,stroke:#141413,color:#141413
+    style CD fill:#d97757,stroke:#141413,color:#141413
     style T1 fill:#1f2b5e,stroke:#6a9bcc,color:#fff
     style T2 fill:#1f2b5e,stroke:#6a9bcc,color:#fff
     style TD fill:#1f2b5e,stroke:#6a9bcc,color:#fff
@@ -514,14 +514,16 @@ graph TD
     ALL --> BOOT["bootstrap<br/>SE 4.7 (default)"]
     ALL --> JACK["jackknife<br/>SE 6.0 (most conservative)"]
     ALL --> PLAC["placebo<br/>SE 2.3 (homoskedastic)"]
-    style Q1 fill:#141413,stroke:#6a9bcc,color:#fff
-    style Q2 fill:#141413,stroke:#6a9bcc,color:#fff
-    style PL1 fill:#d97757,stroke:#141413,color:#fff
-    style PL2 fill:#d97757,stroke:#141413,color:#fff
+    classDef sty_Q1 fill:#141413,stroke:#6a9bcc,color:#fff
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#141413,stroke:#6a9bcc,color:#fff
+    class Q2 sty_Q2
+    style PL1 fill:#d97757,stroke:#141413,color:#141413
+    style PL2 fill:#d97757,stroke:#141413,color:#141413
     style ALL fill:#00d4c8,stroke:#141413,color:#141413
-    style BOOT fill:#6a9bcc,stroke:#141413,color:#fff
-    style JACK fill:#6a9bcc,stroke:#141413,color:#fff
-    style PLAC fill:#6a9bcc,stroke:#141413,color:#fff
+    style BOOT fill:#6a9bcc,stroke:#141413,color:#141413
+    style JACK fill:#6a9bcc,stroke:#141413,color:#141413
+    style PLAC fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 ```stata

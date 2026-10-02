@@ -242,12 +242,12 @@ graph LR
     D --> E["Fixed Effects<br/>Flights<br/>(Section 7)"]
     E --> F["Panel Data<br/>Wages<br/>(Section 8)"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
-    style F fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style D fill:#00d4c8,stroke:#141413,color:#141413
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    style F fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 We start where the answer is known (simulated data), see the result with `scatterfit`, verify manually, then apply the same tool to real flights data and panel wage data.
@@ -287,9 +287,9 @@ graph TD
     Income -->|"+0.3<br/>(rich areas<br/>buy more)"| Sales
     Coupons -->|"+0.2<br/>(true causal<br/>effect)"| Sales
 
-    style Income fill:#d97757,stroke:#141413,color:#fff
-    style Coupons fill:#6a9bcc,stroke:#141413,color:#fff
-    style Sales fill:#00d4c8,stroke:#141413,color:#fff
+    style Income fill:#d97757,stroke:#141413,color:#141413
+    style Coupons fill:#6a9bcc,stroke:#141413,color:#141413
+    style Sales fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 The arrows in this diagram show causal relationships, and the numbers are the true effect sizes in the data generating process. The true causal effect of coupons on sales is **+0.2**, but income opens a **backdoor path** --- an indirect route from coupons to sales that goes *through* income (coupons $\leftarrow$ income $\rightarrow$ sales). Unless we block this path by controlling for income, the naive estimate will be biased downward.

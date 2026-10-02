@@ -85,8 +85,8 @@ flowchart LR
     U -->|"bias OLS"| Y
     Z -.->|"exclusion restriction:<br/>no direct arrow"| Y
 
-    style Z fill:#6a9bcc,stroke:#141413,color:#fff
-    style X fill:#d97757,stroke:#141413,color:#fff
+    style Z fill:#6a9bcc,stroke:#141413,color:#141413
+    style X fill:#d97757,stroke:#141413,color:#141413
     style Y fill:#00d4c8,stroke:#141413,color:#141413
     style U fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
 ```

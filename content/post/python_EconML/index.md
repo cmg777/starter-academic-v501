@@ -321,11 +321,11 @@ flowchart LR
 
     A --> B --> C --> D --> E
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
-    classDef first fill:#d97757,stroke:#141413,color:#fff
+    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef first fill:#d97757,stroke:#141413,color:#141413
     classDef resid fill:#00d4c8,stroke:#141413,color:#141413
     classDef forest fill:#141413,stroke:#d97757,color:#fff
-    classDef cate fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef cate fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 

@@ -251,11 +251,11 @@ graph LR
     C --> D
     D --> E
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
     style D fill:#141413,stroke:#d97757,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 We first establish non-spatial benchmarks to understand the baseline price and income elasticities. Then we introduce the Spatial Durbin Model to capture spillovers, apply Wald tests to check whether a simpler spatial specification suffices, and finally add dynamic components to account for the habit-forming nature of cigarette consumption.
@@ -527,8 +527,8 @@ graph TD
     SDM -->|"θ + ρβ = 0?"| SEM
 
     style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SAR fill:#6a9bcc,stroke:#141413,color:#fff
-    style SLX fill:#d97757,stroke:#141413,color:#fff
+    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
+    style SLX fill:#d97757,stroke:#141413,color:#141413
     style SEM fill:#141413,stroke:#d97757,color:#fff
 ```
 
@@ -735,9 +735,9 @@ graph TD
     SDM -->|"chi2 = 8.49"| SEM
 
     style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SAR fill:#d97757,stroke:#141413,color:#fff
-    style SLX fill:#d97757,stroke:#141413,color:#fff
-    style SEM fill:#d97757,stroke:#141413,color:#fff
+    style SAR fill:#d97757,stroke:#141413,color:#141413
+    style SLX fill:#d97757,stroke:#141413,color:#141413
+    style SEM fill:#d97757,stroke:#141413,color:#141413
 ```
 
 All three Wald tests reject the restricted models. The SDM cannot be simplified to SAR (neighbors' X variables matter), SLX (the autoregressive feedback matters), or SEM (the spatial dependence is substantive, not a nuisance). The **full SDM is the appropriate specification** for modeling cigarette demand across US states. This result confirms that spatial spillovers in cigarette consumption operate through multiple channels simultaneously: direct cross-border effects of neighbors' prices and incomes, and feedback effects through the spatial lag of consumption itself.

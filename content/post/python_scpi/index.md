@@ -255,9 +255,9 @@ flowchart LR
     E --> F["Post-1990 gap =<br/>Treatment effect τ"]
     A --> F
 
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
     style F fill:#00d4c8,stroke:#141413,color:#141413
     style B fill:#1f2b5e,stroke:#6a9bcc,color:#c8d0e0
     style D fill:#1f2b5e,stroke:#6a9bcc,color:#c8d0e0

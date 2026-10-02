@@ -255,13 +255,13 @@ graph LR
 
     A --> B --> C --> D --> E --> F --> G
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#d97757,stroke:#141413,color:#fff
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#d97757,stroke:#141413,color:#141413
     style F fill:#00d4c8,stroke:#141413,color:#141413
-    style G fill:#6a9bcc,stroke:#141413,color:#fff
+    style G fill:#6a9bcc,stroke:#141413,color:#141413
 ```
 
 We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we show how to extract the speed of convergence from OLS output using a straightforward algebraic conversion. We then introduce Nonlinear Least Squares (NLS) as a direct estimation method and compare the two approaches. A pedagogical introduction to rolling windows starts with the raw OLS coefficient $\lambda$ before progressing to the structural $\beta$, including a full walkthrough of how confidence intervals are constructed and transformed. We then shift from beta to sigma convergence, show why one does not imply the other, and track the income distribution over time. Finally, convergence heatmaps covering every possible time window provide the most comprehensive robustness check.
@@ -634,11 +634,11 @@ graph TD
     R4 --> P
     R5 --> P
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
-    style P fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    style P fill:#d97757,stroke:#141413,color:#141413
 ```
 
 We start with the simplest rolling window: the raw OLS slope coefficient $\lambda$. This requires nothing beyond the `reg` command we already know.

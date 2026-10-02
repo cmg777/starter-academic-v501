@@ -242,13 +242,13 @@ graph LR
     D --> E["Dynamic SDM<br/>(Section 9)"]
     E --> F["Impact<br/>Decomposition<br/>(Section 10)"]
 
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
+    style A fill:#6a9bcc,stroke:#141413,color:#141413
+    style B fill:#d97757,stroke:#141413,color:#141413
     style B2 fill:#141413,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#d97757,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
+    style C fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#d97757,stroke:#141413,color:#141413
+    style F fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 Each stage builds on the previous one. The Bayesian comparison tells us *which* model family fits the data best. The static models establish baseline spatial effects. The dynamic models add habit persistence and separate short-run from long-run responses. The impact decomposition translates all of this into policy-relevant direct and spillover effects.
@@ -453,14 +453,14 @@ graph TD
     SEM -->|"λ = 0"| OLS
     SLX -->|"θ = 0"| OLS
 
-    style SDM fill:#d97757,stroke:#141413,color:#fff
-    style SAR fill:#6a9bcc,stroke:#141413,color:#fff
-    style SEM fill:#6a9bcc,stroke:#141413,color:#fff
-    style SDEM fill:#6a9bcc,stroke:#141413,color:#fff
-    style SLX fill:#6a9bcc,stroke:#141413,color:#fff
+    style SDM fill:#d97757,stroke:#141413,color:#141413
+    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
+    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
+    style SDEM fill:#6a9bcc,stroke:#141413,color:#141413
+    style SLX fill:#6a9bcc,stroke:#141413,color:#141413
     style OLS fill:#141413,stroke:#141413,color:#fff
-    style GNS fill:#00d4c8,stroke:#141413,color:#fff
-    style SAC fill:#00d4c8,stroke:#141413,color:#fff
+    style GNS fill:#00d4c8,stroke:#141413,color:#141413
+    style SAC fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 | Model | Equation | Key Parameters | Interpretation |

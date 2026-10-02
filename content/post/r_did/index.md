@@ -339,11 +339,11 @@ graph TD
     A -->|"ΔY treated"| C
     B -->|"ΔY control"| D
     C -.->|"ATT = ΔY treated − ΔY control"| E["Causal Effect"]
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
+    style A fill:#d97757,stroke:#141413,color:#141413
+    style C fill:#d97757,stroke:#141413,color:#141413
+    style B fill:#6a9bcc,stroke:#141413,color:#141413
+    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style E fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 In the textbook case with exactly two periods and two groups, the TWFE regression $Y\_{it} = \theta\_t + \eta\_i + \alpha D\_{it} + v\_{it}$ delivers an estimate of $\alpha$ that is numerically identical to the simple DID estimator, even in the presence of treatment effect heterogeneity. Here, $\theta\_t$ represents time fixed effects (captured by `year` in the regression), $\eta\_i$ represents unit fixed effects (captured by `id`), $D\_{it}$ is the treatment indicator (`post`), and $v\_{it}$ are idiosyncratic unobservables.

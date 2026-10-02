@@ -213,14 +213,14 @@ flowchart TD
   F --> G
   G --> H["Steps 8–10<br/>Bandwidth, parametric,<br/>nonparametric on real data"]
   H --> I["Result<br/>−5.78% parametric<br/>−20.6% nonparametric (bin 1)"]
-  style A fill:#6a9bcc,stroke:#141413,color:#fff
-  style B fill:#6a9bcc,stroke:#141413,color:#fff
-  style C fill:#d97757,stroke:#141413,color:#fff
-  style D fill:#6a9bcc,stroke:#141413,color:#fff
-  style E fill:#d97757,stroke:#141413,color:#fff
+  style A fill:#6a9bcc,stroke:#141413,color:#141413
+  style B fill:#6a9bcc,stroke:#141413,color:#141413
+  style C fill:#d97757,stroke:#141413,color:#141413
+  style D fill:#6a9bcc,stroke:#141413,color:#141413
+  style E fill:#d97757,stroke:#141413,color:#141413
   style F fill:#00d4c8,stroke:#141413,color:#141413
-  style G fill:#d97757,stroke:#141413,color:#fff
-  style H fill:#6a9bcc,stroke:#141413,color:#fff
+  style G fill:#d97757,stroke:#141413,color:#141413
+  style H fill:#6a9bcc,stroke:#141413,color:#141413
   style I fill:#00d4c8,stroke:#141413,color:#141413
 ```
 

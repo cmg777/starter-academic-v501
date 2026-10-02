@@ -99,10 +99,10 @@ flowchart TB
     E --> F6["estat classification<br/>top vs bottom profile"]:::post
     E --> F7["estat series<br/>smooth derivative"]:::post
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
     classDef main fill:#141413,stroke:#141413,color:#fff
-    classDef po fill:#6a9bcc,stroke:#141413,color:#fff
-    classDef aipw fill:#d97757,stroke:#141413,color:#fff
+    classDef po fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef aipw fill:#d97757,stroke:#141413,color:#141413
     classDef iate fill:#00d4c8,stroke:#141413,color:#141413
     classDef post fill:#f5f5f5,stroke:#141413,color:#141413
 ```
