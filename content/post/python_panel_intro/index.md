@@ -20,6 +20,10 @@ links:
   - icon: youtube
     icon_pack: fab
     name: "Video overview"
+    url: https://www.youtube.com/watch?v=qYAOHnH3g8g
+  - icon: youtube
+    icon_pack: fab
+    name: "Video overview (2)"
     url: https://www.youtube.com/watch?v=pkBumNyJ_ss
   - icon: chalkboard-teacher
     icon_pack: fas
