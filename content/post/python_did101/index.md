@@ -69,7 +69,7 @@ diagram: true
 
 ## Abstract
 
-Evaluating whether an educational intervention works is complicated by the fact that outcomes often drift upward for reasons unrelated to the program, so a simple before-after comparison conflates the treatment effect with secular trends. This tutorial introduces the Difference-in-Differences (DiD) design in Python as a way to recover the causal effect of an after-school tutoring program on student performance. It uses the simulated case study from Corral and Yang (2024), in which 10 of 35 high schools in one region adopt a tutoring program, with the outcome being the average GPA of low-income students on a 0–100 scale; the 2×2 dataset has 70 observations (35 schools over 2 periods) and an event-study extension reaches 280 observations across 8 periods. Estimation proceeds through manual 2×2 double differencing, classical OLS with a treated×post interaction, and two-way fixed effects (TWFE) using the PyFixest package, comparing iid, HC1, CRV1, and CRV3 standard errors and building publication-quality tables with etable() and Great Tables. The naive before-after change of 36.20 GPA points overstates the effect by 43%, because 10.88 points reflect a region-wide trend; DiD isolates an ATT of 25.32 points, stable across specifications (25.315 to 25.328) with R² near 0.995, and the event study shows insignificant pre-trends (0.34, -0.32, 0.59) alongside an immediate, sustained post-treatment effect of 24.71 to 25.70. The results demonstrate that a credible comparison group and clean research design, rather than the choice of variance estimator, drive valid causal conclusions.
+Evaluating whether an educational intervention works is complicated by the fact that outcomes often drift upward for reasons unrelated to the program, so a simple before-after comparison conflates the treatment effect with secular trends. This tutorial introduces the Difference-in-Differences (DiD) design in Python as a way to recover the causal effect of an after-school tutoring program on student performance. It uses the simulated case study from Corral and Yang (2024), in which 10 of 35 high schools in one region adopt a tutoring program, with the outcome being the average GPA of low-income students on a 0–100 scale; the 2×2 dataset has 70 observations (35 schools over 2 periods) and an event-study extension reaches 280 observations across 8 periods. Estimation proceeds through manual 2×2 double differencing, classical OLS with a treated×post interaction, and two-way fixed effects (TWFE) using the PyFixest package, comparing iid, HC1, CRV1, and CRV3 standard errors and building publication-quality tables with etable() and Great Tables. The naive before-after change of 36.20 GPA points overstates the effect by 43%, because 10.88 points reflect a region-wide trend; DiD isolates an ATT of 25.32 points, stable across specifications (25.315 to 25.328) with R² near 0.995, and the event study shows small, statistically insignificant pre-period coefficients (0.34, −0.32, 0.59), consistent with (though not proof of) parallel trends, alongside a post-treatment effect that appears in the first treated period and stays roughly flat at 24.71 to 25.70. The results demonstrate that a credible comparison group and clean research design, rather than the choice of variance estimator, drive valid causal conclusions.
 
 ## 1. Overview
 
@@ -77,7 +77,7 @@ How much does an after-school tutoring program improve student performance? A sc
 
 Not quite. Over the same period, GPA also rose in the 25 schools that *did not* receive the program — from **71.22** to **82.10**. Some of the improvement in tutored schools simply reflects a region-wide upward trend. **Difference-in-Differences (DiD)** strips away that common trend and reveals the tutoring program's true causal effect: an **ATT of approximately 25.32 GPA points**.
 
-This tutorial walks through DiD estimation in Python using [PyFixest](https://pyfixest.org/) — a fast, Stata-flavored econometrics package — alongside [Great Tables](https://posit-dev.github.io/great-tables/) for publication-quality output. We use the simulated case study from [Corral and Yang (2024)](https://doi.org/10.1007/s12564-024-09984-9), the same dataset used in the [Stata companion tutorial](/post/stata_did/).
+This tutorial walks through DiD estimation in Python using [PyFixest](https://pyfixest.org/) — a fast, Stata-flavored econometrics package — alongside [Great Tables](https://posit-dev.github.io/great-tables/) for publication-quality output. We use the simulated case study from [Corral and Yang (2024)](https://doi.org/10.1007/s12564-024-09959-0), the same dataset used in the [Stata companion tutorial](/post/stata_did/).
 
 ### 1.1 Learning objectives
 
@@ -163,7 +163,7 @@ The identifying assumption: in the absence of treatment, the treated and control
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-The simulation generates data with parallel pre-trends by construction. In the 8-period extension, the event-study leads (`lead-1`, `lead-2`, etc.) are all near zero — no pre-treatment divergence between treated and control schools. The assumption holds visually and statistically.
+The simulation generates data with parallel pre-trends by construction. In the 8-period extension, the pre-treatment event-study coefficients ($t = -4, -3, -2$) are small (0.34, −0.32, 0.59) and statistically insignificant; $t = -1$ is the reference period, so it is zero by construction. The data are *consistent with* parallel trends, but no test can prove the assumption: it is a claim about the treated schools' unobserved post-period counterfactual.
 
 </details>
 
@@ -220,7 +220,7 @@ The regression implementation of DiD with multiple periods or multiple groups. I
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. With more periods, TWFE generalizes naturally; the manual 2×2 does not.
+The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. TWFE extends mechanically to more periods, which the manual 2×2 does not. One warning: with *staggered* adoption and effects that differ across adoption cohorts or over time, TWFE can be badly biased (see Section 13.2). With a single adoption date, as here, it is fine.
 
 </details>
 
@@ -239,7 +239,7 @@ A dynamic specification that estimates a separate treatment effect for each peri
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-The 8-period event-study specification returns near-zero coefficients for the pre-treatment leads and large positive coefficients for post-treatment lags. The post-treatment effects grow modestly over time, suggesting the program's benefit accumulates.
+The 8-period event-study specification returns near-zero coefficients for the pre-treatment leads and large positive coefficients for the post-treatment lags. The post-treatment coefficients stay roughly flat (25.03, 24.71, 24.77, 25.70): the effect appears in the first treated period and neither builds up nor fades.
 
 </details>
 
@@ -277,7 +277,7 @@ Two parts. (a) *No interference*: one unit's treatment status does not affect an
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-SUTVA assumes that one school's tutoring program does not boost or depress neighbouring schools' `gpa` (no interference) and that all 10 treated schools received the *same* program (single version). The simulation enforces both by construction; in field data, both are testable concerns.
+SUTVA assumes that one school's tutoring program does not boost or depress neighbouring schools' `gpa` (no interference) and that all 10 treated schools received the *same* program (single version). The simulation enforces both by construction. In field data, SUTVA is mostly argued from institutional knowledge (how students are assigned to schools, whether tutors or funds were shared). Spillovers can sometimes be probed, for example by comparing untreated schools near and far from treated ones, but SUTVA cannot be fully tested.
 
 </details>
 
@@ -288,6 +288,1064 @@ No contagion between patients. Patient A taking the drug should not affect Patie
 
 </details>
 </div>
+
+---
+
+## 2. Setup and Imports
+
+Install the required packages. The versions below are the ones that produced every output in this post:
+
+```bash
+pip install pyfixest==0.50.1 great_tables==0.21.0 pandas==2.2.2 numpy==1.26.4 matplotlib==3.9.2
+```
+
+Pinning matters here. PyFixest evolves quickly: other releases label coefficients differently (for example `timeToTreat::-4.0` instead of `C(timeToTreat, contr.treatment(base=-1))[T.-4.0]`) or reject formula syntax that older releases accepted. Exporting a Great Tables table to PNG with `.save()` also needs `selenium` and a Chrome browser.
+
+Import the libraries:
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import pyfixest as pf
+from great_tables import GT, md, style, loc
+```
+
+| Package | Purpose |
+|---------|---------|
+| `pyfixest` | Fast fixed-effects estimation with Stata-like formula syntax |
+| `great_tables` | Publication-quality HTML/PNG tables from DataFrames |
+| `pandas` | Data loading, manipulation, and summary statistics |
+| `matplotlib` | Custom figure generation with dark theme styling |
+
+<details>
+<summary><strong>Dark theme figure styling</strong> (click to expand)</summary>
+
+```python
+# Site color palette
+STEEL_BLUE = "#6a9bcc"
+WARM_ORANGE = "#d97757"
+NEAR_BLACK = "#141413"
+TEAL = "#00d4c8"
+
+# Dark theme palette
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
+
+plt.rcParams.update({
+    "figure.facecolor": DARK_NAVY,
+    "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY,
+    "axes.linewidth": 0,
+    "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "axes.spines.bottom": False,
+    "axes.grid": True,
+    "grid.color": GRID_LINE,
+    "grid.linewidth": 0.6,
+    "grid.alpha": 0.8,
+    "xtick.color": LIGHT_TEXT,
+    "ytick.color": LIGHT_TEXT,
+    "text.color": WHITE_TEXT,
+    "font.size": 12,
+    "legend.frameon": False,
+    "savefig.facecolor": DARK_NAVY,
+})
+```
+
+</details>
+
+
+## 3. Data Loading and Exploration
+
+We load the 2×2 dataset directly from GitHub. This Stata `.dta` file contains 35 schools observed across 2 time periods:
+
+```python
+url_did = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_did.dta"
+df = pd.read_stata(url_did).astype(float)
+print(df.shape)
+print(df.dtypes)
+```
+
+```text
+(70, 7)
+
+id              float64
+time            float64
+treated         float64
+post            float64
+txp             float64
+gpa             float64
+female_share    float64
+dtype: object
+```
+
+The dataset has **70 observations** (35 schools × 2 periods) and **7 variables**:
+
+- `id` — School identifier (1–35)
+- `time` — Time period (1 = pre, 2 = post)
+- `treated` — Treatment indicator (1 = received tutoring program)
+- `post` — Post-period indicator (1 = after program implementation)
+- `txp` — Interaction term (treated × post)
+- `gpa` — Outcome: average GPA of low-income students (0–100 scale)
+- `female_share` — Share of female students (covariate)
+
+```python
+print(df.describe().round(2))
+```
+
+```text
+          id  time  treated  post    txp    gpa  female_share
+count  70.00  70.0    70.00  70.0  70.00  70.00         70.00
+mean   18.00   1.5     0.29   0.5   0.14  77.12          0.53
+std    10.17   0.5     0.46   0.5   0.35  10.88          0.03
+min     1.00   1.0     0.00   0.0   0.00  59.39          0.47
+25%     9.25   1.0     0.00   0.0   0.00  70.68          0.51
+50%    18.00   1.5     0.00   0.5   0.00  76.27          0.53
+75%    26.75   2.0     1.00   1.0   0.00  82.66          0.55
+max    35.00   2.0     1.00   1.0   1.00  99.15          0.57
+```
+
+A crosstab confirms the balanced 2×2 design:
+
+```python
+ct = pd.crosstab(df["treated"], df["post"], margins=True)
+ct.index = ["Comparison (0)", "Treated (1)", "Total"]
+ct.columns = ["Pre (0)", "Post (1)", "Total"]
+print(ct)
+```
+
+```text
+                Pre (0)  Post (1)  Total
+Comparison (0)       25        25     50
+Treated (1)          10        10     20
+Total                35        35     70
+```
+
+We have **10 treated schools** observed in 2 periods (20 observations) and **25 comparison schools** (50 observations). This is a perfectly balanced panel — every school appears exactly once in each period.
+
+### 3.1 Panel structure visualization
+
+The heatmap below shows the treatment assignment across schools and time. Steel blue cells represent the comparison group, while orange cells indicate treated schools in the post-program period.
+
+![Panel structure showing 35 schools across 2 time periods. Treated schools (10) switch from light orange to dark orange after the intervention, while comparison schools (25) remain in steel blue.](did101_panelview.png)
+
+This is a *clean* 2×2 design: treatment timing is simultaneous (all 10 schools receive the program at the same time), and treatment is an absorbing state: once a school starts the program it stays treated, and no comparison school ever adopts it.
+
+
+## 4. The Problem with Naive Comparisons
+
+The most intuitive approach to measuring the program's effect is a simple before-after comparison for the treated schools:
+
+```python
+treated_means = df[df["treated"] == 1].groupby("post")["gpa"].mean()
+print(f"Pre-program:  {treated_means[0]:.2f}")
+print(f"Post-program: {treated_means[1]:.2f}")
+print(f"Naive change: {treated_means[1] - treated_means[0]:.2f}")
+```
+
+```text
+Pre-program:  60.17
+Post-program: 96.37
+Naive change: 36.20
+```
+
+The naive estimate says the program boosted GPA by **36.20 points**. But this ignores everything else that may have changed over the same period — curriculum reforms, new textbooks, regional economic shifts, or simply students maturing. Any of these factors could drive GPA upward in *all* schools, not just the treated ones.
+
+![Naive before-after comparison showing the treated group's GPA rising from 60.17 to 96.37. The entire 36.20-point increase is attributed to the program, ignoring secular trends.](did101_its.png)
+
+The naive approach *overstates* the effect by conflating the treatment effect with time trends that would have occurred regardless of the program.
+
+
+## 5. The DiD Design: Using a Comparison Group
+
+The key insight of DiD is to use the **comparison group** as a mirror for what would have happened to the treated schools *without* the program. We compute all four group means:
+
+<div class="learn-card predict-card">
+<p class="learn-card-kicker">Predict first</p>
+
+The 25 comparison schools never received tutoring. Between the two periods, did their average GPA rise, fall, or stay flat? And will the DiD effect turn out larger or smaller than the naive 36.20 points? Commit to an answer before scrolling.
+
+<details class="learn-card-reveal">
+<summary>Reveal the answer</summary>
+
+**Answer.** Their GPA rose by 10.88 points (71.22 to 82.10) without any program. That region-wide drift is part of the treated schools' 36.20-point gain too, so the DiD effect is smaller: $36.20 - 10.88 = 25.32$ points.
+
+</details>
+</div>
+
+```python
+means = df.groupby(["treated", "post"])["gpa"].mean()
+# Round to 2 decimals so the hand arithmetic below matches the printed means
+pre_control  = round(means[(0, 0)], 2)   # 71.22
+post_control = round(means[(0, 1)], 2)   # 82.10
+pre_treated  = round(means[(1, 0)], 2)   # 60.17
+post_treated = round(means[(1, 1)], 2)   # 96.37
+```
+
+```text
+Group means:
+  Comparison Pre:  71.22
+  Comparison Post: 82.10
+  Treated Pre:     60.17
+  Treated Post:    96.37
+```
+
+The comparison schools' GPA rose by **10.88 points** (from 71.22 to 82.10) — this is the *secular trend*. We assume the treated schools would have experienced the same trend absent the program. This gives us the **counterfactual**:
+
+```python
+counterfactual = pre_treated + (post_control - pre_control)
+did_estimate = post_treated - counterfactual
+print(f"Counterfactual: {pre_treated:.2f} + ({post_control:.2f} - {pre_control:.2f}) = {counterfactual:.2f}")
+print(f"DiD estimate:   {post_treated:.2f} - {counterfactual:.2f} = {did_estimate:.2f}")
+```
+
+```text
+Counterfactual: 60.17 + (82.10 - 71.22) = 71.05
+DiD estimate:   96.37 - 71.05 = 25.32
+```
+
+The causal effect of the tutoring program is **25.32 GPA points** — not 36.20. (This is the arithmetic on the rounded means. With unrounded means the DiD is 25.315, exactly the regression coefficient in Section 7; the common trend is 10.886.) The naive approach overstated the effect by **43%** ($36.20 / 25.32 \approx 1.43$) because it attributed the 10.88-point common trend entirely to the program.
+
+![DiD design showing three lines: the comparison group (steel blue, 71.22 to 82.10), the treated group (orange, 60.17 to 96.37), and the counterfactual path (teal dashed, 60.17 to 71.05). The DiD estimate of 25.32 is the gap between the actual and counterfactual treated outcomes.](did101_counterfactual.png)
+
+### 5.1 The parallel trends assumption
+
+DiD rests on one critical assumption: **parallel trends**. In the absence of treatment, treated and comparison groups would have followed the *same trajectory* over time. Formally:
+
+$$E[Y\_{i,1}(0) - Y\_{i,0}(0) \mid D=1] = E[Y\_{i,1}(0) - Y\_{i,0}(0) \mid D=0]$$
+
+In words: the *change* in potential untreated outcomes is the same for both groups. Think of it like two runners on parallel tracks — they may start at different positions (treated schools have lower baseline GPA), but they run at the same pace. If one runner suddenly speeds up after receiving coaching, the difference between their new speed and the other runner's speed measures the coaching effect.
+
+Note what parallel trends does *not* require: the two groups do not need the same *level* of GPA, only the same *trend*. This is why DiD is powerful — it naturally handles time-invariant differences between groups (like school quality or student demographics).
+
+### 5.2 SUTVA
+
+The **Stable Unit Treatment Value Assumption (SUTVA)** requires that one school's treatment does not affect another school's outcome. If untreated schools lost students to tutored schools, or if tutored schools drew resources away from comparison schools, the DiD estimate would be biased. The simulated data rule spillovers out by construction. In a real evaluation you would have to argue it from how students are assigned to schools and whether tutors or funding were shared across schools.
+
+
+## 6. Manual DiD Calculation
+
+We can organize the four group means into a 2×2 table and compute the DiD as a *double difference*:
+
+```python
+means_table = df.groupby(["treated", "post"])["gpa"].mean().round(2).unstack()
+means_table.index = ["Comparison (0)", "Treated (1)"]
+means_table.columns = ["Pre (0)", "Post (1)"]
+means_table["Difference"] = means_table["Post (1)"] - means_table["Pre (0)"]
+print(means_table)
+```
+
+```text
+                Pre (0)  Post (1)  Difference
+Comparison (0)    71.22     82.10       10.88
+Treated (1)       60.17     96.37       36.20
+```
+
+The DiD formula takes the *difference of differences*:
+
+$$DiD = \Big(E[Y\_{i,1} \mid D=1] - E[Y\_{i,0} \mid D=1]\Big) - \Big(E[Y\_{i,1} \mid D=0] - E[Y\_{i,0} \mid D=0]\Big)$$
+
+Plugging in the numbers:
+
+$$DiD = (96.37 - 60.17) - (82.10 - 71.22) = 36.20 - 10.88 = 25.32$$
+
+Think of it this way: the treated schools improved by 36.20 points, but 10.88 of those points would have happened anyway (as evidenced by the comparison group). The remaining **25.32 points** is the causal effect of the tutoring program.
+
+Going back to the runner analogy: the treated runner sped up by 36.20 units while the comparison runner sped up by 10.88. The coaching effect is the extra 25.32 units of speed that only the coached runner gained.
+
+![Manual DiD calculation showing both groups with labeled means. The comparison group change (10.88) represents the secular trend, while the treated group change (36.20) combines the trend and the treatment effect. The DiD of 25.32 isolates the causal effect.](did101_diff_plot.png)
+
+
+## 7. DiD via Regression
+
+### 7.1 Classical OLS with interaction
+
+The manual calculation is equivalent to an OLS regression with the treatment indicator, time indicator, and their interaction:
+
+$$Y\_{it} = \alpha + \beta\_1 \text{Treat}\_i + \beta\_2 \text{Post}\_t + \beta\_3 (\text{Treat}\_i \times \text{Post}\_t) + \varepsilon\_{it}$$
+
+Where:
+- $\alpha$ is the comparison group's pre-period mean (intercept)
+- $\beta\_1$ captures the baseline difference between groups
+- $\beta\_2$ captures the common time trend
+- $\beta\_3$ is the **DiD estimate** — the causal effect of treatment
+
+In PyFixest, the `feols()` function handles this with a familiar formula syntax:
+
+```python
+fit_ols = pf.feols("gpa ~ treated + post + txp", data=df, vcov="HC1")
+print(fit_ols.summary())
+```
+
+```text
+Estimation:  OLS
+Dep. var.: gpa
+sample: None = all
+Inference:  HC1
+Observations:  70
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Intercept     |     71.215 |        0.218 |   326.123 |      0.000 |  70.779 |  71.651 |
+| treated       |    -11.049 |        0.288 |   -38.388 |      0.000 | -11.624 | -10.475 |
+| post          |     10.886 |        0.339 |    32.116 |      0.000 |  10.209 |  11.563 |
+| txp           |     25.315 |        0.615 |    41.164 |      0.000 |  24.087 |  26.543 |
+---
+RMSE: 1.15 R2: 0.989
+```
+
+Every coefficient maps directly to our group means:
+
+- **Intercept (71.22)** — Comparison group pre-period mean
+- **treated (−11.05)** — Treated schools start 11 points *below* comparison schools
+- **post (10.89)** — Common time trend (comparison group's improvement; 10.886 unrounded, while the 10.88 used earlier is the difference of the rounded means $82.10 - 71.22$)
+- **txp (25.32)** — The DiD estimate, matching our manual calculation
+
+The `vcov="HC1"` option requests heteroskedasticity-robust (White) standard errors. HC1 is a sensible default for cross-sectional data, but here each school appears twice, and HC1 treats those two observations as independent. Section 7.2 switches to standard errors clustered by school, which allow for that within-school correlation.
+
+### 7.2 TWFE with fixed effects
+
+A more flexible approach absorbs school-level and time-level heterogeneity using **two-way fixed effects (TWFE)**. PyFixest uses the `|` pipe syntax to specify absorbed fixed effects:
+
+$$Y\_{it} = \beta\_3 (\text{Treat}\_i \times \text{Post}\_t) + \gamma\_i + \vartheta\_t + \varepsilon\_{it}$$
+
+Here $\gamma\_i$ are school fixed effects (absorbing all time-invariant school characteristics) and $\vartheta\_t$ are time fixed effects (absorbing all common time shocks). Since `treated` is perfectly collinear with $\gamma\_i$ and `post` is perfectly collinear with $\vartheta\_t$, only the interaction term `txp` remains:
+
+<div class="learn-card predict-card">
+<p class="learn-card-kicker">Predict first</p>
+
+We are replacing `treated` and `post` with a full set of school and period fixed effects, and switching to standard errors clustered by school. Will the DiD coefficient change? Will its standard error? Commit to an answer before scrolling.
+
+<details class="learn-card-reveal">
+<summary>Reveal the answer</summary>
+
+**Answer.** The coefficient does not move: it is 25.315 in both models, because in a balanced 2×2 panel the school effects absorb `treated` and the period effects absorb `post` without changing the interaction. The standard error does change, from 0.615 (HC1) to 0.585 (CRV1 by school), because it now allows each school's two observations to be correlated.
+
+</details>
+</div>
+
+```python
+fit_twfe = pf.feols("gpa ~ txp | id + time", data=df, vcov={"CRV1": "id"})
+print(fit_twfe.summary())
+```
+
+```text
+Estimation:  OLS
+Dep. var.: gpa, Fixed effects: id + time
+sample: None = all
+Inference:  CRV1
+Observations:  70
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| txp           |     25.315 |        0.585 |    43.265 |      0.000 | 24.126 |  26.504 |
+---
+RMSE: 0.788 R2: 0.995 R2 Within: 0.981
+```
+
+The estimate is unchanged: **25.315**. But the standard errors now use **CRV1 (cluster-robust variance)** clustered at the school level — the appropriate choice when treatment varies at the school level and observations within the same school are correlated.
+
+The formula `"gpa ~ txp | id + time"` is one of PyFixest's key strengths: everything to the left of `|` is estimated, everything to the right is *absorbed*. No need to manually create dummy variables.
+
+### 7.3 TWFE with covariate
+
+We can add `female_share` as a time-varying covariate to check robustness:
+
+<div class="learn-card predict-card">
+<p class="learn-card-kicker">Predict first</p>
+
+`female_share` changes a little within each school over time. Once it enters the TWFE model, will the DiD estimate move by more than one GPA point? Commit to an answer before scrolling.
+
+<details class="learn-card-reveal">
+<summary>Reveal the answer</summary>
+
+**Answer.** No. The estimate moves from 25.315 to 25.328, a shift of 0.013 points, and `female_share` itself is insignificant (p = 0.714). Within-school changes in the share of female students do not predict GPA changes in these data.
+
+</details>
+</div>
+
+```python
+fit_cov = pf.feols("gpa ~ txp + female_share | id + time", data=df,
+                    vcov={"CRV1": "id"})
+print(fit_cov.summary())
+```
+
+```text
+Estimation:  OLS
+Dep. var.: gpa, Fixed effects: id + time
+sample: None = all
+Inference:  CRV1
+Observations:  70
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| txp           |     25.328 |        0.605 |    41.881 |      0.000 |  24.099 |  26.557 |
+| female_share  |     -3.216 |        8.700 |    -0.370 |      0.714 | -20.898 |  14.465 |
+---
+RMSE: 0.785 R2: 0.995 R2 Within: 0.982
+```
+
+Adding `female_share` barely changes the DiD estimate (25.315 → 25.328, a shift of just 0.013). The covariate itself is statistically insignificant (p = 0.714). That does not show that the fixed effects "already capture" everything relevant. It only says that, once school and period effects are removed, the small within-school changes in `female_share` do not predict GPA changes. The reassuring part is the stability of the DiD coefficient.
+
+One caution applies whenever you add time-varying covariates to a DiD: if the program itself could change the covariate (say, tutoring attracted more female students), controlling for it would absorb part of the effect you want to measure. Such **bad controls** should be measured before treatment or left out.
+
+### 7.4 Programmatic access to results
+
+PyFixest provides tidy methods for extracting specific quantities — useful for post-estimation workflows and building custom tables:
+
+```python
+print(f"Coefficient:   {fit_twfe.coef().values[0]:.4f}")
+print(f"Std. Error:    {fit_twfe.se().values[0]:.4f}")
+print(f"t-statistic:   {fit_twfe.tstat().values[0]:.4f}")
+print(f"p-value:       {fit_twfe.pvalue().values[0]:.4f}")
+print(f"95% CI:        [{fit_twfe.confint().values[0, 0]:.2f}, {fit_twfe.confint().values[0, 1]:.2f}]")
+```
+
+```text
+Coefficient:   25.3149
+Std. Error:    0.5851
+t-statistic:   43.2655
+p-value:       0.0000
+95% CI:        [24.13, 26.50]
+```
+
+The `.tidy()` method returns a full DataFrame of results:
+
+```python
+print(fit_twfe.tidy())
+```
+
+```text
+              Estimate  Std. Error    t value  Pr(>|t|)       2.5%      97.5%
+Coefficient
+txp          25.314897    0.585106  43.265472       0.0  24.125818  26.503976
+```
+
+### 7.5 Comparison across specifications
+
+All three specifications produce essentially the same DiD estimate:
+
+| Method | Estimate | Std. Error | 95% CI | SE Type |
+|--------|----------|------------|--------|---------|
+| OLS / HC1 | 25.315 | 0.615 | [24.09, 26.54] | Heteroskedasticity-robust |
+| TWFE / CRV1 | 25.315 | 0.585 | [24.13, 26.50] | Cluster-robust (school) |
+| TWFE + Cov / CRV1 | 25.328 | 0.605 | [24.10, 26.56] | Cluster-robust (school) |
+
+The point estimates range from 25.315 to 25.328 — a difference of just 0.013 GPA points. The design (treatment assignment, fixed effects) does the heavy lifting; the choice of specification has negligible impact on the estimate.
+
+
+## 8. Inference Comparison
+
+One of PyFixest's strengths is the ability to quickly compare different inference approaches on the same model. Here we estimate the TWFE model four times, each with a different variance-covariance estimator:
+
+<div class="learn-card predict-card">
+<p class="learn-card-kicker">Predict first</p>
+
+The point estimate is 25.315 under all four estimators. Which of iid, HC1, CRV1 and CRV3 will report the largest standard error, and will any of them make the effect insignificant? Commit to an answer before scrolling.
+
+<details class="learn-card-reveal">
+<summary>Reveal the answer</summary>
+
+**Answer.** CRV3 is the largest (0.637), followed by iid (0.607); HC1 and CRV1 are nearly identical (0.585). None comes close to changing the conclusion: the smallest t-statistic is 39.72.
+
+</details>
+</div>
+
+```python
+vcov_types = {
+    "iid":  "iid",
+    "HC1":  "HC1",
+    "CRV1": {"CRV1": "id"},
+    "CRV3": {"CRV3": "id"},
+}
+
+for label, vcov_spec in vcov_types.items():
+    fit_tmp = pf.feols("gpa ~ txp | id + time", data=df, vcov=vcov_spec)
+    tidy = fit_tmp.tidy()
+    txp_row = tidy[tidy.index == "txp"].iloc[0]
+    print(f"  {label:5s}: SE = {txp_row['Std. Error']:.4f}, "
+          f"t = {txp_row['t value']:.2f}, "
+          f"p = {txp_row['Pr(>|t|)']:.4f}")
+```
+
+```text
+  iid  : SE = 0.6071, t = 41.70, p = 0.0000
+  HC1  : SE = 0.5852, t = 43.26, p = 0.0000
+  CRV1 : SE = 0.5851, t = 43.27, p = 0.0000
+  CRV3 : SE = 0.6373, t = 39.72, p = 0.0000
+```
+
+| SE Type | Description | SE | t-stat |
+|---------|-------------|-----|--------|
+| iid | Classical (assumes homoskedasticity) | 0.607 | 41.70 |
+| HC1 | Heteroskedasticity-robust (White) | 0.585 | 43.26 |
+| CRV1 | Cluster-robust at school level | 0.585 | 43.27 |
+| CRV3 | Jackknife cluster-robust (leave one school out) | 0.637 | 39.72 |
+
+- **iid** assumes independent errors with constant variance — rarely justified in panel data
+- **HC1** allows for heteroskedasticity but not within-cluster correlation
+- **CRV1** is the workhorse for panel data: it accounts for arbitrary within-school correlation
+- **CRV3** is a jackknife version of CRV1: it re-estimates the model leaving out one school at a time. This corrects CRV1's tendency to understate uncertainty when clusters are few or some are very influential, and here it gives the largest SE
+
+![Standard errors across four inference methods (iid, HC1, CRV1, CRV3). CRV3 produces the largest SE (0.637) while HC1 and CRV1 are nearly identical (0.585). All methods yield overwhelmingly significant results.](did101_se_comparison.png)
+
+The key takeaway: **inference choice matters less than research design**. Standard errors range from 0.585 to 0.637, but all four methods produce p-values that are essentially zero. When the treatment effect is 25 GPA points and the largest SE is 0.64, the t-statistic is still above 39. The signal-to-noise ratio is so strong that the choice of variance estimator is practically irrelevant here.
+
+In applications with smaller effects, the choice between CRV1 and CRV3 can decide whether a result is significant. What matters most is not the 35 clusters in total but the **10 treated clusters**: when few clusters are treated, CRV1 tends to understate uncertainty even if the total number of clusters looks comfortable. CRV3 is the safer default, and the wild cluster bootstrap (available in PyFixest through `.wildboottest()`, which needs the optional `wildboottest` package) is the standard remedy when treated clusters are few (MacKinnon, Nielsen and Webb, 2023). Exercise 4 computes how small the effect would have to be before the choice mattered here.
+
+
+## 9. Publication-Quality Tables with etable() and Great Tables
+
+### 9.1 Stepwise specifications with csw()
+
+PyFixest's `csw()` operator ("cumulative stepwise") lets you estimate multiple specifications in a single call. `csw(a, b)` fits one model with `a`, then a second with `a + b`:
+
+```python
+fit_multi = pf.feols("gpa ~ csw(txp, female_share) | id + time",
+                     data=df, vcov={"CRV1": "id"})
+models_list = fit_multi.to_list()
+```
+
+This single line estimates **two models**: (1) `gpa ~ txp | id + time` and (2) `gpa ~ txp + female_share | id + time`. In Stata, you would need two separate regression commands; PyFixest handles it in one formula. (Recent PyFixest releases require at least two arguments inside `csw()` or `csw0()`, so the older shorthand `txp + csw0(female_share)` now raises an error.)
+
+### 9.2 etable() output
+
+The `pf.etable()` function builds a regression table from a list of models. By default it returns a Great Tables object, which renders as a formatted table in Jupyter or Quarto. In a plain Python session, ask for a pandas DataFrame with `type="df"`. The `coef_fmt` argument controls each cell: `b*` prints the coefficient with significance stars, and `(se)` adds the standard error in parentheses:
+
+```python
+etable_df = pf.etable(models_list, type="df", coef_fmt="b* \n (se)")
+print(etable_df.replace(r"\s*\n\s*", " ", regex=True).to_string())
+```
+
+```text
+                                  gpa                   
+                                  (1)                (2)
+coef  txp           25.315*** (0.585)  25.328*** (0.605)
+      female_share                        -3.216 (8.700)
+fe     time                         x                  x
+      id                            x                  x
+stats Observations                 70                 70
+      R²                        0.995              0.995
+```
+
+The table shows significance stars (`*` p < 0.05, `**` p < 0.01, `***` p < 0.001), standard errors in parentheses, which fixed effects each model includes, and fit statistics. Call `pf.etable(models_list)` without `type` in a notebook to get the same table as styled HTML.
+
+### 9.3 Custom Great Tables table
+
+For full control over formatting, we can build a table from the `.tidy()` DataFrames:
+
+```python
+rows = []
+for name, fit in [("(1) OLS", fit_ols),
+                  ("(2) TWFE", fit_twfe),
+                  ("(3) TWFE + Cov", fit_cov)]:
+    tidy = fit.tidy()
+    txp_row = tidy[tidy.index == "txp"].iloc[0]
+    rows.append({
+        "Model": name,
+        "Estimate": txp_row["Estimate"],
+        "Std. Error": txp_row["Std. Error"],
+        "t value": txp_row["t value"],
+        "p-value": txp_row["Pr(>|t|)"],
+        "95% CI Lower": txp_row["2.5%"],
+        "95% CI Upper": txp_row["97.5%"],
+        "N": fit._N,
+    })
+
+gt_df = pd.DataFrame(rows)
+gt_table = (
+    GT(gt_df)
+    .tab_header(
+        title=md("**Table 2: DiD Estimates Across Specifications**"),
+        subtitle="Dependent variable: GPA"
+    )
+    .fmt_number(columns=["Estimate", "Std. Error", "t value",
+                         "95% CI Lower", "95% CI Upper"], decimals=3)
+    .fmt_number(columns=["p-value"], decimals=4)
+    .fmt_integer(columns=["N"])
+    .tab_source_note(
+        "Notes: (1) OLS with HC1 robust SE. (2) TWFE with CRV1 "
+        "clustered at school level. (3) TWFE with female_share covariate and CRV1."
+    )
+)
+gt_table.save("did101_table2.png")
+```
+
+![Table 2: DiD estimates across three specifications. All models produce an estimate of approximately 25.32–25.33 with highly significant p-values.](did101_table2.png)
+
+Great Tables provides fine-grained control over number formatting (`.fmt_number()`), column labels (`.cols_label()`), headers (`.tab_header()`), and styling (`.tab_style()`). The `.save()` method exports to PNG using a headless browser (it needs `selenium` and Chrome installed).
+
+### 9.4 Exporting LaTeX tables for manuscripts
+
+When submitting to academic journals, you need LaTeX-formatted tables rather than HTML or PNG. PyFixest's `etable()` can generate publication-ready LaTeX directly by setting `type="tex"`. The output uses `booktabs` for clean horizontal rules and `threeparttable` for properly aligned footnotes — the standard format expected by most economics and social science journals.
+
+```python
+latex_output = pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    coef_fmt="b* \n (se)",  # "*" after b adds significance stars
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+)
+print(latex_output)
+```
+
+```text
+\begin{threeparttable}
+\begingroup
+\renewcommand\cellalign{t}
+\renewcommand\arraystretch{1}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{3}{c}{gpa} \\
+\cmidrule(lr){2-4}
+ & (1) & (2) & (3) \\
+\midrule
+\addlinespace[1ex]
+Treatment & \makecell{-11.049*** \\ (0.288)} &  &  \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+Post & \makecell{10.886*** \\ (0.339)} &  &  \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+Treatment $\times$ Post & \makecell{25.315*** \\ (0.615)} & \makecell{25.315*** \\ (0.585)} & \makecell{25.328*** \\ (0.605)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+Female Share &  &  & \makecell{-3.216 \\ (8.700)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+Constant & \makecell{71.215*** \\ (0.218)} &  &  \\
+\addlinespace[0.5ex]
+\midrule
+\addlinespace[1ex]
+ time & - & x & x \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+id  & - & x & x \\
+\addlinespace[0.5ex]
+\midrule
+\addlinespace[1ex]
+Observations & 70 & 70 & 70 \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+$R^2$ & 0.989 & 0.995 & 0.995 \\
+\addlinespace[0.5ex]
+\bottomrule
+\end{tabularx}
+\endgroup
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.\end{minipage}
+\end{threeparttable}
+```
+
+To save the table directly to a `.tex` file that you can `\input{}` in your manuscript, use the `file_name` parameter:
+
+```python
+pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    coef_fmt="b* \n (se)",  # "*" after b adds significance stars
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+    file_name="did101_table2.tex",
+)
+```
+
+This saves the file to `did101_table2.tex`. In your LaTeX manuscript, include it with:
+
+```text
+\begin{table}[htbp]
+\centering
+\caption{DiD Estimates Across Specifications}
+\label{tab:did-results}
+\input{did101_table2.tex}
+\end{table}
+```
+
+The `labels` dictionary maps internal variable names to publication-friendly labels (e.g., `"txp"` becomes `"Treatment $\times$ Post"`). The `notes` parameter adds a footnote below the table. Your LaTeX document needs the `booktabs`, `makecell`, `tabularx`, and `threeparttable` packages in the preamble:
+
+```text
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+```
+
+
+## 10. Coefficient Comparison
+
+A coefficient plot provides a visual comparison of the DiD estimate across specifications, including 95% confidence intervals:
+
+```python
+fig, ax = plt.subplots(figsize=(9, 5))
+model_names = ["(1) OLS\nHC1", "(2) TWFE\nCRV1", "(3) TWFE+Cov\nCRV1"]
+estimates = [fit.tidy().loc["txp", "Estimate"] for fit in [fit_ols, fit_twfe, fit_cov]]
+ci_lower = [fit.tidy().loc["txp", "2.5%"] for fit in [fit_ols, fit_twfe, fit_cov]]
+ci_upper = [fit.tidy().loc["txp", "97.5%"] for fit in [fit_ols, fit_twfe, fit_cov]]
+
+ax.errorbar(estimates, range(3), xerr=[[e-l for e,l in zip(estimates, ci_lower)],
+            [u-e for e,u in zip(estimates, ci_upper)]],
+            fmt="o", color=TEAL, markersize=10, capsize=6, elinewidth=2)
+ax.set_xlabel("DiD Estimate (txp coefficient)")
+ax.set_title("Coefficient Comparison Across Specifications")
+```
+
+![Coefficient plot showing the txp estimate across three specifications. All estimates cluster tightly around 25.32–25.33 with narrow, non-overlapping-with-zero confidence intervals.](did101_coefplot.png)
+
+The near-identical point estimates and overlapping confidence intervals across all three specifications reinforce that the DiD estimate is robust. The point estimates span a range of just 0.013 GPA points (25.315 to 25.328), demonstrating remarkable stability regardless of whether we include school fixed effects, time fixed effects, or time-varying covariates.
+
+
+## 11. Event Study: Dynamic Treatment Effects
+
+### 11.1 Loading the event study data
+
+The 2×2 design tells us *whether* the program had an effect, but not *when* the effect kicked in or whether it grew or faded over time. The event study dataset extends the analysis to **8 time periods** (4 pre-treatment and 4 post-treatment):
+
+```python
+url_event = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_didevent.dta"
+df_event = pd.read_stata(url_event).astype(float)
+print(f"Shape: {df_event.shape}")
+```
+
+```text
+Shape: (280, 8)
+```
+
+The new variable `timeToTreat` measures **periods relative to treatment onset** for treated schools: −4 through −1 are pre-treatment periods, 0 through 3 are post-treatment. Untreated schools have `NaN` for this variable (they are never treated).
+
+```python
+print(df_event["timeToTreat"].value_counts().sort_index())
+```
+
+```text
+timeToTreat
+-4.0    10
+-3.0    10
+-2.0    10
+-1.0    10
+ 0.0    10
+ 1.0    10
+ 2.0    10
+ 3.0    10
+```
+
+Each of the 10 treated schools contributes one observation per relative time period, giving 10 observations at each event time.
+
+![Panel structure for the event study design showing 35 schools across 8 time periods. Treatment begins at period 5, with 10 treated schools switching from light to dark orange while 25 comparison schools remain in steel blue.](did101_panelview_event.png)
+
+### 11.2 The event study specification
+
+The event study model replaces the single `txp` interaction with a full set of **event-time indicators**, one for each period relative to treatment. We omit one period (the reference period, $t = -1$) to avoid perfect collinearity:
+
+$$Y\_{it} = \sum\_{j=-4,\\, j \neq -1}^{3} \theta\_j \cdot D\_i \cdot \mathbf{1}[t - E\_i = j] + \gamma\_i + \vartheta\_t + \varepsilon\_{it}$$
+
+Here $D\_i = 1$ for the 10 treated schools, $E\_i$ is the period in which school $i$ adopts the program (period 5), and $\mathbf{1}[\cdot]$ equals 1 when the condition inside holds. The sum skips $j = -1$, the reference period.
+
+Each $\theta\_j$ measures the gap between treated and comparison schools at event time $j$, relative to the same gap at $t = -1$:
+- **Pre-treatment coefficients** ($j < 0$): These should be near zero if parallel trends holds. Near-zero values are necessary but not sufficient; significant pre-treatment coefficients would indicate that treated schools were already diverging *before* the program — a red flag for the DiD design.
+- **Post-treatment coefficients** ($j \geq 0$): These capture the dynamic treatment effect at each lag after the program starts.
+
+### 11.3 Estimation with i()
+
+PyFixest's `i()` function creates factor (indicator) variables with a specified reference level — perfect for event study designs:
+
+<div class="learn-card predict-card">
+<p class="learn-card-kicker">Predict first</p>
+
+The 2×2 analysis found an effect of about 25 points. In the event study, what should the three pre-treatment coefficients ($t = -4, -3, -2$) look like if parallel trends holds? And will the post-treatment effect grow over the four treated periods? Commit to an answer before scrolling.
+
+<details class="learn-card-reveal">
+<summary>Reveal the answer</summary>
+
+**Answer.** The pre-treatment coefficients are close to zero (0.34, −0.32, 0.59) and none is significant (all p > 0.17). The effect does not grow: it is 25.03 at $t = 0$ and stays between 24.71 and 25.70 afterwards.
+
+</details>
+</div>
+
+```python
+df_event["timeToTreat"] = df_event["timeToTreat"].fillna(-99)
+fit_event = pf.feols("gpa ~ i(timeToTreat, ref=-1) | id + time",
+                     data=df_event, vcov={"CRV1": "id"})
+print(fit_event.summary())
+```
+
+```text
+Estimation:  OLS
+Dep. var.: gpa, Fixed effects: id + time
+sample: None = all
+Inference:  CRV1
+Observations:  280
+
+| Coefficient       |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:------------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| timeToTreat::-4.0 |      0.342 |        0.401 |     0.852 |      0.400 | -0.474 |   1.157 |
+| timeToTreat::-3.0 |     -0.322 |        0.441 |    -0.730 |      0.471 | -1.219 |   0.575 |
+| timeToTreat::-2.0 |      0.593 |        0.423 |     1.401 |      0.170 | -0.267 |   1.454 |
+| timeToTreat::0.0  |     25.028 |        0.445 |    56.232 |      0.000 | 24.123 |  25.932 |
+| timeToTreat::1.0  |     24.705 |        0.559 |    44.174 |      0.000 | 23.569 |  25.842 |
+| timeToTreat::2.0  |     24.768 |        0.739 |    33.534 |      0.000 | 23.267 |  26.270 |
+| timeToTreat::3.0  |     25.701 |        0.797 |    32.268 |      0.000 | 24.083 |  27.320 |
+---
+RMSE: 1.134 R2: 0.991 R2 Within: 0.961
+```
+
+PyFixest names each coefficient `timeToTreat::X`, where X is the period relative to treatment. (Older releases used `C(timeToTreat, contr.treatment(base=-1))[T.X]`.)
+
+The `i(timeToTreat, ref=-1)` syntax tells PyFixest to create indicator variables for each unique value of `timeToTreat`, using $t = -1$ as the reference period (coefficient normalized to zero). We fill `NaN` values with −99 for untreated schools. That creates a dummy for never-treated schools that is perfectly collinear with the school fixed effects, so PyFixest drops it (with a multicollinearity warning) and the remaining coefficients keep their interpretation.
+
+### 11.4 Event study plot
+
+The event study plot is the signature visualization for DiD designs. Pre-treatment coefficients near zero are evidence consistent with parallel trends, while post-treatment coefficients reveal the dynamic treatment effect:
+
+![Event study plot showing coefficients at each period relative to treatment. Pre-treatment coefficients (t = -4 to -2) hover near zero with confidence intervals that include zero, supporting parallel trends. Post-treatment coefficients (t = 0 to 3) jump to approximately 25 and remain stable.](did101_event_study.png)
+
+The plot shows a textbook event study pattern:
+
+- **Pre-treatment (t = −4 to −2):** Coefficients are small (0.34, −0.32, 0.59) and statistically insignificant (all p > 0.17). The confidence intervals include zero. Treated and comparison schools were following similar trajectories before the program, which supports the **parallel trends assumption**. It does not prove it: the assumption concerns the post-period counterfactual, which is never observed, and with 10 treated schools a pre-trend test has limited power to detect small violations (Roth, 2022).
+
+- **Post-treatment (t = 0 to 3):** A sharp jump to ≈25 points in the first treated period, measured relative to $t = -1$, with the effect staying roughly flat across all four post-treatment periods (24.71 to 25.70). There is **no evidence of a gradual build-up or fade-out**.
+
+### 11.5 Event study coefficients table
+
+| Period | Estimate | 95% CI | Significant? |
+|--------|----------|--------|-------------|
+| t = −4 | 0.342 | [−0.47, 1.16] | No |
+| t = −3 | −0.322 | [−1.22, 0.57] | No |
+| t = −2 | 0.593 | [−0.27, 1.45] | No |
+| t = −1 | 0.000 | (reference) | — |
+| t = 0 | 25.028 | [24.12, 25.93] | Yes (p < 0.001) |
+| t = 1 | 24.705 | [23.57, 25.84] | Yes (p < 0.001) |
+| t = 2 | 24.768 | [23.27, 26.27] | Yes (p < 0.001) |
+| t = 3 | 25.701 | [24.08, 27.32] | Yes (p < 0.001) |
+
+![Table 4: Event study coefficients with estimates, 95% confidence intervals, and significance indicators for each period relative to treatment.](did101_event_table.png)
+
+The event study supports three findings: (1) **no detectable pre-trends**, which supports (but cannot prove) the design; (2) **an effect from the first treated period**, measured relative to $t = -1$; and (3) **sustained impact**, with no fade-out over four post-treatment periods.
+
+
+## 12. Common misconceptions
+
+DiD looks simple, and that simplicity invites a few recurring misreadings. Each card below states a tempting claim and what this tutorial's own numbers say instead.
+
+<details class="learn-card misconception-card">
+<summary><span class="learn-card-kicker">Misconception</span> "Insignificant pre-trend coefficients prove that parallel trends holds."</summary>
+
+**What is actually true.** The pre-period coefficients here (0.34, −0.32, 0.59; all p > 0.17) are *consistent with* parallel trends, but the assumption is about what treated schools would have done after period 4 without the program, which no data can show. Pre-tests also have limited power: a one-point pre-period gap would still sit inside the 95% confidence interval for $t = -2$, [−0.27, 1.45].
+
+</details>
+
+<details class="learn-card misconception-card">
+<summary><span class="learn-card-kicker">Misconception</span> "DiD needs the treated and comparison groups to start at the same GPA."</summary>
+
+**What is actually true.** Treated schools start 11.05 points *below* comparison schools (60.17 versus 71.22), and DiD is still valid. Differencing removes any gap in levels; only the *trends* must be parallel.
+
+</details>
+
+<details class="learn-card misconception-card">
+<summary><span class="learn-card-kicker">Misconception</span> "The 25.32-point estimate is the program's effect for every school."</summary>
+
+**What is actually true.** DiD identifies the ATT: the average effect for the 10 schools that actually ran the program. It says nothing about how the 25 comparison schools would have responded, which could differ if schools chose the program because they expected to benefit.
+
+</details>
+
+<details class="learn-card misconception-card">
+<summary><span class="learn-card-kicker">Misconception</span> "Adding control variables always makes a DiD estimate more credible."</summary>
+
+**What is actually true.** Adding `female_share` moved the estimate by only 0.013 points (25.315 to 25.328); the credibility comes from the design, not the controls. A covariate that the program itself can change is a *bad control* and can bias the estimate.
+
+</details>
+
+<details class="learn-card misconception-card">
+<summary><span class="learn-card-kicker">Misconception</span> "All four standard errors agreed here, so the choice of standard error never matters."</summary>
+
+**What is actually true.** They agree here because the effect is about 40 standard errors away from zero. Exercise 4 shows that an effect of 1.19 points would be significant with CRV1 but not with CRV3 (threshold 1.30). With smaller effects and only 10 treated schools, the choice can decide the result.
+
+</details>
+
+
+## 13. Discussion
+
+### 13.1 Four key findings
+
+1. **The naive before-after comparison overstates the effect by 43%.** The raw change in treated schools is 36.20 GPA points, but 10.88 of these points reflect a common upward trend shared by all schools. DiD correctly attributes only 25.32 points to the program.
+
+2. **The event study shows no detectable differential pre-trends.** All three pre-treatment coefficients (0.34, −0.32, 0.59) are small, close to zero, and statistically insignificant. This supports parallel trends, though no pre-trend test can prove an assumption about an unobserved counterfactual.
+
+3. **The effect is immediate and sustained.** Post-treatment coefficients range from 24.71 to 25.70 (all relative to $t = -1$), showing no evidence of delayed onset, gradual ramp-up, or fade-out.
+
+4. **Inference choice matters less than design.** Standard errors ranged from 0.585 (CRV1) to 0.637 (CRV3) across four inference methods, but all produced t-statistics above 39. When the research design is clean and the signal is this strong, the choice of variance estimator is practically irrelevant; with a small effect and only 10 treated schools, it would not be.
+
+### 13.2 Caveats
+
+This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. In real applications, you should expect:
+
+- **R-squared below 0.99:** The R² of 0.995 in our TWFE models is unrealistically high. Real education data has far more noise.
+- **Smaller treatment effects:** A 25-point GPA increase is enormous. Real programs typically produce single-digit effects.
+- **Imperfect parallel trends:** Pre-treatment coefficients may not be exactly zero, requiring judgment about how much deviation is acceptable.
+- **Staggered treatment timing:** When different units receive treatment at different times *and* the effect varies across adoption cohorts or over time, the standard TWFE estimator can be badly biased, because already-treated units end up serving as controls for later-treated ones (Goodman-Bacon, 2021). Modern estimators address this (Callaway & Sant'Anna, 2021; Sun & Abraham, 2021; Gardner, 2022; Borusyak, Jaravel & Spiess, 2024).
+- **Few treated clusters:** Only 10 schools are treated. With effects of realistic size, cluster-robust inference becomes fragile, and CRV3 or the wild cluster bootstrap should be preferred over CRV1 (MacKinnon, Nielsen & Webb, 2023).
+
+
+## 14. Summary and Takeaways
+
+1. **DiD removes common time trends.** The naive approach overstated the effect by 10.88 GPA points — exactly the secular trend captured by the comparison group.
+
+2. **Multiple approaches produce one answer.** Three specifications (OLS, TWFE, TWFE with covariate) all yield a DiD estimate of 25.32–25.33, demonstrating the robustness of the design.
+
+3. **Event studies probe parallel trends.** Pre-treatment coefficients (0.34, −0.32, 0.59) are close to zero and insignificant, consistent with treated and comparison schools being on similar trajectories before the program. This is a supportive check, not a proof.
+
+4. **The effect is immediate and sustained.** Post-treatment coefficients (24.71–25.70) show no evidence of delayed onset or fade-out.
+
+5. **Inference flexibility is a PyFixest strength.** Switching between iid, HC1, CRV1, and CRV3 requires only changing the `vcov` argument — no need for separate packages or commands.
+
+6. **etable() and Great Tables replace manual table construction.** The `csw()` operator estimates multiple specifications in one call, and `etable()` produces publication-ready output. For custom formatting, Great Tables provides full control via `.tab_header()`, `.fmt_number()`, `.tab_style()`, and `.save()`.
+
+
+## 15. Exercises
+
+The exercises go from a warm-up to a stretch problem. Try each one before opening its solution; every solution was run with the package versions pinned in Section 2.
+
+### 15.1 Warm-up
+
+**Exercise 1 — DiD as a first-difference regression.** With two periods, DiD is the same as regressing each school's *change* in GPA on the treatment indicator. Reshape `df` to one row per school, compute the change `dgpa`, and regress it on `treated`. Compare the slope with the TWFE estimate.
+
+<details class="learn-card solution-card">
+<summary><span class="learn-card-kicker">Solution</span> Show the code and the numbers</summary>
+
+```python
+wide = df.pivot(index="id", columns="time", values="gpa")
+wide["dgpa"] = wide[2.0] - wide[1.0]
+wide["treated"] = df.groupby("id")["treated"].first()
+fit_fd = pf.feols("dgpa ~ treated", data=wide.reset_index(), vcov="HC1")
+print(fit_fd.tidy()[["Estimate", "Std. Error"]].round(3))
+```
+
+```text
+             Estimate  Std. Error
+Coefficient
+Intercept      10.886       0.332
+treated        25.315       0.585
+```
+
+The slope on `treated` is 25.315, identical to the TWFE estimate, and the intercept (10.886) is the comparison schools' trend. Even the HC1 standard error on the differenced data (0.585) matches the school-clustered CRV1 standard error from Section 7.2: with two periods, differencing within each school and clustering by school use the same information.
+
+</details>
+
+### 15.2 Core
+
+**Exercise 2 — Collapse the event study to a 2×2.** Load the event-study dataset and average GPA over the four pre-treatment periods and over the four post-treatment periods for each school. Re-estimate the DiD on the collapsed data. Does the estimate match the 2×2 result? Why or why not?
+
+<details class="learn-card solution-card">
+<summary><span class="learn-card-kicker">Solution</span> Show the code and the numbers</summary>
+
+```python
+df_event = pd.read_stata(url_event).astype(float)
+collapsed = (df_event.groupby(["id", "post"], as_index=False)
+             .agg(gpa=("gpa", "mean"), treated=("treated", "first")))
+collapsed["txp"] = collapsed["treated"] * collapsed["post"]
+fit_col = pf.feols("gpa ~ txp | id + post", data=collapsed, vcov={"CRV1": "id"})
+print(fit_col.tidy()[["Estimate", "Std. Error", "2.5%", "97.5%"]].round(3))
+```
+
+```text
+             Estimate  Std. Error    2.5%  97.5%
+Coefficient
+txp            24.897       0.282  24.324  25.47
+```
+
+The estimate is 24.897, not 25.315, and it should not match exactly: the event-study file is a separate eight-period dataset. The collapsed DiD equals the average of the four post-period event-study coefficients (25.05) minus the average of the four pre-period ones, counting the zero reference period (0.15). Averaging four periods also smooths out noise, so the standard error (0.282) is about half the 2×2 standard error.
+
+</details>
+
+**Exercise 3 — A placebo test.** Keep only the four pre-treatment periods of the event-study data, pretend the program started in period 3, and estimate a DiD with school and period fixed effects. What should you find if parallel trends holds before treatment?
+
+<details class="learn-card solution-card">
+<summary><span class="learn-card-kicker">Solution</span> Show the code and the numbers</summary>
+
+```python
+pre = df_event[df_event["post"] == 0].copy()
+pre["fake_post"] = (pre["time"] >= 3).astype(float)
+pre["fake_txp"] = pre["treated"] * pre["fake_post"]
+fit_placebo = pf.feols("gpa ~ fake_txp | id + time", data=pre, vcov={"CRV1": "id"})
+print(fit_placebo.tidy()[["Estimate", "Std. Error", "Pr(>|t|)", "2.5%", "97.5%"]].round(3))
+```
+
+```text
+             Estimate  Std. Error  Pr(>|t|)   2.5%  97.5%
+Coefficient
+fake_txp        0.287       0.406     0.485 -0.538  1.111
+```
+
+The placebo "effect" is 0.287 points (p = 0.485, 95% CI [−0.54, 1.11]): nothing, as it should be when no program was running. Like the event-study leads, a placebo test can raise a red flag, but passing it does not prove parallel trends.
+
+</details>
+
+### 15.3 Stretch
+
+**Exercise 4 — When would the standard-error choice matter?** With 35 school clusters, PyFixest uses a t distribution with 34 degrees of freedom for clustered inference. For each of the four variance estimators in Section 8, compute the smallest DiD estimate that would still be significant at the 5% level. How far is the actual estimate from these thresholds?
+
+<details class="learn-card solution-card">
+<summary><span class="learn-card-kicker">Solution</span> Show the code and the numbers</summary>
+
+```python
+from scipy import stats
+
+G = df["id"].nunique()
+t_crit = stats.t.ppf(0.975, df=G - 1)
+print(f"Clusters: {G}, critical t (df = {G - 1}): {t_crit:.3f}")
+for vc in ["iid", "HC1", {"CRV1": "id"}, {"CRV3": "id"}]:
+    fit = pf.feols("gpa ~ txp | id + time", data=df, vcov=vc)
+    se = fit.se()["txp"]
+    name = vc if isinstance(vc, str) else list(vc)[0]
+    print(f"{name:5s}: SE = {se:.3f}  ->  smallest significant effect = {t_crit * se:.2f} GPA points")
+```
+
+```text
+Clusters: 35, critical t (df = 34): 2.032
+iid  : SE = 0.607  ->  smallest significant effect = 1.23 GPA points
+HC1  : SE = 0.585  ->  smallest significant effect = 1.19 GPA points
+CRV1 : SE = 0.585  ->  smallest significant effect = 1.19 GPA points
+CRV3 : SE = 0.637  ->  smallest significant effect = 1.30 GPA points
+```
+
+An estimate is significant at 5% only if it exceeds about 2.03 standard errors: 1.19 GPA points with CRV1 and 1.30 with CRV3. The actual effect of 25.3 points is about twenty times larger than either threshold, so the choice cannot change the conclusion here. For an estimate of around 1.2 to 1.3 points, it would.
+
+</details>
+
+
+## References
+
+1. [Corral, D. & Yang, M. (2024). An introduction to the difference-in-differences design in education policy research. *Asia Pacific Education Review*, 25(3), 663–672.](https://doi.org/10.1007/s12564-024-09959-0)
+2. Callaway, B. & Sant'Anna, P.H. (2021). Difference-in-differences with multiple time periods. *Journal of Econometrics*, 225(2), 200–230.
+3. Goodman-Bacon, A. (2021). Difference-in-differences with variation in treatment timing. *Journal of Econometrics*, 225(2), 254–277.
+4. Sun, L. & Abraham, S. (2021). Estimating dynamic treatment effects in event studies with heterogeneous treatment effects. *Journal of Econometrics*, 225(2), 175–199.
+5. Borusyak, K., Jaravel, X. & Spiess, J. (2024). Revisiting event-study designs: robust and efficient estimation. *Review of Economic Studies*, 91(6), 3253–3285.
+6. Baker, A.C., Larcker, D.F. & Wang, C.C.Y. (2022). How much should we trust staggered difference-in-differences estimates? *Journal of Financial Economics*, 144(2), 370–395.
+7. Correia, S. (2016). REGHDFE: Stata module to perform linear or instrumental-variable regression absorbing any number of high-dimensional fixed effects.
+8. Fischer, A. & Schar, A. (2024). PyFixest: Fast high-dimensional fixed effects estimation in Python.
+9. Great Tables: Presentation-ready display tables. Posit PBC.
+10. Gardner, J. (2022). Two-stage differences in differences. Working paper.
+11. Roth, J. (2022). Pretest with caution: Event-study estimates after testing for parallel trends. *American Economic Review: Insights*, 4(3), 305–322.
+12. MacKinnon, J.G., Nielsen, M.Ø. & Webb, M.D. (2023). Cluster-robust inference: A guide to empirical practice. *Journal of Econometrics*, 232(2), 272–299.
 
 ---
 
@@ -876,810 +1934,3 @@ No contagion between patients. Patient A taking the drug should not affect Patie
   }
 })();
 </script>
-
----
-
-## 2. Setup and Imports
-
-Install the required packages:
-
-```python
-pip install pyfixest great_tables pandas matplotlib
-```
-
-Import the libraries:
-
-```python
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import pyfixest as pf
-from great_tables import GT, md, style, loc
-```
-
-| Package | Purpose |
-|---------|---------|
-| `pyfixest` | Fast fixed-effects estimation with Stata-like formula syntax |
-| `great_tables` | Publication-quality HTML/PNG tables from DataFrames |
-| `pandas` | Data loading, manipulation, and summary statistics |
-| `matplotlib` | Custom figure generation with dark theme styling |
-
-<details>
-<summary><strong>Dark theme figure styling</strong> (click to expand)</summary>
-
-```python
-# Site color palette
-STEEL_BLUE = "#6a9bcc"
-WARM_ORANGE = "#d97757"
-NEAR_BLACK = "#141413"
-TEAL = "#00d4c8"
-
-# Dark theme palette
-DARK_NAVY = "#0f1729"
-GRID_LINE = "#1f2b5e"
-LIGHT_TEXT = "#c8d0e0"
-WHITE_TEXT = "#e8ecf2"
-
-plt.rcParams.update({
-    "figure.facecolor": DARK_NAVY,
-    "axes.facecolor": DARK_NAVY,
-    "axes.edgecolor": DARK_NAVY,
-    "axes.linewidth": 0,
-    "axes.labelcolor": LIGHT_TEXT,
-    "axes.titlecolor": WHITE_TEXT,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "axes.spines.left": False,
-    "axes.spines.bottom": False,
-    "axes.grid": True,
-    "grid.color": GRID_LINE,
-    "grid.linewidth": 0.6,
-    "grid.alpha": 0.8,
-    "xtick.color": LIGHT_TEXT,
-    "ytick.color": LIGHT_TEXT,
-    "text.color": WHITE_TEXT,
-    "font.size": 12,
-    "legend.frameon": False,
-    "savefig.facecolor": DARK_NAVY,
-})
-```
-
-</details>
-
-
-## 3. Data Loading and Exploration
-
-We load the 2×2 dataset directly from GitHub. This Stata `.dta` file contains 35 schools observed across 2 time periods:
-
-```python
-url_did = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_did.dta"
-df = pd.read_stata(url_did).astype(float)
-print(df.shape)
-print(df.dtypes)
-```
-
-```text
-(70, 7)
-
-id              float64
-time            float64
-treated         float64
-post            float64
-txp             float64
-gpa             float64
-female_share    float64
-dtype: object
-```
-
-The dataset has **70 observations** (35 schools × 2 periods) and **7 variables**:
-
-- `id` — School identifier (1–35)
-- `time` — Time period (1 = pre, 2 = post)
-- `treated` — Treatment indicator (1 = received tutoring program)
-- `post` — Post-period indicator (1 = after program implementation)
-- `txp` — Interaction term (treated × post)
-- `gpa` — Outcome: average GPA of low-income students (0–100 scale)
-- `female_share` — Share of female students (covariate)
-
-```python
-print(df.describe().round(2))
-```
-
-```text
-          id  time  treated  post    txp    gpa  female_share
-count  70.00  70.0    70.00  70.0  70.00  70.00         70.00
-mean   18.00   1.5     0.29   0.5   0.14  77.12          0.53
-std    10.17   0.5     0.46   0.5   0.35  10.88          0.03
-min     1.00   1.0     0.00   0.0   0.00  59.39          0.47
-25%     9.25   1.0     0.00   0.0   0.00  70.68          0.51
-50%    18.00   1.5     0.00   0.5   0.00  76.27          0.53
-75%    26.75   2.0     1.00   1.0   0.00  82.66          0.55
-max    35.00   2.0     1.00   1.0   1.00  99.15          0.57
-```
-
-A crosstab confirms the balanced 2×2 design:
-
-```python
-ct = pd.crosstab(df["treated"], df["post"], margins=True)
-print(ct)
-```
-
-```text
-                Pre (0)  Post (1)  Total
-Comparison (0)       25        25     50
-Treated (1)          10        10     20
-Total                35        35     70
-```
-
-We have **10 treated schools** observed in 2 periods (20 observations) and **25 comparison schools** (50 observations). This is a perfectly balanced panel — every school appears exactly once in each period.
-
-### 3.1 Panel structure visualization
-
-The heatmap below shows the treatment assignment across schools and time. Steel blue cells represent the comparison group, while orange cells indicate treated schools in the post-program period.
-
-![Panel structure showing 35 schools across 2 time periods. Treated schools (10) switch from light orange to dark orange after the intervention, while comparison schools (25) remain in steel blue.](did101_panelview.png)
-
-This is a *clean* 2×2 design: treatment timing is simultaneous (all 10 schools receive the program at the same time), and no school switches treatment status.
-
-
-## 4. The Problem with Naive Comparisons
-
-The most intuitive approach to measuring the program's effect is a simple before-after comparison for the treated schools:
-
-```python
-treated_means = df[df["treated"] == 1].groupby("post")["gpa"].mean()
-print(f"Pre-program:  {treated_means[0]:.2f}")
-print(f"Post-program: {treated_means[1]:.2f}")
-print(f"Naive change: {treated_means[1] - treated_means[0]:.2f}")
-```
-
-```text
-Pre-program:  60.17
-Post-program: 96.37
-Naive change: 36.20
-```
-
-The naive estimate says the program boosted GPA by **36.20 points**. But this ignores everything else that may have changed over the same period — curriculum reforms, new textbooks, regional economic shifts, or simply students maturing. Any of these factors could drive GPA upward in *all* schools, not just the treated ones.
-
-![Naive before-after comparison showing the treated group's GPA rising from 60.17 to 96.37. The entire 36.20-point increase is attributed to the program, ignoring secular trends.](did101_its.png)
-
-The naive approach *overstates* the effect by conflating the treatment effect with time trends that would have occurred regardless of the program.
-
-
-## 5. The DiD Design: Using a Comparison Group
-
-The key insight of DiD is to use the **comparison group** as a mirror for what would have happened to the treated schools *without* the program. We compute all four group means:
-
-```python
-means = df.groupby(["treated", "post"])["gpa"].mean()
-pre_control  = means[(0, 0)]   # 71.22
-post_control = means[(0, 1)]   # 82.10
-pre_treated  = means[(1, 0)]   # 60.17
-post_treated = means[(1, 1)]   # 96.37
-```
-
-```text
-Group means:
-  Comparison Pre:  71.22
-  Comparison Post: 82.10
-  Treated Pre:     60.17
-  Treated Post:    96.37
-```
-
-The comparison schools' GPA rose by **10.88 points** (from 71.22 to 82.10) — this is the *secular trend*. We assume the treated schools would have experienced the same trend absent the program. This gives us the **counterfactual**:
-
-```python
-counterfactual = pre_treated + (post_control - pre_control)
-did_estimate = post_treated - counterfactual
-print(f"Counterfactual: {pre_treated:.2f} + ({post_control:.2f} - {pre_control:.2f}) = {counterfactual:.2f}")
-print(f"DiD estimate:   {post_treated:.2f} - {counterfactual:.2f} = {did_estimate:.2f}")
-```
-
-```text
-Counterfactual: 60.17 + (82.10 - 71.22) = 71.05
-DiD estimate:   96.37 - 71.05 = 25.32
-```
-
-The causal effect of the tutoring program is **25.32 GPA points** — not 36.20. The naive approach overstated the effect by **43%** because it attributed the 10.88-point common trend entirely to the program.
-
-![DiD design showing three lines: the comparison group (steel blue, 71.22 to 82.10), the treated group (orange, 60.17 to 96.37), and the counterfactual path (teal dashed, 60.17 to 71.05). The DiD estimate of 25.32 is the gap between the actual and counterfactual treated outcomes.](did101_counterfactual.png)
-
-### 5.1 The parallel trends assumption
-
-DiD rests on one critical assumption: **parallel trends**. In the absence of treatment, treated and comparison groups would have followed the *same trajectory* over time. Formally:
-
-$$E[Y\_{i,1}(0) - Y\_{i,0}(0) \mid D=1] = E[Y\_{i,1}(0) - Y\_{i,0}(0) \mid D=0]$$
-
-In words: the *change* in potential untreated outcomes is the same for both groups. Think of it like two runners on parallel tracks — they may start at different positions (treated schools have lower baseline GPA), but they run at the same pace. If one runner suddenly speeds up after receiving coaching, the difference between their new speed and the other runner's speed measures the coaching effect.
-
-Note what parallel trends does *not* require: the two groups do not need the same *level* of GPA, only the same *trend*. This is why DiD is powerful — it naturally handles time-invariant differences between groups (like school quality or student demographics).
-
-### 5.2 SUTVA
-
-The **Stable Unit Treatment Value Assumption (SUTVA)** requires that one school's treatment does not affect another school's outcome. If untreated schools lost students to tutored schools, or if tutored schools drew resources away from comparison schools, the DiD estimate would be biased. In this setting, schools serve distinct geographic catchments, making spillovers unlikely.
-
-
-## 6. Manual DiD Calculation
-
-We can organize the four group means into a 2×2 table and compute the DiD as a *double difference*:
-
-```python
-means_table = df.groupby(["treated", "post"])["gpa"].mean().unstack()
-means_table["Difference"] = means_table[1.0] - means_table[0.0]
-print(means_table.round(2))
-```
-
-```text
-                Pre (0)  Post (1)  Difference
-Comparison (0)    71.22     82.10       10.88
-Treated (1)       60.17     96.37       36.20
-```
-
-The DiD formula takes the *difference of differences*:
-
-$$DiD = \Big(E[Y\_{i,1} \mid D=1] - E[Y\_{i,0} \mid D=1]\Big) - \Big(E[Y\_{i,1} \mid D=0] - E[Y\_{i,0} \mid D=0]\Big)$$
-
-Plugging in the numbers:
-
-$$DiD = (96.37 - 60.17) - (82.10 - 71.22) = 36.20 - 10.88 = 25.32$$
-
-Think of it this way: the treated schools improved by 36.20 points, but 10.88 of those points would have happened anyway (as evidenced by the comparison group). The remaining **25.32 points** is the causal effect of the tutoring program.
-
-Going back to the runner analogy: the treated runner sped up by 36.20 units while the comparison runner sped up by 10.88. The coaching effect is the extra 25.32 units of speed that only the coached runner gained.
-
-![Manual DiD calculation showing both groups with labeled means. The comparison group change (10.88) represents the secular trend, while the treated group change (36.20) combines the trend and the treatment effect. The DiD of 25.32 isolates the causal effect.](did101_diff_plot.png)
-
-
-## 7. DiD via Regression
-
-### 7.1 Classical OLS with interaction
-
-The manual calculation is equivalent to an OLS regression with the treatment indicator, time indicator, and their interaction:
-
-$$Y\_{it} = \alpha + \beta\_1 \text{Treat}\_i + \beta\_2 \text{Post}\_t + \beta\_3 (\text{Treat}\_i \times \text{Post}\_t) + \varepsilon\_{it}$$
-
-Where:
-- $\alpha$ is the comparison group's pre-period mean (intercept)
-- $\beta\_1$ captures the baseline difference between groups
-- $\beta\_2$ captures the common time trend
-- $\beta\_3$ is the **DiD estimate** — the causal effect of treatment
-
-In PyFixest, the `feols()` function handles this with a familiar formula syntax:
-
-```python
-fit_ols = pf.feols("gpa ~ treated + post + txp", data=df, vcov="HC1")
-print(fit_ols.summary())
-```
-
-```text
-Estimation:  OLS
-Dep. var.: gpa, Fixed effects: 0
-Inference:  HC1
-Observations:  70
-
-| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
-|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
-| Intercept     |     71.215 |        0.218 |   326.123 |      0.000 |  70.779 |  71.651 |
-| treated       |    -11.049 |        0.288 |   -38.388 |      0.000 | -11.624 | -10.475 |
-| post          |     10.886 |        0.339 |    32.116 |      0.000 |  10.209 |  11.563 |
-| txp           |     25.315 |        0.615 |    41.164 |      0.000 |  24.087 |  26.543 |
----
-RMSE: 1.15 R2: 0.989
-```
-
-Every coefficient maps directly to our group means:
-
-- **Intercept (71.22)** — Comparison group pre-period mean
-- **treated (−11.05)** — Treated schools start 11 points *below* comparison schools
-- **post (10.89)** — Common time trend (comparison group's improvement)
-- **txp (25.32)** — The DiD estimate, matching our manual calculation
-
-The `vcov="HC1"` option requests heteroskedasticity-robust (White) standard errors, the most common choice for cross-sectional data.
-
-### 7.2 TWFE with fixed effects
-
-A more flexible approach absorbs school-level and time-level heterogeneity using **two-way fixed effects (TWFE)**. PyFixest uses the `|` pipe syntax to specify absorbed fixed effects:
-
-$$Y\_{it} = \beta\_3 (\text{Treat}\_i \times \text{Post}\_t) + \gamma\_i + \vartheta\_t + \varepsilon\_{it}$$
-
-Here $\gamma\_i$ are school fixed effects (absorbing all time-invariant school characteristics) and $\vartheta\_t$ are time fixed effects (absorbing all common time shocks). Since `treated` is perfectly collinear with $\gamma\_i$ and `post` is perfectly collinear with $\vartheta\_t$, only the interaction term `txp` remains:
-
-```python
-fit_twfe = pf.feols("gpa ~ txp | id + time", data=df, vcov={"CRV1": "id"})
-print(fit_twfe.summary())
-```
-
-```text
-Estimation:  OLS
-Dep. var.: gpa, Fixed effects: id+time
-Inference:  CRV1
-Observations:  70
-
-| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
-|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
-| txp           |     25.315 |        0.585 |    43.265 |      0.000 | 24.126 |  26.504 |
----
-RMSE: 0.788 R2: 0.995 R2 Within: 0.981
-```
-
-The estimate is unchanged: **25.315**. But the standard errors now use **CRV1 (cluster-robust variance)** clustered at the school level — the appropriate choice when treatment varies at the school level and observations within the same school are correlated.
-
-The formula `"gpa ~ txp | id + time"` is one of PyFixest's key strengths: everything to the left of `|` is estimated, everything to the right is *absorbed*. No need to manually create dummy variables.
-
-### 7.3 TWFE with covariate
-
-We can add `female_share` as a time-varying covariate to check robustness:
-
-```python
-fit_cov = pf.feols("gpa ~ txp + female_share | id + time", data=df,
-                    vcov={"CRV1": "id"})
-print(fit_cov.summary())
-```
-
-```text
-Estimation:  OLS
-Dep. var.: gpa, Fixed effects: id+time
-Inference:  CRV1
-Observations:  70
-
-| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
-|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
-| txp           |     25.328 |        0.605 |    41.881 |      0.000 |  24.099 |  26.557 |
-| female_share  |     -3.216 |        8.700 |    -0.370 |      0.714 | -20.898 |  14.465 |
----
-RMSE: 0.785 R2: 0.995 R2 Within: 0.982
-```
-
-Adding `female_share` barely changes the DiD estimate (25.315 → 25.328, a shift of just 0.013). The covariate itself is statistically insignificant (p = 0.714), confirming that the two-way fixed effects already capture the relevant variation. This is reassuring — the treatment effect estimate is robust to the inclusion of observable covariates.
-
-### 7.4 Programmatic access to results
-
-PyFixest provides tidy methods for extracting specific quantities — useful for post-estimation workflows and building custom tables:
-
-```python
-print(f"Coefficient:   {fit_twfe.coef().values[0]:.4f}")
-print(f"Std. Error:    {fit_twfe.se().values[0]:.4f}")
-print(f"t-statistic:   {fit_twfe.tstat().values[0]:.4f}")
-print(f"p-value:       {fit_twfe.pvalue().values[0]:.4f}")
-print(f"95% CI:        [{fit_twfe.confint().values[0, 0]:.2f}, {fit_twfe.confint().values[0, 1]:.2f}]")
-```
-
-```text
-Coefficient:   25.3149
-Std. Error:    0.5851
-t-statistic:   43.2655
-p-value:       0.0000
-95% CI:        [24.13, 26.50]
-```
-
-The `.tidy()` method returns a full DataFrame of results:
-
-```python
-print(fit_twfe.tidy())
-```
-
-```text
-              Estimate  Std. Error    t value  Pr(>|t|)       2.5%      97.5%
-Coefficient
-txp          25.314897    0.585106  43.265472       0.0  24.125818  26.503976
-```
-
-### 7.5 Comparison across specifications
-
-All three specifications produce essentially the same DiD estimate:
-
-| Method | Estimate | Std. Error | 95% CI | SE Type |
-|--------|----------|------------|--------|---------|
-| OLS / HC1 | 25.315 | 0.615 | [24.09, 26.54] | Heteroskedasticity-robust |
-| TWFE / CRV1 | 25.315 | 0.585 | [24.13, 26.50] | Cluster-robust (school) |
-| TWFE + Cov / CRV1 | 25.328 | 0.605 | [24.10, 26.56] | Cluster-robust (school) |
-
-The point estimates range from 25.315 to 25.328 — a difference of just 0.013 GPA points. The design (treatment assignment, fixed effects) does the heavy lifting; the choice of specification has negligible impact on the estimate.
-
-
-## 8. Inference Comparison
-
-One of PyFixest's strengths is the ability to quickly compare different inference approaches on the same model. Here we estimate the TWFE model four times, each with a different variance-covariance estimator:
-
-```python
-vcov_types = {
-    "iid":  "iid",
-    "HC1":  "HC1",
-    "CRV1": {"CRV1": "id"},
-    "CRV3": {"CRV3": "id"},
-}
-
-for label, vcov_spec in vcov_types.items():
-    fit_tmp = pf.feols("gpa ~ txp | id + time", data=df, vcov=vcov_spec)
-    tidy = fit_tmp.tidy()
-    txp_row = tidy[tidy.index == "txp"].iloc[0]
-    print(f"  {label:5s}: SE = {txp_row['Std. Error']:.4f}, "
-          f"t = {txp_row['t value']:.2f}, "
-          f"p = {txp_row['Pr(>|t|)']:.4f}")
-```
-
-```text
-  iid  : SE = 0.6071, t = 41.70, p = 0.0000
-  HC1  : SE = 0.5852, t = 43.26, p = 0.0000
-  CRV1 : SE = 0.5851, t = 43.27, p = 0.0000
-  CRV3 : SE = 0.6373, t = 39.72, p = 0.0000
-```
-
-| SE Type | Description | SE | t-stat |
-|---------|-------------|-----|--------|
-| iid | Classical (assumes homoskedasticity) | 0.607 | 41.70 |
-| HC1 | Heteroskedasticity-robust (White) | 0.585 | 43.26 |
-| CRV1 | Cluster-robust at school level | 0.585 | 43.27 |
-| CRV3 | Bias-corrected cluster-robust (Bell-McCaffrey) | 0.637 | 39.72 |
-
-- **iid** assumes constant variance — a strong assumption rarely justified in practice
-- **HC1** allows for heteroskedasticity but not within-cluster correlation
-- **CRV1** is the workhorse for panel data: it accounts for arbitrary within-school correlation
-- **CRV3** applies a small-sample bias correction, producing the most conservative SEs
-
-![Standard errors across four inference methods (iid, HC1, CRV1, CRV3). CRV3 produces the largest SE (0.637) while HC1 and CRV1 are nearly identical (0.585). All methods yield overwhelmingly significant results.](did101_se_comparison.png)
-
-The key takeaway: **inference choice matters less than research design**. Standard errors range from 0.585 to 0.637, but all four methods produce p-values that are essentially zero. When the treatment effect is 25 GPA points and the largest SE is 0.64, the t-statistic is still above 39. The signal-to-noise ratio is so strong that the choice of variance estimator is practically irrelevant here.
-
-In applications with smaller effects or fewer clusters, the choice between CRV1 and CRV3 can make the difference between statistical significance and not. With only 35 clusters, CRV3 is the safer default.
-
-
-## 9. Publication-Quality Tables with etable() and Great Tables
-
-### 9.1 Stepwise specifications with csw0()
-
-PyFixest's `csw0()` operator lets you estimate multiple specifications in a single call. The `csw0` ("cumulative stepwise from zero") starts with a baseline model and progressively adds covariates:
-
-```python
-fit_multi = pf.feols("gpa ~ txp + csw0(female_share) | id + time",
-                     data=df, vcov={"CRV1": "id"})
-```
-
-This single line estimates **two models**: (1) `gpa ~ txp | id + time` and (2) `gpa ~ txp + female_share | id + time`. In Stata, you would need two separate regression commands; PyFixest handles it in one formula.
-
-### 9.2 etable() output
-
-The `etable()` method generates a publication-style regression table as a Great Tables object:
-
-```python
-print(fit_multi.etable())
-```
-
-```text
-                        (1)                     (2)
-txp      25.315*** (0.585)      25.328*** (0.605)
-female_share                       -3.216 (8.700)
----
-FE: time              x                       x
-FE: id                x                       x
-Observations         70                      70
-S.E. type         by: id                  by: id
-R²                 0.995                   0.995
-R² Within          0.981                   0.982
-```
-
-The `etable()` output shows significance stars, standard errors in parentheses, fixed effects indicators, and model diagnostics — all formatted for immediate inclusion in a paper.
-
-### 9.3 Custom Great Tables table
-
-For full control over formatting, we can build a table from the `.tidy()` DataFrames:
-
-```python
-rows = []
-for name, fit in [("(1) OLS", fit_ols),
-                  ("(2) TWFE", fit_twfe),
-                  ("(3) TWFE + Cov", fit_cov)]:
-    tidy = fit.tidy()
-    txp_row = tidy[tidy.index == "txp"].iloc[0]
-    rows.append({
-        "Model": name,
-        "Estimate": txp_row["Estimate"],
-        "Std. Error": txp_row["Std. Error"],
-        "t value": txp_row["t value"],
-        "p-value": txp_row["Pr(>|t|)"],
-        "95% CI Lower": txp_row["2.5%"],
-        "95% CI Upper": txp_row["97.5%"],
-        "N": fit._N,
-    })
-
-gt_df = pd.DataFrame(rows)
-gt_table = (
-    GT(gt_df)
-    .tab_header(
-        title=md("**Table 2: DiD Estimates Across Specifications**"),
-        subtitle="Dependent variable: GPA"
-    )
-    .fmt_number(columns=["Estimate", "Std. Error", "t value",
-                         "95% CI Lower", "95% CI Upper"], decimals=3)
-    .fmt_number(columns=["p-value"], decimals=4)
-    .fmt_integer(columns=["N"])
-    .tab_source_note(
-        "Notes: (1) OLS with HC1 robust SE. (2) TWFE with CRV1 "
-        "clustered at school level. (3) TWFE with female_share covariate and CRV1."
-    )
-)
-gt_table.save("did101_table2.png")
-```
-
-![Table 2: DiD estimates across three specifications. All models produce an estimate of approximately 25.32–25.33 with highly significant p-values.](did101_table2.png)
-
-Great Tables provides fine-grained control over number formatting (`.fmt_number()`), column labels (`.cols_label()`), headers (`.tab_header()`), and styling (`.tab_style()`). The `.save()` method exports to PNG using a headless browser.
-
-### 9.4 Exporting LaTeX tables for manuscripts
-
-When submitting to academic journals, you need LaTeX-formatted tables rather than HTML or PNG. PyFixest's `etable()` can generate publication-ready LaTeX directly by setting `type="tex"`. The output uses `booktabs` for clean horizontal rules and `threeparttable` for properly aligned footnotes — the standard format expected by most economics and social science journals.
-
-```python
-latex_output = pf.etable(
-    [fit_ols, fit_twfe, fit_cov],
-    type="tex",
-    labels={
-        "txp": "Treatment $\\times$ Post",
-        "treated": "Treatment",
-        "post": "Post",
-        "female_share": "Female Share",
-        "Intercept": "Constant",
-    },
-    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
-)
-print(latex_output)
-```
-
-```text
-\begin{threeparttable}
-\begin{tabular}{lcccc}
-\toprule
- & \multicolumn{3}{c}{gpa} \\
-\cmidrule(lr){2-4}
- & (1) & (2) & (3) \\
-\midrule
-Treatment & \makecell{-11.049*** \\ (0.288)} &  &  \\
-Post & \makecell{10.886*** \\ (0.339)} &  &  \\
-Treatment:Post & \makecell{25.315*** \\ (0.615)} & \makecell{25.315*** \\ (0.585)} & \makecell{25.328*** \\ (0.605)} \\
-Female Share &  &  & \makecell{-3.216 \\ (8.700)} \\
-Constant & \makecell{71.215*** \\ (0.218)} &  &  \\
-\midrule
-id & - & x & x \\
-time & - & x & x \\
-\midrule
-Observations & 70 & 70 & 70 \\
-S.E. type & hetero & by: id & by: id \\
-$R^2$ & 0.989 & 0.995 & 0.995 \\
-$R^2$ Within & - & 0.981 & 0.982 \\
-\bottomrule
-\end{tabular}
-\footnotesize Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.
-\end{threeparttable}
-```
-
-To save the table directly to a `.tex` file that you can `\input{}` in your manuscript, use the `file_name` parameter:
-
-```python
-pf.etable(
-    [fit_ols, fit_twfe, fit_cov],
-    type="tex",
-    labels={
-        "txp": "Treatment $\\times$ Post",
-        "treated": "Treatment",
-        "post": "Post",
-        "female_share": "Female Share",
-        "Intercept": "Constant",
-    },
-    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
-    file_name="did101_table2.tex",
-)
-```
-
-This saves the file to `did101_table2.tex`. In your LaTeX manuscript, include it with:
-
-```text
-\begin{table}[htbp]
-\centering
-\caption{DiD Estimates Across Specifications}
-\label{tab:did-results}
-\input{did101_table2.tex}
-\end{table}
-```
-
-The `labels` dictionary maps internal variable names to publication-friendly labels (e.g., `"txp"` becomes `"Treatment $\times$ Post"`). The `notes` parameter adds a footnote below the table. Your LaTeX document needs the `booktabs`, `makecell`, and `threeparttable` packages in the preamble:
-
-```text
-\usepackage{booktabs}
-\usepackage{makecell}
-\usepackage{threeparttable}
-```
-
-
-## 10. Coefficient Comparison
-
-A coefficient plot provides a visual comparison of the DiD estimate across specifications, including 95% confidence intervals:
-
-```python
-fig, ax = plt.subplots(figsize=(9, 5))
-model_names = ["(1) OLS\nHC1", "(2) TWFE\nCRV1", "(3) TWFE+Cov\nCRV1"]
-estimates = [fit.tidy().loc["txp", "Estimate"] for fit in [fit_ols, fit_twfe, fit_cov]]
-ci_lower = [fit.tidy().loc["txp", "2.5%"] for fit in [fit_ols, fit_twfe, fit_cov]]
-ci_upper = [fit.tidy().loc["txp", "97.5%"] for fit in [fit_ols, fit_twfe, fit_cov]]
-
-ax.errorbar(estimates, range(3), xerr=[[e-l for e,l in zip(estimates, ci_lower)],
-            [u-e for e,u in zip(estimates, ci_upper)]],
-            fmt="o", color=TEAL, markersize=10, capsize=6, elinewidth=2)
-ax.set_xlabel("DiD Estimate (txp coefficient)")
-ax.set_title("Coefficient Comparison Across Specifications")
-```
-
-![Coefficient plot showing the txp estimate across three specifications. All estimates cluster tightly around 25.32–25.33 with narrow, non-overlapping-with-zero confidence intervals.](did101_coefplot.png)
-
-The near-identical point estimates and overlapping confidence intervals across all three specifications reinforce that the DiD estimate is robust. The point estimates span a range of just 0.013 GPA points (25.315 to 25.328), demonstrating remarkable stability regardless of whether we include school fixed effects, time fixed effects, or time-varying covariates.
-
-
-## 11. Event Study: Dynamic Treatment Effects
-
-### 11.1 Loading the event study data
-
-The 2×2 design tells us *whether* the program had an effect, but not *when* the effect kicked in or whether it grew or faded over time. The event study dataset extends the analysis to **8 time periods** (4 pre-treatment and 4 post-treatment):
-
-```python
-url_event = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_didevent.dta"
-df_event = pd.read_stata(url_event).astype(float)
-print(f"Shape: {df_event.shape}")
-```
-
-```text
-Shape: (280, 8)
-```
-
-The new variable `timeToTreat` measures **periods relative to treatment onset** for treated schools: −4 through −1 are pre-treatment periods, 0 through 3 are post-treatment. Untreated schools have `NaN` for this variable (they are never treated).
-
-```python
-print(df_event["timeToTreat"].value_counts().sort_index())
-```
-
-```text
-timeToTreat
--4.0    10
--3.0    10
--2.0    10
--1.0    10
- 0.0    10
- 1.0    10
- 2.0    10
- 3.0    10
-```
-
-Each of the 10 treated schools contributes one observation per relative time period, giving 10 observations at each event time.
-
-![Panel structure for the event study design showing 35 schools across 8 time periods. Treatment begins at period 5, with 10 treated schools switching from light to dark orange while 25 comparison schools remain in steel blue.](did101_panelview_event.png)
-
-### 11.2 The event study specification
-
-The event study model replaces the single `txp` interaction with a full set of **event-time indicators**, one for each period relative to treatment. We omit one period (the reference period, $t = -1$) to avoid perfect collinearity:
-
-$$Y\_{it} = \alpha + \sum\_{j=-m}^{q} \theta\_j \cdot \text{treat}\_{it}(t = k + j) + \gamma\_i + \vartheta\_t + \varepsilon\_{it}$$
-
-Each $\theta\_j$ measures the treatment effect at event time $j$:
-- **Pre-treatment coefficients** ($j < 0$): These should be near zero if parallel trends holds. Significant pre-treatment coefficients would indicate that treated schools were already diverging *before* the program — a red flag for the DiD design.
-- **Post-treatment coefficients** ($j \geq 0$): These capture the dynamic treatment effect at each lag after the program starts.
-
-### 11.3 Estimation with i()
-
-PyFixest's `i()` function creates factor (indicator) variables with a specified reference level — perfect for event study designs:
-
-```python
-df_event["timeToTreat"] = df_event["timeToTreat"].fillna(-99)
-fit_event = pf.feols("gpa ~ i(timeToTreat, ref=-1) | id + time",
-                     data=df_event, vcov={"CRV1": "id"})
-print(fit_event.summary())
-```
-
-```text
-Estimation:  OLS
-Dep. var.: gpa, Fixed effects: id+time
-Inference:  CRV1
-Observations:  280
-
-| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
-|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
-| t = -4        |      0.342 |        0.401 |     0.852 |      0.400 | -0.474 |   1.157 |
-| t = -3        |     -0.322 |        0.441 |    -0.730 |      0.471 | -1.219 |   0.575 |
-| t = -2        |      0.593 |        0.423 |     1.401 |      0.170 | -0.267 |   1.454 |
-| t = 0         |     25.028 |        0.445 |    56.232 |      0.000 | 24.123 |  25.932 |
-| t = 1         |     24.705 |        0.559 |    44.174 |      0.000 | 23.569 |  25.842 |
-| t = 2         |     24.768 |        0.739 |    33.534 |      0.000 | 23.267 |  26.270 |
-| t = 3         |     25.701 |        0.797 |    32.268 |      0.000 | 24.083 |  27.320 |
----
-RMSE: 1.134 R2: 0.991 R2 Within: 0.961
-```
-
-*Note: Coefficient names simplified for readability. PyFixest outputs `C(timeToTreat, contr.treatment(base=-1))[T.X.0]` notation, where X is the relative time period.*
-
-The `i(timeToTreat, ref=-1)` syntax tells PyFixest to create indicator variables for each unique value of `timeToTreat`, using $t = -1$ as the reference period (coefficient normalized to zero). We fill `NaN` values with −99 for untreated schools — this creates a dummy that gets absorbed by the school fixed effects, keeping the remaining coefficients interpretable.
-
-### 11.4 Event study plot
-
-The event study plot is the signature visualization for DiD designs. Pre-treatment coefficients near zero validate the parallel trends assumption, while post-treatment coefficients reveal the dynamic treatment effect:
-
-![Event study plot showing coefficients at each period relative to treatment. Pre-treatment coefficients (t = -4 to -2) hover near zero with confidence intervals that include zero, supporting parallel trends. Post-treatment coefficients (t = 0 to 3) jump to approximately 25 and remain stable.](did101_event_study.png)
-
-The plot shows a textbook event study pattern:
-
-- **Pre-treatment (t = −4 to −2):** Coefficients are small (0.34, −0.32, 0.59) and statistically insignificant (all p > 0.17). The confidence intervals comfortably include zero. This is strong evidence supporting the **parallel trends assumption** — treated and comparison schools were following similar trajectories before the program.
-
-- **Post-treatment (t = 0 to 3):** An immediate, sharp jump to ≈25 points at the moment of treatment, with the effect remaining remarkably stable across all four post-treatment periods (24.71 to 25.70). There is **no evidence of fade-out** or dynamic adjustment — the program's effect is both immediate and sustained.
-
-### 11.5 Event study coefficients table
-
-| Period | Estimate | 95% CI | Significant? |
-|--------|----------|--------|-------------|
-| t = −4 | 0.342 | [−0.47, 1.16] | No |
-| t = −3 | −0.322 | [−1.22, 0.57] | No |
-| t = −2 | 0.593 | [−0.27, 1.45] | No |
-| t = −1 | 0.000 | (reference) | — |
-| t = 0 | 25.028 | [24.12, 25.93] | Yes (p < 0.001) |
-| t = 1 | 24.705 | [23.57, 25.84] | Yes (p < 0.001) |
-| t = 2 | 24.768 | [23.27, 26.27] | Yes (p < 0.001) |
-| t = 3 | 25.701 | [24.08, 27.32] | Yes (p < 0.001) |
-
-![Table 4: Event study coefficients with estimates, 95% confidence intervals, and significance indicators for each period relative to treatment.](did101_event_table.png)
-
-The event study confirms three critical findings: (1) **no pre-trends** — the design is credible, (2) **immediate effect** — the program works from day one, and (3) **sustained impact** — no fade-out over four post-treatment periods.
-
-
-## 12. Discussion
-
-### 12.1 Four key findings
-
-1. **The naive before-after comparison overstates the effect by 43%.** The raw change in treated schools is 36.20 GPA points, but 10.88 of these points reflect a common upward trend shared by all schools. DiD correctly attributes only 25.32 points to the program.
-
-2. **The event study confirms no differential pre-trends.** All three pre-treatment coefficients (0.34, −0.32, 0.59) are small, close to zero, and statistically insignificant. The parallel trends assumption is well-supported by the data.
-
-3. **The effect is immediate and sustained.** Post-treatment coefficients range from 24.71 to 25.70, showing no evidence of delayed onset, gradual ramp-up, or fade-out. The tutoring program's impact is both immediate and remarkably stable.
-
-4. **Inference choice matters less than design.** Standard errors ranged from 0.585 (CRV1) to 0.637 (CRV3) across four inference methods, but all produced t-statistics above 39. When the research design is clean and the signal is strong, the choice of variance estimator is practically irrelevant.
-
-### 12.2 Caveats
-
-This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. In real applications, you should expect:
-
-- **R-squared below 0.99:** The R² of 0.995 in our TWFE models is unrealistically high. Real education data has far more noise.
-- **Smaller treatment effects:** A 25-point GPA increase is enormous. Real programs typically produce single-digit effects.
-- **Imperfect parallel trends:** Pre-treatment coefficients may not be exactly zero, requiring judgment about how much deviation is acceptable.
-- **Staggered treatment timing:** When different units receive treatment at different times, the standard TWFE estimator can be biased. Modern DiD estimators (Callaway & Sant'Anna, 2021; Gardner, 2022) address this.
-
-
-## 13. Summary and Takeaways
-
-1. **DiD removes common time trends.** The naive approach overstated the effect by 10.88 GPA points — exactly the secular trend captured by the comparison group.
-
-2. **Multiple approaches produce one answer.** Three specifications (OLS, TWFE, TWFE with covariate) all yield a DiD estimate of 25.32–25.33, demonstrating the robustness of the design.
-
-3. **Event studies test parallel trends.** Pre-treatment coefficients (0.34, −0.32, 0.59) are close to zero and insignificant, providing strong evidence that treated and comparison schools were on similar trajectories before the program.
-
-4. **The effect is immediate and sustained.** Post-treatment coefficients (24.71–25.70) show no evidence of delayed onset or fade-out.
-
-5. **Inference flexibility is a PyFixest strength.** Switching between iid, HC1, CRV1, and CRV3 requires only changing the `vcov` argument — no need for separate packages or commands.
-
-6. **etable() and Great Tables replace manual table construction.** The `csw0()` operator estimates multiple specifications in one call, and `etable()` produces publication-ready output. For custom formatting, Great Tables provides full control via `.tab_header()`, `.fmt_number()`, `.tab_style()`, and `.save()`.
-
-
-## 14. Exercises
-
-1. **Robustness check:** Load the event study dataset and collapse it to a 2×2 design by averaging GPA across all pre-treatment periods and all post-treatment periods for each school. Re-estimate the DiD. Does the estimate match the 2×2 result?
-
-2. **Inference sensitivity:** Estimate the TWFE model with all four SE types (iid, HC1, CRV1, CRV3). At what significance level (α) would the choice of SE type change your conclusion about statistical significance? How few clusters would you need before the choice starts to matter?
-
-3. **Staggered DiD:** Read about PyFixest's `did2s()` function for the Gardner (2022) two-stage DiD estimator. How would you adapt this tutorial's code to handle a setting where the 10 treated schools received the program at different times?
-
-
-## References
-
-1. Corral, D. & Yang, M. (2024). An introduction to the difference-in-differences design in education policy research. *Asia Pacific Education Review*.
-2. Callaway, B. & Sant'Anna, P.H. (2021). Difference-in-differences with multiple time periods. *Journal of Econometrics*, 225(2), 200–230.
-3. Goodman-Bacon, A. (2021). Difference-in-differences with variation in treatment timing. *Journal of Econometrics*, 225(2), 254–277.
-4. Sun, L. & Abraham, S. (2021). Estimating dynamic treatment effects in event studies with heterogeneous treatment effects. *Journal of Econometrics*, 225(2), 175–199.
-5. Borusyak, K., Jaravel, X. & Spiess, J. (2024). Revisiting event-study designs: robust and efficient estimation. *Review of Economic Studies*, 91(6), 3253–3285.
-6. Baker, A.C., Larcker, D.F. & Wang, C.C.Y. (2022). How much should we trust staggered difference-in-differences estimates? *Journal of Financial Economics*, 144(2), 370–395.
-7. Correia, S. (2016). REGHDFE: Stata module to perform linear or instrumental-variable regression absorbing any number of high-dimensional fixed effects.
-8. Fischer, A. & Schar, A. (2024). PyFixest: Fast high-dimensional fixed effects estimation in Python.
-9. Great Tables: Presentation-ready display tables. Posit PBC.
-10. Gardner, J. (2022). Two-stage differences in differences. Working paper.

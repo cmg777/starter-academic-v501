@@ -11,7 +11,7 @@ Executable companion to the blog post:
 - `tutorial.qmd` — the executable Quarto notebook.
 - `setup_env.py` — bootstraps a local `.venv/` with pinned packages on first render.
 - `_quarto.yml` — wires `setup_env.py` to Quarto's pre-render hook.
-- `script.py` — the canonical companion script, kept for reference.
+- `script.py` — the canonical companion script, kept for reference. To run it on its own (`.venv/bin/python script.py`), also `pip install selenium` into the `.venv/` and have Chrome installed: Great Tables needs both to save its two tables as PNG files.
 - `README.md` — this file.
 
 ## Prerequisites
