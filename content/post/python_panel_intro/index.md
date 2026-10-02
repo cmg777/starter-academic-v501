@@ -98,51 +98,54 @@ The tutorial proceeds in seven stages. The same 2,199 workers carry the entire a
 
 ```mermaid
 graph TD
-    A["<b>Describe the panel</b><br/>2,199 workers, T = 2<br/>only 6.1% of union variance is within"] --> B["<b>Cross-sectional estimators</b><br/>POLS 0.075, Between 0.066"]
-    B --> C["<b>Within estimators</b><br/>FD, FE, TWFE about 0.21<br/>identified by 73 switchers"]
-    C --> D["<b>Random effects and tests</b><br/>RE 0.109, Hausman p = 0.180<br/>CRE recovers FE exactly"]
-    D --> E["<b>Controls</b><br/>schooling and gender absorbed<br/>the age coefficient flips sign"]
-    E --> F["<b>Interactive lab</b><br/>vary selection and switchers"]
-    F --> G["<b>Consolidate</b><br/>misconceptions, discussion,<br/>graded exercises"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#c8d0e0,stroke:#141413,color:#141413
-    style G fill:#c8d0e0,stroke:#141413,color:#141413
+    A("<b>Describe the panel</b><br/>2,199 workers, T = 2<br/>only 6.1% of union variance is within") --> B("<b>Cross-sectional estimators</b><br/>POLS 0.075, Between 0.066")
+    B --> C("<b>Within estimators</b><br/>FD, FE, TWFE about 0.21<br/>identified by 73 switchers")
+    C --> D("<b>Random effects and tests</b><br/>RE 0.109, Hausman p = 0.180<br/>CRE recovers FE exactly")
+    D --> E("<b>Controls</b><br/>schooling and gender absorbed<br/>the age coefficient flips sign")
+    E --> F("<b>Interactive lab</b><br/>vary selection and switchers")
+    F --> G("<b>Consolidate</b><br/>misconceptions, discussion,<br/>graded exercises")
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef within fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef tests fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef practice fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A,B data
+    class C within
+    class D,E tests
+    class F,G practice
 ```
 
-The colors in the diagram mark the logic of the argument. The blue boxes describe the data and the cross-sectional benchmark. The orange box introduces the within estimators, which remove fixed worker traits. The teal boxes test the choice between fixed and random effects and add controls. The gray boxes return control to the reader through a lab, a set of misconceptions, and graded exercises.
+The border colors of the boxes mark the logic of the argument. The boxes with blue borders describe the data and the cross-sectional benchmark. The box with an orange border introduces the within estimators, which remove fixed worker traits. The boxes with teal borders test the choice between fixed and random effects and then add controls. Finally, the boxes with gray borders turn the analysis over to the reader through a lab, a set of misconceptions, and graded exercises.
 
 ### 1.4 How the estimators relate
 
-The diagram below summarizes the estimator family. It also shows how the two specification tests, the Hausman test and the Mundlak term, guide the choice between fixed and random effects. Readers can return to this map whenever the relationship between two estimators becomes unclear.
+The diagram below summarizes the estimator family. It classifies each estimator by the variation that it uses. It also shows how the two specification tests, the Hausman test and the Mundlak term, guide the choice between fixed and random effects. Readers can return to this map whenever the relationship between two estimators becomes unclear.
 
 ```mermaid
 flowchart TD
-    A["Panel data y_it, x_it for i = 1..N, t = 1..T"]
-    A --> B{"What variation does the estimator use?"}
-    B -->|"All variation (ignores panel)"| POLS["Pooled OLS"]
-    B -->|"Cross-sectional only"| BETW["Between"]
-    B -->|"Within-individual only"| WITHIN["FE / FDFE / DVFE / TWFE"]
-    B -->|"Weighted between + within"| RE["Random Effects"]
-    WITHIN --> TEST{"Hausman test or Mundlak term"}
+    A("<b>Panel data</b><br/>outcome y and regressor x<br/>for workers i in periods t") --> Q("<b>Which variation does<br/>the estimator use?</b>")
+    Q -->|"all variation,<br/>panel ignored"| POLS("Pooled OLS")
+    Q -->|"between<br/>workers only"| BETW("Between")
+    Q -->|"within<br/>workers only"| WITHIN("FE, FDFE,<br/>DVFE, TWFE")
+    Q -->|"weighted between<br/>and within"| RE("Random effects")
+    WITHIN --> TEST("<b>Specification test</b><br/>Hausman test or<br/>Mundlak term")
     RE --> TEST
-    TEST -->|"Reject H0: RE inconsistent"| USE_FE["Use FE (consistent)"]
-    TEST -->|"Fail to reject: RE plausible"| USE_RE["Use RE (efficient)"]
-    WITHIN --> CRE["CRE / Mundlak: bridges FE and RE"]
+    WITHIN --> CRE("<b>CRE (Mundlak)</b><br/>FE coefficient inside<br/>an RE model")
     RE --> CRE
-    style POLS fill:#999999,stroke:#141413,color:#fff
-    style BETW fill:#8FB4D8,stroke:#141413,color:#141413
-    style WITHIN fill:#d97757,stroke:#141413,color:#fff
-    style RE fill:#00d4c8,stroke:#141413,color:#141413
-    style CRE fill:#c4623d,stroke:#141413,color:#fff
-    style USE_FE fill:#d97757,stroke:#141413,color:#fff
-    style USE_RE fill:#00d4c8,stroke:#141413,color:#141413
+    TEST -->|"reject H0:<br/>RE inconsistent"| USE_FE("Use FE<br/>(consistent)")
+    TEST -->|"fail to reject:<br/>RE plausible"| USE_RE("Use RE<br/>(efficient)")
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef question fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef within fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef tests fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef bridge fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A,POLS,BETW data
+    class Q,TEST question
+    class WITHIN,USE_FE within
+    class RE,USE_RE tests
+    class CRE bridge
 ```
 
-The diagram makes the central trade-off visible. Pooled OLS, the between estimator, and random effects rely mainly on cross-sectional variation, so they ask how union and non-union workers compare. The within estimators (FE, FDFE, DVFE, and TWFE) rely only on changes within workers, so they ask what happens when the same worker changes union status. The CRE (Mundlak) model sits between the two groups and recovers the within coefficient inside a random-effects framework. Finally, the Hausman test and the Mundlak term are formal tools for choosing between fixed and random effects, and we run both.
+The diagram makes the central trade-off of panel methods visible. Pooled OLS and the between estimator rely on cross-sectional variation, so they ask how union and non-union workers compare. Random effects also leans heavily on this comparison, because it combines between and within variation. By contrast, the within estimators (FE, FDFE, DVFE, and TWFE) rely only on changes within workers, so they ask what happens when the same worker changes union status. The CRE (Mundlak) model connects the two groups, because it recovers the within coefficient inside a random-effects framework. The Hausman test and the Mundlak term are formal tools for choosing between fixed and random effects, and we run both in sections 13 and 14.
 
 ## 2. Key concepts at a glance
 

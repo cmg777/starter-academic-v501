@@ -3091,24 +3091,68 @@ body:not(.dark) .cz-footer a:hover { color: #0a7d75; }                /* footer 
 
 /* --- 23. Mermaid diagrams — dark-mode contrast fix ---
    Wowchemy re-initialises Mermaid with theme:'dark' in dark mode (see the
-   theme's wowchemy-theming.js). Mermaid's `style <id> fill:...` directives only
-   reach RECT-shaped nodes; decision rhombi — and any node without an explicit
-   fill — fall back to the near-black dark-theme default (#1f2020). The visible
-   (HTML) node-label text renders DARK in both modes, so on that near-black
-   rhombus it becomes invisible "black text on a black box". (This Mermaid
-   version also silently ignores per-node `color:` directives.) Fix: give every
-   node shape WITHOUT an inline fill a LIGHT lavender panel — the same fill
-   Mermaid uses for rhombi in light mode — so the dark label text stays legible.
-   Explicit inline fills (the rects) keep winning via `:not([style*="fill"])`,
-   the dark label text is left as-is, and light mode is untouched. --- */
+   theme's wowchemy-theming.js). Nodes WITHOUT an explicit fill (typically
+   decision rhombi or plain boxes with no `style`/`classDef`) get the theme
+   default shape colors, while their HTML label text renders LIGHT (#ccc).
+   An earlier version of this rule painted those shapes light lavender, which
+   turned them into pale text on a pale box. The rules below use the site dark
+   palette instead, and apply ONLY in dark mode (light mode is untouched):
+   1. Unstyled node shapes: navy panel (#1f2b5e) with a steel-blue border, and
+      light label text (#e8ecf2). The rules match only nodes whose class is
+      exactly "node default" (or "node default default"), so nodes styled
+      through `classDef` / `:::class` keep their colors, and shapes with an
+      inline fill (from a `style` line) are excluded via `:not([style*="fill"])`.
+   2. Edge labels: dark navy chip (#0f1729) with light text, instead of the
+      theme default mid-gray box.
+   3. Connector lines and arrowheads: light gray-blue (#c8d0e0), so arrows stay
+      visible on the dark page. Links colored by `linkStyle` (inline stroke)
+      keep their color. --- */
 body.dark .mermaid {
-  .node polygon:not([style*="fill"]),
-  .node rect:not([style*="fill"]),
-  .node circle:not([style*="fill"]),
-  .node ellipse:not([style*="fill"]),
-  .node path:not([style*="fill"]) {
-    fill: #ececff !important;   /* light lavender panel — legible with dark label text */
-    stroke: #6a9bcc !important; /* steel-blue border for definition */
+  /* Unstyled nodes only: Mermaid gives them exactly class="node default" (or
+     "node default default"); nodes styled through classDef / :::class carry an
+     extra class name and keep their own fill and text colors. */
+  .node[class="node default"],
+  .node[class="node default default"] {
+    > polygon:not([style*="fill"]),
+    > rect:not([style*="fill"]),
+    > circle:not([style*="fill"]),
+    > ellipse:not([style*="fill"]),
+    > path:not([style*="fill"]) {
+      fill: #1f2b5e !important;   /* navy panel from the site dark palette */
+      stroke: #6a9bcc !important; /* steel-blue border for definition */
+    }
+  }
+  .node[class="node default"]:has(> :is(polygon, rect, circle, ellipse, path):not([style*="fill"])),
+  .node[class="node default default"]:has(> :is(polygon, rect, circle, ellipse, path):not([style*="fill"])) {
+    .nodeLabel,
+    .label,
+    span,
+    p {
+      color: #e8ecf2 !important;
+    }
+    text {
+      fill: #e8ecf2 !important;
+    }
+  }
+  .edgeLabel,
+  .edgeLabel p,
+  .edgeLabel span {
+    background-color: #0f1729 !important;
+    color: #e8ecf2 !important;
+  }
+  .edgeLabel rect {
+    fill: #0f1729 !important;
+    opacity: 1 !important;
+  }
+  .flowchart-link:not([style*="stroke"]),
+  path.path:not([style*="stroke"]) {
+    stroke: #c8d0e0 !important;
+  }
+  marker path,
+  .arrowMarkerPath,
+  .arrowheadPath {
+    fill: #c8d0e0 !important;
+    stroke: #c8d0e0 !important;
   }
 }
 
