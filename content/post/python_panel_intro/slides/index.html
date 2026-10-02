@@ -213,7 +213,7 @@
 </section>
 <section id="same-workers-same-question-but-the-answer-triples-depending-on-the-estimator" class="slide level2 center">
 <h2>Same workers, same question — but the answer triples depending on the estimator</h2>
-<p>A simple regression says joining a union raises wages by <strong>7.5%</strong>. Compare each worker to <em>themselves</em> across years and the number jumps to <strong>21%</strong>.</p>
+<p>A simple regression says joining a union raises wages by <strong>7.5 log points</strong>. Compare each worker to <em>themselves</em> across years and the number jumps to <strong>21 log points</strong> (about 23%).</p>
 <div class="fragment">
 <p>One dataset, two stories. <em>Which one do you report?</em></p>
 <aside class="notes">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> — union membership; only <strong>16.3%</strong> of worker-years unionized</li>
 <li class="fragment"><strong>Window</strong> — restricted to <strong>2010 and 2012</strong>, so <span class="math inline">\(T = 2\)</span> and the panel is balanced</li>
 </ul>
-<p><span class="takeaway fragment">With <span class="math inline">\(T = 2\)</span>, every worker contributes exactly two rows — the cleanest setting to see that first-differences and the within estimator are the <em>same thing</em>.</span></p>
+<p><span class="takeaway fragment">With <span class="math inline">\(T = 2\)</span>, every worker contributes exactly two rows — the cleanest setting to see that first differences and the within estimator are exactly linked: FD without an intercept <em>is</em> FE, and FD with an intercept is two-way FE.</span></p>
 <aside class="notes">
 <p>NLSY-style data on US workers; the full file has five waves (2010–2018) but we keep two for pedagogical clarity. 4,398 worker-year observations, balanced. The low unionization rate (16.3%) matters: any estimator that leans on cross-sectional variation is working mostly with non-union workers.</p>
 <style type="text/css">
@@ -340,7 +340,7 @@
 <h2>Only the workers who <em>switch</em> status identify the within estimators</h2>
 
 <img data-src="../panel_intro_trajectories.png" class="r-stretch quarto-figure-center"><p class="caption">Log-wage trajectories for 30 sampled workers. Teal lines change union status; orange/blue lines never do.</p><aside class="notes">
-<p>Most lines are flat-colored — always-union (orange) or never-union (blue). Only the teal “changer” lines carry identifying information for FE, FD, and Mundlak. Read only the teal lines and you have run fixed effects; ignore them and you have run a between estimator. The cross-sectional-vs-within tension is literally a question of which lines you choose to read.</p>
+<p>Most lines are flat-colored — always-union (orange) or never-union (blue). Only the teal “changer” lines carry identifying information for FE, FD, and Mundlak. One-way fixed effects reads only the teal lines, because a line whose union status never changes carries no within-worker contrast; the blue and orange lines can only be compared with each other, which is the cross-sectional comparison. The tension is literally a question of which lines you choose to read.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -353,8 +353,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="pooled-ols-the-naive-baseline-reports-a-7.5-premium" class="slide level2 center">
-<h2>Pooled OLS — the naive baseline — reports a 7.5% premium</h2>
+<section id="pooled-ols-the-naive-baseline-reports-a-7.5-log-point-premium" class="slide level2 center">
+<h2>Pooled OLS — the naive baseline — reports a 7.5-log-point premium</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2-3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>fit_pols <span class="op">=</span> pf.feols(<span class="st">"lwage ~ union"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span><span class="st">"HC1"</span>)</span>
 <span id="cb1-2"><a href=""></a><span class="bu">print</span>(fit_pols.coef()[<span class="st">"union"</span>])   <span class="co"># 0.0750</span></span>
 <span id="cb1-3"><a href=""></a><span class="co"># Union coefficient: 0.0750  (SE 0.0231)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -379,7 +379,7 @@
 <p>The worker-specific effect <span class="math inline">\(\alpha_i\)</span> — ability, schooling, gender — <em>cancels in the subtraction</em>. What is left is identified only by workers who <strong>changed</strong> union status.</p>
 <p><span class="takeaway fragment">FDFE <span class="math inline">\(= 0.2113\)</span> (SE 0.079); the SE is <span class="math inline">\(3.4\times\)</span> larger than POLS — the switcher-only signature.</span></p>
 <aside class="notes">
-<p>Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that still excludes zero. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.</p>
+<p>Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that excludes zero but also contains the POLS 0.075, so the upward revision is large in size but not statistically decisive on its own. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -416,7 +416,7 @@
 <span id="cb2-3"><a href=""></a><span class="co"># Both → 0.2103;  FDFE → 0.2113 (the +0.001 is an intercept-driven year trend)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Within transformation, first-differences, and dummy-variable FE are three recipes for the <strong>same dish</strong>. Absorption (<code>| ID</code>) is just the fast one.</span></p>
 <aside class="notes">
-<p>DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: 2,199 dummies still runs fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.</p>
+<p>DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: about 2,200 dummies still run fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -489,8 +489,8 @@
 </section>
 <section id="mundlak-recovers-the-fe-coefficient-and-flags-negative-selection" class="slide level2 center">
 <h2>Mundlak recovers the FE coefficient <em>and</em> flags negative selection</h2>
-<p><span class="math display">\[y_{it} = \alpha + \beta\,x_{it} + \gamma\,\bar{x}_i + u_{it}\]</span></p>
-<p>Add each worker’s <strong>mean</strong> union exposure <span class="math inline">\(\bar{x}_i\)</span>, then run RE. The within coefficient <span class="math inline">\(\beta\)</span> equals FE; the mean coefficient <span class="math inline">\(\gamma\)</span> tests whether <span class="math inline">\(\alpha_i\)</span> correlates with <span class="math inline">\(x\)</span>.</p>
+<p><span class="math display">\[y_{it} = \alpha + \beta\,x_{it} + \gamma\,\bar{x}_i + a_i + u_{it}\]</span></p>
+<p>Add each worker’s <strong>mean</strong> union exposure <span class="math inline">\(\bar{x}_i\)</span>, then run RE (random worker effect <span class="math inline">\(a_i\)</span>). The within coefficient <span class="math inline">\(\beta\)</span> equals FE; the mean coefficient <span class="math inline">\(\gamma\)</span> tests whether <span class="math inline">\(\alpha_i\)</span> correlates with <span class="math inline">\(x\)</span>.</p>
 <p><span class="takeaway fragment">CRE within <span class="math inline">\(= 0.2103\)</span> (matches FE exactly); Mundlak term <span class="math inline">\(\gamma = -0.144\)</span>, <span class="math inline">\(p = 0.072\)</span> — borderline, hinting at negative selection.</span></p>
 <aside class="notes">
 <p>Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. In this balanced panel γ is exactly Between minus FE (0.0662 − 0.2103). Unlike the plug-in Hausman number, this test stays valid with robust SEs; clustered by worker it gives p = 0.106. So: the textbook test rejects, the robust test is borderline.</p>
@@ -516,7 +516,7 @@
 <p><span class="bignum">0.210</span></p>
 <p><span class="bignum-label"><span class="math inline">\(\hat\beta_{\mathrm{FE}}\)</span> on union (SE 0.081) — vs pooled OLS 0.075; FDFE, TWFE, and CRE all agree near 0.21</span></p>
 <aside class="notes">
-<p>The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to <em>joining</em> a union. Caveat for Q&amp;A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026).</p>
+<p>The Act-III payoff. Cross-sectional methods say 7–11 log points; within methods say about 21. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to <em>joining</em> a union. Caveat for Q&amp;A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -572,6 +572,12 @@
 <td style="text-align: left;">within demeaned</td>
 </tr>
 <tr class="even">
+<td>TWFE</td>
+<td style="text-align: right;">0.2113</td>
+<td style="text-align: right;">0.0792</td>
+<td style="text-align: left;">within, net of year effects</td>
+</tr>
+<tr class="odd">
 <td>CRE</td>
 <td style="text-align: right;">0.2103</td>
 <td style="text-align: right;">0.0703</td>
@@ -579,9 +585,9 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">Cross-sectional 7–11% · within ~21%. Standard errors swing inversely — the within camp is noisier but causally cleaner.</span></p>
+<p><span class="takeaway fragment">Cross-sectional 7–11 log points · within ~21. Standard errors swing inversely — the within camp is noisier but causally cleaner.</span></p>
 <aside class="notes">
-<p>The payoff table. The six methods cluster into two camps roughly three-fold apart. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.</p>
+<p>The payoff table. The seven methods cluster into two camps roughly three-fold apart; TWFE equals FDFE exactly because T = 2. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -615,7 +621,7 @@
 <h2>Does FE make this causal? No — strict exogeneity still carries the weight</h2>
 <p><span class="objection">Objection.</span> Within estimators just net out fixed traits — they can’t manufacture identification.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. FE/FDFE/TWFE/CRE target the ATE for <em>union switchers</em> only — and only under <strong>strict exogeneity given the worker fixed effect</strong>.</p>
+<p><span class="rebuttal">Response.</span> Correct. FE/FDFE/TWFE/CRE target the average effect among <em>union switchers</em> only — and only under <strong>strict exogeneity given the worker fixed effect</strong>.</p>
 <aside class="notes">
 <p>Steelman, don’t strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the 73 of 2,199 workers (3.3%) who switched union status (36 joined, 37 left) — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.</p>
 <style type="text/css">
@@ -630,6 +636,28 @@
           display:block!important;
       }</style></aside>
 </div>
+</section>
+<section id="the-0.21-rests-on-73-switchers-and-on-two-waves" class="slide level2 center">
+<h2>The 0.21 rests on 73 switchers and on two waves</h2>
+<ul>
+<li class="fragment"><strong>Joiners vs leavers</strong> — two-way FE on stayers + joiners gives <strong>0.345</strong>; on stayers + leavers, <strong>0.081</strong></li>
+<li class="fragment"><strong>All five waves</strong> (2010–2018) — two-way FE falls to <strong>0.040</strong> (SE 0.026), FD with year effects to <strong>0.057</strong></li>
+<li class="fragment"><strong>More waves, more within variation</strong> — the within share of union rises from 6.1% to 16.1%, yet the premium shrinks</li>
+</ul>
+<p><span class="takeaway fragment">The within estimate is credible about <em>what</em> it identifies, not about how general it is: 0.21 is a 2010–2012 number for a small, possibly unusual group.</span></p>
+<aside class="notes">
+<p>These are the post’s Exercises 5 and 6. Each subsample has fewer than 40 switchers, so the asymmetry is noisy, but it warns that the symmetric within model averages two very different responses. With T = 5, FD and FE also stop coinciding (they weight the periods differently), and neither is significant at 5%. None of this makes the cross-sectional 0.075 right; it says the within answer is local and fragile.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="with-robust-errors-lead-with-cremundlak-and-its-built-in-test" class="slide level2 center" data-background-color="#141413">
 <h2>With robust errors, lead with CRE/Mundlak and its built-in test</h2>

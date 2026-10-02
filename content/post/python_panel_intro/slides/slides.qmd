@@ -49,7 +49,7 @@ format:
 
 ## Same workers, same question — but the answer triples depending on the estimator
 
-A simple regression says joining a union raises wages by **7.5%**. Compare each worker to *themselves* across years and the number jumps to **21%**.
+A simple regression says joining a union raises wages by **7.5 log points**. Compare each worker to *themselves* across years and the number jumps to **21 log points** (about 23%).
 
 . . .
 
@@ -88,7 +88,7 @@ The spoiler figure. Don't explain every bar yet — just plant that the estimato
 - **Window** — restricted to **2010 and 2012**, so $T = 2$ and the panel is balanced
 :::
 
-[With $T = 2$, every worker contributes exactly two rows — the cleanest setting to see that first-differences and the within estimator are the *same thing*.]{.takeaway .fragment}
+[With $T = 2$, every worker contributes exactly two rows — the cleanest setting to see that first differences and the within estimator are exactly linked: FD without an intercept *is* FE, and FD with an intercept is two-way FE.]{.takeaway .fragment}
 
 ::: {.notes}
 NLSY-style data on US workers; the full file has five waves (2010–2018) but we keep two for pedagogical clarity. 4,398 worker-year observations, balanced. The low unionization rate (16.3%) matters: any estimator that leans on cross-sectional variation is working mostly with non-union workers.
@@ -136,10 +136,10 @@ Fixed effects only use the within part. For union that is a thin 6.1% slice of t
 ![Log-wage trajectories for 30 sampled workers. Teal lines change union status; orange/blue lines never do.](../panel_intro_trajectories.png)
 
 ::: {.notes}
-Most lines are flat-colored — always-union (orange) or never-union (blue). Only the teal "changer" lines carry identifying information for FE, FD, and Mundlak. Read only the teal lines and you have run fixed effects; ignore them and you have run a between estimator. The cross-sectional-vs-within tension is literally a question of which lines you choose to read.
+Most lines are flat-colored — always-union (orange) or never-union (blue). Only the teal "changer" lines carry identifying information for FE, FD, and Mundlak. One-way fixed effects reads only the teal lines, because a line whose union status never changes carries no within-worker contrast; the blue and orange lines can only be compared with each other, which is the cross-sectional comparison. The tension is literally a question of which lines you choose to read.
 :::
 
-## Pooled OLS — the naive baseline — reports a 7.5% premium
+## Pooled OLS — the naive baseline — reports a 7.5-log-point premium
 
 ``` {.python code-line-numbers="1|2-3"}
 fit_pols = pf.feols("lwage ~ union", data=df, vcov="HC1")
@@ -162,7 +162,7 @@ The worker-specific effect $\alpha_i$ — ability, schooling, gender — *cancel
 [FDFE $= 0.2113$ (SE 0.079); the SE is $3.4\times$ larger than POLS — the switcher-only signature.]{.takeaway .fragment}
 
 ::: {.notes}
-Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that still excludes zero. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.
+Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that excludes zero but also contains the POLS 0.075, so the upward revision is large in size but not statistically decisive on its own. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.
 :::
 
 ## The within transformation demeans the data — and the slope steepens to 0.21
@@ -184,7 +184,7 @@ fit_dvfe = pf.feols("lwage ~ union + C(ID_str)", data=df, vcov="HC1") # 2,198 du
 [Within transformation, first-differences, and dummy-variable FE are three recipes for the **same dish**. Absorption (`| ID`) is just the fast one.]{.takeaway .fragment}
 
 ::: {.notes}
-DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: 2,199 dummies still runs fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.
+DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: about 2,200 dummies still run fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.
 :::
 
 ## Two-way FE absorbs year shocks and lands at 0.2113 — exactly first differences
@@ -228,9 +228,9 @@ With classical variances (SE 0.0509 for FE, 0.0278 for RE): $H = 5.62$, $p = 0.0
 
 ## Mundlak recovers the FE coefficient *and* flags negative selection
 
-$$y_{it} = \alpha + \beta\,x_{it} + \gamma\,\bar{x}_i + u_{it}$$
+$$y_{it} = \alpha + \beta\,x_{it} + \gamma\,\bar{x}_i + a_i + u_{it}$$
 
-Add each worker's **mean** union exposure $\bar{x}_i$, then run RE. The within coefficient $\beta$ equals FE; the mean coefficient $\gamma$ tests whether $\alpha_i$ correlates with $x$.
+Add each worker's **mean** union exposure $\bar{x}_i$, then run RE (random worker effect $a_i$). The within coefficient $\beta$ equals FE; the mean coefficient $\gamma$ tests whether $\alpha_i$ correlates with $x$.
 
 [CRE within $= 0.2103$ (matches FE exactly); Mundlak term $\gamma = -0.144$, $p = 0.072$ — borderline, hinting at negative selection.]{.takeaway .fragment}
 
@@ -249,7 +249,7 @@ Mundlak (1978) proved β here is numerically identical to FE — and it is, to f
 [$\hat\beta_{\mathrm{FE}}$ on union (SE 0.081) — vs pooled OLS 0.075; FDFE, TWFE, and CRE all agree near 0.21]{.bignum-label}
 
 ::: {.notes}
-The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to *joining* a union. Caveat for Q&A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026).
+The Act-III payoff. Cross-sectional methods say 7–11 log points; within methods say about 21. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to *joining* a union. Caveat for Q&A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026).
 :::
 
 ## Two camps, three-fold apart — and the gap is selection, not noise
@@ -261,12 +261,13 @@ The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%
 | RE      | 0.1092              | 0.0299 | GLS between + within |
 | FDFE    | 0.2113              | 0.0792 | within differences |
 | FE      | [0.2103]{.key}      | 0.0812 | within demeaned |
+| TWFE    | 0.2113              | 0.0792 | within, net of year effects |
 | CRE     | 0.2103              | 0.0703 | RE + Mundlak (= within) |
 
-[Cross-sectional 7–11% · within ~21%. Standard errors swing inversely — the within camp is noisier but causally cleaner.]{.takeaway .fragment}
+[Cross-sectional 7–11 log points · within ~21. Standard errors swing inversely — the within camp is noisier but causally cleaner.]{.takeaway .fragment}
 
 ::: {.notes}
-The payoff table. The six methods cluster into two camps roughly three-fold apart. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.
+The payoff table. The seven methods cluster into two camps roughly three-fold apart; TWFE equals FDFE exactly because T = 2. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.
 :::
 
 ## Adding controls leaves the two-camp gap intact
@@ -283,10 +284,24 @@ With age, schooling, female, and year effects in every model, POLS drops to 0.05
 
 . . .
 
-[Response.]{.rebuttal} Correct. FE/FDFE/TWFE/CRE target the ATE for *union switchers* only — and only under **strict exogeneity given the worker fixed effect**.
+[Response.]{.rebuttal} Correct. FE/FDFE/TWFE/CRE target the average effect among *union switchers* only — and only under **strict exogeneity given the worker fixed effect**.
 
 ::: {.notes}
 Steelman, don't strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the 73 of 2,199 workers (3.3%) who switched union status (36 joined, 37 left) — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.
+:::
+
+## The 0.21 rests on 73 switchers and on two waves
+
+::: {.incremental}
+- **Joiners vs leavers** — two-way FE on stayers + joiners gives **0.345**; on stayers + leavers, **0.081**
+- **All five waves** (2010–2018) — two-way FE falls to **0.040** (SE 0.026), FD with year effects to **0.057**
+- **More waves, more within variation** — the within share of union rises from 6.1% to 16.1%, yet the premium shrinks
+:::
+
+[The within estimate is credible about *what* it identifies, not about how general it is: 0.21 is a 2010–2012 number for a small, possibly unusual group.]{.takeaway .fragment}
+
+::: {.notes}
+These are the post's Exercises 5 and 6. Each subsample has fewer than 40 switchers, so the asymmetry is noisy, but it warns that the symmetric within model averages two very different responses. With T = 5, FD and FE also stop coinciding (they weight the periods differently), and neither is significant at 5%. None of this makes the cross-sectional 0.075 right; it says the within answer is local and fragile.
 :::
 
 ## With robust errors, lead with CRE/Mundlak and its built-in test {background-color="#141413"}
