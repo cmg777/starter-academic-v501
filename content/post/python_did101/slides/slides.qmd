@@ -10,7 +10,7 @@ key-results:
   - num: "25.32"
     cap: "ATT · GPA points (DiD)"
   - num: "+43%"
-    cap: "naive overstatement"
+    cap: "naive overstates the DiD effect"
   - num: "0"
     cap: "significant pre-trends"
 format:
@@ -74,7 +74,7 @@ The spoiler figure for Act I. Don't resolve it yet — just plant the suspicion.
 - Why naive before-after overstates, and how a comparison group fixes it
 - Manual double-differencing, then OLS and two-way fixed effects in PyFixest
 - Four standard-error flavours — does inference change the verdict?
-- An 8-period event study to test parallel trends
+- An 8-period event study to probe parallel trends
 :::
 
 # The Investigation {.divider background-color="#6a9bcc"}
@@ -83,10 +83,10 @@ The spoiler figure for Act I. Don't resolve it yet — just plant the suspicion.
 
 ## A clean 2×2 lab: 35 schools, 2 periods, simultaneous treatment
 
-![Panel structure — 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. No school changes status, and timing is simultaneous.](../did101_panelview.png)
+![Panel structure — 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. Timing is simultaneous and treatment, once on, stays on.](../did101_panelview.png)
 
 ::: {.notes}
-The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods), outcome is average GPA of low-income students on a 0–100 scale. This is a textbook 2×2 — all 10 treated schools adopt at the same moment, no switching, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.
+The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods), outcome is average GPA of low-income students on a 0–100 scale. This is a textbook 2×2 — all 10 treated schools adopt at the same moment, no school ever drops out of treatment, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.
 :::
 
 ## The comparison group reveals an 11-point trend the program never caused
@@ -149,7 +149,7 @@ print(fit_ols.summary())
 | txp | [25.32]{.key} | the DiD estimate |
 
 ::: {.notes}
-The manual double-difference is exactly an OLS regression with a treated dummy, a post dummy, and their interaction. Every coefficient is a group mean or a difference of group means. txp = 25.315 is the ATT, matching the manual calculation to the decimal. HC1 gives heteroskedasticity-robust standard errors.
+The manual double-difference is exactly an OLS regression with a treated dummy, a post dummy, and their interaction. Every coefficient is a group mean or a difference of group means. txp = 25.315 is the ATT; the manual 25.32 is the same number computed from means rounded to two decimals (likewise post = 10.886 here versus 10.88 from the rounded means). HC1 gives heteroskedasticity-robust standard errors, but it treats each school's two observations as independent; the next slide clusters by school.
 :::
 
 ## Two-way fixed effects absorb school and time — leaving only the interaction
@@ -179,7 +179,7 @@ Add female_share and the estimate moves by 0.013 (25.315 → 25.328); the covari
 ![Standard errors across iid, HC1, CRV1, and CRV3. CRV3 is largest (0.637); HC1 and CRV1 are nearly identical (0.585). All four yield overwhelmingly significant results.](../did101_se_comparison.png)
 
 ::: {.notes}
-Four variance estimators on the same model. SEs range from 0.585 to 0.637 — but with an effect of 25 GPA points, even the largest SE leaves a t-statistic above 39. With only 35 clusters CRV3's small-sample correction is the safer default, but here inference choice is practically irrelevant. The lesson: design beats variance estimator.
+Four variance estimators on the same model. SEs range from 0.585 to 0.637 — but with an effect of 25 GPA points, even the largest SE leaves a t-statistic above 39. What matters for inference is the 10 treated schools, not the 35 clusters in total: with few treated clusters CRV1 can understate uncertainty, so CRV3 (a leave-one-school-out jackknife) or the wild cluster bootstrap is the safer choice. Here the effect is so large that the choice is practically irrelevant. The lesson: design beats variance estimator.
 :::
 
 # The Resolution {.divider background-color="#00d4c8"}
@@ -201,7 +201,7 @@ The Act-III payoff. The naive before-after said 36.20; DiD says 25.32. The 10.88
 ![Event-study coefficients by period relative to treatment. Leads (t = −4 to −2) sit near zero with CIs covering zero; lags (t = 0 to 3) jump to ≈25 and stay flat.](../did101_event_study.png)
 
 ::: {.notes}
-The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. Pre-treatment coefficients (0.34, −0.32, 0.59) are all insignificant (p > 0.17) — strong support for parallel trends. Post-treatment effects jump to ~25 at t = 0 and hold across all four lags: immediate and sustained, no fade-out.
+The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. Pre-treatment coefficients (0.34, −0.32, 0.59) are all insignificant (p > 0.17) — consistent with parallel trends, though no pre-test can prove it. Post-treatment effects jump to ~25 at t = 0 and hold across all four lags: immediate and sustained, no fade-out.
 :::
 
 ## The numbers behind the picture: silent leads, loud lags
@@ -214,10 +214,10 @@ The 8-period extension (280 observations) replaces the single interaction with o
 | t = 0 | [25.03]{.key} | [24.12, 25.93] | yes |
 | t = 3 | 25.70 | [24.08, 27.32] | yes |
 
-[Three near-zero leads validate parallel trends; four large lags trace a stable effect.]{.takeaway .fragment}
+[Three near-zero leads are consistent with parallel trends; four large lags trace a stable effect.]{.takeaway .fragment}
 
 ::: {.notes}
-t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant — the design is credible. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p < 0.001 and remarkably flat: the program works from day one and shows no decay over four periods.
+t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant, which supports (but cannot prove) the design. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p < 0.001 and remarkably flat: the effect appears in the first treated period (relative to t = −1) and shows no decay over four periods.
 :::
 
 ## Event-study panel confirms the design: treatment switches on at period 5
@@ -225,7 +225,7 @@ t = −1 is the omitted reference (normalized to zero). The three pre-treatment 
 ![Panel structure for the event study — 35 schools across 8 periods. Treatment begins at period 5; 10 treated schools switch from light to dark orange, 25 comparison schools stay steel blue.](../did101_panelview_event.png)
 
 ::: {.notes}
-Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. The clean staggered-on-simultaneously structure is what lets the event study cleanly separate leads from lags.
+Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. Simultaneous adoption, with no staggering, is what lets this simple event study separate leads from lags cleanly.
 :::
 
 ## Does precision make this causal? No — the assumptions still carry it
@@ -237,7 +237,7 @@ Four pre-treatment periods and four post-treatment periods, with each of the 10 
 [Response.]{.rebuttal} Precision is not identification. The 25.32 ATT is valid only under **parallel trends** and **SUTVA**. Flat pre-trends are supportive, not proof; and this is *simulated* data with parallel trends built in. In the field, expect imperfect pre-trends, smaller effects, and R² well below 0.99.
 
 ::: {.notes}
-Steelman, don't strawman. The event study tests but cannot confirm parallel trends — it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. And staggered real-world timing can bias the standard TWFE estimator (Callaway–Sant'Anna, Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.
+Steelman, don't strawman. The event study tests but cannot confirm parallel trends — it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. And with staggered real-world timing and effects that vary across adoption cohorts, the standard TWFE estimator can be badly biased (Goodman-Bacon; Callaway–Sant'Anna; Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.
 :::
 
 # A credible comparison group, not the variance estimator, is what makes the effect causal. {.divider background-color="#141413"}

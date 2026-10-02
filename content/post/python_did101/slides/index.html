@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-10-02">
   <title>Introduction to Difference-in-Differences in Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -199,12 +199,12 @@
   <p class="subtitle">Does after-school tutoring raise GPA? Separating the program from the trend</p>
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">25.32</span><span class="kr-cap">ATT · GPA points (DiD)</span></div>
-    <div class="kr"><span class="kr-num">+43%</span><span class="kr-cap">naive overstatement</span></div>
+    <div class="kr"><span class="kr-num">+43%</span><span class="kr-cap">naive overstates the DiD effect</span></div>
     <div class="kr"><span class="kr-num">0</span><span class="kr-cap">significant pre-trends</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">October 2, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -255,7 +255,7 @@
 <li class="fragment">Why naive before-after overstates, and how a comparison group fixes it</li>
 <li class="fragment">Manual double-differencing, then OLS and two-way fixed effects in PyFixest</li>
 <li class="fragment">Four standard-error flavours — does inference change the verdict?</li>
-<li class="fragment">An 8-period event study to test parallel trends</li>
+<li class="fragment">An 8-period event study to probe parallel trends</li>
 </ul>
 </section></section>
 <section>
@@ -266,8 +266,8 @@
 <section id="a-clean-22-lab-35-schools-2-periods-simultaneous-treatment" class="slide level2 center">
 <h2>A clean 2×2 lab: 35 schools, 2 periods, simultaneous treatment</h2>
 
-<img data-src="../did101_panelview.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure — 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. No school changes status, and timing is simultaneous.</p><aside class="notes">
-<p>The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods), outcome is average GPA of low-income students on a 0–100 scale. This is a textbook 2×2 — all 10 treated schools adopt at the same moment, no switching, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.</p>
+<img data-src="../did101_panelview.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure — 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. Timing is simultaneous and treatment, once on, stays on.</p><aside class="notes">
+<p>The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods), outcome is average GPA of low-income students on a 0–100 scale. This is a textbook 2×2 — all 10 treated schools adopt at the same moment, no school ever drops out of treatment, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -412,7 +412,7 @@
 </tbody>
 </table>
 <aside class="notes">
-<p>The manual double-difference is exactly an OLS regression with a treated dummy, a post dummy, and their interaction. Every coefficient is a group mean or a difference of group means. txp = 25.315 is the ATT, matching the manual calculation to the decimal. HC1 gives heteroskedasticity-robust standard errors.</p>
+<p>The manual double-difference is exactly an OLS regression with a treated dummy, a post dummy, and their interaction. Every coefficient is a group mean or a difference of group means. txp = 25.315 is the ATT; the manual 25.32 is the same number computed from means rounded to two decimals (likewise post = 10.886 here versus 10.88 from the rounded means). HC1 gives heteroskedasticity-robust standard errors, but it treats each school’s two observations as independent; the next slide clusters by school.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -465,7 +465,7 @@
 <h2>Inference flavours barely move the needle when the signal is this strong</h2>
 
 <img data-src="../did101_se_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Standard errors across iid, HC1, CRV1, and CRV3. CRV3 is largest (0.637); HC1 and CRV1 are nearly identical (0.585). All four yield overwhelmingly significant results.</p><aside class="notes">
-<p>Four variance estimators on the same model. SEs range from 0.585 to 0.637 — but with an effect of 25 GPA points, even the largest SE leaves a t-statistic above 39. With only 35 clusters CRV3’s small-sample correction is the safer default, but here inference choice is practically irrelevant. The lesson: design beats variance estimator.</p>
+<p>Four variance estimators on the same model. SEs range from 0.585 to 0.637 — but with an effect of 25 GPA points, even the largest SE leaves a t-statistic above 39. What matters for inference is the 10 treated schools, not the 35 clusters in total: with few treated clusters CRV1 can understate uncertainty, so CRV3 (a leave-one-school-out jackknife) or the wild cluster bootstrap is the safer choice. Here the effect is so large that the choice is practically irrelevant. The lesson: design beats variance estimator.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -505,7 +505,7 @@
 <h2>Pre-trends are flat and effects jump immediately — a textbook event study</h2>
 
 <img data-src="../did101_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Event-study coefficients by period relative to treatment. Leads (t = −4 to −2) sit near zero with CIs covering zero; lags (t = 0 to 3) jump to ≈25 and stay flat.</p><aside class="notes">
-<p>The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. Pre-treatment coefficients (0.34, −0.32, 0.59) are all insignificant (p &gt; 0.17) — strong support for parallel trends. Post-treatment effects jump to ~25 at t = 0 and hold across all four lags: immediate and sustained, no fade-out.</p>
+<p>The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. Pre-treatment coefficients (0.34, −0.32, 0.59) are all insignificant (p &gt; 0.17) — consistent with parallel trends, though no pre-test can prove it. Post-treatment effects jump to ~25 at t = 0 and hold across all four lags: immediate and sustained, no fade-out.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -562,9 +562,9 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">Three near-zero leads validate parallel trends; four large lags trace a stable effect.</span></p>
+<p><span class="takeaway fragment">Three near-zero leads are consistent with parallel trends; four large lags trace a stable effect.</span></p>
 <aside class="notes">
-<p>t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant — the design is credible. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p &lt; 0.001 and remarkably flat: the program works from day one and shows no decay over four periods.</p>
+<p>t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant, which supports (but cannot prove) the design. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p &lt; 0.001 and remarkably flat: the effect appears in the first treated period (relative to t = −1) and shows no decay over four periods.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -581,7 +581,7 @@
 <h2>Event-study panel confirms the design: treatment switches on at period 5</h2>
 
 <img data-src="../did101_panelview_event.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure for the event study — 35 schools across 8 periods. Treatment begins at period 5; 10 treated schools switch from light to dark orange, 25 comparison schools stay steel blue.</p><aside class="notes">
-<p>Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. The clean staggered-on-simultaneously structure is what lets the event study cleanly separate leads from lags.</p>
+<p>Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. Simultaneous adoption, with no staggering, is what lets this simple event study separate leads from lags cleanly.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -600,7 +600,7 @@
 <div class="fragment">
 <p><span class="rebuttal">Response.</span> Precision is not identification. The 25.32 ATT is valid only under <strong>parallel trends</strong> and <strong>SUTVA</strong>. Flat pre-trends are supportive, not proof; and this is <em>simulated</em> data with parallel trends built in. In the field, expect imperfect pre-trends, smaller effects, and R² well below 0.99.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. The event study tests but cannot confirm parallel trends — it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. And staggered real-world timing can bias the standard TWFE estimator (Callaway–Sant’Anna, Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.</p>
+<p>Steelman, don’t strawman. The event study tests but cannot confirm parallel trends — it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. And with staggered real-world timing and effects that vary across adoption cohorts, the standard TWFE estimator can be badly biased (Goodman-Bacon; Callaway–Sant’Anna; Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
