@@ -102,25 +102,25 @@ The diagram below maps the whole tutorial. Three data streams flow into one DiD 
 ```mermaid
 graph LR
     subgraph DATA["Three data streams"]
-    A["<b>Satellite</b><br/>district x year<br/>panel"]
-    B["<b>DHS household</b><br/>repeated<br/>cross-section"]
-    C["<b>DHS individual</b><br/>repeated<br/>cross-section"]
+    A("<b>Satellite</b><br/>district x year<br/>panel")
+    B("<b>DHS household</b><br/>repeated<br/>cross-section")
+    C("<b>DHS individual</b><br/>repeated<br/>cross-section")
     end
 
     subgraph DESIGN["DiD design"]
-    D["<b>Staggered rollout</b><br/>17 treated woredas<br/>vs 122 controls"]
+    D("<b>Staggered rollout</b><br/>17 treated woredas<br/>vs 122 controls")
     end
 
     subgraph LADDER["Estimator ladder"]
-    E["Naive 2x2"]
-    F["Static TWFE<br/>+ event study"]
-    G["Sun-Abraham /<br/>Borusyak /<br/>Callaway-Sant'Anna"]
+    E("Naive 2x2")
+    F("Static TWFE<br/>+ event study")
+    G("Sun-Abraham /<br/>Borusyak /<br/>Callaway-Sant'Anna")
     end
 
     subgraph OUT["Outcome families"]
-    H["<b>Activity</b><br/>lights, impervious"]
-    I["<b>Welfare</b><br/>durables, wealth"]
-    J["<b>Empowerment</b><br/>female jobs, agency"]
+    H("<b>Activity</b><br/>lights, impervious")
+    I("<b>Welfare</b><br/>durables, wealth")
+    J("<b>Empowerment</b><br/>female jobs, agency")
     end
 
     A --> D
@@ -130,13 +130,18 @@ graph LR
     F --> H
     B --> I
     C --> J
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style G fill:#00d4c8,stroke:#141413,color:#141413
-    style J fill:#00d4c8,stroke:#141413,color:#141413
+    style DATA fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style DESIGN fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style LADDER fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style OUT fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B,C blue
+    class D orange
+    class E,F,H,I gray
+    class G,J teal
 ```
 
 The key idea the diagram encodes is that one estimand — the ATT — threads through everything. The naive 2×2 is the cartoon version; TWFE and its event-study view are the workhorse; and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing. Each box maps onto a section below, and the gender finding (the teal "Empowerment" box) is where the analysis lands.

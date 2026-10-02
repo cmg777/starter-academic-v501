@@ -215,22 +215,23 @@ DiD combines these two simpler approaches so that selection bias and the effect 
 
 ```mermaid
 graph TB
-    subgraph "Before Treatment"
-        A["<b>Treated Group</b><br/>Pre-treatment outcome"]
-        B["<b>Control Group</b><br/>Pre-treatment outcome"]
+    subgraph SG1["Before treatment"]
+        A("<b>Treated group</b><br/>Pre-treatment outcome")
+        B("<b>Control group</b><br/>Pre-treatment outcome")
     end
-    subgraph "After Treatment"
-        C["<b>Treated Group</b><br/>Post-treatment outcome"]
-        D["<b>Control Group</b><br/>Post-treatment outcome"]
+    subgraph SG2["After treatment"]
+        C("<b>Treated group</b><br/>post-treatment outcome")
+        D("<b>Control group</b><br/>post-treatment outcome")
     end
 
     A -->|"Change in<br/>treated"| C
     B -->|"Change in<br/>control"| D
-
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    class A,C orange
+    class B,D blue
 ```
 
 ### The DiD estimator
@@ -1254,25 +1255,26 @@ With multiple DiD estimators available, the choice depends on the data structure
 
 ```mermaid
 graph TD
-    A["<b>Panel data with<br/>treatment & control</b>"] --> B{"Single treatment<br/>period?"}
-    B -->|Yes| C["<b>Classic 2×2 DiD</b><br/>DifferenceInDifferences()"]
+    A("<b>Panel data with<br/>treatment & control</b>") --> B{"Single treatment<br/>period?"}
+    B -->|Yes| C("<b>Classic 2×2 DiD</b><br/>DifferenceInDifferences()")
     B -->|No| D{"Staggered<br/>adoption?"}
-    D -->|"No<br/>(same timing)"| E["<b>Multi-Period DiD</b><br/>MultiPeriodDiD()"]
+    D -->|"No<br/>(same timing)"| E("<b>Multi-period DiD</b><br/>MultiPeriodDiD()")
     D -->|Yes| F{"Never-treated<br/>group available?"}
-    F -->|Yes| G["<b>Callaway-Sant'Anna</b><br/>CallawaySantAnna()"]
-    F -->|No| H["<b>Sun-Abraham / Stacked DiD</b><br/>SunAbraham() / StackedDiD()<br/><i>(not covered here)</i>"]
+    F -->|Yes| G("<b>Callaway-Sant'Anna</b><br/>CallawaySantAnna()")
+    F -->|No| H("<b>Sun-Abraham / stacked DiD</b><br/>SunAbraham() / StackedDiD()<br/><i>(not covered here)</i>")
 
-    style A fill:#141413,stroke:#141413,color:#fff
-    classDef sty_B fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_B fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class B sty_B
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    classDef sty_D fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_D fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class D sty_D
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    classDef sty_F fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef sty_F fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class F sty_F
-    style G fill:#00d4c8,stroke:#141413,color:#141413
-    style H fill:#d97757,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class C,E,G teal
+    class H orange
 ```
 
 The following table summarizes when to use each estimator:

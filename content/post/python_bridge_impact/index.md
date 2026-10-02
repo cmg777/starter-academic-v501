@@ -130,22 +130,21 @@ The tutorial runs in eight stages. Each is a section below, and each either adds
 
 ```mermaid
 graph TD
-    A["<b>Four data families</b><br/>Night lights, census,<br/>rice yields, DHS and HIES"] --> B["<b>The design</b><br/>Jamuna hinterland treated<br/>Padma hinterland comparison<br/>Dhaka core excluded"]
-    B --> C["<b>Baseline</b><br/>A 2x2 by hand, then<br/>two-way fixed effects"]
-    C --> D["<b>Dynamics</b><br/>Short run versus long run,<br/>and a full event study"]
-    D --> E["<b>Doubly robust</b><br/>LWDR logit-odds weights<br/>KOBDR Oaxaca-Blinder weights"]
-    E --> F["<b>Two engines, one answer</b><br/>diff-diff with SurveyDesign<br/>and pyfixest with weights"]
-    F --> G["<b>Robustness</b><br/>Placebos, HonestDiD,<br/>public-goods placebo"]
-    G --> H["<b>Verdict</b><br/>Density rises, so backwash fails.<br/>Comparative advantage survives"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style G fill:#141413,stroke:#141413,color:#fff
-    style H fill:#141413,stroke:#141413,color:#fff
+    A("<b>Four data families</b><br/>night lights, census,<br/>rice yields, DHS and HIES") --> B("<b>The design</b><br/>Jamuna hinterland treated<br/>Padma hinterland comparison<br/>Dhaka core excluded")
+    B --> C("<b>Baseline</b><br/>A 2x2 by hand, then<br/>two-way fixed effects")
+    C --> D("<b>Dynamics</b><br/>short run versus long run,<br/>and a full event study")
+    D --> E("<b>Doubly robust</b><br/>LWDR logit-odds weights<br/>KOBDR Oaxaca-Blinder weights")
+    E --> F("<b>Two engines, one answer</b><br/>diff-diff with SurveyDesign<br/>and pyfixest with weights")
+    F --> G("<b>Robustness</b><br/>placebos, HonestDiD,<br/>public-goods placebo")
+    G --> H("<b>Verdict</b><br/>density rises, so backwash fails.<br/>comparative advantage survives")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A,B blue
+    class C,D orange
+    class E,F teal
+    class G,H anchor
 ```
 
 Notice that the estimator gets more sophisticated as you move down, but the question never changes. Stages three through five all estimate the same thing; they differ only in how hard they work to make the Padma hinterland a fair stand-in for the Jamuna hinterland. Stages six and seven then try to break the answer.
@@ -357,19 +356,20 @@ In words: had the bridge never been built, luminosity in the Jamuna hinterland w
 
 ```mermaid
 graph LR
-    J0["<b>Jamuna hinterland</b><br/>1992-1997<br/>pre-bridge mean"] -->|"observed change<br/>in the treated"| J1["<b>Jamuna hinterland</b><br/>1998-2013<br/>post-bridge mean"]
-    P0["<b>Padma hinterland</b><br/>1992-1997<br/>pre-bridge mean"] -->|"observed change<br/>in the comparison"| P1["<b>Padma hinterland</b><br/>1998-2013<br/>post-bridge mean"]
-    P0 -.->|"parallel trends<br/>assumption"| CF["<b>Counterfactual Jamuna</b><br/>where Jamuna would have<br/>landed with no bridge"]
+    J0("<b>Jamuna hinterland</b><br/>1992-1997<br/>pre-bridge mean") -->|"observed change<br/>in the treated"| J1("<b>Jamuna hinterland</b><br/>1998-2013<br/>post-bridge mean")
+    P0("<b>Padma hinterland</b><br/>1992-1997<br/>pre-bridge mean") -->|"observed change<br/>in the comparison"| P1("<b>Padma hinterland</b><br/>1998-2013<br/>post-bridge mean")
+    P0 -.->|"parallel trends<br/>assumption"| CF("<b>Counterfactual Jamuna</b><br/>where Jamuna would have<br/>landed with no bridge")
     P1 -.-> CF
-    J1 --> ATT["<b>ATT</b><br/>treated change minus<br/>comparison change"]
+    J1 --> ATT("<b>ATT</b><br/>treated change minus<br/>comparison change")
     CF --> ATT
-
-    style J0 fill:#6a9bcc,stroke:#141413,color:#141413
-    style J1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style P0 fill:#d97757,stroke:#141413,color:#141413
-    style P1 fill:#d97757,stroke:#141413,color:#141413
-    style CF fill:#141413,stroke:#141413,color:#fff
-    style ATT fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class J0,J1 blue
+    class P0,P1 orange
+    class CF anchor
+    class ATT teal
 ```
 
 The two solid arrows are things we measure. The two dashed arrows are the assumption. Every robustness check later in the post is an attempt to make those dashed arrows more credible, and none of them can make the assumption disappear.
@@ -380,37 +380,35 @@ Now put the three theories into the same picture and find where they can be told
 
 ```mermaid
 graph TD
-    Q["<b>Trade costs to the core fall by half</b><br/>What happens to the hinterland?"]
-    Q --> T1["<b>Big push</b><br/>Integration raises efficiency<br/>and revives the lagging region"]
-    Q --> T2["<b>Backwash</b><br/>Myrdal 1957, Krugman 1991<br/>The core captures the<br/>increasing returns"]
-    Q --> T3["<b>Comparative advantage</b><br/>No increasing returns needed.<br/>The hinterland specialises in what<br/>it is relatively good at"]
+    Q("<b>Trade costs to the core fall by half</b><br/>what happens to the hinterland?")
+    Q --> T1("<b>Big push</b><br/>integration raises efficiency<br/>and revives the lagging region")
+    Q --> T2("<b>Backwash</b><br/>Myrdal 1957, Krugman 1991<br/>The core captures the<br/>increasing returns")
+    Q --> T3("<b>Comparative advantage</b><br/>No increasing returns needed.<br/>The hinterland specialises in what<br/>it is relatively good at")
 
-    T1 --> P1["Predicts<br/>manufacturing share up,<br/>or at worst flat"]
-    T2 --> P2["Predicts<br/>manufacturing share DOWN<br/><b>and</b> population density DOWN"]
-    T3 --> P3["Predicts<br/>manufacturing share DOWN<br/><b>and</b> population density UP or flat"]
+    T1 --> P1("Predicts<br/>manufacturing share up,<br/>or at worst flat")
+    T2 --> P2("Predicts<br/>manufacturing share DOWN<br/><b>and</b> population density DOWN")
+    T3 --> P3("Predicts<br/>manufacturing share DOWN<br/><b>and</b> population density UP or flat")
 
     P1 --> E1{"Did the manufacturing<br/>share fall?"}
     P2 --> E1
     P3 --> E1
-    E1 -->|"Yes, minus 1.2 pp"| OUT1["<b>Big push rejected</b>"]
-    E1 -->|"Yes, minus 1.2 pp"| E2{"<b>The discriminating test</b><br/>What did population<br/>density do?"}
-    E2 -->|"Fell"| OUT2["Backwash supported"]
-    E2 -->|"Rose, plus 5.9 percent<br/>in the long run"| OUT3["<b>Backwash rejected</b><br/>Comparative advantage survives"]
+    E1 -->|"Yes, minus 1.2 pp"| OUT1("<b>Big push rejected</b>")
+    E1 -->|"Yes, minus 1.2 pp"| E2{"<b>The discriminating test</b><br/>what did population<br/>density do?"}
+    E2 -->|"Fell"| OUT2("Backwash supported")
+    E2 -->|"Rose, plus 5.9 percent<br/>in the long run"| OUT3("<b>Backwash rejected</b><br/>comparative advantage survives")
 
-    style Q fill:#141413,stroke:#141413,color:#fff
-    style T1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style T2 fill:#d97757,stroke:#141413,color:#141413
-    style T3 fill:#00d4c8,stroke:#141413,color:#141413
-    style P1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
-    style P2 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style P3 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    classDef sty_E1 fill:#141413,stroke:#141413,color:#fff
+    classDef sty_E1 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class E1 sty_E1
-    classDef sty_E2 fill:#141413,stroke:#141413,color:#fff
+    classDef sty_E2 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class E2 sty_E2
-    style OUT1 fill:#d97757,stroke:#141413,color:#141413
-    style OUT2 fill:#d97757,stroke:#141413,color:#141413
-    style OUT3 fill:#00d4c8,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Q anchor
+    class T1,P1 blue
+    class T2,P2,OUT1,OUT2 orange
+    class T3,P3,OUT3 teal
 ```
 
 Formally, the discriminating test is a joint sign restriction:
@@ -1018,26 +1016,24 @@ A doubly robust estimator does both, and is consistent if *either* model is corr
 
 ```mermaid
 graph TD
-    Z["<b>Pre-bridge covariates</b><br/>log population in 1991<br/>log distance to bridge foot"] --> L["<b>Logit model</b><br/>probability of being in the<br/>Jamuna hinterland, given Z"]
-    L --> P["<b>Fitted propensity p</b><br/>one number per upazila"]
-    P --> TR["<b>Trim</b><br/>drop comparison upazilas in the<br/>bottom 5 percent of p"]
-    TR --> W1["<b>LWDR weight</b><br/>odds of p, rescaled.<br/>Treated units weighted 1"]
-    Z --> W2["<b>KOBDR weight</b><br/>Oaxaca-Blinder projection of the<br/>treated covariate mean onto controls"]
+    Z("<b>Pre-bridge covariates</b><br/>log population in 1991<br/>log distance to bridge foot") --> L("<b>Logit model</b><br/>probability of being in the<br/>Jamuna hinterland, given Z")
+    L --> P("<b>Fitted propensity p</b><br/>one number per upazila")
+    P --> TR("<b>Trim</b><br/>drop comparison upazilas in the<br/>bottom 5 percent of p")
+    TR --> W1("<b>LWDR weight</b><br/>odds of p, rescaled.<br/>treated units weighted 1")
+    Z --> W2("<b>KOBDR weight</b><br/>Oaxaca-Blinder projection of the<br/>treated covariate mean onto controls")
     TR --> W2
-    W2 --> NEG["Drop comparison units with<br/>negative KOBDR weight"]
-    W1 --> REG["<b>Weighted two-way fixed effects</b><br/>the same covariates enter again<br/>as regression adjustment"]
+    W2 --> NEG("Drop comparison units with<br/>negative KOBDR weight")
+    W1 --> REG("<b>Weighted two-way fixed effects</b><br/>the same covariates enter again<br/>as regression adjustment")
     NEG --> REG
-    REG --> DR["<b>Doubly robust ATT</b><br/>consistent if EITHER the weight model<br/>OR the outcome model is right"]
-
-    style Z fill:#6a9bcc,stroke:#141413,color:#141413
-    style L fill:#6a9bcc,stroke:#141413,color:#141413
-    style P fill:#6a9bcc,stroke:#141413,color:#141413
-    style TR fill:#d97757,stroke:#141413,color:#141413
-    style W1 fill:#d97757,stroke:#141413,color:#141413
-    style NEG fill:#d97757,stroke:#141413,color:#141413
-    style W2 fill:#00d4c8,stroke:#141413,color:#141413
-    style REG fill:#141413,stroke:#141413,color:#fff
-    style DR fill:#00d4c8,stroke:#141413,color:#141413
+    REG --> DR("<b>Doubly robust ATT</b><br/>consistent if EITHER the weight model<br/>OR the outcome model is right")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Z,L,P blue
+    class TR,W1,NEG orange
+    class W2,DR teal
+    class REG anchor
 ```
 
 The two branches out of the covariate box are the two protections. The left branch models who got treated; the right branch models what the outcome would have been. Note also that trimming and negative-weight dropping happen *before* the regression: both are sample decisions, and both must be reported.
@@ -1553,20 +1549,16 @@ The authors deserve credit before any of this: they published a complete package
 
 ```mermaid
 graph LR
-    A["<code>global trimL</code> never defined<br/>in nite_2021.do"] --> B["<code>gen cut11 = r(p$trimL)</code><br/>expands to <code>r(p)</code>,<br/>which does not exist"]
-    B --> C["cut11 is missing for<br/>all 1,743 observations"]
-    C --> D["<code>replace ipw4 = . if p &lt; cut11</code><br/>In Stata any number is less<br/>than missing, so this is TRUE<br/>for every comparison unit"]
-    D --> E["Every comparison upazila<br/>loses its weight"]
-    E --> F["The regression runs on<br/>treated units only<br/>N = 868, 124 upazilas"]
-    F --> G["<b>treat_yr = 1.064, se 0.710</b><br/>an unidentified number<br/>that still prints"]
-
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#141413,stroke:#141413,color:#fff
-    style F fill:#141413,stroke:#141413,color:#fff
-    style G fill:#141413,stroke:#141413,color:#fff
+    A("<code>global trimL</code> never defined<br/>in nite_2021.do") --> B("<code>gen cut11 = r(p$trimL)</code><br/>expands to <code>r(p)</code>,<br/>which does not exist")
+    B --> C("cut11 is missing for<br/>all 1,743 observations")
+    C --> D("<code>replace ipw4 = . if p &lt; cut11</code><br/>in Stata any number is less<br/>than missing, so this is TRUE<br/>for every comparison unit")
+    D --> E("Every comparison upazila<br/>loses its weight")
+    E --> F("The regression runs on<br/>treated units only<br/>N = 868, 124 upazilas")
+    F --> G("<b>treat_yr = 1.064, se 0.710</b><br/>an unidentified number<br/>that still prints")
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A,B,C,D orange
+    class E,F,G anchor
 ```
 
 We can reproduce both branches exactly:

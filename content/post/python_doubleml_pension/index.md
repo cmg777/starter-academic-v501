@@ -242,16 +242,19 @@ The following causal diagram shows this confounding structure:
 
 ```mermaid
 graph LR
-    X["X<br/>Income, Education,<br/>Age, ..."] --> D["D<br/>401(k) Eligibility<br/>(e401)"]
-    X --> Y["Y<br/>Net Financial Assets<br/>(net_tfa)"]
-    D --> P["P<br/>401(k) Participation<br/>(p401)"]
+    X("X<br/>income, Education,<br/>age, ...") --> D("D<br/>401(k) Eligibility<br/>(e401)")
+    X --> Y("Y<br/>Net financial assets<br/>(net_tfa)")
+    D --> P("P<br/>401(k) Participation<br/>(p401)")
     D -->|"causal effect?"| Y
     P -->|"causal effect?"| Y
-
-    style X fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style P fill:#00d4c8,stroke:#141413,color:#141413
-    style Y fill:#141413,stroke:#141413,color:#fff
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class X orange
+    class D blue
+    class Y anchor
+    class P teal
 ```
 
 Think of it this way: comparing 401(k) holders to non-holders and attributing the savings gap to the plan is like comparing gym members to non-members and concluding that gym memberships cause fitness. People who join gyms are already more health-conscious --- just as people with 401(k) access already earn more. The key insight from the economics literature is that 401(k) *eligibility* is more plausibly exogenous than *participation*, because eligibility depends on the employer's plan offerings, not just the individual's savings motivation.
@@ -264,18 +267,19 @@ This tutorial applies three progressively more sophisticated DML models to the s
 
 ```mermaid
 graph TD
-    Q["What causal question<br/>are we asking?"] --> A["Effect of <b>eligibility</b><br/>on savings?"]
-    Q --> B["Effect of <b>participation</b><br/>on savings?"]
-    A --> PLR["<b>PLR</b><br/>Constant treatment effect<br/>Estimand: ATE"]
-    A --> IRM["<b>IRM</b><br/>Doubly robust (AIPW)<br/>Estimand: ATE"]
-    B --> IIVM["<b>IIVM</b><br/>Instrument: eligibility<br/>Estimand: LATE"]
-
-    style Q fill:#141413,stroke:#141413,color:#fff
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#00d4c8,stroke:#141413,color:#141413
-    style PLR fill:#6a9bcc,stroke:#141413,color:#141413
-    style IRM fill:#d97757,stroke:#141413,color:#141413
-    style IIVM fill:#00d4c8,stroke:#141413,color:#141413
+    Q("What causal question<br/>are we asking?") --> A("Effect of <b>eligibility</b><br/>on savings?")
+    Q --> B("Effect of <b>participation</b><br/>on savings?")
+    A --> PLR("<b>PLR</b><br/>constant treatment effect<br/>Estimand: ATE")
+    A --> IRM("<b>IRM</b><br/>doubly robust (AIPW)<br/>Estimand: ATE")
+    B --> IIVM("<b>IIVM</b><br/>instrument: eligibility<br/>Estimand: LATE")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class Q anchor
+    class A,PLR blue
+    class B,IIVM teal
+    class IRM orange
 ```
 
 | Model | Treatment | Estimand | Key assumption | Approach |

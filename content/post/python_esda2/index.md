@@ -240,18 +240,21 @@ The analysis follows a natural progression from visualization to formal testing.
 
 ```mermaid
 graph LR
-    A["<b>Step 1</b><br/>Load &<br/>Explore"] --> B["<b>Step 2</b><br/>Visualize<br/>Maps"]
-    B --> C["<b>Step 3</b><br/>Spatial<br/>Weights"]
-    C --> D["<b>Step 4</b><br/>Global<br/>Moran's I"]
-    D --> E["<b>Step 5</b><br/>Local<br/>LISA"]
-    E --> F["<b>Step 6</b><br/>Space-Time<br/>Dynamics"]
-
-    style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>Step 1</b><br/>load &<br/>explore") --> B("<b>Step 2</b><br/>visualize<br/>maps")
+    B --> C("<b>Step 3</b><br/>spatial<br/>weights")
+    C --> D("<b>Step 4</b><br/>global<br/>Moran's I")
+    D --> E("<b>Step 5</b><br/>local<br/>LISA")
+    E --> F("<b>Step 6</b><br/>Space-time<br/>dynamics")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B orange
+    class C,D blue
+    class E teal
+    class F key
 ```
 
 Steps 1--2 are purely visual --- they build intuition about where high and low values are concentrated. Step 3 formalizes the notion of "neighbors" through a spatial weights matrix. Steps 4--5 use that matrix to compute statistics that quantify spatial clustering, first globally (one number for the whole map) and then locally (one number per region). Step 6 connects the spatial and temporal dimensions by tracking how regions move through the Moran scatter plot between periods.

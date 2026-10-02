@@ -257,13 +257,17 @@ Most statistical software lets you jump from data to estimates without stating y
 
 ```mermaid
 graph LR
-    A["1. Model<br/>Define causal graph"] --> B["2. Identify<br/>Find estimand"]
-    B --> C["3. Estimate<br/>Compute effect"]
-    C --> D["4. Refute<br/>Test robustness"]
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#a78bfa,stroke:#141413,color:#141413
+    A("1. model<br/>define causal graph") --> B("2. identify<br/>find estimand")
+    B --> C("3. estimate<br/>compute effect")
+    C --> D("4. refute<br/>test robustness")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D violet
 ```
 
 | Step | Question | What you do |
@@ -410,24 +414,30 @@ A DAG has three properties:
 
 ```mermaid
 graph LR
-    I["Introversion<br/>(Confounder)"] --> T["Work from Home<br/>(Treatment)"]
-    I --> Y["Productivity<br/>(Outcome)"]
-    C["Num. Children<br/>(Confounder)"] --> T
+    I("Introversion<br/>(Confounder)") --> T("Work from home<br/>(Treatment)")
+    I --> Y("Productivity<br/>(Outcome)")
+    C("Num. children<br/>(Confounder)") --> T
     C --> Y
-    Z["Subway Disruption<br/>(Instrument)"] --> T
+    Z("Subway disruption<br/>(Instrument)") --> T
     T --> Y
-    style I fill:#999,stroke:#141413,color:#141413
-    style C fill:#999,stroke:#141413,color:#141413
-    style Z fill:#00d4c8,stroke:#141413,color:#141413
-    style T fill:#d97757,stroke:#141413,color:#141413
-    style Y fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class I,C orange
+    class T blue
+    class Y teal
+    class Z violet
+    linkStyle 0,1,2,3 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 5 stroke:#00d4c8,stroke-width:3px
 ```
 
 Three types of variables appear in our DAG:
 
-- **Confounders** (gray): Introversion and num_children have arrows pointing to *both* treatment and outcome. They create "backdoor paths" that confound the naive comparison.
-- **Instrument** (teal): Subway disruption has an arrow to treatment but *not* to outcome. It provides exogenous variation in WFH choice --- employees near the closed subway line are forced to work from home regardless of their personality or family situation.
-- **Treatment and Outcome** (orange and blue): The arrow from treatment to outcome represents the causal effect we want to estimate.
+- **Confounders** (orange border, dashed orange arrows): Introversion and num_children have arrows pointing to *both* treatment and outcome. They create "backdoor paths" that confound the naive comparison.
+- **Instrument** (violet border): Subway disruption has an arrow to treatment but *not* to outcome. It provides exogenous variation in WFH choice --- employees near the closed subway line are forced to work from home regardless of their personality or family situation.
+- **Treatment and Outcome** (blue and teal borders): The solid teal arrow from treatment to outcome represents the causal effect we want to estimate.
 
 ### Creating the CausalModel
 

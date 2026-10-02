@@ -103,23 +103,25 @@ The diagram below is the roadmap: every estimator we run, why it fails or succee
 
 ```mermaid
 flowchart TD
-    A["Dynamic panel model:<br/>n_it = rho n_i,t-1 + ... + alpha_i + eps_it"]
-    A --> B["Pooled OLS<br/>rho = 0.962, biased UP<br/>(L1.n absorbs alpha_i)"]
-    A --> C["Fixed effects<br/>rho = 0.626, biased DOWN<br/>(Nickell bias, T = 7-9)"]
-    B --> D["The bracket:<br/>truth lies in [0.626, 0.962]"]
+    A("Dynamic panel model:<br/>n_it = rho n_i,t-1 + ... + alpha_i + eps_it")
+    A --> B("Pooled OLS<br/>rho = 0.962, biased UP<br/>(L1.n absorbs alpha_i)")
+    A --> C("Fixed effects<br/>rho = 0.626, biased DOWN<br/>(Nickell bias, T = 7-9)")
+    B --> D("The bracket:<br/>truth lies in [0.626, 0.962]")
     C --> D
-    D --> E["Anderson-Hsiao IV<br/>rho = 1.233 (SE 0.478)<br/>consistent but useless"]
-    E --> F["Difference GMM<br/>rho = 0.679, 91 instruments<br/>hugs FE bound: weak instruments"]
-    F --> G["System GMM, collapsed<br/>rho = 0.927 (SE 0.079)<br/>AR(2) p = 0.994, Hansen p = 0.462"]
-    G --> H["Diagnostics + proliferation grid<br/>+ exact replication check"]
-    style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style B fill:#999999,stroke:#141413,color:#141413
-    style C fill:#999999,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
-    style F fill:#d97757,stroke:#141413,color:#141413
-    style G fill:#00d4c8,stroke:#141413,color:#141413
-    style H fill:#1f2b5e,stroke:#6a9bcc,color:#fff
+    D --> E("Anderson-Hsiao IV<br/>rho = 1.233 (SE 0.478)<br/>consistent but useless")
+    E --> F("Difference GMM<br/>rho = 0.679, 91 instruments<br/>hugs FE bound: weak instruments")
+    F --> G("System GMM, collapsed<br/>rho = 0.927 (SE 0.079)<br/>AR(2) p = 0.994, Hansen p = 0.462")
+    G --> H("Diagnostics + proliferation grid<br/>+ exact replication check")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B,C gray
+    class D,E,H blue
+    class F orange
+    class G teal
 ```
 
 Read the diagram top to bottom and you have the whole argument: two naive estimators whose *known* bias directions form a credible bracket, one IV estimator that is right in theory and hopeless in practice, a difference-GMM estimator that passes every printed test yet sits suspiciously on the bracket's floor, and a system-GMM estimator that lands in the upper half of the bracket with clean diagnostics. The final section stress-tests that winner against instrument proliferation and a published benchmark.

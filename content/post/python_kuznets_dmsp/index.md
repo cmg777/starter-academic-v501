@@ -119,15 +119,16 @@ depth on a pre-built inequality series.
 
 ```mermaid
 flowchart LR
-  A["Nighttime lights<br/>+ controls"] --> B["Predicted regional<br/>GDP per capita<br/>(Table 1)"]
-  B --> C["Population-weighted<br/>inequality indices<br/>(Table 2)"]
-  C --> D["Regional Kuznets<br/>curve (Table 3)"]
-  C --> E["Determinants &<br/>robustness (Tables 4, B.4)"]
-  style A fill:#6a9bcc,stroke:#141413,color:#141413
-  style B fill:#6a9bcc,stroke:#141413,color:#141413
-  style C fill:#d97757,stroke:#141413,color:#141413
-  style D fill:#00d4c8,stroke:#141413,color:#141413
-  style E fill:#00d4c8,stroke:#141413,color:#141413
+  A("Nighttime lights<br/>+ controls") --> B("Predicted regional<br/>GDP per capita<br/>(Table 1)")
+  B --> C("Population-weighted<br/>inequality indices<br/>(Table 2)")
+  C --> D("Regional Kuznets<br/>curve (Table 3)")
+  C --> E("Determinants &<br/>robustness (Tables 4, B.4)")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B blue
+    class C orange
+    class D,E teal
 ```
 
 Reading the diagram left to right, light becomes income (blue), income becomes inequality

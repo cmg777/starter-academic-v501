@@ -208,30 +208,27 @@ The decision that organizes the entire post is a single question — where does 
 ```mermaid
 graph TD
     Q{"Where does covariate X<br/>enter the DiD?"}
-    Q -->|"Nowhere (baseline)"| N["Spec 0: Naive TWFE"]
-    Q -->|"In the LEVEL<br/>(additive)"| L["Spec A: Additive X"]
-    Q -->|"In the EFFECT<br/>(X × treatment)"| E["Spec BT: X × treatment"]
-    Q -->|"In the TREND<br/>(X × post)"| T["Spec B: X × post"]
-    Q -->|"Trend + effect<br/>(saturated FD)"| S["Spec C = HIT 1997"]
-    Q -->|"Propensity<br/>reweighting"| P["IPW / Doubly robust"]
-    N --> INERT["Counterfactual trend untouched<br/>ATT stays ~3,621 (inert)"]
+    Q -->|"Nowhere (baseline)"| N("Spec 0: naive TWFE")
+    Q -->|"In the LEVEL<br/>(additive)"| L("Spec A: Additive X")
+    Q -->|"In the EFFECT<br/>(X × treatment)"| E("Spec BT: X × treatment")
+    Q -->|"In the TREND<br/>(X × post)"| T("Spec B: X × post")
+    Q -->|"Trend + effect<br/>(saturated FD)"| S("Spec C = HIT 1997")
+    Q -->|"Propensity<br/>reweighting"| P("IPW / doubly robust")
+    N --> INERT("Counterfactual trend untouched<br/>ATT stays ~3,621 (inert)")
     L --> INERT
     E --> INERT
-    T --> FIX["Bends the control's<br/>counterfactual trend<br/>ATT snaps to ~1,794 (corrected)"]
+    T --> FIX("Bends the control's<br/>counterfactual trend<br/>ATT snaps to ~1,794 (corrected)")
     S --> FIX
     P --> FIX
-    FIX -.->|recovers| BENCH["RCT benchmark<br/>ATT = 1,794"]
-    classDef sty_Q fill:#d97757,stroke:#141413,color:#141413
+    FIX -.->|recovers| BENCH("RCT benchmark<br/>ATT = 1,794")
+    classDef sty_Q fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
     class Q sty_Q
-    style INERT fill:#9aa0a6,stroke:#141413,color:#141413
-    style FIX fill:#6a9bcc,stroke:#141413,color:#141413
-    style BENCH fill:#141413,stroke:#141413,color:#fff
-    style N fill:#9aa0a6,stroke:#141413,color:#141413
-    style L fill:#9aa0a6,stroke:#141413,color:#141413
-    style E fill:#9aa0a6,stroke:#141413,color:#141413
-    style T fill:#6a9bcc,stroke:#141413,color:#141413
-    style S fill:#6a9bcc,stroke:#141413,color:#141413
-    style P fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class N,L,E,INERT gray
+    class T,S,P,FIX blue
+    class BENCH anchor
 ```
 
 ## Setup and imports

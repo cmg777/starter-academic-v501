@@ -112,23 +112,23 @@ By the end of this tutorial, you will be able to:
 ```mermaid
 graph LR
     subgraph SETTING["The natural experiment"]
-    A["<b>2004 tsunami</b><br/>floods some<br/>Aceh districts"]
-    B["<b>Treated</b><br/>10 flooded<br/>districts"]
-    C["<b>Control</b><br/>non-flooded<br/>districts"]
+    A("<b>2004 tsunami</b><br/>floods some<br/>Aceh districts")
+    B("<b>Treated</b><br/>10 flooded<br/>districts")
+    C("<b>Control</b><br/>non-flooded<br/>districts")
     A --> B
     A --> C
     end
 
     subgraph MEASURE["Two outcomes"]
-    D["<b>District GDP</b><br/>growth"]
-    E["<b>Sub-district</b><br/>night-lights"]
+    D("<b>District GDP</b><br/>growth")
+    E("<b>Sub-district</b><br/>night-lights")
     end
 
     subgraph METHODS["Four causal tools"]
-    F["<b>Difference-in-<br/>Differences</b><br/>pyfixest"]
-    G["<b>Event study</b><br/>diff-diff"]
-    H["<b>Synthetic<br/>control</b><br/>mlsynth"]
-    I["<b>Conley spatial<br/>std. errors</b>"]
+    F("<b>Difference-in-<br/>differences</b><br/>pyfixest")
+    G("<b>Event study</b><br/>diff-diff")
+    H("<b>Synthetic<br/>control</b><br/>mlsynth")
+    I("<b>Conley spatial<br/>std. errors</b>")
     end
 
     B --> D
@@ -137,12 +137,17 @@ graph LR
     D --> F --> G
     D --> H
     F --> I
-
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style H fill:#00d4c8,stroke:#141413,color:#141413
-    style I fill:#00d4c8,stroke:#141413,color:#141413
+    style SETTING fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style MEASURE fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style METHODS fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B orange
+    class C blue
+    class D,E,F,G gray
+    class H,I teal
 ```
 
 Read the diagram left to right: the tsunami splits districts into treated and control; we observe two outcomes (district GDP and finer sub-district night-lights); and we deploy four causal tools — DiD and its event-study view, an independent synthetic control, and the spatial standard errors that keep our confidence honest. Each maps onto a section below.
