@@ -100,8 +100,8 @@ Run ordinary OLS on the entire panel as if the rows were independent observation
 **2. Between vs within variation.**
 Variance of any panel variable splits into a *between* part (across units) and a *within* part (over time, inside one unit). The decomposition tells you what kind of variation each estimator can leverage.
 
-- **Example.** For `union` in this dataset, 93.9% of the variance is *between* workers (some are unionised, others are not) and only 9.1% is *within* workers (some workers actually change union status across the two periods). FE relies on the 9.1%.
-- **Analogy.** Comparing different people vs comparing the same person to themselves. The 93.9% is "Alice vs Bob"; the 9.1% is "Alice last year vs Alice this year." Different questions; different answers.
+- **Example.** For `union` in this dataset, 93.9% of the variance is *between* workers (some are unionised, others are not) and only 6.1% is *within* workers (some workers actually change union status across the two periods). FE relies on the 6.1%.
+- **Analogy.** Comparing different people vs comparing the same person to themselves. The 93.9% is "Alice vs Bob"; the 6.1% is "Alice last year vs Alice this year." Different questions; different answers.
 
 **3. Within transformation** $\tilde{y}_{it} = y_{it} - \bar{y}_i$.
 Subtract each unit's time-series mean from each observation. The unit-specific intercept $\alpha_i$ vanishes by construction. What remains is within-unit variation: the part of $y$ that moves over time inside one worker.
@@ -110,9 +110,9 @@ Subtract each unit's time-series mean from each observation. The unit-specific i
 - **Analogy.** Subtracting the watermark from every page. The text underneath is what we came for. Pre-demeaning, every page is dominated by the watermark.
 
 **4. First differences (FD/FDFE)** $\Delta y_{it}$.
-Subtracting yesterday from today. Removes $\alpha_i$ via differencing rather than demeaning. With $T = 2$, FD and within transformation give numerically identical estimates. With $T > 2$, they can diverge.
+Subtracting yesterday from today. Removes $\alpha_i$ via differencing rather than demeaning. With $T = 2$, FD without an intercept and the within transformation give numerically identical estimates, and FD with an intercept equals two-way FE. With $T > 2$, they can diverge.
 
-- **Example.** FDFE on this two-period panel returns 0.2113 (SE 0.0792). FE returns 0.2103. The two are within 0.001 of each other — exactly what theory predicts when $T = 2$.
+- **Example.** FDFE on this two-period panel returns 0.2113 (SE 0.0792). FE returns 0.2103. The 0.001 gap is the FD intercept (the common 2010→2012 wage trend); FD without an intercept returns exactly 0.2103.
 - **Analogy.** Subtracting yesterday from today vs subtracting your average from today. With only two days, the two operations agree. With ten days, they diverge — but the question they answer (within-unit change) is the same.
 
 **5. Fixed effects (FE).**
@@ -124,7 +124,7 @@ The cleanest within-comparison. Estimate $\alpha_i$ explicitly (or absorb them) 
 **6. Two-Way FE (TWFE).**
 FE that absorbs both unit effects $\alpha_i$ and time effects $\delta_t$. Removes calendar-year shocks (recession, policy change) along with unit-specific shifts. Standard for short panels with macro shocks.
 
-- **Example.** TWFE returns 0.2129 (SE 0.0793) — almost identical to one-way FE because the time effect is small with $T = 2$. With more periods or a stronger macro shock, TWFE can diverge from FE meaningfully.
+- **Example.** TWFE returns 0.2113 (SE 0.0792) — identical to first differences with an intercept, and within 0.001 of one-way FE (0.2103) because the common time trend is small with $T = 2$. With more periods or a stronger macro shock, TWFE can diverge from FE meaningfully.
 - **Analogy.** Wiping the negative twice. First pass removes the watermark printed on every page (unit FE). Second pass removes the smudge on the entire stack from a particular printing run (time FE).
 
 **7. Random effects (RE).**
@@ -210,7 +210,7 @@ df = df_full[df_full["year"].isin([2010, 2012])].copy()
 df = df.sort_values(["ID", "year"]).reset_index(drop=True)
 
 # Convert union "Yes/No" to 1/0; build a female dummy.
-df["union"] = df["union"].map({"Yes": 1, "No": 0, 1: 1, 0: 0})
+df["union"] = df["union"].astype(str).map({"Yes": 1, "No": 0}).astype(float)
 df["female"] = (df["gender"].astype(str).str.strip().str.lower() == "female").astype(float)
 
 # Drop rows with missing values in the variables we use.
@@ -340,7 +340,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Interpretation.** Almost all of the variation in our variables is *between* workers, not over time within a worker. Union status is 93.9% between and only 9.1% within — fixed-effects estimators have access to that thin 9% slice of total union variance. Schooling has zero within-variation (100% between) because nobody's reported education changes between 2010 and 2012 in this sample, which is why FE will mechanically drop schooling from the regression. The big methodological consequence is that FE standard errors will be much larger than POLS standard errors, so the choice between FE and RE is not just a question of unbiasedness; it is also a question of statistical precision.
+**Interpretation.** Almost all of the variation in our variables is *between* workers, not over time within a worker. Union status is 93.9% between and only 6.1% within — fixed-effects estimators have access to that thin 6% slice of total union variance. Schooling has zero within-variation (100% between) because nobody's reported education changes between 2010 and 2012 in this sample, which is why FE will mechanically drop schooling from the regression. The big methodological consequence is that FE standard errors will be much larger than POLS standard errors, so the choice between FE and RE is not just a question of unbiasedness; it is also a question of statistical precision.
 
 ## 5. Visualizing the panel: who actually changes union status?
 
@@ -508,9 +508,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Interpretation.** The two panels look almost like different datasets, but they come from the *same* observations. On the left (raw data), the POLS slope is ≈ 0.08, dragged down by the union and non-union workers' mean wages being close to each other. On the right (demeaned data), the FE slope is ≈ 0.21, identified only by the workers who actually changed union status — those are the points that move off the origin. The visual makes geometrically clear what the variance decomposition told us numerically: the within slope is steeper because we are no longer comparing *across* workers (where ability and schooling confound the picture); we are comparing each worker to themselves.
+**Interpretation.** The two panels look almost like different datasets, but they come from the *same* observations. On the left (raw data), the POLS slope is 0.075, dragged down by the union and non-union workers' mean wages being close to each other. On the right (demeaned data), the FE slope is ≈ 0.21, identified only by the workers who actually changed union status — those are the points that move off the origin. The visual makes geometrically clear what the variance decomposition told us numerically: the within slope is steeper because we are no longer comparing *across* workers (where ability and schooling confound the picture); we are comparing each worker to themselves.
 
-The FE coefficient of 0.2103 is essentially identical to FDFE (0.2113). The tiny gap of +0.001 comes from the fact that our FD regression includes an intercept (which absorbs an aggregate time trend), while plain FE does not. Once we add a year fixed effect to FE — that's two-way FE in the next section — the gap closes exactly.
+The FE coefficient of 0.2103 is essentially identical to FDFE (0.2113). The tiny gap of +0.001 comes from the fact that our FD regression includes an intercept (which absorbs an aggregate time trend), while plain FE does not. Run without an intercept, FD returns 0.2103 — exactly the one-way FE estimate; the FD intercept (0.0727) is the common 2010→2012 wage trend. Adding a year fixed effect to FE — that's two-way FE in the next section — reproduces FD with an intercept exactly (0.2113).
 
 A small numerical aside: the **dummy-variable** version of FE gives the same answer.
 
@@ -524,21 +524,21 @@ print(f"DVFE coefficient: {fit_dvfe.coef()['union']:.4f}")
 
 **Interpretation.** Including a dummy for every worker (N − 1 = 2,198 dummies in this sample) recovers the FE coefficient exactly: 0.2103. The within transformation, first-differences, and dummy-variable FE are three recipes for the same dish. The reason modern software prefers absorption (`| ID`) over dummies is purely computational: with N = 2,199 dummies it still runs fast, but at N = 100,000 the dummy specification becomes prohibitive while absorbed FE remains trivial.
 
-## 10. Two-way fixed effects: closing the FD–FE gap
+## 10. Two-way fixed effects: explaining the FD–FE gap
 
 **Two-way fixed effects** (TWFE) absorbs both individual and time effects. We let `pyfixest` handle both with `| ID + year`. This is the workhorse specification of applied micro and DID research.
 
 ```{python}
 #| label: fit-twfe
 
-# Stata: reghdfe lwage union age, absorb(ID year) vce(cluster ID)
-fit_twfe = pf.feols("lwage ~ union + age | ID + year", data=df, vcov={"CRV1": "ID"})
+# Stata: reghdfe lwage union, absorb(ID year) vce(cluster ID)
+fit_twfe = pf.feols("lwage ~ union | ID + year", data=df, vcov={"CRV1": "ID"})
 twfe_coef = fit_twfe.coef()["union"]
 twfe_se = fit_twfe.se()["union"]
 print(f"Union coefficient: {twfe_coef:.4f}  (SE {twfe_se:.4f})")
 ```
 
-**Interpretation.** TWFE returns 21.3 log points (SE 7.9), almost indistinguishable from FE (0.210). The small +0.002 gap relative to FE is exactly what closes the FD–FE puzzle from the previous section: by absorbing year effects we are mechanically removing the aggregate wage trend that FD's intercept was capturing. Schooling, gender, and any other time-invariant regressor would be silently absorbed by the individual fixed effects — you cannot identify the effect of something that does not change within a worker. This is a structural feature of within-style methods, not a coding error, and is one of the main reasons applied researchers reach for CRE/Mundlak when they want both within identification *and* coefficients on time-invariant variables.
+**Interpretation.** TWFE returns 21.1 log points (SE 7.9) — identical to first differences with an intercept (0.2113). With T = 2, FD with an intercept equals TWFE exactly, and one-way FE (0.2103) equals FD without an intercept; the 0.001 gap between them is the common time trend, which the year effect (like FD's intercept) absorbs. Schooling, gender, and any other time-invariant regressor would be silently absorbed by the individual fixed effects — you cannot identify the effect of something that does not change within a worker. This is a structural feature of within-style methods, not a coding error, and is one of the main reasons applied researchers reach for CRE/Mundlak when they want both within identification *and* coefficients on time-invariant variables.
 
 ## 11. Random effects: betting on the no-correlation assumption
 
@@ -558,7 +558,7 @@ re_se = fit_re.std_errors["union"]
 print(f"Union coefficient: {re_coef:.4f}  (SE {re_se:.4f})")
 ```
 
-**Interpretation.** RE returns 10.9 log points (SE 3.0), which sits squarely between POLS (0.075) and FE (0.210). RE is mathematically a *weighted average* of the between and within estimators, with the weights determined by their relative variances. Because our data has very thin within variation in union status (only 9% of total), RE leans heavily toward the between picture and lands much closer to POLS than to FE. The RE standard error (0.030) is a striking 2.7× tighter than FE's (0.081), but that efficiency is real only if individual effects are uncorrelated with union membership. If union-status selection is correlated with unobserved ability — and the gap between FE and POLS strongly suggests it is — that precision is being purchased with bias.
+**Interpretation.** RE returns 10.9 log points (SE 3.0), which sits squarely between POLS (0.075) and FE (0.210). RE is mathematically a *weighted average* of the between and within estimators, with the weights determined by their relative variances. Because our data has very thin within variation in union status (only 6% of total), RE leans heavily toward the between picture and lands much closer to POLS than to FE. The RE standard error (0.030) is a striking 2.7× tighter than FE's (0.081), but that efficiency is real only if individual effects are uncorrelated with union membership. If union-status selection is correlated with unobserved ability — and the gap between FE and POLS strongly suggests it is — that precision is being purchased with bias.
 
 ## 12. The Hausman test: FE or RE?
 
@@ -579,7 +579,7 @@ print(f"H statistic: {H:.4f}   p-value = {p_h:.4f}")
 print(f"β_FE − β_RE = {b_diff[0]:+.4f}")
 ```
 
-**Interpretation.** The two estimators differ by about 0.101 log points; the test statistic is 1.79 on 1 degree of freedom, giving a p-value of 0.180. Conventionally, since 0.180 > 0.05, we *fail to reject* the null and conclude that RE is acceptable. But take this verdict with a grain of salt: the Hausman test has low power exactly when within variation is thin, which is the case here (only 9% within share for union). A noisy FE estimate inflates $V_{\mathrm{FE}}$ in the denominator and shrinks $H$, making non-rejection mechanical rather than substantive. We will see in the next section that the modern Mundlak alternative gives a borderline-significant signal in the same data.
+**Interpretation.** The two estimators differ by about 0.101 log points; the test statistic is 1.79 on 1 degree of freedom, giving a p-value of 0.180. Conventionally, since 0.180 > 0.05, we *fail to reject* the null and conclude that RE is acceptable. But take this verdict with a grain of salt: the Hausman test has low power exactly when within variation is thin, which is the case here (only 6% within share for union). A noisy FE estimate inflates $V_{\mathrm{FE}}$ in the denominator and shrinks $H$, making non-rejection mechanical rather than substantive. We will see in the next section that the modern Mundlak alternative gives a borderline-significant signal in the same data.
 
 ## 13. Correlated random effects (CRE / Mundlak): the modern bridge
 
@@ -689,6 +689,7 @@ fit_re_x = RandomEffects(df_rx["lwage"], exog_rx).fit(cov_type="robust")
 
 # CRE + controls — adds the within-mean of every time-varying regressor
 df["age_bar"] = df.groupby("ID")["age"].transform("mean")
+df_rx = df.set_index(["ID", "year"])
 exog_cx = sm.add_constant(
     df_rx[["union", "union_bar", "age", "age_bar", "schooling", "female"]])
 fit_cre_x = RandomEffects(df_rx["lwage"], exog_cx).fit(cov_type="robust")
@@ -738,15 +739,15 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Interpretation.** Adding controls pulls the POLS union coefficient down to 0.057 — controls absorb some of the cross-sectional confounding — but TWFE and CRE still report a within-worker premium of about 0.21, leaving the four-camp gap (POLS 0.057 / RE 0.086 / TWFE 0.213 / CRE 0.210) largely intact. The schooling premium of 11.1% per year and the female penalty of 27.3 log points are stable across POLS, RE, and CRE because these regressors are essentially time-invariant; both are absorbed by individual FE in the TWFE column. The age coefficient does something interesting: it is +0.021 in POLS, +0.022 in RE, and +0.033 in CRE, but flips to −0.058 in TWFE. This is *not* a real age–wage relationship: with T = 2 and every worker aging by exactly two years between waves, age within an individual is collinear with the year dummy, so the TWFE age coefficient confounds the age slope with the year effect. POLS, RE, and CRE return the expected positive age slope; the TWFE −0.058 should be read as a methodological artifact of T = 2.
+**Interpretation.** Adding controls pulls the POLS union coefficient down to 0.057 — controls absorb some of the cross-sectional confounding — but TWFE and CRE still report a within-worker premium of about 0.21, leaving the four-camp gap (POLS 0.057 / RE 0.086 / TWFE 0.213 / CRE 0.210) largely intact. The schooling premium of 11.1% per year and the female penalty of 27.3 log points are stable across POLS, RE, and CRE because these regressors are essentially time-invariant; both are absorbed by individual FE in the TWFE column. The age coefficient does something interesting: it is +0.021 in POLS, +0.022 in RE, and +0.033 in CRE, but flips to −0.058 in TWFE. This is *not* a real age–wage relationship: age is not exactly collinear with the year dummy — between waves age rose by 2 years for 1,885 workers, by 1 for 164, and by 3 for 150 — so the TWFE age coefficient (−0.0576, SE 0.0238) is identified only from the 314 workers whose age did not rise by exactly two years, which makes it fragile and nearly confounds the age slope with the year effect. POLS, RE, and CRE return the expected positive age slope; the TWFE −0.058 should be read as a fragile, nearly collinear estimate, not an age–wage profile.
 
 ## 16. Discussion: what does our case study tell us?
 
-We started with a deceptively simple question: does union membership raise wages, and if so by how much? Six estimators on the same dataset gave us answers ranging from 0.066 to 0.213 log points — a factor-of-three spread that is not noise but a structural feature of how the methods identify the parameter.
+We started with a deceptively simple question: does union membership raise wages, and if so by how much? Six estimators on the same dataset gave us answers ranging from 0.066 to 0.211 log points — a factor-of-three spread that is not noise but a structural feature of how the methods identify the parameter.
 
 The cross-sectional camp (POLS, Between, RE) is asking "how do union and non-union workers compare?". Their 7–11% answer is what we would report if we believed union members were comparable to non-members on every relevant unobservable. The within camp (FE, FDFE, TWFE, CRE) is asking "what happens when *the same worker* switches union status?". Their 21% answer is what we would report if we trusted that nothing else changes for a worker between 2010 and 2012 except the things we observe. Both questions are legitimate; the gap between the answers is the empirical signature of selection on unobservables.
 
-The Hausman test failed to reject the random-effects assumption (p = 0.180), which by the textbook script would tell us to use RE. But the test has low power exactly when within variation is thin, which is the case here (9% within share). The Mundlak alternative landed at p = 0.072 — borderline non-significant by a hair — and the Mundlak term itself was −0.144, suggesting that the workers with more union exposure are different (lower-paid on average) from workers with less. Both tests point in the same direction, but Mundlak's nuanced "almost significant" reading is more honest than Hausman's confident "fail to reject" verdict.
+The Hausman test failed to reject the random-effects assumption (p = 0.180), which by the textbook script would tell us to use RE. But the test has low power exactly when within variation is thin, which is the case here (6% within share). The Mundlak alternative landed at p = 0.072 — borderline non-significant by a hair — and the Mundlak term itself was −0.144, suggesting that the workers with more union exposure are different (lower-paid on average) from workers with less. Both tests point in the same direction, but Mundlak's nuanced "almost significant" reading is more honest than Hausman's confident "fail to reject" verdict.
 
 For a practitioner faced with this kind of dataset, the practical implication is that **CRE/Mundlak is usually the right specification to lead with**. It gives you the FE coefficient on the time-varying treatment (the within effect), the RE structure that lets you keep schooling and gender in the regression, and a built-in specification test (the t-statistic on the Mundlak term) that beats Hausman in low-power settings. The cost is one extra regressor per time-varying covariate, which is essentially free in modern software.
 
@@ -757,7 +758,7 @@ Stated formally in causal-inference language: the within estimators (FDFE, FE, T
 **Takeaways.**
 
 - **Method insight.** Three within recipes — first-differences, the within transformation, and dummy-variable FE — produce the same coefficient on union (0.2103, with FDFE differing by only +0.001 because of an intercept-driven year-trend artifact). This identity holds exactly when T = 2 and approximately when T > 2; understanding *why* is the single most useful intuition in panel econometrics.
-- **Data insight.** Almost all of our variation is between workers (union 94%, age 97%, schooling 100%). Only 9% of union variance is within. That is the slice of the data that fixed-effects estimators are working with, and it explains why FE standard errors (0.081) are 2.7× larger than RE standard errors (0.030).
+- **Data insight.** Almost all of our variation is between workers (union 94%, age 97%, schooling 100%). Only 6% of union variance is within. That is the slice of the data that fixed-effects estimators are working with, and it explains why FE standard errors (0.081) are 2.7× larger than RE standard errors (0.030).
 - **Limitation.** With T = 2, our FE estimate is power-limited. The Hausman test fails to reject the RE assumption (p = 0.180) primarily because $V_{\mathrm{FE}}$ is large, not because RE is consistent. The Mundlak term tells the same story with more nuance (p = 0.072, borderline). Real applications usually have T > 2 and substantially more within variation, which sharpens both the FE estimate and the specification tests.
 - **Next step.** A natural extension is to use all five waves of the panel (2010–2018) instead of just 2010 and 2012, which would give us T = 5 and dramatically more within variation in union status. With T > 2, the FD–FE gap becomes a real identification choice (FD is more efficient under serially correlated errors; FE under random errors), and event-study designs become possible.
 

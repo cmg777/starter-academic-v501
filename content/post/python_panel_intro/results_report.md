@@ -13,7 +13,7 @@
 
 The script runs a beginner-friendly tour of the standard panel-data estimators on a balanced two-period worker wage panel (`wage_panel_bob4.dta`, 2010 & 2012, N = 2,199 individuals, T = 2). It estimates the union-membership effect on log wages with seven methods — Pooled OLS, Between, First-Differences, Within (FE), Dummy-Variable FE (one-line aside), Two-Way FE, and Random Effects — then runs the Hausman specification test and the Mundlak/CRE alternative. Five PNG figures and six CSV tables are generated.
 
-The headline finding: estimators that ignore individual heterogeneity (POLS β = 0.0750; Between β = 0.0662) report a union wage premium roughly one-third the size of the within-individual estimate (FE β = 0.2103). Once worker fixed effects are absorbed, switching union status is associated with a ~21 % log-wage gain — but the Hausman test (χ² = 1.79, p = 0.180) fails to reject the random-effects restriction, primarily because the within standard error is large (only 9 % of total union variance is within-individual).
+The headline finding: estimators that ignore individual heterogeneity (POLS β = 0.0750; Between β = 0.0662) report a union wage premium roughly one-third the size of the within-individual estimate (FE β = 0.2103). Once worker fixed effects are absorbed, switching union status is associated with a ~21 % log-wage gain — but the Hausman test (χ² = 1.79, p = 0.180) fails to reject the random-effects restriction, primarily because the within standard error is large (only 6 % of total union variance is within-individual).
 
 **Warnings:** None.
 
@@ -60,7 +60,7 @@ age                6.2576       6.1755       1.0147       97.4%
 schooling          2.1825       2.1827       0.0000      100.0%
 ```
 
-**Interpretation:** For every variable in the model, the bulk of the variation is *between* workers, not over time within a worker. Union status is 93.9 % between and only 9.1 percentage points of variance comes from workers actually switching union status across the two periods — the small slice of the data that fixed-effects estimators are confined to using. Schooling has zero within variation (100 % between), which is why the FE/TWFE specifications mechanically absorb it. Because the within share for `union` is so thin, FE standard errors will be much larger than POLS standard errors; the methodological choice between FE and RE is therefore not just an unbiasedness question but a precision question.
+**Interpretation:** For every variable in the model, the bulk of the variation is *between* workers, not over time within a worker. Union status is 93.9 % between and only 6.1 % of variance comes from workers actually switching union status across the two periods — the small slice of the data that fixed-effects estimators are confined to using. Schooling has zero within variation (100 % between), which is why the FE/TWFE specifications mechanically absorb it. Because the within share for `union` is so thin, FE standard errors will be much larger than POLS standard errors; the methodological choice between FE and RE is therefore not just an unbiasedness question but a precision question.
 
 ### Pooled OLS (POLS)
 
@@ -93,22 +93,23 @@ Differenced sample: 2199 rows (one per worker since T=2).
 ```text
 Union coefficient: 0.2103  (SE 0.0812)
 Clustered SE at ID: 0.0812  (coefficient unchanged)
-FD coef  = 0.211314
-FE coef  = 0.210318
-diff     = +0.000996  (closes once we add year FE → TWFE)
+FD coef (with intercept)    = 0.211314
+FD coef (without intercept) = 0.210318
+FE coef                     = 0.210318
 DVFE coefficient: 0.2103  (same as FE, with N-1 dummies)
 ```
 
-**Interpretation:** The within (FE) estimator returns a union effect of 21.0 % log points (SE 8.1), essentially identical to FDFE — confirming the textbook identity that, for T = 2, first-differences and the within transformation produce the same coefficient up to a small intercept-driven gap (≈ 0.001 here, which closes once year FE is added). Clustering standard errors at the individual level leaves the slope unchanged; the dummy-variable FE specification, which estimates 2,198 nuisance intercepts directly, recovers the same 0.2103 coefficient. The triple agreement (FE = DVFE ≈ FDFE) is the single most important pedagogical takeaway of the script: three apparently different recipes are algebraically the same estimator.
+**Interpretation:** The within (FE) estimator returns a union effect of 21.0 % log points (SE 8.1), essentially identical to FDFE — confirming the textbook identity that, for T = 2, first-differences and the within transformation produce the same coefficient up to a small intercept-driven gap (≈ 0.001 here; FD without an intercept equals FE exactly, and FD with an intercept equals TWFE exactly). Clustering standard errors at the individual level leaves the slope unchanged; the dummy-variable FE specification, which estimates 2,198 nuisance intercepts directly, recovers the same 0.2103 coefficient. The triple agreement (FE = DVFE ≈ FDFE) is the single most important pedagogical takeaway of the script: three apparently different recipes are algebraically the same estimator.
 
 ### Two-Way Fixed Effects (TWFE)
 
 ```text
-Union coefficient: 0.2129  (SE 0.0793)
+Union coefficient: 0.2113  (SE 0.0792)
+TWFE − FD = +0.000000  (identical when T = 2)
 Schooling and gender are absorbed (time-invariant) — TWFE cannot identify their effects.
 ```
 
-**Interpretation:** Adding year fixed effects on top of individual FE yields a union effect of 21.3 % log points (SE 7.9), nearly indistinguishable from FE (0.210) but with the FD–FE intercept gap mechanically closed. Schooling, female, and any other time-constant regressor are absorbed by the individual FE and cannot be identified by TWFE — a structural limitation of within-style methods, not a coding error. For applied work this means TWFE answers a narrow question well (the effect of a *change* in the regressor) but cannot speak to time-invariant determinants of wages.
+**Interpretation:** Adding year fixed effects on top of individual FE yields a union effect of 21.1 % log points (SE 7.9), identical to FDFE (0.2113): with T = 2, FD with an intercept equals TWFE exactly, and one-way FE (0.2103) equals FD without an intercept; the 0.001 gap is the common time trend. Schooling, female, and any other time-constant regressor are absorbed by the individual FE and cannot be identified by TWFE — a structural limitation of within-style methods, not a coding error. For applied work this means TWFE answers a narrow question well (the effect of a *change* in the regressor) but cannot speak to time-invariant determinants of wages.
 
 ### Random Effects (RE)
 
@@ -117,7 +118,7 @@ Union coefficient: 0.1092  (SE 0.0299)
 RE is a weighted average of Between and Within — leans toward FE when within-variance dominates.
 ```
 
-**Interpretation:** The RE estimator splits the difference between cross-sectional and within information, returning 10.9 % log points (SE 3.0). Because the data has very little within variation in union status (only 9 % of total), RE leans heavily toward the Between picture and lands much closer to POLS (0.075) and Between (0.066) than to FE (0.210). The RE standard error (0.030) is dramatically tighter than FE's (0.081) — a 2.7× efficiency gain — but this efficiency is real only if individual effects are uncorrelated with union membership; otherwise the precision is bought with bias.
+**Interpretation:** The RE estimator splits the difference between cross-sectional and within information, returning 10.9 % log points (SE 3.0). Because the data has very little within variation in union status (only 6 % of total), RE leans heavily toward the Between picture and lands much closer to POLS (0.075) and Between (0.066) than to FE (0.210). The RE standard error (0.030) is dramatically tighter than FE's (0.081) — a 2.7× efficiency gain — but this efficiency is real only if individual effects are uncorrelated with union membership; otherwise the precision is bought with bias.
 
 ### Hausman Test (FE vs RE)
 
@@ -166,7 +167,7 @@ schooling    0.1108 (0.0037)         absorbed  0.1112 (0.0047)  0.1108 (0.0047)
 female      -0.2731 (0.0160)         absorbed -0.2731 (0.0206) -0.2731 (0.0206)
 ```
 
-**Interpretation:** Adding age, schooling, gender, and year effects pulls the POLS union coefficient down to 0.057 — controls absorb some of the cross-sectional confounding — but TWFE and CRE still report a within-worker premium of about 0.21, leaving the 4× gap between camps largely intact. The schooling premium (≈ 11 % per year) and the female penalty (−27 % log points) are stable across POLS, RE, and CRE because these regressors are essentially time-invariant; both are absorbed by individual FE in the TWFE column. The age coefficient flips sign in TWFE (−0.058 vs +0.021 elsewhere) because identifying age effects from a two-year panel where every worker simply ages by two years confounds the age slope with the year fixed effect — a methodological artifact rather than a substantive finding.
+**Interpretation:** Adding age, schooling, gender, and year effects pulls the POLS union coefficient down to 0.057 — controls absorb some of the cross-sectional confounding — but TWFE and CRE still report a within-worker premium of about 0.21, leaving the 4× gap between camps largely intact. The schooling premium (≈ 11 % per year) and the female penalty (−27 % log points) are stable across POLS, RE, and CRE because these regressors are essentially time-invariant; both are absorbed by individual FE in the TWFE column. The age coefficient flips sign in TWFE (−0.058 vs +0.021 elsewhere) because age is nearly collinear with the year fixed effect: between waves age rose by 2 years for 1,885 workers (by 1 for 164 and by 3 for 150), so the TWFE age coefficient (−0.0576, SE 0.0238) is identified only from the 314 workers whose age did not rise by exactly two years — a fragile estimate rather than a substantive finding.
 
 ---
 
@@ -174,9 +175,9 @@ female      -0.2731 (0.0160)         absorbed -0.2731 (0.0206) -0.2731 (0.0206)
 
 | # | Filename | Description | Key takeaway |
 |---|----------|-------------|--------------|
-| 1 | `panel_intro_variation.png` | Stacked horizontal bar chart of between vs within variance shares for log wage, union, age, and schooling. | Almost all variation is between workers; within-variation in union (9 %) is the thin slice that FE/TWFE rely on. |
+| 1 | `panel_intro_variation.png` | Stacked horizontal bar chart of between vs within variance shares for log wage, union, age, and schooling. | Almost all variation is between workers; within-variation in union (6 %) is the thin slice that FE/TWFE rely on. |
 | 2 | `panel_intro_trajectories.png` | Spaghetti plot of log-wage trajectories for 30 sampled workers across 2010 → 2012, colored by union-status pattern (never / always / changed). | Workers who change union status (teal lines) are the identifying observations for FE; most of the sample is constant-union and contributes no within information. |
-| 3 | `panel_intro_demeaning.png` | Two-panel scatter: raw union vs raw log wage (POLS slope), and worker-demeaned union vs demeaned log wage (FE slope). | The same data produces visibly different slopes — flatter on the raw scatter (POLS ≈ 0.08), steeper on the demeaned scatter (FE ≈ 0.21) — a geometric depiction of the within transformation. |
+| 3 | `panel_intro_demeaning.png` | Two-panel scatter: raw union vs raw log wage (POLS slope), and worker-demeaned union vs demeaned log wage (FE slope). | The same data produces visibly different slopes — flatter on the raw scatter (POLS 0.075), steeper on the demeaned scatter (FE ≈ 0.21) — a geometric depiction of the within transformation. |
 | 4 | `panel_intro_coef_comparison.png` | Horizontal bar chart of union coefficients with 95 % CI for the six basic estimators (POLS, Between, FDFE, FE, RE, CRE), with the Hausman χ² annotated. | Within-style estimators (FDFE, FE, CRE) cluster near 0.21; cross-sectional estimators (POLS, Between, RE) cluster near 0.07–0.11. Hausman χ² = 1.79, p = 0.180. |
 | 5 | `panel_intro_extended_models.png` | Subplot grid showing union, age, schooling, and female coefficients across POLS, TWFE, RE, and CRE specifications with controls. | Time-invariant regressors (schooling, female) are absorbed by ID FE in TWFE; the union–TWFE/CRE gap relative to POLS/RE is preserved after adding controls. |
 
@@ -186,9 +187,9 @@ female      -0.2731 (0.0160)         absorbed -0.2731 (0.0206) -0.2731 (0.0206)
 
 1. **Within and cross-sectional estimators disagree by a factor of three.** POLS gives a 7.5 % union log-wage premium (SE 2.3); Between gives 6.6 % (SE 3.1); FE gives 21.0 % (SE 8.1); CRE gives 21.0 % (SE 7.0). The 0.21 vs 0.07 gap is the central pedagogical finding of the dataset.
 
-2. **Three within recipes produce the same coefficient.** First-Differences (0.2113), Within / Fixed Effects (0.2103), and Dummy-Variable FE (0.2103) agree to the third decimal. The tiny FD–FE gap (+0.001) is fully explained by the FD intercept absorbing a year trend; adding year FE (TWFE = 0.2129) closes it.
+2. **Three within recipes produce the same coefficient.** First-Differences (0.2113), Within / Fixed Effects (0.2103), and Dummy-Variable FE (0.2103) agree to the third decimal. The tiny FD–FE gap (+0.001) is fully explained by the FD intercept absorbing a year trend (0.0727): FD without an intercept equals FE (0.2103), and FD with an intercept equals TWFE (0.2113) exactly.
 
-3. **Union variance is mostly between, not within.** The variance decomposition shows union is 93.9 % between-individual and only 9.1 % of variance is within-individual switches. This is why FE standard errors (0.081) are 2.7× larger than RE standard errors (0.030) — FE simply has less data to work with.
+3. **Union variance is mostly between, not within.** The variance decomposition shows union is 93.9 % between-individual and only 6.1 % of variance is within-individual switches. This is why FE standard errors (0.081) are 2.7× larger than RE standard errors (0.030) — FE simply has less data to work with.
 
 4. **The Hausman test fails to reject RE — but with low power.** χ² = 1.79 on df = 1, p = 0.180. The non-rejection reflects the noisy FE coefficient as much as it reflects RE consistency; the Mundlak term is borderline (p = 0.072) and points the same direction. A blog post should not over-claim "RE is fine here" without flagging the precision caveat.
 
@@ -196,17 +197,17 @@ female      -0.2731 (0.0160)         absorbed -0.2731 (0.0206) -0.2731 (0.0206)
 
 6. **Schooling and gender are mechanically absorbed by individual FE.** With T = 2 and time-invariant regressors, FE/TWFE cannot identify schooling or female effects — the script reports them as "absorbed". This is a structural limitation of within methods that newcomers commonly misread as a bug.
 
-7. **The age coefficient flips sign in TWFE.** TWFE returns age = −0.058 vs +0.021 in POLS/RE/CRE. With T = 2 and every worker aging by exactly two years, age within an individual is collinear with the year dummy, so the TWFE age coefficient is not interpretable as an age–wage profile slope.
+7. **The age coefficient flips sign in TWFE.** TWFE returns age = −0.058 vs +0.021 in POLS/RE/CRE. Age is not exactly collinear with the year dummy (age rose by 2 years for 1,885 workers, by 1 for 164, and by 3 for 150), so the TWFE age coefficient is identified only from the 314 workers whose age did not rise by exactly two years; it is fragile and not interpretable as an age–wage profile slope.
 
 ---
 
 ## Surprises and Caveats
 
-- **FD and FE differ by 0.001, not zero.** With T = 2 the textbook claim is that the two coefficients are *identical*. They are — but only when the FD regression is run without an intercept. The script keeps the intercept (the more common applied practice) which absorbs an aggregate time trend, producing the small +0.001 gap. This is a pedagogical opportunity, not a bug: TWFE closes the gap exactly, which the script demonstrates explicitly.
+- **FD and FE differ by 0.001, not zero.** With T = 2 the textbook claim is that the two coefficients are *identical*. They are — but only when the FD regression is run without an intercept. The script keeps the intercept (the more common applied practice) which absorbs an aggregate time trend, producing the small +0.001 gap. This is a pedagogical opportunity, not a bug: the script reports FD without an intercept (0.2103 = FE) and shows that TWFE reproduces FD with an intercept exactly (0.2113).
 
-- **Hausman non-rejection is power-limited.** With only 9 % within-variance in union, the FE estimate is noisy enough that the Hausman test would fail to reject RE for a wide range of true population disagreements. The companion Mundlak term (p = 0.072) is borderline and reaches the same verdict; future readers should not take "p = 0.180" as strong evidence that RE is correct.
+- **Hausman non-rejection is power-limited.** With only 6 % within-variance in union, the FE estimate is noisy enough that the Hausman test would fail to reject RE for a wide range of true population disagreements. The companion Mundlak term (p = 0.072) is borderline and reaches the same verdict; future readers should not take "p = 0.180" as strong evidence that RE is correct.
 
-- **TWFE age estimate is an artifact of T = 2 and equally-spaced waves.** The negative age slope in TWFE (−0.058) should not be taken as a real finding; with everyone aging exactly two years between waves, TWFE cannot separate age from year effects. POLS, RE, and CRE all return the expected positive age–wage slope (≈ +0.02 per year).
+- **TWFE age estimate is fragile because age is nearly collinear with the year effect.** The negative age slope in TWFE (−0.058) should not be taken as a real finding; only the 314 workers whose age did not rise by exactly two years between waves let TWFE separate age from year effects. POLS, RE, and CRE all return the expected positive age–wage slope (≈ +0.02 per year).
 
 - **Dataset is small in T but large in N.** With T = 2 the within estimator drops to its minimum effective dimension; key textbook results (FD = Within identity, CRE = FE recovery) are clean here precisely because of this. On a longer panel many of these identities become approximations rather than equalities, and the choice between FE, FD, and CRE has more substantive consequences.
 

@@ -215,6 +215,16 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 - **Node smoke test.** Keep the numerics in pure functions (no DOM access at import time) and check them in Node before touching the browser, e.g. bundle with the same esbuild Hugo uses or `node --input-type=module -e "import('./assets/js/<name>.js')…"`, and assert the default-state numbers against the post's results JSON.
 - **Browser checks.** On the dev server: light, dark and 375px width; no horizontal overflow; clean console; keyboard-only operation; the `aria-live` text changes after a control moves. `check_learn_cards.cjs` covers the page-level part (overflow, page errors, both themes).
 
+### Reference implementation #2: `panel-lab`
+
+`layouts/shortcodes/panel-lab.html` + `assets/js/panel-lab.js` + `assets/css/panel-lab.css`, for `content/post/python_panel_intro/`. Same conventions as `fwl-lab`: Scratch guard key `panelLabAssets`, global `window.PanelLab`, classes prefixed `pl-` under `.panel-lab`, plain Unicode labels (no TeX), dark tokens under `.dark .panel-lab`.
+
+- **Params:** `id` (default `panel-lab-<ordinal>`), `tab` (`selection` default, or `demeaning`), e.g. `{{</* panel-lab */>}}`.
+- **Tabs** (ARIA tablist; Left/Right/Home/End):
+  - *Selection lab* — simulated balanced panel, N = 2,199, T = 2, true effect 0.21. Sliders: selection ρ (default −0.15, negative = lower-wage workers more likely in a union), switcher share (default 3.3% = 73 switchers), noise σε (default 0.30); sample #1 = seed 20100922. Shows POLS, Between, RE (Swamy–Arora), FE two-way (= FD with intercept) with 95% intervals. Defaults: 0.075 / 0.066 / 0.112 / 0.209, FE CI 0.111 to 0.306, 321 always-union, 1,805 never-union.
+  - *Demeaning lab* — fixed toy panel (8 workers × 2 periods: 3 never, 2 always, 3 switchers). Raw/demeaned toggle (`aria-pressed`). Points are draggable and `role="slider"` (Arrow ±0.05, Page ±0.25) **in the raw view only**; the demeaned view is read only. Defaults: POLS 0.078, FE 0.260. Moving a stayer leaves FE unchanged.
+- **Smoke test:** load the file in `vm` with `{ window: {} }` and call `window.PanelLab.*`. It checks FD with intercept = two-way within, FD without intercept = one-way within (1e-10), the default numbers, and that toy FE does not change when a stayer moves. Pattern: `node -e "const vm=require('vm'),fs=require('fs');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync('assets/js/panel-lab.js','utf8'),c);const L=c.window.PanelLab;console.log(L.estimate(L.buildPanel(L.simDraws(2199,L.SEED_BASE+1),L.DEFAULTS)))"`.
+
 ## Reference implementation
 
 `content/post/python_fwl/` (Frisch–Waugh–Lovell theorem, 50 simulated stores): §7.2 predict card, §8.2 proof card, §16 the `fwl-lab` interactive widget, §18 Common misconceptions, §22 graded exercises with solution cards. Canonical numbers: `content/post/python_fwl/fwl_results.json` (written by `script.py`).

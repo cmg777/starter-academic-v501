@@ -10,6 +10,13 @@ Time periods (T): 2
 Observations (N×T): 4398
 Balanced: True
 
+Union-status patterns (workers):
+never     1805
+always     321
+joiner      36
+leaver      37
+Switchers: 73 of 2199 workers (3.3%)
+
 Descriptive statistics:
            lwage      union        age  schooling
 count  4398.0000  4398.0000  4398.0000  4398.0000
@@ -46,20 +53,23 @@ Sample collapsed to 2199 individual averages — within-person changes are erase
 ── 7. First-Differences ──────────────────────────────────────────────
 Union coefficient: 0.2113  (SE 0.0792)
 Differenced sample: 2199 rows (one per worker since T=2).
+FD intercept (common trend): 0.0727
+FD slope without intercept:  0.2103
 
 ── 8. Within / Fixed Effects ─────────────────────────────────────────
 Union coefficient: 0.2103  (SE 0.0812)
 Clustered SE at ID: 0.0812  (coefficient unchanged)
-FD coef  = 0.211314
-FE coef  = 0.210318
-diff     = +0.000996  (closes once we add year FE → TWFE)
+FD coef (with intercept)    = 0.211314
+FD coef (without intercept) = 0.210318
+FE coef                     = 0.210318
 DVFE coefficient: 0.2103  (same as FE, with N-1 dummies)
 
 ── Figure 3: Within Transformation ───────────────────────────────────
 Saved panel_intro_demeaning.png
 
 ── 9. Two-Way Fixed Effects ──────────────────────────────────────────
-Union coefficient: 0.2129  (SE 0.0793)
+Union coefficient: 0.2113  (SE 0.0792)
+TWFE − FD = +0.000000  (identical when T = 2)
 Schooling and gender are absorbed (time-invariant) — TWFE cannot identify their effects.
 
 ── 10. Random Effects ────────────────────────────────────────────────
@@ -82,6 +92,12 @@ Saved panel_intro_coef_comparison.png
 Exported basic_models_comparison.csv
 
 ── 14. Extended Models with Controls ─────────────────────────────────
+Change in age between waves (workers):
+age
+1     164
+2    1885
+3     150
+Workers whose age did not rise by exactly 2: 314
 
 Variable                POLS             TWFE               RE              CRE
 ============================================================================
@@ -105,9 +121,10 @@ CRE            0.2103     0.0703  Mundlak — bridges FE and RE
 
 Key takeaways:
   1. POLS (0.0750) and Between (0.0662) use cross-sectional variation.
-  2. FE = DVFE = 0.2103; FDFE = 0.2113. FD matches Within exactly only after absorbing year FE (TWFE).
+  2. FE = DVFE = 0.2103; FDFE = TWFE = 0.2113. With T = 2, FD with an intercept equals FE with year effects.
   3. RE (0.1092) is a weighted average; CRE (0.2103) recovers the FE coefficient.
   4. Hausman (χ²=1.79, p=0.180) and Mundlak term (p=0.072) agree on the FE-vs-RE choice.
+Exported panel_intro_results.json
 
 Generated files:
   basic_models_comparison.csv

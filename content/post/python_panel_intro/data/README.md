@@ -106,7 +106,7 @@ df = pd.read_stata(BASE + "raw_data.dta")
 ## Known limitations & caveats
 
 - <strong>Two periods only in the analysis panel.</strong> <code>data_panel</code> keeps just 2010 and 2012 (<em>T</em>&nbsp;=&nbsp;2) so the first-difference and within estimators coincide; with only two waves the fixed-effects estimate is power-limited and the Hausman test has low power. <code>raw_data</code> retains all five waves for extensions.
-- <strong>Thin within variation.</strong> Union status is 93.9% between-worker and only 9.1% within; schooling has zero within-variation in the two-period window, so fixed effects mechanically drops it.
+- <strong>Thin within variation.</strong> Union status is 93.9% between-worker and only 6.1% within; schooling has zero within-variation in the two-period window, so fixed effects mechanically drops it.
 - <strong>10 workers dropped.</strong> The analysis panel keeps 2,199 of the 2,209 raw workers; ten are dropped for missing values in <code>lwage</code>/<code>union</code>/<code>age</code>/<code>schooling</code>.
 - <strong>Estimands differ.</strong> Within estimators (FDFE/FE/TWFE/CRE) identify the effect for union <em>switchers</em> under strict exogeneity; POLS/Between report a population-weighted association without a causal interpretation absent unconfoundedness.
 

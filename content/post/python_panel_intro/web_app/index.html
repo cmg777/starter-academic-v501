@@ -117,10 +117,10 @@
         <div class="gloss-body">OLS on the demeaned data. Identifies beta from within-unit changes only. Drops time-invariant regressors (schooling, gender) mechanically.</div>
       </details>
       <details class="gloss"><summary>First differences (FDFE)</summary>
-        <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2 it gives the same coefficient as FE. With T &gt; 2 the two diverge under serially correlated errors.</div>
+        <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2, FD without an intercept gives the same coefficient as FE, and FD with an intercept equals two-way FE. With T &gt; 2 the two diverge under serially correlated errors.</div>
       </details>
       <details class="gloss"><summary>Two-way FE (TWFE)</summary>
-        <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. Closes the FD-FE gap induced by aggregate trends.</div>
+        <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. With T = 2 it equals FD with an intercept exactly (0.2113); one-way FE (0.2103) equals FD without an intercept, and the 0.001 gap is the common time trend.</div>
       </details>
       <details class="gloss"><summary>Random effects (RE)</summary>
         <div class="gloss-body">Treats the unit effect as a random draw uncorrelated with regressors. GLS-weighted combination of between and within. Efficient if assumption holds; biased if not.</div>
@@ -241,7 +241,7 @@
       <li><strong>Two clear camps on "union (basic)"</strong>. POLS/Between/RE land at 6–11%; FDFE/FE/CRE land at 21%. That factor-of-three gap is the empirical signature of selection on unobservables.</li>
       <li><strong>CRE equals FE exactly</strong> (0.2103 to four decimals). Mundlak's algebra is exact: add the unit means and RE recovers the within coefficient on the original variable.</li>
       <li><strong>Schooling is absorbed under TWFE</strong>. No row appears for TWFE on schooling because schooling has zero within-variation. The other three methods recover 0.111.</li>
-      <li><strong>The age coefficient flips sign under TWFE</strong> (+0.021 in POLS/RE, &minus;0.058 in TWFE). With T = 2 and every worker aging by 2 years, age within an individual is collinear with the year dummy — a methodological artifact, not a real effect.</li>
+      <li><strong>The age coefficient flips sign under TWFE</strong> (+0.021 in POLS/RE, &minus;0.058 in TWFE). Age is not exactly collinear with the year dummy (it rose by 2 years for 1,885 workers, by 1 for 164, and by 3 for 150), so the TWFE age coefficient is identified only from the 314 workers whose age did not rise by exactly two years — a fragile estimate, not a real age–wage profile.</li>
     </ul>
   </div>
 

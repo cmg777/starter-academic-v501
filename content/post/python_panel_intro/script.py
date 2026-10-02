@@ -2,7 +2,7 @@
 Introduction to Panel Data Methods (Python tutorial).
 
 Estimates seven panel estimators on a two-period worker wage panel
-(2010 & 2012, N=2,209) and visualizes how each one uses the data:
+(2010 & 2012, N=2,199) and visualizes how each one uses the data:
 POLS, Between, First-Differences, Within (FE), Two-Way FE, Random
 Effects, and Correlated Random Effects (Mundlak). Includes a Hausman
 test comparing FE and RE.
@@ -11,7 +11,8 @@ Usage:
     python script.py
 
 Outputs:
-    panel_intro_*.png (5 figures), *.csv (8 tables)
+    panel_intro_*.png (5 figures), *.csv (6 tables),
+    panel_intro_results.json (every number quoted in the post)
 
 References:
     https://pyfixest.org/pyfixest.html
@@ -19,6 +20,7 @@ References:
 """
 
 import glob
+import json
 
 import numpy as np
 import pandas as pd
@@ -153,6 +155,21 @@ print(f"Time periods (T): {df['year'].nunique()}")
 print(f"Observations (N×T): {len(df)}")
 obs_per_id = df.groupby("ID")["year"].count()
 print(f"Balanced: {(obs_per_id == df['year'].nunique()).all()}")
+
+# Union-status patterns: only switchers identify the within estimators.
+wide_union = df.pivot(index="ID", columns="year", values="union")
+pattern = np.select(
+    [(wide_union[2010] == 0) & (wide_union[2012] == 0),
+     (wide_union[2010] == 1) & (wide_union[2012] == 1),
+     (wide_union[2010] == 0) & (wide_union[2012] == 1)],
+    ["never", "always", "joiner"], default="leaver")
+pattern_counts = pd.Series(pattern).value_counts().reindex(
+    ["never", "always", "joiner", "leaver"])
+n_switchers = int(pattern_counts["joiner"] + pattern_counts["leaver"])
+print("\nUnion-status patterns (workers):")
+print(pattern_counts.to_string())
+print(f"Switchers: {n_switchers} of {len(wide_union)} workers "
+      f"({100 * n_switchers / len(wide_union):.1f}%)")
 
 desc_vars = ["lwage", "union", "age", "schooling"]
 desc_overall = df[desc_vars].describe().round(4)
@@ -308,6 +325,13 @@ fdfe_se = fit_fdfe.se()["d_union"]
 print(f"Union coefficient: {fdfe_coef:.4f}  (SE {fdfe_se:.4f})")
 print(f"Differenced sample: {len(df_diff)} rows (one per worker since T=2).")
 
+# FD without an intercept: no allowance for a common 2010→2012 wage trend.
+fit_fd_noint = pf.feols("d_lwage ~ d_union - 1", data=df_diff, vcov="HC1")
+fd_noint_coef = fit_fd_noint.coef()["d_union"]
+fd_intercept = fit_fdfe.coef()["Intercept"]
+print(f"FD intercept (common trend): {fd_intercept:.4f}")
+print(f"FD slope without intercept:  {fd_noint_coef:.4f}")
+
 
 # ── 8. Within / Fixed Effects (FE) ────────────────────────────────────────────
 section("8. Within / Fixed Effects")
@@ -330,13 +354,12 @@ print(f"Union coefficient: {fe_coef:.4f}  (SE {fe_se:.4f})")
 fit_fe_clu = pf.feols("lwage ~ union | ID", data=df, vcov={"CRV1": "ID"})
 print(f"Clustered SE at ID: {fit_fe_clu.se()['union']:.4f}  (coefficient unchanged)")
 
-# T=2 closeness: with an intercept in the FD regression (which absorbs the
-# average time trend), the FD slope is very close to — but not identical to —
-# the within slope. The two match exactly when Within also absorbs year FE
-# (that's TWFE: see Section 9).
-print(f"FD coef  = {fdfe_coef:.6f}")
-print(f"FE coef  = {fe_coef:.6f}")
-print(f"diff     = {fdfe_coef - fe_coef:+.6f}  (closes once we add year FE → TWFE)")
+# T=2 identities: one-way FE equals FD WITHOUT an intercept; FD WITH an
+# intercept (which absorbs the common time trend) equals FE plus year FE,
+# i.e. TWFE with union only (see Section 9).
+print(f"FD coef (with intercept)    = {fdfe_coef:.6f}")
+print(f"FD coef (without intercept) = {fd_noint_coef:.6f}")
+print(f"FE coef                     = {fe_coef:.6f}")
 
 # DVFE: explicit individual dummies — algebraically equivalent to FE,
 # but estimates N-1 nuisance intercepts. Don't do this for large N.
@@ -388,13 +411,15 @@ save_dark("panel_intro_demeaning.png")
 # ── 9. Two-Way Fixed Effects (TWFE) ───────────────────────────────────────────
 section("9. Two-Way Fixed Effects")
 
-# Stata: reghdfe lwage union age, absorb(ID year) vce(cluster ID)
+# Stata: reghdfe lwage union, absorb(ID year) vce(cluster ID)
 # Absorbs ID effects (unobserved worker traits) AND year effects (common shocks).
 # Schooling and gender are time-invariant — automatically absorbed by ID FE.
-fit_twfe = pf.feols("lwage ~ union + age | ID + year", data=df, vcov={"CRV1": "ID"})
+# With T=2 and union as the only regressor, TWFE reproduces FD exactly.
+fit_twfe = pf.feols("lwage ~ union | ID + year", data=df, vcov={"CRV1": "ID"})
 twfe_coef = fit_twfe.coef()["union"]
 twfe_se = fit_twfe.se()["union"]
 print(f"Union coefficient: {twfe_coef:.4f}  (SE {twfe_se:.4f})")
+print(f"TWFE − FD = {twfe_coef - fdfe_coef:+.6f}  (identical when T = 2)")
 print("Schooling and gender are absorbed (time-invariant) — TWFE cannot identify their effects.")
 
 
@@ -506,6 +531,13 @@ print("Exported basic_models_comparison.csv")
 section("14. Extended Models with Controls")
 
 df["age_bar"] = df.groupby("ID")["age"].transform("mean")
+
+# Age is NOT exactly collinear with the year effect: interview spacing varies.
+age_change = df.groupby("ID")["age"].diff().dropna().astype(int).value_counts().sort_index()
+print("Change in age between waves (workers):")
+print(age_change.to_string())
+n_irregular_age = int(age_change.drop(2, errors="ignore").sum())
+print(f"Workers whose age did not rise by exactly 2: {n_irregular_age}")
 
 # POLS + controls
 fit_pols_x = pf.feols(
@@ -621,9 +653,44 @@ for m, c, s, desc in summary_rows:
 
 print("\nKey takeaways:")
 print(f"  1. POLS ({pols_coef:.4f}) and Between ({between_coef:.4f}) use cross-sectional variation.")
-print(f"  2. FE = DVFE = {fe_coef:.4f}; FDFE = {fdfe_coef:.4f}. FD matches Within exactly only after absorbing year FE (TWFE).")
+print(f"  2. FE = DVFE = {fe_coef:.4f}; FDFE = TWFE = {twfe_coef:.4f}. With T = 2, FD with an intercept equals FE with year effects.")
 print(f"  3. RE ({re_coef:.4f}) is a weighted average; CRE ({cre_coef:.4f}) recovers the FE coefficient.")
 print(f"  4. Hausman (χ²={H:.2f}, p={p_h:.3f}) and Mundlak term (p={mundlak_p:.3f}) agree on the FE-vs-RE choice.")
+
+# ── 16. Results JSON (single source of truth for the post) ──────────────────
+def r4(x):
+    return round(float(x), 4)
+
+ext_json = {row["variable"]: {k: v for k, v in row.items() if k != "variable"}
+            for row in extended_results}
+results = {
+    "sample": {"N": int(df["ID"].nunique()), "T": int(df["year"].nunique()),
+               "NT": int(len(df)), "union_mean": r4(df["union"].mean())},
+    "variation": {row["variable"]: {k: v for k, v in row.items() if k != "variable"}
+                  for row in variation_data},
+    "union_patterns": {k: int(v) for k, v in pattern_counts.items()},
+    "n_switchers": n_switchers,
+    "age_change_counts": {str(k): int(v) for k, v in age_change.items()},
+    "models": {
+        "POLS": {"coef": r4(pols_coef), "se": r4(pols_se)},
+        "Between": {"coef": r4(between_coef), "se": r4(between_se)},
+        "FDFE": {"coef": r4(fdfe_coef), "se": r4(fdfe_se),
+                 "intercept": r4(fd_intercept), "coef_no_intercept": r4(fd_noint_coef)},
+        "FE": {"coef": r4(fe_coef), "se": r4(fe_se),
+               "se_cluster": r4(fit_fe_clu.se()["union"])},
+        "DVFE": {"coef": r4(dvfe_coef)},
+        "TWFE": {"coef": r4(twfe_coef), "se": r4(twfe_se)},
+        "RE": {"coef": r4(re_coef), "se": r4(re_se)},
+        "CRE": {"coef": r4(cre_coef), "se": r4(cre_se),
+                "mundlak_coef": r4(mundlak_coef), "mundlak_p": r4(mundlak_p)},
+    },
+    "figure_slopes": {"pols_polyfit": r4(b_pols), "fe_polyfit": r4(b_fe)},
+    "hausman": {"H": r4(H), "p": r4(p_h), "diff": r4(b_diff[0])},
+    "extended": ext_json,
+}
+with open("panel_intro_results.json", "w") as fh:
+    json.dump(results, fh, indent=2, default=float)
+print("Exported panel_intro_results.json")
 
 print("\nGenerated files:")
 for f in sorted(glob.glob("panel_intro_*.png") + glob.glob("*.csv")):

@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-10-02">
   <title>Introduction to Panel Data Methods</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -200,11 +200,11 @@
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">0.075</span><span class="kr-cap">pooled OLS — cross-sectional</span></div>
     <div class="kr"><span class="kr-num">0.210</span><span class="kr-cap">fixed effects — within-worker</span></div>
-    <div class="kr"><span class="kr-num">9.1%</span><span class="kr-cap">of union variance is within</span></div>
+    <div class="kr"><span class="kr-num">6.1%</span><span class="kr-cap">of union variance is within</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">October 2, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -319,11 +319,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="of-union-variation-is-between-workers-only-9.1-is-within" class="slide level2 center">
-<h2>94% of union variation is <em>between</em> workers — only 9.1% is within</h2>
+<section id="of-union-variation-is-between-workers-only-6.1-is-within" class="slide level2 center">
+<h2>94% of union variation is <em>between</em> workers — only 6.1% is within</h2>
 
 <img data-src="../panel_intro_variation.png" class="r-stretch quarto-figure-center"><p class="caption">Between vs within variance shares for the four key variables. Union is 93.9% between; schooling is 100% between (zero within).</p><aside class="notes">
-<p>Fixed effects only use the within part. For union that is a thin 9.1% slice of total variance. Schooling has zero within-variation (nobody’s education changes across two years), so FE mechanically drops it. The consequence: FE standard errors will be much larger than POLS — the FE-vs-RE choice is about precision as much as bias.</p>
+<p>Fixed effects only use the within part. For union that is a thin 6.1% slice of total variance. Schooling has zero within-variation (nobody’s education changes across two years), so FE mechanically drops it. The consequence: FE standard errors will be much larger than POLS — the FE-vs-RE choice is about precision as much as bias.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -396,7 +396,7 @@
 <h2>The within transformation demeans the data — and the slope steepens to 0.21</h2>
 
 <img data-src="../panel_intro_demeaning.png" class="r-stretch quarto-figure-center"><p class="caption">Within transformation: raw scatter with the shallow POLS slope (left); demeaned scatter with the steeper FE slope through the origin (right).</p><aside class="notes">
-<p>Same observations, two pictures. Left (raw): POLS slope ≈ 0.08, dragged down because union and non-union mean wages sit close together. Right (demeaned): FE slope ≈ 0.21, identified only by the points that move off the origin — the switchers. The within estimator subtracts each worker’s mean, so α_i vanishes; OLS on the demeaned data gives the FE coefficient.</p>
+<p>Same observations, two pictures. Left (raw): POLS slope 0.075, dragged down because union and non-union mean wages sit close together. Right (demeaned): FE slope ≈ 0.21, identified only by the points that move off the origin — the switchers. The within estimator subtracts each worker’s mean, so α_i vanishes; OLS on the demeaned data gives the FE coefficient.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -416,7 +416,7 @@
 <span id="cb2-3"><a href=""></a><span class="co"># Both → 0.2103;  FDFE → 0.2113 (the +0.001 is an intercept-driven year trend)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Within transformation, first-differences, and dummy-variable FE are three recipes for the <strong>same dish</strong>. Absorption (<code>| ID</code>) is just the fast one.</span></p>
 <aside class="notes">
-<p>DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: 2,199 dummies still runs fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap closes once we add a year effect — that is two-way FE, next.</p>
+<p>DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: 2,199 dummies still runs fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -429,13 +429,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-way-fe-absorbs-year-shocks-and-lands-at-0.2129-closing-the-fdfe-gap" class="slide level2 center">
-<h2>Two-way FE absorbs year shocks and lands at 0.2129 — closing the FD–FE gap</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-code-line-numbers="1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>fit_twfe <span class="op">=</span> pf.feols(<span class="st">"lwage ~ union + age | ID + year"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span>{<span class="st">"CRV1"</span>: <span class="st">"ID"</span>})</span>
-<span id="cb3-2"><a href=""></a><span class="co"># Union coefficient: 0.2129  (SE 0.0793)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="two-way-fe-absorbs-year-shocks-and-lands-at-0.2113-exactly-first-differences" class="slide level2 center">
+<h2>Two-way FE absorbs year shocks and lands at 0.2113 — exactly first differences</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-code-line-numbers="1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>fit_twfe <span class="op">=</span> pf.feols(<span class="st">"lwage ~ union | ID + year"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span>{<span class="st">"CRV1"</span>: <span class="st">"ID"</span>})</span>
+<span id="cb3-2"><a href=""></a><span class="co"># Union coefficient: 0.2113  (SE 0.0792)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Absorbing the year effect removes the aggregate wage trend FD’s intercept was capturing. Time-invariant regressors (schooling, female) are <em>silently absorbed</em>.</span></p>
 <aside class="notes">
-<p>TWFE = 0.2129, all but identical to one-way FE because with T = 2 the time effect is small. The +0.002 vs FE is exactly the trend FD’s intercept absorbed. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables.</p>
+<p>TWFE = 0.2113, identical to FD with an intercept: with T = 2 the two coincide exactly, while one-way FE (0.2103) equals FD without an intercept. The 0.001 gap is the common time trend that the year effect and FD’s intercept both absorb. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -453,7 +453,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-code-line-numbers="1-2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>exog <span class="op">=</span> sm.add_constant(df_re[[<span class="st">"union"</span>]])</span>
 <span id="cb4-2"><a href=""></a>fit_re <span class="op">=</span> RandomEffects(df_re[<span class="st">"lwage"</span>], exog).fit(cov_type<span class="op">=</span><span class="st">"robust"</span>)</span>
 <span id="cb4-3"><a href=""></a><span class="co"># Union coefficient: 0.1092  (SE 0.0299)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="takeaway fragment">RE is a variance-weighted average of between and within. With only 9% within, it leans toward the <em>between</em> picture — and SE is <span class="math inline">\(2.7\times\)</span> tighter than FE.</span></p>
+<p><span class="takeaway fragment">RE is a variance-weighted average of between and within. With only 6% within, it leans toward the <em>between</em> picture — and SE is <span class="math inline">\(2.7\times\)</span> tighter than FE.</span></p>
 <aside class="notes">
 <p>RE treats α_i as a random draw uncorrelated with the regressors and uses GLS to blend within and between efficiently. Here it lands at 0.109, squarely between POLS (0.075) and FE (0.210), leaning toward POLS because within variation is thin. The SE (0.030) is striking — but that precision is real only if individual effects are uncorrelated with union status. The FE–POLS gap suggests they are not, so the precision is bought with bias.</p>
 <style type="text/css">
@@ -598,7 +598,7 @@
 <h2>Adding controls leaves the four-camp gap intact</h2>
 
 <img data-src="../panel_intro_extended_models.png" class="r-stretch quarto-figure-center"><p class="caption">Extended models — union, age, schooling, female across POLS / TWFE / RE / CRE. The within premium survives controls.</p><aside class="notes">
-<p>With age, schooling, female, and year dummies, POLS drops to 0.057 (controls absorb some confounding), but TWFE and CRE still report ~0.21. Schooling (+11.1%/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The TWFE age coefficient flips to −0.058, a T = 2 artifact (age is collinear with the year dummy), not a real age–wage relationship.</p>
+<p>With age, schooling, female, and year dummies, POLS drops to 0.057 (controls absorb some confounding), but TWFE and CRE still report ~0.21. Schooling (+11.1%/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The TWFE age coefficient flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -617,7 +617,7 @@
 <div class="fragment">
 <p><span class="rebuttal">Response.</span> Correct. FE/FDFE/TWFE/CRE target the ATE for <em>union switchers</em> only — and only under <strong>strict exogeneity given the worker fixed effect</strong>.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the ~9% of workers who switched status — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.</p>
+<p>Steelman, don’t strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the 73 of 2,199 workers (3.3%) who switched union status (36 joined, 37 left) — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

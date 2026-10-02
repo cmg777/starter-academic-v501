@@ -202,7 +202,7 @@
 
   // ------------------------------------------------------------------
   // variation_bars (Tab 1 helper) — between vs within share for each
-  // panel variable. Simple stacked horizontal bars to make the 9% slice
+  // panel variable. Simple stacked horizontal bars to make the 6% slice
   // visible.
   // ------------------------------------------------------------------
   function variation_bars(container) {

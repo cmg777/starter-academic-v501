@@ -1,0 +1,165 @@
+{{- /*
+  panel-lab.html — inline interactive panel-data lab (two tabs) for
+  content/post/python_panel_intro (union wage premium, two-period panel).
+
+  Usage:
+    {{< panel-lab >}}                                  opens on the Selection lab
+    {{< panel-lab id="lab-two" tab="demeaning" >}}     opens on the Demeaning lab
+  Params:
+    id   element id (default "panel-lab-<ordinal>"); must be unique on the page
+    tab  "selection" (default) or "demeaning": the tab shown first
+
+  Tab A "Selection lab": simulated balanced panel (2,199 workers, T = 2,
+  true effect 0.21); sliders for selection, switcher share and noise; POLS,
+  between, random effects and FE (two-way) with 95% intervals.
+  Tab B "Demeaning lab": fixed toy panel (8 workers x 2 periods); raw or
+  demeaned view; points draggable and keyboard-adjustable in the raw view.
+
+  Assets: assets/css/panel-lab.css and assets/js/panel-lab.js are emitted ONCE
+  per page (Page.Scratch guard "panelLabAssets"), minified, fingerprinted, SRI.
+  Labels are plain Unicode/HTML, never TeX. Keep this output free of blank
+  lines, code/pre/img/table/h2/h3 elements and the dollar character.
+*/ -}}
+{{- $id := .Get "id" | default (printf "panel-lab-%d" .Ordinal) -}}
+{{- $tab := .Get "tab" | default "selection" -}}
+{{- if not (in (slice "selection" "demeaning") $tab) -}}
+{{- errorf "panel-lab: tab must be \"selection\" or \"demeaning\" (got %q) in %s" $tab .Position -}}
+{{- end -}}
+{{- $selA := eq $tab "selection" -}}
+{{- if not (.Page.Scratch.Get "panelLabAssets") -}}
+{{- .Page.Scratch.Set "panelLabAssets" true -}}
+{{- $css := resources.Get "css/panel-lab.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $js := resources.Get "js/panel-lab.js" | js.Build (dict "minify" true "target" "es2017") | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}
+<section class="panel-lab" id="{{ $id }}" data-panel-lab data-tab="{{ $tab }}" aria-labelledby="{{ $id }}-title">
+<div class="pl-head">
+<p class="pl-title" id="{{ $id }}-title">Interactive panel-data lab</p>
+<p class="pl-status" data-out="status">{{ if $selA }}Simulated panel calibrated to the post (true effect 0.21){{ else }}Toy panel: 8 workers observed in 2 periods{{ end }}</p>
+</div>
+<noscript><p class="pl-noscript">This interactive lab needs JavaScript. The static figures in this post show the same estimators and the same demeaning step.</p></noscript>
+<div class="pl-body">
+<div class="pl-tabs" role="tablist" aria-label="Panel-data lab views">
+<button type="button" class="pl-tab" role="tab" id="{{ $id }}-tab-sel" data-tab="selection" aria-controls="{{ $id }}-panel-sel" aria-selected="{{ if $selA }}true{{ else }}false{{ end }}" tabindex="{{ if $selA }}0{{ else }}-1{{ end }}">Selection lab</button>
+<button type="button" class="pl-tab" role="tab" id="{{ $id }}-tab-dem" data-tab="demeaning" aria-controls="{{ $id }}-panel-dem" aria-selected="{{ if $selA }}false{{ else }}true{{ end }}" tabindex="{{ if $selA }}-1{{ else }}0{{ end }}">Demeaning lab</button>
+</div>
+<div class="pl-panel" role="tabpanel" id="{{ $id }}-panel-sel" data-panel="selection" aria-labelledby="{{ $id }}-tab-sel"{{ if not $selA }} hidden{{ end }}>
+<p class="pl-intro">A simulated two-period panel of 2,199 workers in which the true union effect is 0.21 log points. Change how union membership is selected on the worker effect α<sub>i</sub>, how many workers switch status, and how noisy wages are, then compare four estimators.</p>
+<div class="pl-controls">
+<div class="pl-ctl">
+<div class="pl-ctl-top"><label for="{{ $id }}-rho">Selection on the worker effect <i>ρ</i></label><output for="{{ $id }}-rho" data-param-out="rho">−0.15</output></div>
+<input type="range" id="{{ $id }}-rho" data-param="rho" min="-0.9" max="0.9" step="0.01" value="-0.15" autocomplete="off" aria-describedby="{{ $id }}-rho-help">
+<p class="pl-help" id="{{ $id }}-rho-help">Correlation between α<sub>i</sub> and the propensity to be a union member. Negative values mean that lower-wage workers are more likely to be union members, as in the post. Default −0.15.</p>
+</div>
+<div class="pl-ctl">
+<div class="pl-ctl-top"><label for="{{ $id }}-share">Share of workers who switch status</label><output for="{{ $id }}-share" data-param-out="share">3.3%</output></div>
+<input type="range" id="{{ $id }}-share" data-param="share" min="1" max="30" step="0.1" value="3.3" autocomplete="off" aria-describedby="{{ $id }}-share-help">
+<p class="pl-help" id="{{ $id }}-share-help">Workers whose union status changes between the two periods; only they identify FE. Default 3.3%, the 73 switchers of the post.</p>
+</div>
+<div class="pl-ctl">
+<div class="pl-ctl-top"><label for="{{ $id }}-sigma">Idiosyncratic noise <i>σ</i><sub>ε</sub></label><output for="{{ $id }}-sigma" data-param-out="sigma">0.30</output></div>
+<input type="range" id="{{ $id }}-sigma" data-param="sigma" min="0.1" max="0.6" step="0.01" value="0.3" autocomplete="off" aria-describedby="{{ $id }}-sigma-help">
+<p class="pl-help" id="{{ $id }}-sigma-help">Standard deviation of the period-specific wage shock ε<sub>it</sub>. More noise widens every interval, the FE interval most of all. Default 0.30.</p>
+</div>
+</div>
+<div class="pl-actions">
+<button type="button" class="pl-btn pl-btn-primary" data-act="draw">Draw a new sample</button>
+<button type="button" class="pl-btn" data-act="reset">Reset to defaults</button>
+</div>
+<div class="pl-strip-wrap">
+<p class="pl-cap">Four estimates of the union effect, with 95% confidence intervals</p>
+<svg class="pl-strip" viewBox="0 0 320 182" role="img" aria-labelledby="{{ $id }}-strip-t" aria-describedby="{{ $id }}-strip-d" data-strip="strip">
+<title id="{{ $id }}-strip-t">Union effect estimates by estimator</title>
+<desc id="{{ $id }}-strip-d">Estimates of the union effect with 95 percent confidence intervals, and the true effect 0.21.</desc>
+<g data-ticks="x"></g>
+<path class="pl-zero" data-mk="zero" d="M104 20L104 150"/>
+<path class="pl-frame-b" d="M104 150L308 150"/>
+<path class="pl-rowline" d="M104 38L308 38M104 68L308 68M104 98L308 98M104 128L308 128"/>
+<text class="pl-rowlab" x="96" y="41.5" text-anchor="end">Pooled OLS</text>
+<text class="pl-rowlab" x="96" y="71.5" text-anchor="end">Between</text>
+<text class="pl-rowlab" x="96" y="101.5" text-anchor="end">Random effects</text>
+<text class="pl-rowlab" x="96" y="131.5" text-anchor="end">FE (two-way)</text>
+<path class="pl-truth" data-mk="truth" d="M200 16L200 150"/>
+<text class="pl-truth-label" data-mk-label="truth" x="200" y="11" text-anchor="middle">true effect 0.21</text>
+<path class="pl-ci pl-c-pols" data-ci="pols" d=""/>
+<path class="pl-ci pl-c-between" data-ci="between" d=""/>
+<path class="pl-ci pl-c-re" data-ci="re" d=""/>
+<path class="pl-ci pl-c-twfe" data-ci="twfe" d=""/>
+<g class="pl-mk pl-c-pols" data-mk="pols"><circle r="5"/></g>
+<g class="pl-mk pl-c-between" data-mk="between"><rect x="-4.5" y="-4.5" width="9" height="9"/></g>
+<g class="pl-mk pl-c-re" data-mk="re"><path d="M0 -6L5.6 4L-5.6 4Z"/></g>
+<g class="pl-mk pl-c-twfe" data-mk="twfe"><path d="M0 -6.3L6.3 0L0 6.3L-6.3 0Z"/></g>
+<text class="pl-val pl-v-pols" data-val="pols" x="0" y="29" text-anchor="middle"></text>
+<text class="pl-val pl-v-between" data-val="between" x="0" y="59" text-anchor="middle"></text>
+<text class="pl-val pl-v-re" data-val="re" x="0" y="89" text-anchor="middle"></text>
+<text class="pl-val pl-v-twfe" data-val="twfe" x="0" y="119" text-anchor="middle"></text>
+<text class="pl-axlab" x="206" y="178" text-anchor="middle">Union effect (log points)</text>
+</svg>
+</div>
+<dl class="pl-readout">
+<div class="pl-row"><dt><span class="pl-key pl-key-pols" aria-hidden="true"></span>Pooled OLS<span class="pl-sub">all 4,398 worker-years</span></dt><dd><span data-out="pols"></span></dd></div>
+<div class="pl-row"><dt><span class="pl-key pl-key-between" aria-hidden="true"></span>Between<span class="pl-sub">mean of each worker, 2,199 rows</span></dt><dd><span data-out="between"></span></dd></div>
+<div class="pl-row"><dt><span class="pl-key pl-key-re" aria-hidden="true"></span>Random effects<span class="pl-sub">Swamy–Arora, partial demeaning</span></dt><dd><span data-out="re"></span></dd></div>
+<div class="pl-row"><dt><span class="pl-key pl-key-twfe" aria-hidden="true"></span>FE (two-way)<span class="pl-sub">= first differences with an intercept</span></dt><dd><span data-out="twfe"></span></dd></div>
+<div class="pl-row"><dt>FE 95% confidence interval<span class="pl-sub">from the first-difference standard error</span></dt><dd><span data-out="feci"></span></dd></div>
+<div class="pl-row"><dt>Switchers<span class="pl-sub" data-out="switchSplit"></span></dt><dd><span data-out="switchers"></span></dd></div>
+</dl>
+<p class="pl-flag" data-state="bias"><span data-out="flag"></span><span class="pl-sub" data-out="flagSub"></span></p>
+</div>
+<div class="pl-panel" role="tabpanel" id="{{ $id }}-panel-dem" data-panel="demeaning" aria-labelledby="{{ $id }}-tab-dem"{{ if $selA }} hidden{{ end }}>
+<p class="pl-intro">Eight workers observed in two periods (log wage on the vertical axis, union status on the horizontal axis). Three never join a union, two are always members (and earn less), and three switch status. Compare the raw data with the data after subtracting the mean of each worker, then move points to see which observations drive each slope.</p>
+<div class="pl-dem-top">
+<div class="pl-seg" role="group" aria-label="Data view">
+<button type="button" class="pl-seg-btn" data-view="raw" aria-pressed="true">Raw data</button>
+<button type="button" class="pl-seg-btn" data-view="demeaned" aria-pressed="false">Demeaned data</button>
+</div>
+<button type="button" class="pl-btn" data-act="reset-points">Reset points</button>
+</div>
+<p class="pl-help pl-view-note" data-out="viewNote">Drag a point up or down, or focus it and use the arrow keys (Page Up and Page Down for larger steps).</p>
+<div class="pl-dem-grid">
+<div class="pl-plot">
+<svg class="pl-scatter" viewBox="0 0 300 236" role="group" aria-labelledby="{{ $id }}-sc-t" aria-describedby="{{ $id }}-sc-d" data-scatter="toy" data-mode="raw">
+<title id="{{ $id }}-sc-t">Log wage against union status for 8 workers in 2 periods</title>
+<desc id="{{ $id }}-sc-d">Toy panel with a fitted line.</desc>
+<defs><clipPath id="{{ $id }}-sc-clip"><rect x="46" y="12" width="244" height="180"/></clipPath></defs>
+<g data-ticks="x"></g>
+<g data-ticks="y"></g>
+<rect class="pl-frame" x="46" y="12" width="244" height="180"/>
+<path class="pl-axis0" data-zero="x" d="" visibility="hidden"/>
+<text class="pl-axis0-label" data-zero-label x="0" y="24" visibility="hidden">stayers: x = 0</text>
+<g clip-path="url(#{{ $id }}-sc-clip)">
+<g data-links></g>
+<path class="pl-halo" data-line="pols" d=""/>
+<path class="pl-fit pl-fit-pols" data-line="pols" d=""/>
+<path class="pl-halo" data-line="fe" d=""/>
+<path class="pl-fit pl-fit-fe" data-line="fe" d=""/>
+</g>
+<g data-pts></g>
+<text class="pl-axlab" data-axlab="x" x="168" y="226" text-anchor="middle">Union status</text>
+<text class="pl-axlab" data-axlab="y" transform="translate(10 102) rotate(-90)" text-anchor="middle">Log wage</text>
+</svg>
+<ul class="pl-legend">
+<li><svg class="pl-sw" viewBox="0 0 16 14" aria-hidden="true" focusable="false"><circle class="pl-g-never pl-swm" cx="8" cy="7" r="4.6"/></svg><span>Never union (workers 1 to 3)</span></li>
+<li><svg class="pl-sw" viewBox="0 0 16 14" aria-hidden="true" focusable="false"><rect class="pl-g-always pl-swm" x="3.8" y="2.8" width="8.4" height="8.4"/></svg><span>Always union (workers 4 and 5)</span></li>
+<li><svg class="pl-sw" viewBox="0 0 16 14" aria-hidden="true" focusable="false"><path class="pl-g-switch pl-swm" d="M8 1.2L13.8 7L8 12.8L2.2 7Z"/></svg><span>Switchers (workers 6 to 8)</span></li>
+<li><svg class="pl-sw pl-sw-wide" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><circle class="pl-swh" cx="7" cy="7" r="4.4"/><circle class="pl-swf" cx="22" cy="7" r="4.4"/></svg><span>Hollow: period 1; filled: period 2</span></li>
+<li><svg class="pl-sw pl-sw-wide" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="pl-fit pl-fit-pols" d="M2 7L28 7"/></svg><span>POLS line (raw view)</span></li>
+<li><svg class="pl-sw pl-sw-wide" viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path class="pl-fit pl-fit-fe" d="M2 7L28 7"/></svg><span>FE line (demeaned view)</span></li>
+</ul>
+</div>
+<div class="pl-dem-side">
+<dl class="pl-readout pl-readout-toy">
+<div class="pl-row"><dt><span class="pl-key pl-key-pols" aria-hidden="true"></span>POLS slope<span class="pl-sub">all 16 observations, raw data</span></dt><dd><span data-out="toyPols"></span></dd></div>
+<div class="pl-row"><dt><span class="pl-key pl-key-twfe" aria-hidden="true"></span>FE slope<span class="pl-sub">demeaned data, line through the origin</span></dt><dd><span data-out="toyFe"></span></dd></div>
+<div class="pl-row"><dt>FE minus POLS</dt><dd><span data-out="toyGap"></span></dd></div>
+<div class="pl-row"><dt>Switchers<span class="pl-sub">2 join, 1 leaves; 5 stayers</span></dt><dd><span>3 of 8</span></dd></div>
+</dl>
+<p class="pl-flag" data-state="default"><span data-out="toyFlag"></span></p>
+</div>
+</div>
+</div>
+<p class="pl-sr" aria-live="polite" data-live></p>
+</div>
+</section>
+{{- /* end panel-lab */ -}}

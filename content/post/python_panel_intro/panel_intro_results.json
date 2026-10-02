@@ -1,0 +1,139 @@
+{
+  "sample": {
+    "N": 2199,
+    "T": 2,
+    "NT": 4398,
+    "union_mean": 0.1626
+  },
+  "variation": {
+    "lwage": {
+      "overall_sd": 0.5982000231742859,
+      "between_sd": 0.5569999814033508,
+      "within_sd": 0.2184000015258789,
+      "between_pct": 86.69999694824219,
+      "within_pct": 13.300000190734863
+    },
+    "union": {
+      "overall_sd": 0.369,
+      "between_sd": 0.3576,
+      "within_sd": 0.0911,
+      "between_pct": 93.9,
+      "within_pct": 6.1
+    },
+    "age": {
+      "overall_sd": 6.257599830627441,
+      "between_sd": 6.17549991607666,
+      "within_sd": 1.0147000551223755,
+      "between_pct": 97.4000015258789,
+      "within_pct": 2.5999999046325684
+    },
+    "schooling": {
+      "overall_sd": 2.182499885559082,
+      "between_sd": 2.1826999187469482,
+      "within_sd": 0.0,
+      "between_pct": 100.0,
+      "within_pct": 0.0
+    }
+  },
+  "union_patterns": {
+    "never": 1805,
+    "always": 321,
+    "joiner": 36,
+    "leaver": 37
+  },
+  "n_switchers": 73,
+  "age_change_counts": {
+    "1": 164,
+    "2": 1885,
+    "3": 150
+  },
+  "models": {
+    "POLS": {
+      "coef": 0.075,
+      "se": 0.0231
+    },
+    "Between": {
+      "coef": 0.0662,
+      "se": 0.0311
+    },
+    "FDFE": {
+      "coef": 0.2113,
+      "se": 0.0792,
+      "intercept": 0.0727,
+      "coef_no_intercept": 0.2103
+    },
+    "FE": {
+      "coef": 0.2103,
+      "se": 0.0812,
+      "se_cluster": 0.0812
+    },
+    "DVFE": {
+      "coef": 0.2103
+    },
+    "TWFE": {
+      "coef": 0.2113,
+      "se": 0.0792
+    },
+    "RE": {
+      "coef": 0.1092,
+      "se": 0.0299
+    },
+    "CRE": {
+      "coef": 0.2103,
+      "se": 0.0703,
+      "mundlak_coef": -0.1441,
+      "mundlak_p": 0.0717
+    }
+  },
+  "figure_slopes": {
+    "pols_polyfit": 0.075,
+    "fe_polyfit": 0.2103
+  },
+  "hausman": {
+    "H": 1.7941,
+    "p": 0.1804,
+    "diff": 0.1011
+  },
+  "extended": {
+    "union": {
+      "POLS_coef": 0.0571,
+      "POLS_se": 0.0204,
+      "TWFE_coef": 0.2129,
+      "TWFE_se": 0.0793,
+      "RE_coef": 0.0861,
+      "RE_se": 0.0258,
+      "CRE_coef": 0.2103,
+      "CRE_se": 0.0683
+    },
+    "age": {
+      "POLS_coef": 0.0209,
+      "POLS_se": 0.0013,
+      "TWFE_coef": -0.0576,
+      "TWFE_se": 0.0238,
+      "RE_coef": 0.0224,
+      "RE_se": 0.0016,
+      "CRE_coef": 0.0332,
+      "CRE_se": 0.0046
+    },
+    "schooling": {
+      "POLS_coef": 0.1108,
+      "POLS_se": 0.0037,
+      "TWFE_coef": null,
+      "TWFE_se": null,
+      "RE_coef": 0.1112,
+      "RE_se": 0.0047,
+      "CRE_coef": 0.1108,
+      "CRE_se": 0.0047
+    },
+    "female": {
+      "POLS_coef": -0.2731,
+      "POLS_se": 0.016,
+      "TWFE_coef": null,
+      "TWFE_se": null,
+      "RE_coef": -0.2731,
+      "RE_se": 0.0206,
+      "CRE_coef": -0.2731,
+      "CRE_se": 0.0206
+    }
+  }
+}
