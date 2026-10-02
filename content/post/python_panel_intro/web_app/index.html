@@ -32,8 +32,9 @@
   <h2>What does panel data buy you?</h2>
   <p class="lede">
     Pooled OLS on a worker wage panel says joining a union raises wages by
-    roughly 7%. The within (fixed-effects) estimator on the very same data
-    says about 21% — almost three times larger.
+    about 7.5 log points (roughly 7.5%). The within (fixed-effects) estimator
+    on the very same data says about 21 log points (about 23%) — almost
+    three times larger.
     <strong>That factor-of-three gap is the empirical signature of selection
     on unobservables</strong>, and panel methods exist to peel it apart.
   </p>
@@ -50,20 +51,20 @@
   <div class="card">
     <h3>The within transformation, animated</h3>
     <p>
-      Three workers, two periods each. <strong>Alice</strong> (steel) earns
-      high wages and never joins the union. <strong>Bob</strong> (teal)
-      switches into the union between periods. <strong>Carla</strong> (orange)
-      earns low wages and is always in the union. The dashed grey line is the
-      <em>pooled OLS</em> fit — shallow, because between-worker differences
-      dominate. Wait a few seconds: the points slide as each worker's two-year
+      Three workers, two periods each. <strong>Alice</strong> (steel) never
+      joins the union. <strong>Bob</strong> (teal) is a low-wage worker who
+      joins the union between periods. <strong>Carla</strong> (orange) is
+      always in the union. The dashed grey line is the <em>pooled OLS</em>
+      fit — shallow, because Bob's low wages pull the union and non-union
+      averages together, just as negative selection does in the post's data. Wait a few seconds: the points slide as each worker's two-year
       mean is subtracted. After demeaning, <em>only Bob moves</em> — and the
       FE slope (orange) is much steeper.
     </p>
     <div class="chart-area" id="intro-anim"></div>
     <p class="note">
       The animation cycles between raw and demeaned coordinates on a 10-second
-      loop. Demeaning kills two of three workers (Alice and Carla collapse to
-      the origin) because they never switched. Only switchers identify the FE
+      loop. Demeaning removes two of three workers from the slope (Alice and
+      Carla collapse onto union = 0) because they never switched. Only switchers identify the FE
       coefficient — that is the post's central asymmetry.
     </p>
   </div>
@@ -100,7 +101,7 @@
     <div class="cta-card" data-goto="pane-hausman">
       <div class="cta-tag">Tab 4</div>
       <h4>Hausman vs Mundlak</h4>
-      <p>Drive the Hausman chi-square yourself by changing the FE/RE coefficient gap and the standard errors. See why the test has low power when within-variation is thin.</p>
+      <p>Drive the Hausman chi-square yourself by changing the FE/RE coefficient gap and the standard errors. See why the textbook test rejects RE, why plugging in robust SEs flips the verdict, and why the Mundlak test is the robust check.</p>
     </div>
   </div>
 
@@ -120,16 +121,16 @@
         <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2, FD without an intercept gives the same coefficient as FE, and FD with an intercept equals two-way FE. With T &gt; 2 the two estimators differ in general; serial correlation of the errors decides which one is more efficient.</div>
       </details>
       <details class="gloss"><summary>Two-way FE (TWFE)</summary>
-        <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. With T = 2 it equals FD with an intercept exactly (0.2113); one-way FE (0.2103) equals FD without an intercept, and the 0.001 gap is the common time trend.</div>
+        <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. With T = 2 it equals FD with an intercept exactly (0.2113); one-way FE (0.2103) equals FD without an intercept, and the 0.001 gap arises from the common wage trend that the intercept and the year effect absorb.</div>
       </details>
       <details class="gloss"><summary>Random effects (RE)</summary>
         <div class="gloss-body">Treats the unit effect as a random draw uncorrelated with regressors. GLS-weighted combination of between and within. Efficient if assumption holds; biased if not.</div>
       </details>
       <details class="gloss"><summary>Mundlak / CRE</summary>
-        <div class="gloss-body">Add each unit's mean of every time-varying regressor as an extra control, then run RE. The within coefficient on the original variable equals FE. The Mundlak term tests the RE assumption.</div>
+        <div class="gloss-body">Add each unit's mean of every time-varying regressor as an extra control, then run RE. The within coefficient on the original variable equals FE. The Mundlak term tests the RE assumption; in a balanced panel it equals the between estimate minus FE (0.0662 − 0.2103 = −0.1441).</div>
       </details>
       <details class="gloss"><summary>Hausman test</summary>
-        <div class="gloss-body">Compares FE and RE: H = (&beta;_FE &minus; &beta;_RE)' (V_FE &minus; V_RE)&#8315;&sup1; (&beta;_FE &minus; &beta;_RE) ~ chi-square(k). Large H rejects RE.</div>
+        <div class="gloss-body">Compares FE and RE: H = (&beta;_FE &minus; &beta;_RE)' (V_FE &minus; V_RE)&#8315;&sup1; (&beta;_FE &minus; &beta;_RE) ~ chi-square(k). Large H rejects RE. Valid only with classical (non-robust) variances: here H = 5.62, p = 0.018.</div>
       </details>
     </div>
   </div>
@@ -273,13 +274,13 @@
     <h3>Why does the union premium triple?</h3>
     <p>
       POLS asks: "how do union and non-union workers compare?" Their answer
-      (7%) is biased if union members are systematically different from
+      (7.5 log points) is biased if union members are systematically different from
       non-members on unobservables (ability, motivation, industry).
     </p>
     <p>
       FE asks a sharper question: "what happens when <em>the same worker</em>
       switches union status?" Only the workers who actually changed union
-      status between 2010 and 2012 contribute. The answer (21%) is what we
+      status between 2010 and 2012 contribute. The answer (21 log points) is what we
       would report if we trusted that nothing else changes for a worker over
       those two years.
     </p>
@@ -288,6 +289,13 @@
       higher-ability workers are less likely to be in unions in this sample,
       so cross-sectional comparisons understate the within-worker payoff to
       joining a union.
+    </p>
+    <p>
+      <strong>But the 0.21 is local and fragile.</strong> It rests on the 73
+      workers (3.3%) who switched. Joiners alone give 0.345 and leavers alone
+      0.081, so the pooled 0.21 averages two very different responses. With
+      all five waves (2010–2018), two-way FE falls to 0.040 (SE 0.026) and FD
+      with year effects to 0.057: the 0.21 is a 2010–2012 number.
     </p>
   </div>
 
