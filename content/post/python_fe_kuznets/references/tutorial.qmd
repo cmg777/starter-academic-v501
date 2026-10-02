@@ -66,23 +66,22 @@ The following diagram outlines the analytical pipeline:
 
 ```{mermaid}
 graph TD
-    A["<b>Data</b><br/>180 countries, 1992-2012"] --> B["<b>Visual EDA</b><br/>Scatter plots + polynomial fits"]
-    B --> C["<b>Pooled OLS</b><br/>Linear / Quadratic / Cubic"]
-    C --> D["<b>Why Fixed Effects?</b><br/>Country trajectories differ"]
-    D --> E["<b>Two-Way FE</b><br/>Country + Year FE"]
-    E --> F["<b>Turning Points</b><br/>3 development phases"]
-    E --> G["<b>Determinants</b><br/>What drives inequality?"]
-    G --> H["<b>Robustness</b><br/>Coefficient stability"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#fff
-    style G fill:#1a3a8a,stroke:#141413,color:#fff
-    style H fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>Data</b><br/>180 countries, 1992-2012") --> B("<b>Visual EDA</b><br/>scatter plots + polynomial fits")
+    B --> C("<b>Pooled OLS</b><br/>linear / quadratic / cubic")
+    C --> D("<b>Why fixed Effects?</b><br/>country trajectories differ")
+    D --> E("<b>Two-way FE</b><br/>country + year FE")
+    E --> F("<b>Turning points</b><br/>3 development phases")
+    E --> G("<b>Determinants</b><br/>what drives inequality?")
+    G --> H("<b>Robustness</b><br/>coefficient stability")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A,B blue
+    class C,D orange
+    class E,F teal
+    class G,H key
 ```
-
 The pipeline progresses from exploratory analysis (blue) through baseline estimation (orange) to the core fixed effects results (teal) and determinant analysis (dark blue). Each stage builds on the previous: the visual patterns motivate the polynomial specification, the spaghetti plot motivates fixed effects, and the robust N-shape motivates the search for determinants.
 
 ### Key concepts at a glance

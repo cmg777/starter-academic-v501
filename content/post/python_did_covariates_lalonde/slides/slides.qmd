@@ -264,11 +264,18 @@ The small remaining gap is expected, not an error: diff-diff's Callaway-Sant'Ann
 ```{mermaid}
 flowchart LR
     Q{"Where does X enter?"}
-    Q -->|level / effect| I["inert · ~3,621"]
-    Q -->|trend / propensity| C["corrected · ~1,794"]
-    C -.recovers.-> B["RCT benchmark 1,794"]
+    Q -->|level / effect| I("inert · ~3,621")
+    Q -->|trend / propensity| C("corrected · ~1,794")
+    C -.recovers.-> B("RCT benchmark 1,794")
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Q orange
+    class I gray
+    class C blue
+    class B anchor
 ```
-
 Covariates in DiD are **not** a robustness knob.
 
 [They have a job: make parallel trends hold, once you condition on X.]{.takeaway .fragment}

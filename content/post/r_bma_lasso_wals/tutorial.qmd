@@ -30,21 +30,24 @@ This tutorial introduces three principled approaches to the variable selection p
 
 ```{mermaid}
 graph TD
-    Q["<b>Variable Selection</b><br/>Which of 12 variables<br/>truly matter?"] --> BMA
+    Q("<b>Variable selection</b><br/>which of 12 variables<br/>truly matter?") --> BMA
     Q --> LASSO
     Q --> WALS
 
-    BMA["<b>BMA</b><br/>Bayesian Model Averaging<br/>PIPs from 4,096 models"] --> R["<b>Convergence</b><br/>Variables identified<br/>by all 3 methods"]
-    LASSO["<b>LASSO</b><br/>L1 penalized regression<br/>Automatic selection"] --> R
-    WALS["<b>WALS</b><br/>Frequentist averaging<br/>t-statistics"] --> R
-
-    style Q fill:#141413,stroke:#141413,color:#fff
-    style BMA fill:#6a9bcc,stroke:#141413,color:#fff
-    style LASSO fill:#d97757,stroke:#141413,color:#fff
-    style WALS fill:#00d4c8,stroke:#141413,color:#fff
-    style R fill:#1a3a8a,stroke:#141413,color:#fff
+    BMA("<b>BMA</b><br/>Bayesian model averaging<br/>PIPs from 4,096 models") --> R("<b>Convergence</b><br/>variables identified<br/>by all 3 methods")
+    LASSO("<b>LASSO</b><br/>L1 penalized regression<br/>automatic selection") --> R
+    WALS("<b>WALS</b><br/>Frequentist averaging<br/>t-statistics") --> R
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Q anchor
+    class BMA blue
+    class R key
+    class LASSO orange
+    class WALS teal
 ```
-
 1. **Bayesian Model Averaging (BMA)**: Average across all 4,096 models, weighting each by how well it fits the data. Variables that appear important across many models earn a high "inclusion probability."
 
 2. **LASSO (Least Absolute Shrinkage and Selection Operator)**: Add a penalty to the regression that forces the coefficients of irrelevant variables to be *exactly zero*, performing automatic selection.

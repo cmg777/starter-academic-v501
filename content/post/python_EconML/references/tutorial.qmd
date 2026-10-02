@@ -181,22 +181,20 @@ The causal forest produces per-observation CATE estimates, which aggregate to th
 
 ```{mermaid}
 flowchart LR
-    A["<b>Panel Data</b><br/>3,000 obs"]:::data
-    B["<b>First Stage</b><br/>GBM nuisance<br/>models"]:::first
-    C["<b>Residualize</b><br/>Y - E[Y | X,W]<br/>T - E[T | X,W]"]:::resid
-    D["<b>Causal Forest</b><br/>500 honest trees"]:::forest
-    E["<b>CATEs</b><br/>Per-observation<br/>effects"]:::cate
+    A("<b>Panel data</b><br/>3,000 obs"):::data
+    B("<b>First stage</b><br/>GBM nuisance<br/>models"):::first
+    C("<b>Residualize</b><br/>Y - E[Y | X,W]<br/>T - E[T | X,W]"):::resid
+    D("<b>Causal forest</b><br/>500 honest trees"):::forest
+    E("<b>CATEs</b><br/>Per-observation<br/>effects"):::cate
 
     A --> B --> C --> D --> E
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#fff
-    classDef first fill:#d97757,stroke:#141413,color:#fff
-    classDef resid fill:#00d4c8,stroke:#141413,color:#141413
-    classDef forest fill:#141413,stroke:#d97757,color:#fff
-    classDef cate fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef first fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef resid fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef forest fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef cate fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
 ```
-
-
 ## Setup and verification
 
 ```{python}

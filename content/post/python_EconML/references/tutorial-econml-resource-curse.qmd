@@ -81,14 +81,15 @@ This two-stage approach has a key property: **Neyman orthogonality**. First-stag
 ```{mermaid}
 %%| fig-cap: "EconML CausalForestDML pipeline"
 flowchart LR
-    A[Panel Data] --> B[First Stage: GBM]
-    B --> C[Residualize Y, T]
-    C --> D[Causal Forest]
-    D --> E[CATEs]
-    E --> F[GATEs]
-    E --> G[ATEs]
+    A("Panel data") --> B("First Stage: GBM")
+    B --> C("Residualize Y, T")
+    C --> D("Causal forest")
+    D --> E("CATEs")
+    E --> F("GATEs")
+    E --> G("ATEs")
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A,B,C,D,E,F,G gray
 ```
-
 ## Three Levels of Treatment Effects
 
 The causal forest estimates effects at three levels:

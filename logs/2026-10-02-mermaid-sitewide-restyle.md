@@ -88,3 +88,34 @@ border color.
   on every node.
 
 Convention for new diagrams: copy the classDef lines above; never use `style` on nodes.
+
+## Follow-up (same day): companion files
+
+The same restyle now covers the Mermaid copies outside `index.md`: 62 blocks in 38 tracked files.
+
+- **Quarto sources.** These are the `references/*.qmd` files and `r_*/tutorial.qmd`. 56 blocks in
+  33 files were exact copies of a post's old diagram, so they now carry the post's new block
+  verbatim. That includes the DAG arrow styling, and any `%%|` chunk options were kept.
+  `python_panel_intro`'s copies were already up to date.
+- **Blocks that differ from their post.** Seven blocks never matched a post:
+  - the two resource-curse tutorials in `python_EconML` and `stata_cate2`
+  - `r_augsynth`, `r_sc_multi_country`, and both blocks in `r_double_lasso`
+  - the `python_did_covariates_lalonde` slide
+
+  The same converter restyled them. The ones that never had colors got gray borders. All 7 were
+  rendered in a scratch Quarto document: no errors, and every node is styled.
+- **Slide deck** `python_did_covariates_lalonde/slides`. This is the only deck that uses Mermaid.
+  - The diagram uses the post's role colors: question orange, inert gray, corrected blue,
+    benchmark anchor.
+  - The deck was re-rendered. The theme CSS hash changed, so the old hashed file was removed and
+    the new one is tracked.
+  - `date: today` would have changed the deck date, so it was put back to August 4, 2026.
+  - Arrow labels were 3.62:1 (theme blue on a light chip). A rule in the deck's `site-brand.scss`
+    (dark chip, light text) brings them to 15.08:1. Quarto renders diagrams as `svg.mermaid-js`
+    with no `.mermaid` wrapper.
+  - The same rule went into the `write-slides` template
+    (`.claude/skills/write-slides/references/templates/site-brand.scss`), so future decks get it.
+    The other 70 deck copies have no Mermaid and were left unchanged.
+- **Not changed.** Rendered `tutorial.html` files are untracked build outputs.
+  `SLIDES_REVIEW.md` and `post_review.md` are historical review notes. The `python_panel_intro`
+  notebook was already up to date. No other notebook contains Mermaid.

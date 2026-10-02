@@ -132,15 +132,18 @@ Most statistical software lets you jump from data to estimates without stating y
 
 ```{mermaid}
 graph LR
-    A["1. Model<br/>Define causal graph"] --> B["2. Identify<br/>Find estimand"]
-    B --> C["3. Estimate<br/>Compute effect"]
-    C --> D["4. Refute<br/>Test robustness"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#8b5cf6,stroke:#141413,color:#fff
+    A("1. model<br/>define causal graph") --> B("2. identify<br/>find estimand")
+    B --> C("3. estimate<br/>compute effect")
+    C --> D("4. refute<br/>test robustness")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D violet
 ```
-
 | Step | Question | What you do |
 |------|----------|-------------|
 | **Model** | What are my causal assumptions? | Draw a DAG (Directed Acyclic Graph) showing which variables cause which |
@@ -365,19 +368,24 @@ A DAG has three properties:
 
 ```{mermaid}
 graph LR
-    I["Introversion<br/>(Confounder)"] --> T["Work from Home<br/>(Treatment)"]
-    I --> Y["Productivity<br/>(Outcome)"]
-    C["Num. Children<br/>(Confounder)"] --> T
+    I("Introversion<br/>(Confounder)") --> T("Work from home<br/>(Treatment)")
+    I --> Y("Productivity<br/>(Outcome)")
+    C("Num. children<br/>(Confounder)") --> T
     C --> Y
-    Z["Subway Disruption<br/>(Instrument)"] --> T
+    Z("Subway disruption<br/>(Instrument)") --> T
     T --> Y
-    style I fill:#999,stroke:#141413,color:#fff
-    style C fill:#999,stroke:#141413,color:#fff
-    style Z fill:#00d4c8,stroke:#141413,color:#fff
-    style T fill:#d97757,stroke:#141413,color:#fff
-    style Y fill:#6a9bcc,stroke:#141413,color:#fff
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class I,C orange
+    class T blue
+    class Y teal
+    class Z violet
+    linkStyle 0,1,2,3 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 5 stroke:#00d4c8,stroke-width:3px
 ```
-
 Three types of variables appear in our DAG:
 
 - **Confounders** (gray): Introversion and num_children have arrows pointing to *both* treatment and outcome. They create "backdoor paths" that confound the naive comparison.

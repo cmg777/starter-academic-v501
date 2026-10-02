@@ -206,20 +206,22 @@ The analysis follows a natural progression: start with a simple global model, vi
 
 ```{mermaid}
 graph LR
-    A["<b>Step 1</b><br/>Load &<br/>Explore"] --> B["<b>Step 2</b><br/>Map<br/>Variables"]
-    B --> C["<b>Step 3</b><br/>Global<br/>OLS"]
-    C --> D["<b>Step 4</b><br/>MGWR<br/>Estimation"]
-    D --> E["<b>Step 5</b><br/>Map<br/>Coefficients"]
-    E --> F["<b>Step 6</b><br/>Significance<br/>& Compare"]
-
-    style A fill:#141413,stroke:#6a9bcc,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>Step 1</b><br/>load &<br/>explore") --> B("<b>Step 2</b><br/>map<br/>variables")
+    B --> C("<b>Step 3</b><br/>global<br/>OLS")
+    C --> D("<b>Step 4</b><br/>MGWR<br/>estimation")
+    D --> E("<b>Step 5</b><br/>map<br/>coefficients")
+    E --> F("<b>Step 6</b><br/>significance<br/>& compare")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B orange
+    class C blue
+    class D,E teal
+    class F key
 ```
-
 ## 3. Setup and imports
 
 The analysis uses [mgwr](https://mgwr.readthedocs.io/) for multiscale regression, [GeoPandas](https://geopandas.org/) for spatial data, and [mapclassify](https://pysal.org/mapclassify/) for choropleth classification.

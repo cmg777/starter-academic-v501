@@ -28,15 +28,16 @@ Our estimand throughout is the **ATT** (average treatment effect on the treated)
 
 ```{mermaid}
 flowchart TD
-    P["Kansas panel"] --> Q{"Good pre-2012 fit?"}
-    Q -->|yes| S["Classic SCM"]
-    Q -->|imperfect| R["Ridge ASCM"]
-    S --> B["+ bias correction"]
+    P("Kansas panel") --> Q{"Good pre-2012 fit?"}
+    Q -->|yes| S("Classic SCM")
+    Q -->|imperfect| R("Ridge ASCM")
+    S --> B("+ bias correction")
     R --> B
-    B --> A["ATT = actual - synthetic"]
-    A --> I["Inference: placebo / conformal / jackknife+ / jackknife"]
+    B --> A("ATT = actual - synthetic")
+    A --> I("Inference: placebo / conformal / jackknife+ / jackknife")
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class P,Q,S,R,B,A,I gray
 ```
-
 ## 2. Setup
 
 `augsynth` is **not on CRAN**; the chunk below installs it from GitHub only if it is missing, then loads everything. Verified with R 4.5.2 and `augsynth` 0.2.0.

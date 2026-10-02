@@ -156,21 +156,19 @@ Think of it as building a custom control group from scratch. Rather than picking
 
 ```{mermaid}
 flowchart LR
-    A["West Germany<br/>(treated unit)"] --> B["Pre-treatment GDP<br/>1960–1990"]
-    C["16 Donor Countries<br/>(control pool)"] --> D["Find weights w₁...w₁₆<br/>to match pre-treatment GDP"]
+    A("West Germany<br/>(treated unit)") --> B("Pre-treatment GDP<br/>1960–1990")
+    C("16 donor countries<br/>(control pool)") --> D("Find weights w₁...w₁₆<br/>to match pre-treatment GDP")
     B --> D
-    D --> E["Synthetic<br/>West Germany"]
-    E --> F["Post-1990 gap =<br/>Treatment effect τ"]
+    D --> E("Synthetic<br/>West Germany")
+    E --> F("Post-1990 gap =<br/>treatment effect τ")
     A --> F
-
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style B fill:#1f2b5e,stroke:#6a9bcc,color:#c8d0e0
-    style D fill:#1f2b5e,stroke:#6a9bcc,color:#c8d0e0
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A orange
+    class B,C,D,E blue
+    class F teal
 ```
-
 Formally, the treatment effect at each post-treatment period $T$ is the difference between what we observe and the counterfactual:
 
 $$\tau_T = Y_{1T}(1) - Y_{1T}(0)$$

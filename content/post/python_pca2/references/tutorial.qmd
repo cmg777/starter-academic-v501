@@ -224,22 +224,23 @@ The pooled pipeline extends the [six-step pipeline from the previous tutorial](h
 
 ```{mermaid}
 graph LR
-    S["<b>Step 0</b><br/>Stack<br/>Periods"] --> A["<b>Step 1</b><br/>Polarity<br/>Adjustment"]
-    A --> B["<b>Step 2</b><br/>Pooled<br/>Standardization"]
-    B --> C["<b>Step 3</b><br/>Pooled<br/>Covariance"]
-    C --> D["<b>Step 4</b><br/>Pooled Eigen-<br/>Decomposition"]
-    D --> E["<b>Step 5</b><br/>Scoring<br/>(PC1)"]
-    E --> F["<b>Step 6</b><br/>Pooled<br/>Normalization"]
-
-    style S fill:#141413,stroke:#6a9bcc,color:#fff
-    style A fill:#d97757,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#fff
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
+    S("<b>Step 0</b><br/>stack<br/>periods") --> A("<b>Step 1</b><br/>polarity<br/>adjustment")
+    A --> B("<b>Step 2</b><br/>pooled<br/>standardization")
+    B --> C("<b>Step 3</b><br/>pooled<br/>covariance")
+    C --> D("<b>Step 4</b><br/>pooled Eigen-<br/>decomposition")
+    D --> E("<b>Step 5</b><br/>scoring<br/>(PC1)")
+    E --> F("<b>Step 6</b><br/>pooled<br/>normalization")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class S anchor
+    class A orange
+    class B,C blue
+    class D,E teal
+    class F key
 ```
-
 The key insight is that Steps 2, 3, and 6 --- labeled "Pooled" --- compute their parameters from the stacked data (all periods combined) rather than from each period separately. This single change ensures that a region's Z-score in 2013 is measured against the same baseline as its Z-score in 2019, that the eigenvector weights are fixed across time, and that the 0--1 normalization uses a common scale.
 
 ## 3. Setup and verification

@@ -56,15 +56,18 @@ CML organises a treatment-effect study into a sequence of progressively finer qu
 
 ```{mermaid}
 graph LR
-    A["<b>1. ATE</b><br/>Population<br/>average effect"] --> B["<b>2. GATE</b><br/>Effect by<br/>subgroup"]
-    B --> C["<b>3. IATE</b><br/>Effect for<br/>each individual"]
-    C --> D["<b>4. Policy</b><br/>Welfare-optimal<br/>assignment rule"]
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#999999,stroke:#141413,color:#fff
+    A("<b>1. ATE</b><br/>population<br/>average effect") --> B("<b>2. GATE</b><br/>effect by<br/>subgroup")
+    B --> C("<b>3. IATE</b><br/>effect for<br/>each individual")
+    C --> D("<b>4. policy</b><br/>welfare-optimal<br/>assignment rule")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D gray
 ```
-
 The arrows are not just decorative. Each step *builds* on the previous one: a credible average effect is the floor on which any subgroup analysis stands, and credible group effects are the floor on which any individual analysis stands. Skipping the first step and jumping straight to a fancy heterogeneity model is the most common mistake in applied CML. We will resist that temptation by starting from the simplest possible baseline and only adding complexity when the data warrant it.
 
 **Learning objectives:**

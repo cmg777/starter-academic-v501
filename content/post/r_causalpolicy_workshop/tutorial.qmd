@@ -68,24 +68,27 @@ The diagram below makes the common skeleton explicit. Each method needs three in
 
 ```{mermaid}
 flowchart LR
-    OBS["California observed<br/>1989–2000<br/>(mean ≈ 60 packs)"]
-    CF["Counterfactual<br/>What California would have looked like<br/>WITHOUT Proposition 99"]
-    EFF["Effect =<br/>Observed − Counterfactual"]
+    OBS("California observed<br/>1989–2000<br/>(mean ≈ 60 packs)")
+    CF("Counterfactual<br/>what California would have looked like<br/>WITHOUT Proposition 99")
+    EFF("Effect =<br/>observed − Counterfactual")
     OBS --> EFF
     CF --> EFF
 
-    SRC1["Method 1: California's pre-1989 mean"] -.-> CF
-    SRC2["Method 2: Nevada's pre→post change"] -.-> CF
-    SRC3["Method 3: California's own pre-trend extrapolated"] -.-> CF
-    SRC4["Method 4: piecewise line around 1989"] -.-> CF
-    SRC5["Method 5: weighted blend of donor states"] -.-> CF
-    SRC6["Method 6: Bayesian time-series fit on donors"] -.-> CF
-
-    style OBS fill:#d97757,stroke:#141413,color:#fff
-    style CF fill:#6a9bcc,stroke:#141413,color:#fff
-    style EFF fill:#00d4c8,stroke:#141413,color:#141413
+    SRC1("Method 1: California's pre-1989 mean") -.-> CF
+    SRC2("Method 2: Nevada's pre→post change") -.-> CF
+    SRC3("Method 3: California's own pre-trend extrapolated") -.-> CF
+    SRC4("Method 4: piecewise line around 1989") -.-> CF
+    SRC5("Method 5: weighted blend of donor states") -.-> CF
+    SRC6("Method 6: Bayesian time-series fit on donors") -.-> CF
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class OBS orange
+    class CF blue
+    class EFF teal
+    class SRC1,SRC2,SRC3,SRC4,SRC5,SRC6 gray
 ```
-
 Read the diagram from left to right. The orange box (California observed) is fixed --- every method sees the same data. The blue box (counterfactual) is the *construction*, and the six dashed arrows feeding it show how each method differs in its source of information. The teal box on the right is the universal output: a number measuring the gap. The whole rest of this tutorial is a guided tour of those six dashed arrows.
 
 ### Which method when?
@@ -96,28 +99,30 @@ The six methods are not interchangeable. Each one is appropriate for a different
 flowchart TB
     Q1{"Do you have a credible<br/>donor pool of untreated units?<br/>(roughly 10+ similar units<br/>followed over the same window)"}
     Q1 -->|Yes| Q2{"Do you want frequentist<br/>placebo inference,<br/>or Bayesian credible<br/>intervals?"}
-    Q1 -->|No, only one good control| DiD["Difference-in-Differences<br/>(this tutorial: §6)<br/><br/>Cost: parallel-trends assumption<br/>on a single comparison unit"]
+    Q1 -->|No, only one good control| DiD("Difference-in-differences<br/>(this tutorial: §6)<br/><br/>cost: parallel-trends assumption<br/>on a single comparison unit")
     Q1 -->|No, only the treated unit| Q3{"Is the policy date the<br/>only structural break<br/>in the series?"}
 
-    Q2 -->|Frequentist + tidy code| SCM["Synthetic Control<br/>(this tutorial: §10)<br/><br/>Cost: convex-combination<br/>of donors must match the<br/>treated pre-period"]
-    Q2 -->|Bayesian + uncertainty bands| CI["CausalImpact<br/>(this tutorial: §11)<br/><br/>Cost: state-space prior;<br/>covariate-set choice<br/>affects the estimate"]
+    Q2 -->|Frequentist + tidy code| SCM("Synthetic control<br/>(this tutorial: §10)<br/><br/>cost: convex-combination<br/>of donors must match the<br/>treated pre-period")
+    Q2 -->|Bayesian + uncertainty bands| CI("CausalImpact<br/>(this tutorial: §11)<br/><br/>cost: state-space prior;<br/>covariate-set choice<br/>affects the estimate")
 
-    Q3 -->|Yes, sharp jump at threshold| RDD["Regression Discontinuity on time<br/>(this tutorial: §9)<br/><br/>Cost: assumes no other shock<br/>coincides with the threshold"]
-    Q3 -->|No, model the smooth pre-trend| ITS["Interrupted Time Series<br/>(this tutorial: §7 and §8)<br/><br/>Cost: pre-trend extrapolation<br/>must be specified correctly"]
+    Q3 -->|Yes, sharp jump at threshold| RDD("Regression discontinuity on time<br/>(this tutorial: §9)<br/><br/>cost: assumes no other shock<br/>coincides with the threshold")
+    Q3 -->|No, model the smooth pre-trend| ITS("Interrupted time Series<br/>(this tutorial: §7 and §8)<br/><br/>cost: pre-trend extrapolation<br/>must be specified correctly")
 
-    NAIVE["Naive pre-post<br/>(this tutorial: §5)<br/><br/>Use only as a baseline.<br/>Never as a causal estimate."] -.->|"baseline for everyone"| Q1
+    NAIVE("Naive pre-post<br/>(this tutorial: §5)<br/><br/>use only as a baseline.<br/>never as a causal estimate.") -.->|"baseline for everyone"| Q1
 
-    style Q1 fill:#1f2b5e,stroke:#141413,color:#fff
-    style Q2 fill:#1f2b5e,stroke:#141413,color:#fff
-    style Q3 fill:#1f2b5e,stroke:#141413,color:#fff
-    style DiD fill:#6a9bcc,stroke:#141413,color:#fff
-    style SCM fill:#d97757,stroke:#141413,color:#fff
-    style CI fill:#d97757,stroke:#141413,color:#fff
-    style RDD fill:#6a9bcc,stroke:#141413,color:#fff
-    style ITS fill:#6a9bcc,stroke:#141413,color:#fff
-    style NAIVE fill:#7a8395,stroke:#141413,color:#fff
+    classDef sty_Q1 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Q1 sty_Q1
+    classDef sty_Q2 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Q2 sty_Q2
+    classDef sty_Q3 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Q3 sty_Q3
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class DiD,RDD,ITS blue
+    class SCM,CI orange
+    class NAIVE gray
 ```
-
 The orange terminal nodes (Synthetic Control, CausalImpact) are the most defensible families when a donor pool exists --- and they happen to be the methods that produce the consensus estimate later in this tutorial. The blue nodes are valid choices in their respective data situations but carry stronger identifying assumptions. The grey naive-pre-post node is the universal baseline that *everyone* should compute first --- never as the final answer, always as the bias yardstick.
 
 ### Key concepts at a glance
@@ -408,24 +413,27 @@ The four ingredients of the DiD calculation are easier to see as a 2×2 grid. Ea
 
 ```{mermaid}
 flowchart TB
-    subgraph "California"
-        CA_pre["Pre (1984–88) mean<br/>= 99.0"] --> CA_d["Δ California =<br/>72.0 − 99.0 = −27.0"]
-        CA_post["Post (1989–93) mean<br/>= 72.0"] --> CA_d
+    subgraph SG1["California"]
+        CA_pre("Pre (1984–88) mean<br/>= 99.0") --> CA_d("Δ California =<br/>72.0 − 99.0 = −27.0")
+        CA_post("Post (1989–93) mean<br/>= 72.0") --> CA_d
     end
-    subgraph "Nevada (control)"
-        NV_pre["Pre (1984–88) mean<br/>= 143.1"] --> NV_d["Δ Nevada =<br/>121.8 − 143.1 = −21.3"]
-        NV_post["Post (1989–93) mean<br/>= 121.8"] --> NV_d
+    subgraph SG2["Nevada (control)"]
+        NV_pre("Pre (1984–88) mean<br/>= 143.1") --> NV_d("Δ Nevada =<br/>121.8 − 143.1 = −21.3")
+        NV_post("Post (1989–93) mean<br/>= 121.8") --> NV_d
     end
-    CA_d --> DD["DiD ATT =<br/>(−27.0) − (−21.3) = −5.7"]
+    CA_d --> DD("DiD ATT =<br/>(−27.0) − (−21.3) = −5.7")
     NV_d --> DD
-
-    style CA_pre fill:#d97757,stroke:#141413,color:#fff
-    style CA_post fill:#d97757,stroke:#141413,color:#fff
-    style NV_pre fill:#6a9bcc,stroke:#141413,color:#fff
-    style NV_post fill:#6a9bcc,stroke:#141413,color:#fff
-    style DD fill:#00d4c8,stroke:#141413,color:#141413
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class CA_pre,CA_post orange
+    class CA_d,NV_d gray
+    class NV_pre,NV_post blue
+    class DD teal
 ```
-
 The arithmetic is literally what the regression below computes. In `cigsale ~ state * prepost`, the interaction coefficient `stateCalifornia:prepostPost` *is* the DiD estimate.
 
 ```{r}
@@ -753,18 +761,17 @@ $$\widehat{\text{ATT}}_{\text{SCM}} = \frac{1}{T_{\text{post}}} \sum_{t > t^*} \
 
 ```{mermaid}
 flowchart LR
-    A["1. synthetic_control()<br/>declare treated unit<br/>and intervention time"] --> B["2. generate_predictor()<br/>define matching variables<br/>(one call per time window)"]
-    B --> C["3. generate_weights()<br/>optimise donor weights<br/>(quadratic programming)"]
-    C --> D["4. generate_control()<br/>build synthetic California<br/>and post-period gap series"]
-    D --> E["5. plot_/grab_ helpers<br/>trends, weights,<br/>placebos, MSPE ratio,<br/>Fisher exact p-value"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
-    style E fill:#00d4c8,stroke:#141413,color:#141413
+    A("1. synthetic_control()<br/>declare treated unit<br/>and intervention time") --> B("2. generate_predictor()<br/>define matching variables<br/>(one call per time window)")
+    B --> C("3. generate_weights()<br/>optimise donor weights<br/>(quadratic programming)")
+    C --> D("4. generate_control()<br/>build synthetic California<br/>and post-period gap series")
+    D --> E("5. plot_/grab_ helpers<br/>trends, weights,<br/>placebos, MSPE ratio,<br/>Fisher exact p-value")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B,C blue
+    class D orange
+    class E teal
 ```
-
 Stages 1--4 produce the estimate. Stage 5 is a battery of inspection helpers --- `plot_trends()`, `plot_differences()`, `plot_weights()`, `plot_placebos()`, `plot_mspe_ratio()`, `grab_unit_weights()`, `grab_predictor_weights()`, `grab_balance_table()`, `grab_significance()` --- that turn the fitted object into figures and tables for diagnostics and inference. We use all of them below.
 
 ### A roadmap for this section
@@ -1052,23 +1059,27 @@ The two ingredients each play a distinct role.
 
 ```{mermaid}
 flowchart TB
-    subgraph "BSTS counterfactual ŷ₁ₜ"
-        TREND["μₜ — local-level trend<br/>(absorbs dynamics no control can explain)"]
-        REG["β·xₜ — regression on donor cigsale + covariates<br/>(borrows from donor pool)"]
-        ERR["εₜ — random error"]
+    subgraph SG1["BSTS counterfactual ŷ₁ₜ"]
+        TREND("μₜ — local-level trend<br/>(absorbs dynamics no control can explain)")
+        REG("β·xₜ — regression on donor cigsale + covariates<br/>(borrows from donor pool)")
+        ERR("εₜ — random error")
     end
-    TREND --> Y["ŷ₁ₜ"]
+    TREND --> Y("ŷ₁ₜ")
     REG --> Y
     ERR --> Y
-    Y --> CMP["Observed y₁ₜ − ŷ₁ₜ<br/>= policy effect (with credible band)"]
-
-    style TREND fill:#6a9bcc,stroke:#141413,color:#fff
-    style REG fill:#00d4c8,stroke:#141413,color:#141413
-    style ERR fill:#7a8395,stroke:#141413,color:#fff
-    style Y fill:#1f2b5e,stroke:#141413,color:#fff
-    style CMP fill:#d97757,stroke:#141413,color:#fff
+    Y --> CMP("Observed y₁ₜ − ŷ₁ₜ<br/>= policy effect (with credible band)")
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class TREND blue
+    class REG teal
+    class ERR gray
+    class Y anchor
+    class CMP orange
 ```
-
 The trend $\mu_t$ absorbs the dynamics that no control series can explain; the regression term $\beta^\top x_t$ borrows information from the donor pool. After the model is fit on $t \le t^*$, it is projected forward and the posterior over $y_{1t} - \hat{y}_{1t}$ gives the credible interval for the policy effect.
 
 **Input format.** CausalImpact wants a *wide* dataset with the treated outcome in column 1 and every control series in the remaining columns. The covariate columns have missing values, so we fill them with random-forest multiple imputation from `mice`.

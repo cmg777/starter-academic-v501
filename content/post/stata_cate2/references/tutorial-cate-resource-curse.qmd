@@ -94,15 +94,16 @@ Stata 19 provides two estimators for the CATE:
 ```{mermaid}
 %%| fig-cap: "Hierarchy of treatment effect estimates from Stata 19's `cate` command"
 flowchart LR
-    A[Panel Data] --> B[cate po/aipw]
-    B --> C[IATEs]
-    B --> D[GATEs]
-    B --> E[ATE]
-    C --> F[Per-observation effects]
-    D --> G[Group averages by Z]
-    E --> H[Overall average]
+    A("Panel data") --> B("cate po/aipw")
+    B --> C("IATEs")
+    B --> D("GATEs")
+    B --> E("ATE")
+    C --> F("Per-observation effects")
+    D --> G("Group averages by Z")
+    E --> H("Overall average")
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A,B,C,D,E,F,G,H gray
 ```
-
 - **IATE** (Individualized Average Treatment Effects): One effect per observation, $\tau(\mathbf{x}_i)$
 - **GATE** (Group Average Treatment Effects): Average effect within prespecified groups, $\tau(g) = E\{\tau(\mathbf{x}) \mid G = g\}$
 - **ATE**: Overall population average, $\text{ATE} = E\{\tau(\mathbf{x})\}$
