@@ -130,15 +130,20 @@ The three stages are nested. Each one keeps everything the previous stage assume
 
 ```mermaid
 graph LR
-    A["<b>Difference-in-differences</b><br/>every donor weighted 1/N<br/>parallel trends"] --> B["<b>Stage 1: Classical SC</b><br/>weights chosen to fit<br/>simplex constraint"]
-    B --> C["<b>Stage 2: Bayesian SC</b><br/>simplex replaced by<br/>a horseshoe prior"]
-    C --> D["<b>Stage 3: Bayesian spatial SC</b><br/>SUTVA on donors dropped<br/>SAR layer, intensity rho"]
-    D --> E["<b>Two estimands</b><br/>effect on California<br/>+ spillover on each donor"]
-    style A fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style B fill:#6a9bcc,stroke:#6a9bcc,color:#141413
-    style C fill:#1a3a8a,stroke:#1a3a8a,color:#e8ecf2
-    style D fill:#00d4c8,stroke:#00d4c8,color:#141413
-    style E fill:#d97757,stroke:#d97757,color:#141413
+    A("<b>Difference-in-differences</b><br/>every donor weighted 1/N<br/>parallel trends") --> B("<b>Stage 1: classical SC</b><br/>weights chosen to fit<br/>simplex constraint")
+    B --> C("<b>Stage 2: Bayesian SC</b><br/>simplex replaced by<br/>a horseshoe prior")
+    C --> D("<b>Stage 3: Bayesian spatial SC</b><br/>SUTVA on donors dropped<br/>SAR layer, intensity rho")
+    D --> E("<b>Two estimands</b><br/>effect on California<br/>+ spillover on each donor")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B blue
+    class C key
+    class D teal
+    class E orange
 ```
 
 Read the arrows as successive relaxations. Difference-in-differences fixes the donor weights at $1/N$ and asks parallel trends to do all the work. Classical synthetic control lets the data choose the weights, but confines them to the simplex. The Bayesian stage replaces that hard constraint with a prior that *prefers* zero without forbidding anything else. The spatial stage keeps the Bayesian weights and drops the last assumption — that the donors were bystanders.
@@ -827,18 +832,22 @@ This is exactly the identity the toy example in section 4.3 verified with $-\\le
 
 ```mermaid
 graph TD
-    P["<b>Proposition 99</b><br/>California, 1988"] --> CA["California's sales fall"]
-    P -.->|"leak, intensity rho"| NV["<b>Nevada</b>'s sales also fall<br/>spillover = -5.50"]
-    NV --> SYN["Synthetic California<br/>alpha_NV = 0.20"]
-    CA --> ATT["Measured gap"]
+    P("<b>Proposition 99</b><br/>California, 1988") --> CA("California's sales fall")
+    P -.->|"leak, intensity rho"| NV("<b>Nevada</b>'s sales also fall<br/>spillover = -5.50")
+    NV --> SYN("Synthetic California<br/>alpha_NV = 0.20")
+    CA --> ATT("Measured gap")
     SYN --> ATT
-    ATT --> BIAS["<b>Bias</b> = -sum(alpha_j * xi_j)<br/>= +1.13 packs<br/>the effect looks SMALLER"]
-    style P fill:#d97757,stroke:#d97757,color:#141413
-    style NV fill:#00d4c8,stroke:#00d4c8,color:#141413
-    style SYN fill:#6a9bcc,stroke:#6a9bcc,color:#141413
-    style BIAS fill:#1a3a8a,stroke:#1a3a8a,color:#e8ecf2
-    style CA fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style ATT fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    ATT --> BIAS("<b>Bias</b> = -sum(alpha_j * xi_j)<br/>= +1.13 packs<br/>the effect looks SMALLER")
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class P orange
+    class CA,ATT anchor
+    class NV teal
+    class SYN blue
+    class BIAS key
 ```
 
 The dashed arrow is the one classical synthetic control cannot draw. To estimate its strength we need a model of how outcomes travel between neighbouring states — which is what a spatial autoregression is for.
@@ -895,21 +904,23 @@ The product $\\rho \\, \\mathbf{w} \\, \\alpha^{\\top}$ appears inside $\\rho A$
 
 ```mermaid
 graph LR
-    S1["<b>Step 1</b><br/>horseshoe Gibbs on the<br/>pre-treatment regression<br/>-> alpha"] --> FIX["alpha fixed at its<br/>posterior mean"]
-    FIX --> S2["<b>Step 2</b> Gibbs sweep"]
-    S2 --> F["latent factors<br/>forward-filter<br/>backward-sample"]
-    S2 --> B["beta<br/>horseshoe"]
-    S2 --> SIG["sigma^2<br/>inverse gamma"]
-    S2 --> RHO["<b>rho</b><br/>adaptive random-walk<br/>Metropolis"]
-    RHO --> EFF["Effects, in closed form<br/>eigendecomposition +<br/>Sherman-Morrison"]
-    style S1 fill:#6a9bcc,stroke:#6a9bcc,color:#141413
-    style S2 fill:#1a3a8a,stroke:#1a3a8a,color:#e8ecf2
-    style RHO fill:#00d4c8,stroke:#00d4c8,color:#141413
-    style EFF fill:#d97757,stroke:#d97757,color:#141413
-    style FIX fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style F fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style B fill:#141413,stroke:#c8d0e0,color:#e8ecf2
-    style SIG fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    S1("<b>Step 1</b><br/>horseshoe Gibbs on the<br/>pre-treatment regression<br/>-> alpha") --> FIX("alpha fixed at its<br/>posterior mean")
+    FIX --> S2("<b>Step 2</b> Gibbs sweep")
+    S2 --> F("latent factors<br/>forward-filter<br/>backward-sample")
+    S2 --> B("beta<br/>horseshoe")
+    S2 --> SIG("sigma^2<br/>inverse gamma")
+    S2 --> RHO("<b>rho</b><br/>adaptive random-walk<br/>Metropolis")
+    RHO --> EFF("Effects, in closed form<br/>eigendecomposition +<br/>Sherman-Morrison")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class S1 blue
+    class FIX,F,B,SIG anchor
+    class S2 key
+    class RHO teal
+    class EFF orange
 ```
 
 Read the split as the price of the identification problem: Step 1 never sees $\\rho$, and Step 2 never re-litigates $\\alpha$. The $\\rho$ step is a **random-walk Metropolis** move — propose a small jump, accept it with a probability that depends on how much better the new value fits, and otherwise stay put — which is the only part of this sampler that is not a draw from a closed-form conditional, and the reason section 9.6 has an effective-sample-size problem to report.
@@ -1558,20 +1569,24 @@ graph TD
     Q1{"Could the treatment<br/>have reached any<br/>donor unit?"}
     Q1 -->|"No, and you can defend it"| Q2{"Is the treated unit<br/>inside the donors'<br/>convex hull?"}
     Q1 -->|"Yes, or you cannot rule it out"| Q3{"Do you have a credible<br/>exposure structure<br/>(w and W)?"}
-    Q2 -->|Yes| SC["<b>Classical SC</b><br/>VanillaSC<br/>interpretable, sparse"]
-    Q2 -->|"No, or the pre-fit is poor"| BSC["<b>Bayesian SC</b><br/>BSCM or scspill at rho=0<br/>extrapolation allowed"]
-    Q3 -->|Yes| SAR["<b>Bayesian spatial SC</b><br/>SCSPILL method='sar'<br/>two estimands"]
-    Q3 -->|"No, but you can name<br/>the affected units"| ALT["<b>Screen or net out</b><br/>SPOTSYNTH, ISCM<br/>SPILLSYNTH method='cd'"]
-    classDef sty_Q1 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    Q2 -->|Yes| SC("<b>Classical SC</b><br/>VanillaSC<br/>interpretable, sparse")
+    Q2 -->|"No, or the pre-fit is poor"| BSC("<b>Bayesian SC</b><br/>BSCM or scspill at rho=0<br/>extrapolation allowed")
+    Q3 -->|Yes| SAR("<b>Bayesian spatial SC</b><br/>SCSPILL method='sar'<br/>two estimands")
+    Q3 -->|"No, but you can name<br/>the affected units"| ALT("<b>Screen or net out</b><br/>SPOTSYNTH, ISCM<br/>SPILLSYNTH method='cd'")
+    classDef sty_Q1 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q1 sty_Q1
-    classDef sty_Q2 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    classDef sty_Q2 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q2 sty_Q2
-    classDef sty_Q3 fill:#141413,stroke:#c8d0e0,color:#e8ecf2
+    classDef sty_Q3 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q3 sty_Q3
-    style SC fill:#6a9bcc,stroke:#6a9bcc,color:#141413
-    style BSC fill:#1a3a8a,stroke:#1a3a8a,color:#e8ecf2
-    style SAR fill:#00d4c8,stroke:#00d4c8,color:#141413
-    style ALT fill:#d97757,stroke:#d97757,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class SC blue
+    class BSC key
+    class SAR teal
+    class ALT orange
 ```
 
 The first question is the one that gets skipped, and it is the only one with no statistical answer. Whether Proposition 99 could plausibly have reached Nevada is a question about cigarettes, borders and advertising, not about panels. The data can tell you how large the leak was *given* that you allowed for one; they cannot tell you to look.

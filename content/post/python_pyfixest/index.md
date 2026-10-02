@@ -400,14 +400,21 @@ The following diagram illustrates the core problem fixed effects solve. When an 
 
 ```mermaid
 graph LR
-    A["<b>Group Characteristics</b><br/>(unobserved)"] -->|"correlates"| X["<b>X1</b><br/>(covariate)"]
-    A -->|"affects"| Y["<b>Y</b><br/>(outcome)"]
+    A("<b>Group characteristics</b><br/>(unobserved)") -->|"correlates"| X("<b>X1</b><br/>(covariate)")
+    A -->|"affects"| Y("<b>Y</b><br/>(outcome)")
     X -->|"causal effect β = ?"| Y
-    FE["<b>Fixed Effects</b><br/>(absorbs A)"] -.->|"blocks backdoor"| A
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style X fill:#6a9bcc,stroke:#141413,color:#141413
-    style Y fill:#00d4c8,stroke:#141413,color:#141413
-    style FE fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
+    FE("<b>Fixed effects</b><br/>(absorbs A)") -.->|"blocks backdoor"| A
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key_dash fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef orange_dash fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    class A orange_dash
+    class X blue
+    class Y teal
+    class FE key_dash
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
 ### 5.1 Absorbing group heterogeneity
@@ -1198,34 +1205,37 @@ The wage panel illustrates a general principle: one-way fixed effects absorb eve
 
 ```mermaid
 graph LR
-    subgraph "Absorbed by One-Way FE"
-        ED["<b>Education</b><br/>(time-invariant)"]
-        AB["<b>Ability</b><br/>(unobserved)"]
-        RC["<b>Race</b><br/>(time-invariant)"]
+    subgraph SG1["Absorbed by one-way FE"]
+        ED("<b>Education</b><br/>(time-invariant)")
+        AB("<b>Ability</b><br/>(unobserved)")
+        RC("<b>Race</b><br/>(time-invariant)")
     end
-    subgraph "Estimated (time-varying)"
-        UN["<b>Union</b>"]
-        MA["<b>Married</b>"]
-        OC["<b>Occupation</b>"]
+    subgraph SG2["Estimated (time-varying)"]
+        UN("<b>Union</b>")
+        MA("<b>Married</b>")
+        OC("<b>Occupation</b>")
     end
-    subgraph "Recovery strategies"
-        MK["<b>CRE/Mundlak</b><br/>(individual means)"]
+    subgraph SG3["Recovery strategies"]
+        MK("<b>CRE/Mundlak</b><br/>(individual means)")
     end
-    UN --> W["<b>Log Wage</b>"]
+    UN --> W("<b>Log wage</b>")
     MA --> W
     OC --> W
     ED -.-> W
     AB -.-> W
     MK -.->|"recovers γ"| ED
     MK -.->|"recovers γ"| RC
-    style ED fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
-    style AB fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
-    style RC fill:#d97757,stroke:#141413,color:#141413,stroke-dasharray: 5 5
-    style UN fill:#6a9bcc,stroke:#141413,color:#141413
-    style MA fill:#6a9bcc,stroke:#141413,color:#141413
-    style OC fill:#6a9bcc,stroke:#141413,color:#141413
-    style W fill:#00d4c8,stroke:#141413,color:#141413
-    style MK fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG3 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange_dash fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key_dash fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class ED,AB,RC orange_dash
+    class UN,MA,OC blue
+    class MK key_dash
+    class W teal
 ```
 
 The dashed arrows from the orange (absorbed) variables indicate that their effects on wages are *real* but *unestimable* under one-way FE --- they are folded into each worker's individual intercept. The solid arrows from the blue (estimated) variables show the effects we can identify: changes in union status, marital status, and occupation that occur within a worker's career. The dark blue CRE/Mundlak node represents the recovery strategy from Section 11.7: by substituting individual means for entity dummies, we recover the coefficients $\gamma$ for education and race while producing time-varying estimates that closely match one-way FE. This partially resolves the tradeoff from Section 11.4, though at the cost of a stronger modeling assumption.

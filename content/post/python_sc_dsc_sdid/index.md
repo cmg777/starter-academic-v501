@@ -129,30 +129,32 @@ Each stage of this ladder exists because the stage below it gets something wrong
 
 ```mermaid
 flowchart TD
-    D["<b>Panel data</b><br/>24 countries, 104 quarters<br/>one treated unit"] --> Q0{"Which donors<br/>count, and by<br/>how much?"}
-    Q0 -->|"all of them, equally"| DID["<b>Stage 0 — DiD</b><br/>FDID(...).fit().did"]
+    D("<b>Panel data</b><br/>24 countries, 104 quarters<br/>one treated unit") --> Q0{"Which donors<br/>count, and by<br/>how much?"}
+    Q0 -->|"all of them, equally"| DID("<b>Stage 0 — DiD</b><br/>FDID(...).fit().did")
     DID --> Q1{"But the donors do<br/>not look like the UK"}
-    Q1 --> SC["<b>Stage 1 — SC</b><br/>VanillaSC"]
+    Q1 --> SC("<b>Stage 1 — SC</b><br/>VanillaSC")
     SC --> Q2{"But the blend must<br/>match the LEVEL, not<br/>just the shape"}
-    Q2 --> DSC["<b>Stage 2 — DSC</b><br/>TSSC(method='MSCa')"]
+    Q2 --> DSC("<b>Stage 2 — DSC</b><br/>TSSC(method='MSCa')")
     DSC --> Q3{"But every pre-period<br/>counts the same"}
-    Q3 --> SDID["<b>Stage 3 — SDID</b><br/>SDID(zeta=0.0)"]
-    SDID --> PIVOT["<b>The pivot</b><br/>extrapolation bias vs<br/>interpolation bias"]
-    PIVOT --> MASC["<b>Stage 4 — MASC</b><br/>MASC(set_f=...)"]
-    PIVOT --> ASCM["<b>Stage 5 — ASCM</b><br/>VanillaSC(augment='ridge')"]
-    MASC --> SEL["<b>Which stage?</b><br/>in-sample placebo<br/>tournament"]
+    Q3 --> SDID("<b>Stage 3 — SDID</b><br/>SDID(zeta=0.0)")
+    SDID --> PIVOT("<b>The pivot</b><br/>extrapolation bias vs<br/>interpolation bias")
+    PIVOT --> MASC("<b>Stage 4 — MASC</b><br/>MASC(set_f=...)")
+    PIVOT --> ASCM("<b>Stage 5 — ASCM</b><br/>VanillaSC(augment='ridge')")
+    MASC --> SEL("<b>Which stage?</b><br/>in-sample placebo<br/>tournament")
     ASCM --> SEL
-    SEL --> INF["<b>Inference</b><br/>six methods, one flag"]
-    style D fill:#141413,stroke:#6a9bcc,color:#fff
-    style DID fill:#8b9dc3,stroke:#141413,color:#141413
-    style SC fill:#6a9bcc,stroke:#141413,color:#141413
-    style DSC fill:#00d4c8,stroke:#141413,color:#141413
-    style SDID fill:#d97757,stroke:#141413,color:#141413
-    style MASC fill:#6a9bcc,stroke:#141413,color:#141413
-    style ASCM fill:#6a9bcc,stroke:#141413,color:#141413
-    style PIVOT fill:#141413,stroke:#d97757,color:#fff
-    style SEL fill:#1a3a8a,stroke:#141413,color:#fff
-    style INF fill:#1a3a8a,stroke:#141413,color:#fff
+    SEL --> INF("<b>Inference</b><br/>six methods, one flag")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class D,PIVOT anchor
+    class Q0,Q1,Q2,Q3 gray
+    class DID,SC,MASC,ASCM blue
+    class DSC teal
+    class SDID orange
+    class SEL,INF key
 ```
 
 Read the diagram top to bottom as a conversation. Every arrow labelled "but" is an objection to the stage above it, and every box below an objection is the estimator that answers it. The two boxes hanging off the pivot are not a further step up but two different reactions to the same discovery, which is why the ladder branches there rather than continuing.
@@ -628,22 +630,22 @@ with a different choice of the unit weights $\omega\_i$ and the time weights $\l
 
 ```mermaid
 graph TD
-    R["<b>One weighted two-way regression</b><br/>min Σ ω<sub>i</sub> λ<sub>t</sub> (Y<sub>it</sub> − μ − α<sub>i</sub> − β<sub>t</sub> − τD<sub>it</sub>)²"]
-    R --> A["ω uniform, λ uniform<br/><b>DiD</b>"]
-    R --> B["ω fitted, λ uniform, no intercept<br/><b>SC</b>"]
-    R --> C["ω fitted, λ uniform, intercept<br/><b>DSC</b>"]
-    R --> D["ω fitted, λ fitted, intercept<br/><b>SDID</b>"]
-    R --> E["<b>Change the feasible set instead</b>"]
-    E --> F["blend with m-nearest-neighbour matching<br/><b>MASC</b>"]
-    E --> G["allow negative weights, penalise them<br/><b>ASCM</b>"]
-    style R fill:#141413,stroke:#6a9bcc,color:#fff
-    style A fill:#8b9dc3,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#141413,stroke:#d97757,color:#fff
-    style F fill:#6a9bcc,stroke:#141413,color:#141413
-    style G fill:#6a9bcc,stroke:#141413,color:#141413
+    R("<b>One weighted two-way regression</b><br/>min Σ ω<sub>i</sub> λ<sub>t</sub> (Y<sub>it</sub> − μ − α<sub>i</sub> − β<sub>t</sub> − τD<sub>it</sub>)²")
+    R --> A("ω uniform, λ uniform<br/><b>DiD</b>")
+    R --> B("ω fitted, λ uniform, no intercept<br/><b>SC</b>")
+    R --> C("ω fitted, λ uniform, intercept<br/><b>DSC</b>")
+    R --> D("ω fitted, λ fitted, intercept<br/><b>SDID</b>")
+    R --> E("<b>Change the feasible set instead</b>")
+    E --> F("blend with m-nearest-neighbour matching<br/><b>MASC</b>")
+    E --> G("allow negative weights, penalise them<br/><b>ASCM</b>")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class R,E anchor
+    class A,B,F,G blue
+    class C teal
+    class D orange
 ```
 
 The diagram splits the ladder into two families. The first four stages change *which weights* the same regression uses. The last two change *what weights are allowed at all* — MASC by mixing in a different estimator, ASCM by relaxing the simplex. That distinction is why the ladder branches rather than continuing upward, and it is the reason section 16's tournament cannot simply declare the top stage the winner.
@@ -1259,16 +1261,19 @@ The estimates cluster, but they do not coincide, and the ladder gives no reason 
 
 ```mermaid
 flowchart LR
-    A["Pick a fake<br/>treatment date k<br/>(2010Q1 … 2014Q4)"] --> B["Fit every stage<br/>on quarters 1..k"]
-    B --> C["Predict quarter<br/>k + h"]
-    C --> D["Compare with<br/>what happened.<br/>True effect = 0"]
-    D --> E["Score:<br/>RMSE, MAB"]
+    A("Pick a fake<br/>treatment date k<br/>(2010Q1 … 2014Q4)") --> B("Fit every stage<br/>on quarters 1..k")
+    B --> C("Predict quarter<br/>k + h")
+    C --> D("Compare with<br/>what happened.<br/>True effect = 0")
+    D --> E("Score:<br/>RMSE, MAB")
     E --> A
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#141413,stroke:#6a9bcc,color:#fff
-    style C fill:#141413,stroke:#6a9bcc,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B,C anchor
+    class D orange
+    class E teal
 ```
 
 The loop runs twenty times, once for each last-pre-treatment quarter from 2010Q1 to 2014Q4, and each pass refits all seven estimators from scratch. Everything the earlier sections taught about defaults now pays off: `vce="noinference"`, `method="MSCa"`, `inference=False` and an explicit `m_grid` are what keep this to thirteen seconds rather than several hours.

@@ -238,18 +238,19 @@ Before diving into the math, it helps to see the full pipeline at a glance. Each
 
 ```mermaid
 graph LR
-    A["<b>Step 1</b><br/>Polarity<br/>Adjustment"] --> B["<b>Step 2</b><br/>Standardization<br/>(Z-scores)"]
-    B --> C["<b>Step 3</b><br/>Covariance<br/>Matrix"]
-    C --> D["<b>Step 4</b><br/>Eigen-<br/>Decomposition"]
-    D --> E["<b>Step 5</b><br/>Scoring<br/>(PC1)"]
-    E --> F["<b>Step 6</b><br/>Normalization<br/>(0-1)"]
-
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>Step 1</b><br/>polarity<br/>adjustment") --> B("<b>Step 2</b><br/>standardization<br/>(Z-scores)")
+    B --> C("<b>Step 3</b><br/>covariance<br/>matrix")
+    C --> D("<b>Step 4</b><br/>Eigen-<br/>decomposition")
+    D --> E("<b>Step 5</b><br/>scoring<br/>(PC1)")
+    E --> F("<b>Step 6</b><br/>normalization<br/>(0-1)")
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A orange
+    class B,C blue
+    class D,E teal
+    class F key
 ```
 
 The pipeline transforms raw indicators into a single number that captures the dominant pattern of variation. We start by aligning indicator directions (Step 1), removing unit differences (Step 2), measuring variable overlap (Step 3), finding the optimal weights (Step 4), computing scores (Step 5), and finally rescaling for human readability (Step 6).

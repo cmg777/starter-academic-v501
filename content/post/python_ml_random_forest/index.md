@@ -82,19 +82,19 @@ This is the road map for the whole tutorial. We load and explore the data, fit a
 
 ```mermaid
 graph TD
-    A["Load and merge DS4Bolivia<br/>339 municipalities, 64 features"] --> B["Exploratory data analysis"]
-    B --> C["Baseline Random Forest<br/>default hyperparameters"]
-    C --> D["5-fold cross-validation"]
-    D --> E["Per-fold metrics<br/>mean +/- SD"]
-    D --> F["Out-of-fold predictions<br/>all 339 points"]
-    F --> G["Actual vs predicted<br/>colored by fold"]
-    F --> H["Distribution overlap<br/>plus KS test"]
-    C --> I["Feature importance<br/>MDI and permutation"]
-    I --> J["Partial dependence plots"]
-    A -.optional.-> K["Appendix A<br/>train/test split"]
-    C -.optional.-> L["Appendix B<br/>grid / random / Optuna tuning"]
-    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:1px,color:#e8ecf2;
-    classDef appendix fill:#141a2e,stroke:#8a93a8,stroke-width:1px,color:#c8d0e0;
+    A("Load and merge DS4Bolivia<br/>339 municipalities, 64 features") --> B("Exploratory data analysis")
+    B --> C("Baseline random forest<br/>default hyperparameters")
+    C --> D("5-fold cross-validation")
+    D --> E("Per-fold metrics<br/>mean +/- SD")
+    D --> F("Out-of-fold predictions<br/>all 339 points")
+    F --> G("Actual vs predicted<br/>colored by fold")
+    F --> H("Distribution overlap<br/>plus KS test")
+    C --> I("Feature importance<br/>MDI and permutation")
+    I --> J("Partial dependence plots")
+    A -.optional.-> K("Appendix A<br/>train/test split")
+    C -.optional.-> L("Appendix B<br/>grid / random / Optuna tuning")
+    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef appendix fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class A,B,C,D,E,F,G,H,I,J box;
     class K,L appendix;
 ```
@@ -444,18 +444,18 @@ The textbook recipe is to hold out, say, 20% of the data as a test set, train on
 
 ```mermaid
 graph TD
-    D["All 339 municipalities"] --> S["Shuffle and split into 5 folds"]
-    S --> R1["Round 1: test = Fold 1, train = Folds 2-5"]
-    S --> R2["Round 2: test = Fold 2, train = Folds 1,3,4,5"]
-    S --> R3["Round 3: test = Fold 3, train = Folds 1,2,4,5"]
-    S --> R4["Round 4: test = Fold 4, train = Folds 1,2,3,5"]
-    S --> R5["Round 5: test = Fold 5, train = Folds 1,2,3,4"]
-    R1 --> O["Out-of-fold predictions:<br/>every municipality predicted once,<br/>by a forest that never saw it"]
+    D("All 339 municipalities") --> S("Shuffle and split into 5 folds")
+    S --> R1("Round 1: test = Fold 1, train = Folds 2-5")
+    S --> R2("Round 2: test = Fold 2, train = Folds 1,3,4,5")
+    S --> R3("Round 3: test = Fold 3, train = Folds 1,2,4,5")
+    S --> R4("Round 4: test = Fold 4, train = Folds 1,2,3,5")
+    S --> R5("Round 5: test = Fold 5, train = Folds 1,2,3,4")
+    R1 --> O("Out-of-fold predictions:<br/>every municipality predicted once,<br/>by a forest that never saw it")
     R2 --> O
     R3 --> O
     R4 --> O
     R5 --> O
-    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:1px,color:#e8ecf2;
+    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class D,S,R1,R2,R3,R4,R5,O box;
 ```
 

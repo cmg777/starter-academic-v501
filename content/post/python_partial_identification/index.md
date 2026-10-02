@@ -237,13 +237,19 @@ In our case study, a job training program ($X$) may cause workers to find jobs (
 
 ```mermaid
 graph LR
-    U["U<br/>(Prior Experience)<br/><i>Unmeasured</i>"] -->|"affects enrollment"| X["X<br/>(Job Training)"]
-    U -->|"affects hiring"| Y["Y<br/>(Got a Job)"]
+    U("U<br/>(Prior Experience)<br/><i>Unmeasured</i>") -->|"affects enrollment"| X("X<br/>(Job Training)")
+    U -->|"affects hiring"| Y("Y<br/>(Got a Job)")
     X -->|"causal effect<br/>(what we want)"| Y
-
-    style U fill:#999999,stroke:#141413,color:#141413,stroke-dasharray: 5 5
-    style X fill:#6a9bcc,stroke:#141413,color:#141413
-    style Y fill:#d97757,stroke:#141413,color:#141413
+    classDef gray_dash fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef orange_dash fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class U orange_dash
+    class X blue
+    class Y teal
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
 The dashed border on $U$ signals it is unmeasured. Because we cannot condition on $U$, the backdoor criterion fails and **point identification is impossible**. This is precisely when partial identification becomes valuable: we can still bound the causal effect using only the observable joint distribution of $X$ and $Y$. The next section sets up our simulated data so we can see exactly how this works.
@@ -621,16 +627,16 @@ The following flowchart summarizes when to use partial identification versus poi
 
 ```mermaid
 graph TD
-    Q["Are all confounders<br/>observed?"] -->|"Yes"| PI["<b>Point Identification</b><br/>DoWhy, DoubleML"]
-    Q -->|"No"| IV["Is there an<br/>instrument?"]
-    IV -->|"Yes"| IVPI["<b>Point Identification</b><br/>via Instrumental Variables<br/>(IV / 2SLS)"]
-    IV -->|"No"| PART["<b>Partial Identification</b><br/>Compute bounds"]
-
-    style Q fill:#141413,stroke:#141413,color:#fff
-    style PI fill:#6a9bcc,stroke:#141413,color:#141413
-    style IV fill:#141413,stroke:#141413,color:#fff
-    style IVPI fill:#6a9bcc,stroke:#141413,color:#141413
-    style PART fill:#d97757,stroke:#141413,color:#141413
+    Q("Are all confounders<br/>observed?") -->|"Yes"| PI("<b>Point identification</b><br/>DoWhy, DoubleML")
+    Q -->|"No"| IV("Is there an<br/>instrument?")
+    IV -->|"Yes"| IVPI("<b>Point identification</b><br/>via instrumental variables<br/>(IV / 2SLS)")
+    IV -->|"No"| PART("<b>Partial identification</b><br/>compute bounds")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class Q,IV anchor
+    class PI,IVPI blue
+    class PART orange
 ```
 
 ### ATE bounds comparison
