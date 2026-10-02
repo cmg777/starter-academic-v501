@@ -23,10 +23,6 @@ import matplotlib.patches as mpatches
 import pyfixest as pf
 from great_tables import GT, md, style, loc
 
-# Reproducibility
-RANDOM_SEED = 42
-np.random.seed(RANDOM_SEED)
-
 # Site color palette
 STEEL_BLUE = "#6a9bcc"
 WARM_ORANGE = "#d97757"
@@ -423,9 +419,10 @@ print("\n" + "=" * 60)
 print("SECTION 9: Publication-Quality Tables")
 print("=" * 60)
 
-# 9.1: Stepwise specifications with csw0()
-print("\n--- 9.1: Stepwise Specifications with csw0() ---")
-fit_multi = pf.feols("gpa ~ txp + csw0(female_share) | id + time", data=df,
+# 9.1: Stepwise specifications with csw()
+# csw(a, b) fits one model per cumulative step: gpa ~ a, then gpa ~ a + b
+print("\n--- 9.1: Stepwise Specifications with csw() ---")
+fit_multi = pf.feols("gpa ~ csw(txp, female_share) | id + time", data=df,
                      vcov={"CRV1": "id"})
 models_list = fit_multi.to_list()
 print(f"Number of models: {len(models_list)}")
@@ -435,8 +432,10 @@ for i, f in enumerate(models_list):
 
 # 9.2: etable() output
 print("\n--- 9.2: etable() Output ---")
-etable_result = fit_multi.etable()
-print(etable_result)
+# type="df" returns a pandas DataFrame (the default returns a Great Tables
+# object, which renders as a styled table in notebooks but not in a terminal)
+etable_df = pf.etable(models_list, type="df", coef_fmt="b* \n (se)")
+print(etable_df.replace(r"\s*\n\s*", " ", regex=True).to_string())
 
 # 9.3: Custom Great Tables table
 print("\n--- 9.3: Building Great Tables Table ---")
@@ -489,6 +488,7 @@ print("\n--- 9.4: LaTeX Table Export ---")
 latex_output = pf.etable(
     [fit_ols, fit_twfe, fit_cov],
     type="tex",
+    coef_fmt="b* \n (se)",  # "*" after b adds significance stars
     labels={
         "txp": "Treatment $\\times$ Post",
         "treated": "Treatment",
@@ -504,6 +504,7 @@ print(latex_output)
 pf.etable(
     [fit_ols, fit_twfe, fit_cov],
     type="tex",
+    coef_fmt="b* \n (se)",  # "*" after b adds significance stars
     labels={
         "txp": "Treatment $\\times$ Post",
         "treated": "Treatment",
@@ -644,12 +645,14 @@ coef_names = tidy_event.index.tolist()
 coefs = tidy_event["Estimate"].values
 ci_lo = tidy_event["2.5%"].values
 ci_hi = tidy_event["97.5%"].values
+pvals = tidy_event["Pr(>|t|)"].values
 
-# Extract numeric time from coefficient names like "C(timeToTreat, -1.0)[T.-4.0]"
+# Extract numeric time from coefficient names. Recent PyFixest names them
+# "timeToTreat::-4.0"; older releases used "C(timeToTreat, ...)[T.-4.0]".
 import re
 time_vals = []
 for name in coef_names:
-    match = re.search(r'T\.([-\d.]+)', name)
+    match = re.search(r'(?:::|\[T\.)(-?[\d.]+)\]?$', name)
     if match:
         time_vals.append(float(match.group(1)))
     else:
@@ -663,6 +666,7 @@ time_vals = time_vals[valid_mask]
 coefs = coefs[valid_mask]
 ci_lo = ci_lo[valid_mask]
 ci_hi = ci_hi[valid_mask]
+pvals = pvals[valid_mask]
 
 # Add reference period (timeToTreat = -1)
 ref_time = -1.0
@@ -678,12 +682,16 @@ ci_lo_plot = np.concatenate([ci_lo[time_vals < ref_time],
 ci_hi_plot = np.concatenate([ci_hi[time_vals < ref_time],
                              [0],
                              ci_hi[time_vals > ref_time]])
+pvals_plot = np.concatenate([pvals[time_vals < ref_time],
+                             [np.nan],
+                             pvals[time_vals > ref_time]])
 
 sort_idx = np.argsort(time_plot)
 time_plot = time_plot[sort_idx]
 coefs_plot = coefs_plot[sort_idx]
 ci_lo_plot = ci_lo_plot[sort_idx]
 ci_hi_plot = ci_hi_plot[sort_idx]
+pvals_plot = pvals_plot[sort_idx]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.fill_between(time_plot, ci_lo_plot, ci_hi_plot, alpha=0.2, color=STEEL_BLUE)
@@ -713,15 +721,19 @@ print("Saved: did101_event_study.png")
 # 11.5: Event study coefficients table
 print("\n--- 11.5: Event Study Coefficients Table ---")
 event_rows = []
-for t, c, lo, hi in zip(time_plot, coefs_plot, ci_lo_plot, ci_hi_plot):
+for t, c, lo, hi, p in zip(time_plot, coefs_plot, ci_lo_plot, ci_hi_plot,
+                          pvals_plot):
     period_label = f"t = {int(t)}" if t != ref_time else f"t = {int(t)} (ref)"
-    sig = ""
     if t == ref_time:
         sig = "(reference)"
-    elif abs(c) / max(abs(hi - c), 0.001) > 1.96:
-        # Check if CI excludes zero
-        if lo > 0 or hi < 0:
-            sig = "***"
+    elif p < 0.001:
+        sig = "***"
+    elif p < 0.01:
+        sig = "**"
+    elif p < 0.05:
+        sig = "*"
+    else:
+        sig = ""
     event_rows.append({
         "Period": period_label,
         "Estimate": c,
@@ -744,7 +756,7 @@ gt_event = (
     )
     .tab_source_note(
         "Notes: TWFE with school and time FE. CRV1 clustered SE at school level. "
-        "*** p < 0.001."
+        "* p < 0.05, ** p < 0.01, *** p < 0.001."
     )
     .tab_style(
         style=style.text(weight="bold"),
