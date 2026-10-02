@@ -133,24 +133,24 @@ The tutorial runs in eight stages. The same 50 restaurants carry the whole story
 
 ```mermaid
 graph TD
-    A["<b>Simulate 50 restaurants</b><br/>Truth known: coupons raise<br/>sales by exactly 0.2"] --> B["<b>Naive regression</b><br/>Slope −0.106, the wrong sign"]
-    B --> C["<b>Control for income</b><br/>Slope +0.267, and the OVB<br/>identity explains the gap"]
-    C --> D["<b>The FWL theorem</b><br/>A short proof, then<br/>the same number in NumPy"]
-    D --> E["<b>Verify step by step</b><br/>Same coefficient every time,<br/>but different SEs"]
-    E --> F["<b>See it</b><br/>Residual plots, rescaled axes,<br/>and a second control"]
-    F --> G["<b>Break it yourself</b><br/>Interactive lab: flip the sign,<br/>switch confounding off"]
-    G --> H["<b>Beyond OLS</b><br/>Misconceptions, fixed effects,<br/>Double Machine Learning"]
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style G fill:#c8d0e0,stroke:#141413,color:#141413
-    style H fill:#c8d0e0,stroke:#141413,color:#141413
+    A("<b>Simulate 50 restaurants</b><br/>true coupon effect = 0.2") --> B("<b>Naive regression</b><br/>slope −0.106,<br/>the wrong sign")
+    B --> C("<b>Control for income</b><br/>slope +0.267, and the<br/>OVB identity explains the gap")
+    C --> D("<b>The FWL theorem</b><br/>a short proof,<br/>then the same number in NumPy")
+    D --> E("<b>Verify step by step</b><br/>same coefficient,<br/>different SEs")
+    E --> F("<b>See it</b><br/>residual plots, rescaled axes,<br/>a second control")
+    F --> G("<b>Break it yourself</b><br/>interactive lab")
+    G --> H("<b>Beyond OLS</b><br/>misconceptions, DML,<br/>panel data appendix")
+    classDef puzzle fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef solve fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef check fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef practice fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A,B puzzle
+    class C,D solve
+    class E,F check
+    class G,H practice
 ```
 
-Read the colors as a plot line. The blue boxes set up the puzzle: a known truth and a naive slope with the wrong sign. The orange boxes solve it twice — once with the omitted-variable-bias identity, once with the FWL theorem. The teal boxes check the answer, first with numbers and then with pictures. The gray boxes hand you the controls: a lab where you break the result yourself, and the bridge to fixed effects and Double Machine Learning. After the exercises, an appendix runs the same promotion again in June and applies FWL to the two-month panel.
+The border colors of the boxes mark the logic of the argument. The boxes with blue borders set up the puzzle, a known truth and a naive slope with the wrong sign. The boxes with orange borders solve it twice, first with the omitted-variable-bias identity and then with the FWL theorem. The boxes with teal borders check the answer, first with numbers and then with pictures. Finally, the boxes with gray borders turn the analysis over to the reader through a lab where the result can be broken on purpose, a set of misconceptions, and the bridge to Double Machine Learning. The last box also includes the appendix, which runs the same promotion again in June and applies FWL to the resulting two-month panel.
 
 ## 2. Key concepts at a glance
 
@@ -298,24 +298,28 @@ FWL is a carpenter's straightedge. DML swaps it for a flexible curve ruler. The 
 
 ## 3. The causal structure
 
-Before looking at data, it helps to understand the causal relationships among the variables. A **Directed Acyclic Graph (DAG)** — a diagram where arrows indicate direct causal effects — makes these assumptions explicit.
+Before looking at data, it helps to understand the causal relationships among the variables. A **Directed Acyclic Graph (DAG)** is a diagram in which each arrow represents a direct causal effect of one variable on another. Drawing the graph first makes the assumptions of the analysis explicit, so the reader can see which variables must be controlled for and why.
 
 In this fast-food scenario, three variables interact:
 
 ```mermaid
 graph LR
-    I["<b>Income</b><br/>(confounder)"] -->|"Higher income<br/>→ fewer redemptions"| C["<b>Coupons</b><br/>(redemption rate)"]
-    I -->|"Higher income<br/>→ more spending"| S["<b>Sales</b><br/>(monthly)"]
-    C -->|"True causal<br/>effect: +0.2"| S
-
-    style I fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style S fill:#00d4c8,stroke:#141413,color:#141413
+    I("<b>Income</b><br/>confounder") -.->|"fewer<br/>redemptions"| C("<b>Coupons</b><br/>treatment:<br/>redemption rate")
+    I -.->|"more<br/>spending"| S("<b>Sales</b><br/>outcome:<br/>monthly sales")
+    C ===>|"causal effect<br/>+0.2"| S
+    classDef confounder fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef treatment fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef outcome fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class I confounder
+    class C treatment
+    class S outcome
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
-Income acts as a **confounder** — a variable that influences both the treatment (the coupon redemption rate) and the outcome (monthly sales). Wealthier neighborhoods redeem fewer coupons but spend more, creating a *backdoor path* from coupons to sales through income. Ignoring income allows this backdoor path to generate a spurious negative association between coupons and sales, masking the true positive effect.
+Income acts as a **confounder**, which is a variable that influences both the treatment (the coupon redemption rate) and the outcome (monthly sales). The two dashed orange arrows trace this influence, because wealthier neighborhoods redeem fewer coupons but also spend more. Together, these arrows form a *backdoor path* from coupons to sales that runs through income. If the analysis ignores income, this backdoor path produces a spurious negative association between coupons and sales, and that association hides the true positive effect shown by the thick teal arrow.
 
-To estimate the causal effect without this bias, the analysis must **block** this backdoor path by conditioning on income. The FWL theorem provides an elegant way to do this and to visualize the result.
+To estimate the causal effect without this bias, the analysis must **block** the backdoor path by conditioning on income. Once income is held fixed, the only remaining link between coupons and sales is the thick teal arrow. The FWL theorem provides an elegant way to do this and also to visualize the result.
 
 ## 4. Setup and imports
 
