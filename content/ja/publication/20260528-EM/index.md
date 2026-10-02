@@ -97,13 +97,14 @@ image:
 
 ```mermaid
 graph LR
-    A["<b>ステップ1 — C-Lasso</b><br/>（機械学習）<br/><i>成長と失業のパターンを共有する潜在<br/>レジームへ県を分類する</i>"]
-    B["<b>ステップ2 — 空間ダービンモデル</b><br/><i>各レジームの反応を直接的（局所的）な<br/>関連と間接的（近隣への波及）な関連へ<br/>分割する</i>"]
+    A("<b>ステップ1 — C-Lasso</b><br/>（機械学習）<br/><i>成長と失業のパターンを共有する潜在<br/>レジームへ県を分類する</i>")
+    B("<b>ステップ2 — 空間ダービンモデル</b><br/><i>各レジームの反応を直接的（局所的）な<br/>関連と間接的（近隣への波及）な関連へ<br/>分割する</i>")
 
     A --> B
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
 ```
 
 ---

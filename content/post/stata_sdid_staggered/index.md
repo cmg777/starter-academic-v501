@@ -88,24 +88,24 @@ The workhorse for panel policy evaluation is the **two-way fixed-effects (TWFE)*
 
 ```mermaid
 graph TD
-    subgraph "Block design — predecessor (Prop 99)"
-        B1["California<br/>adopts 1989"] --> BATT["one ATT"]
-        B2["other states<br/>never treated"] --> BATT
+    subgraph SG1["Block design — predecessor (Prop 99)"]
+        B1("California<br/>adopts 1989") --> BATT("one ATT")
+        B2("other states<br/>never treated") --> BATT
     end
-    subgraph "Staggered design — this post (gender quotas)"
-        S1["cohort 2000"] --> SATT["aggregate ATT"]
-        S2["cohort 2002"] --> SATT
-        S3["cohorts 2003 to 2013"] --> SATT
-        SC["110 never-treated<br/>controls"] -.donor pool.-> SATT
+    subgraph SG2["Staggered design — this post (gender quotas)"]
+        S1("cohort 2000") --> SATT("aggregate ATT")
+        S2("cohort 2002") --> SATT
+        S3("cohorts 2003 to 2013") --> SATT
+        SC("110 never-treated<br/>controls") -.donor pool.-> SATT
     end
-    style B1 fill:#d97757,stroke:#141413,color:#141413
-    style B2 fill:#6a9bcc,stroke:#141413,color:#141413
-    style BATT fill:#00d4c8,stroke:#141413,color:#141413
-    style S1 fill:#d97757,stroke:#141413,color:#141413
-    style S2 fill:#d97757,stroke:#141413,color:#141413
-    style S3 fill:#d97757,stroke:#141413,color:#141413
-    style SC fill:#6a9bcc,stroke:#141413,color:#141413
-    style SATT fill:#00d4c8,stroke:#141413,color:#141413
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    class B1,S1,S2,S3 orange
+    class BATT,SATT teal
+    class B2,SC blue
 ```
 
 ### 1.1 Learning objectives
@@ -359,25 +359,23 @@ Staggered SDID is a disarmingly simple idea: **do the single-cohort analysis onc
 
 ```mermaid
 graph LR
-    POOL["110 never-treated<br/>controls (donor pool)"]
-    C1["Cohort 2000<br/>+ controls"]
-    C2["Cohort 2002<br/>+ controls"]
-    CD["Cohorts 2003…2013<br/>+ controls"]
-    T1["SDID &rarr; &tau;<sub>2000</sub> = 8.4"]
-    T2["SDID &rarr; &tau;<sub>2002</sub> = 7.0"]
-    TD["SDID &rarr; &tau;<sub>a</sub><br/>(&minus;3.5 … +21.8)"]
-    ATT["Aggregate ATT = 8.0<br/>weighted by treated periods"]
+    POOL("110 never-treated<br/>controls (donor pool)")
+    C1("Cohort 2000<br/>+ controls")
+    C2("Cohort 2002<br/>+ controls")
+    CD("Cohorts 2003…2013<br/>+ controls")
+    T1("SDID &rarr; &tau;<sub>2000</sub> = 8.4")
+    T2("SDID &rarr; &tau;<sub>2002</sub> = 7.0")
+    TD("SDID &rarr; &tau;<sub>a</sub><br/>(&minus;3.5 … +21.8)")
+    ATT("Aggregate ATT = 8.0<br/>weighted by treated periods")
     POOL --> C1 --> T1 --> ATT
     POOL --> C2 --> T2 --> ATT
     POOL --> CD --> TD --> ATT
-    style POOL fill:#6a9bcc,stroke:#141413,color:#141413
-    style C1 fill:#d97757,stroke:#141413,color:#141413
-    style C2 fill:#d97757,stroke:#141413,color:#141413
-    style CD fill:#d97757,stroke:#141413,color:#141413
-    style T1 fill:#1f2b5e,stroke:#6a9bcc,color:#fff
-    style T2 fill:#1f2b5e,stroke:#6a9bcc,color:#fff
-    style TD fill:#1f2b5e,stroke:#6a9bcc,color:#fff
-    style ATT fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class POOL,T1,T2,TD blue
+    class C1,C2,CD orange
+    class ATT teal
 ```
 
 The overall ATT aggregates the cohort effects with **non-negative** weights equal to each cohort's share of treated unit-by-post-period observations:
@@ -507,23 +505,23 @@ With one treated unit (California), the previous tutorial could only use placebo
 ```mermaid
 graph TD
     Q1{"How many<br/>treated units?"}
-    Q1 -->|"One (e.g. California)"| PL1["Placebo only<br/>jackknife undefined"]
+    Q1 -->|"One (e.g. California)"| PL1("Placebo only<br/>jackknife undefined")
     Q1 -->|"Many (e.g. 9 quota adopters)"| Q2{"More controls than treated?<br/>no singleton cohorts?"}
-    Q2 -->|"Yes"| ALL["All three available"]
-    Q2 -->|"Singleton cohorts"| PL2["Placebo / bootstrap<br/>jackknife drops out"]
-    ALL --> BOOT["bootstrap<br/>SE 4.7 (default)"]
-    ALL --> JACK["jackknife<br/>SE 6.0 (most conservative)"]
-    ALL --> PLAC["placebo<br/>SE 2.3 (homoskedastic)"]
-    classDef sty_Q1 fill:#141413,stroke:#6a9bcc,color:#fff
+    Q2 -->|"Yes"| ALL("All three available")
+    Q2 -->|"Singleton cohorts"| PL2("Placebo / bootstrap<br/>jackknife drops out")
+    ALL --> BOOT("bootstrap<br/>SE 4.7 (default)")
+    ALL --> JACK("jackknife<br/>SE 6.0 (most conservative)")
+    ALL --> PLAC("placebo<br/>SE 2.3 (homoskedastic)")
+    classDef sty_Q1 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q1 sty_Q1
-    classDef sty_Q2 fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef sty_Q2 fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q2 sty_Q2
-    style PL1 fill:#d97757,stroke:#141413,color:#141413
-    style PL2 fill:#d97757,stroke:#141413,color:#141413
-    style ALL fill:#00d4c8,stroke:#141413,color:#141413
-    style BOOT fill:#6a9bcc,stroke:#141413,color:#141413
-    style JACK fill:#6a9bcc,stroke:#141413,color:#141413
-    style PLAC fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    class PL1,PL2 orange
+    class ALL teal
+    class BOOT,JACK,PLAC blue
 ```
 
 ```stata

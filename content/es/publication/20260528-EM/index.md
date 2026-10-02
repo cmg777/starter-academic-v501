@@ -97,13 +97,14 @@ En lugar de imponer grupos geográficos de antemano (por ejemplo, "Oeste" frente
 
 ```mermaid
 graph LR
-    A["<b>Paso 1 — C-Lasso</b><br/>(aprendizaje automático)<br/><i>Ordena los distritos en regímenes latentes<br/>que comparten un patrón de crecimiento-desempleo</i>"]
-    B["<b>Paso 2 — Modelo espacial de Durbin</b><br/><i>Divide la respuesta de cada régimen en una<br/>asociación directa (local) e indirecta (desbordamiento<br/>hacia los vecinos)</i>"]
+    A("<b>Paso 1 — C-Lasso</b><br/>(aprendizaje automático)<br/><i>Ordena los distritos en regímenes latentes<br/>que comparten un patrón de crecimiento-desempleo</i>")
+    B("<b>Paso 2 — Modelo espacial de Durbin</b><br/><i>Divide la respuesta de cada régimen en una<br/>asociación directa (local) e indirecta (desbordamiento<br/>hacia los vecinos)</i>")
 
     A --> B
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
 ```
 
 ---

@@ -240,22 +240,24 @@ The tutorial follows a progressive approach --- each stage builds on the previou
 
 ```mermaid
 graph LR
-    A["<b>Data & W</b><br/><i>Section 3</i><br/>Panel setup<br/>Weight matrix"]
-    B["<b>Non-Spatial</b><br/><i>Section 4</i><br/>OLS, FE,<br/>Two-way FE"]
-    C["<b>SDM</b><br/><i>Section 6</i><br/>Spatial Durbin<br/>+ Lee-Yu"]
-    D["<b>Wald Tests</b><br/><i>Section 7</i><br/>SAR? SLX?<br/>SEM?"]
-    E["<b>Dynamic</b><br/><i>Section 8</i><br/>Temporal &<br/>spatial lags"]
+    A("<b>Data & W</b><br/><i>Section 3</i><br/>panel setup<br/>weight matrix")
+    B("<b>Non-spatial</b><br/><i>Section 4</i><br/>OLS, FE,<br/>two-way FE")
+    C("<b>SDM</b><br/><i>Section 6</i><br/>spatial Durbin<br/>+ Lee-Yu")
+    D("<b>Wald tests</b><br/><i>Section 7</i><br/>SAR? SLX?<br/>SEM?")
+    E("<b>Dynamic</b><br/><i>Section 8</i><br/>temporal &<br/>spatial lags")
 
     A --> B
     B --> C
     C --> D
     D --> E
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#141413,stroke:#d97757,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A,E blue
+    class B orange
+    class C teal
+    class D anchor
 ```
 
 We first establish non-spatial benchmarks to understand the baseline price and income elasticities. Then we introduce the Spatial Durbin Model to capture spillovers, apply Wald tests to check whether a simpler spatial specification suffices, and finally add dynamic components to account for the habit-forming nature of cigarette consumption.
@@ -517,19 +519,22 @@ A key advantage of the SDM is that it **nests** three simpler spatial models as 
 
 ```mermaid
 graph TD
-    SDM["<b>Spatial Durbin Model (SDM)</b><br/>y = ρWy + Xβ + WXθ + ε<br/><i>Most general</i>"]
-    SAR["<b>SAR</b><br/>y = ρWy + Xβ + ε<br/><i>θ = 0</i>"]
-    SLX["<b>SLX</b><br/>y = Xβ + WXθ + ε<br/><i>ρ = 0</i>"]
-    SEM["<b>SEM</b><br/>y = Xβ + u, u = λWu + ε<br/><i>θ + ρβ = 0</i>"]
+    SDM("<b>Spatial Durbin model (SDM)</b><br/>y = ρWy + Xβ + WXθ + ε<br/><i>Most general</i>")
+    SAR("<b>SAR</b><br/>y = ρWy + Xβ + ε<br/><i>θ = 0</i>")
+    SLX("<b>SLX</b><br/>y = Xβ + WXθ + ε<br/><i>ρ = 0</i>")
+    SEM("<b>SEM</b><br/>y = Xβ + u, u = λWu + ε<br/><i>θ + ρβ = 0</i>")
 
     SDM -->|"θ = 0?"| SAR
     SDM -->|"ρ = 0?"| SLX
     SDM -->|"θ + ρβ = 0?"| SEM
-
-    style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
-    style SLX fill:#d97757,stroke:#141413,color:#141413
-    style SEM fill:#141413,stroke:#d97757,color:#fff
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class SDM teal
+    class SAR blue
+    class SLX orange
+    class SEM anchor
 ```
 
 The **SAR** (Spatial Autoregressive) model restricts $\theta = 0$, assuming that only neighbors' consumption (not their prices or incomes) matters. The **SLX** (Spatial Lag of X) model restricts $\rho = 0$, assuming that neighbors' characteristics affect local consumption but there is no autoregressive feedback. The **SEM** (Spatial Error Model) imposes the common factor restriction $\theta + \rho \beta = 0$, implying that spatial dependence operates entirely through correlated errors rather than substantive spillovers. In Section 7, we will use Wald tests to determine which, if any, of these restrictions the data supports.
@@ -725,19 +730,18 @@ The Wald test **rejects** the SEM common factor restriction (chi2 = 8.49, p = 0.
 
 ```mermaid
 graph TD
-    SDM["<b>Spatial Durbin Model (SDM)</b><br/>RETAINED"]
-    SAR["<b>SAR</b><br/>θ = 0<br/>Rejected<br/>p = 0.002"]
-    SLX["<b>SLX</b><br/>ρ = 0<br/>Rejected<br/>p < 0.001"]
-    SEM["<b>SEM</b><br/>θ + ρβ = 0<br/>Rejected<br/>p = 0.014"]
+    SDM("<b>Spatial Durbin model (SDM)</b><br/>RETAINED")
+    SAR("<b>SAR</b><br/>θ = 0<br/>rejected<br/>p = 0.002")
+    SLX("<b>SLX</b><br/>ρ = 0<br/>rejected<br/>p < 0.001")
+    SEM("<b>SEM</b><br/>θ + ρβ = 0<br/>rejected<br/>p = 0.014")
 
     SDM -->|"chi2 = 12.87"| SAR
     SDM -->|"chi2 = 61.04"| SLX
     SDM -->|"chi2 = 8.49"| SEM
-
-    style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SAR fill:#d97757,stroke:#141413,color:#141413
-    style SLX fill:#d97757,stroke:#141413,color:#141413
-    style SEM fill:#d97757,stroke:#141413,color:#141413
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class SDM teal
+    class SAR,SLX,SEM orange
 ```
 
 All three Wald tests reject the restricted models. The SDM cannot be simplified to SAR (neighbors' X variables matter), SLX (the autoregressive feedback matters), or SEM (the spatial dependence is substantive, not a nuisance). The **full SDM is the appropriate specification** for modeling cigarette demand across US states. This result confirms that spatial spillovers in cigarette consumption operate through multiple channels simultaneously: direct cross-border effects of neighbors' prices and incomes, and feedback effects through the spatial lag of consumption itself.

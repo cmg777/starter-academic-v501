@@ -158,14 +158,17 @@ One feature matters for a fair comparison: this panel contains **only the outcom
 
 ```mermaid
 graph LR
-    POOL["<b>Donor pool</b><br/>38 control states<br/>Utah, Nevada, Montana, …"]
-    CA["<b>California</b><br/>treated 1989"]
-    SYN["<b>Synthetic California</b><br/>counterfactual Y(0)"]
+    POOL("<b>Donor pool</b><br/>38 control states<br/>Utah, Nevada, Montana, …")
+    CA("<b>California</b><br/>treated 1989")
+    SYN("<b>Synthetic California</b><br/>counterfactual Y(0)")
     POOL -->|weighted average ω| SYN
     CA -->|compare after 1989| SYN
-    style POOL fill:#6a9bcc,stroke:#141413,color:#141413
-    style CA fill:#d97757,stroke:#141413,color:#141413
-    style SYN fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class POOL blue
+    class CA orange
+    class SYN teal
 ```
 
 Let us first look at the data with no model at all — California against the simple average of the 38 control states.
@@ -240,14 +243,18 @@ Without $\alpha\_i$, SC cannot absorb a level gap, so it must build a synthetic 
 
 ```mermaid
 graph TD
-    OBJ["<b>One weighted two-way<br/>fixed-effects regression</b><br/><i>min Σ (Y − μ − α − β − Wτ)² · ω · λ</i>"]
-    OBJ --> DID["<b>DiD</b><br/>ω uniform, λ uniform<br/>α included<br/><i>parallel trends on all controls</i>"]
-    OBJ --> SC["<b>Synthetic control</b><br/>ω optimized, no λ<br/><b>no</b> unit FE α<br/><i>match level AND trend</i>"]
-    OBJ --> SDID["<b>SDID</b><br/>ω optimized + λ optimized<br/>α included<br/><i>match trend, allow level gap</i>"]
-    style OBJ fill:#141413,stroke:#6a9bcc,color:#fff
-    style DID fill:#d97757,stroke:#141413,color:#141413
-    style SC fill:#6a9bcc,stroke:#141413,color:#141413
-    style SDID fill:#00d4c8,stroke:#141413,color:#141413
+    OBJ("<b>One weighted two-way<br/>fixed-effects regression</b><br/><i>min Σ (Y − μ − α − β − Wτ)² · ω · λ</i>")
+    OBJ --> DID("<b>DiD</b><br/>ω uniform, λ uniform<br/>α included<br/><i>parallel trends on all controls</i>")
+    OBJ --> SC("<b>Synthetic control</b><br/>ω optimized, no λ<br/><b>no</b> unit FE α<br/><i>match level AND trend</i>")
+    OBJ --> SDID("<b>SDID</b><br/>ω optimized + λ optimized<br/>α included<br/><i>match trend, allow level gap</i>")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class OBJ anchor
+    class DID orange
+    class SC blue
+    class SDID teal
 ```
 
 ### How the weights are chosen
@@ -471,16 +478,18 @@ Arkhangelsky et al. (2021) offer three ways to estimate $\hat{V}\_{\tau}$: a **b
 ```mermaid
 graph TD
     Q{"How many<br/>treated units?"}
-    Q -->|"One — e.g. California"| PL["<b>Placebo / permutation</b><br/><i>the valid choice here</i>"]
-    Q -->|"Many — e.g. staggered adoption"| BJ["Bootstrap or jackknife<br/><i>asymptotics in number of treated units</i>"]
-    PL --> THIS["this tutorial<br/>vce(placebo)"]
-    BJ --> OOS["out of scope<br/>(needs another design)"]
-    classDef sty_Q fill:#141413,stroke:#6a9bcc,color:#fff
+    Q -->|"One — e.g. California"| PL("<b>Placebo / permutation</b><br/><i>the valid choice here</i>")
+    Q -->|"Many — e.g. staggered adoption"| BJ("Bootstrap or jackknife<br/><i>asymptotics in number of treated units</i>")
+    PL --> THIS("this tutorial<br/>vce(placebo)")
+    BJ --> OOS("out of scope<br/>(needs another design)")
+    classDef sty_Q fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
     class Q sty_Q
-    style PL fill:#00d4c8,stroke:#141413,color:#141413
-    style THIS fill:#6a9bcc,stroke:#141413,color:#141413
-    style BJ fill:#6a9bcc,stroke:#141413,color:#141413
-    style OOS fill:#d97757,stroke:#141413,color:#141413
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class PL teal
+    class BJ,THIS blue
+    class OOS orange
 ```
 
 So we run placebo inference, the appropriate choice for a comparative case study.

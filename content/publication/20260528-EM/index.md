@@ -97,13 +97,14 @@ Rather than imposing geographic groups in advance (say, "West" versus "East"), t
 
 ```mermaid
 graph LR
-    A["<b>Step 1 — C-Lasso</b><br/>(machine learning)<br/><i>Sorts districts into latent regimes<br/>sharing a growth-unemployment pattern</i>"]
-    B["<b>Step 2 — Spatial Durbin Model</b><br/><i>Splits each regime's response into a<br/>direct (local) and indirect (neighbor<br/>spillover) association</i>"]
+    A("<b>Step 1 — C-Lasso</b><br/>(machine learning)<br/><i>Sorts districts into latent regimes<br/>sharing a growth-unemployment pattern</i>")
+    B("<b>Step 2 — spatial Durbin model</b><br/><i>Splits each regime's response into a<br/>direct (local) and indirect (neighbor<br/>spillover) association</i>")
 
     A --> B
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
 ```
 
 ---

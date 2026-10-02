@@ -242,14 +242,14 @@ The eight models in this tutorial form a nested hierarchy. At the top sits the *
 
 ```mermaid
 graph TD
-    GNS["<b>GNS</b><br/>y = ρWy + Xβ + WXθ + u<br/>u = λWu + ε<br/><i>Most general</i>"]
-    SDM["<b>SDM</b><br/>y = ρWy + Xβ + WXθ + ε<br/><i>λ = 0</i>"]
-    SDEM["<b>SDEM</b><br/>y = Xβ + WXθ + u<br/>u = λWu + ε<br/><i>ρ = 0</i>"]
-    SAC["<b>SAC</b><br/>y = ρWy + Xβ + u<br/>u = λWu + ε<br/><i>θ = 0</i>"]
-    SAR["<b>SAR</b><br/>y = ρWy + Xβ + ε<br/><i>λ = 0, θ = 0</i>"]
-    SEM["<b>SEM</b><br/>y = Xβ + u<br/>u = λWu + ε<br/><i>ρ = 0, θ = 0</i>"]
-    SLX["<b>SLX</b><br/>y = Xβ + WXθ + ε<br/><i>ρ = 0, λ = 0</i>"]
-    OLS["<b>OLS</b><br/>y = Xβ + ε<br/><i>ρ = 0, θ = 0, λ = 0</i>"]
+    GNS("<b>GNS</b><br/>y = ρWy + Xβ + WXθ + u<br/>u = λWu + ε<br/><i>Most general</i>")
+    SDM("<b>SDM</b><br/>y = ρWy + Xβ + WXθ + ε<br/><i>λ = 0</i>")
+    SDEM("<b>SDEM</b><br/>y = Xβ + WXθ + u<br/>u = λWu + ε<br/><i>ρ = 0</i>")
+    SAC("<b>SAC</b><br/>y = ρWy + Xβ + u<br/>u = λWu + ε<br/><i>θ = 0</i>")
+    SAR("<b>SAR</b><br/>y = ρWy + Xβ + ε<br/><i>λ = 0, θ = 0</i>")
+    SEM("<b>SEM</b><br/>y = Xβ + u<br/>u = λWu + ε<br/><i>ρ = 0, θ = 0</i>")
+    SLX("<b>SLX</b><br/>y = Xβ + WXθ + ε<br/><i>ρ = 0, λ = 0</i>")
+    OLS("<b>OLS</b><br/>y = Xβ + ε<br/><i>ρ = 0, θ = 0, λ = 0</i>")
 
     GNS --> SDM
     GNS --> SDEM
@@ -263,15 +263,14 @@ graph TD
     SAR --> OLS
     SEM --> OLS
     SLX --> OLS
-
-    style GNS fill:#141413,stroke:#d97757,color:#fff
-    style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SDEM fill:#6a9bcc,stroke:#141413,color:#141413
-    style SAC fill:#6a9bcc,stroke:#141413,color:#141413
-    style SAR fill:#d97757,stroke:#141413,color:#141413
-    style SEM fill:#d97757,stroke:#141413,color:#141413
-    style SLX fill:#d97757,stroke:#141413,color:#141413
-    style OLS fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class GNS,OLS anchor
+    class SDM teal
+    class SDEM,SAC blue
+    class SAR,SEM,SLX orange
 ```
 
 The diagram shows three spatial channels and their corresponding parameters: $\rho$ (spatial lag of $y$), $\theta$ (spatial lag of $X$), and $\lambda$ (spatial lag of the error). Setting any of these to zero yields a nested model. The SDM is often the starting point for model selection because it nests the three most common models --- SAR, SLX, and SEM --- and the restrictions can be tested with standard Wald tests.
@@ -472,19 +471,22 @@ Following the Anselin (2005) decision rule --- compare the standard LM tests fir
 
 ```mermaid
 graph TD
-    MI["<b>Moran's I</b><br/>I = 0.222, p = 0.005<br/>Significant"]
-    LM["<b>Standard LM Tests</b><br/>LM-error = 5.33 (p = 0.021)<br/>LM-lag = 3.40 (p = 0.065)"]
-    RLM["<b>Robust LM Tests</b><br/>Robust LM-error = 2.19<br/>Robust LM-lag = 0.26"]
-    SEM_d["<b>SEM Preferred</b><br/>Error specification<br/>dominates"]
+    MI("<b>Moran's I</b><br/>I = 0.222, p = 0.005<br/>significant")
+    LM("<b>Standard LM tests</b><br/>LM-error = 5.33 (p = 0.021)<br/>LM-lag = 3.40 (p = 0.065)")
+    RLM("<b>Robust LM tests</b><br/>Robust LM-error = 2.19<br/>Robust LM-lag = 0.26")
+    SEM_d("<b>SEM preferred</b><br/>error specification<br/>dominates")
 
     MI -->|"Spatial dependence?"| LM
     LM -->|"Both significant?"| RLM
     RLM -->|"Error > Lag"| SEM_d
-
-    style MI fill:#6a9bcc,stroke:#141413,color:#141413
-    style LM fill:#d97757,stroke:#141413,color:#141413
-    style RLM fill:#00d4c8,stroke:#141413,color:#141413
-    style SEM_d fill:#141413,stroke:#d97757,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class MI blue
+    class LM orange
+    class RLM teal
+    class SEM_d anchor
 ```
 
 ---
@@ -774,19 +776,20 @@ The SDM clearly outperforms the SLX. The SLX is estimated by OLS (no spatial lag
 
 ```mermaid
 graph TD
-    SDM["<b>Spatial Durbin Model (SDM)</b><br/>Starting point"]
-    SLX["<b>SLX</b><br/>ρ = 0<br/>Rejected"]
-    SAR["<b>SAR</b><br/>θ = 0<br/>Not rejected"]
-    SEM["<b>SEM</b><br/>θ + ρβ = 0<br/>Not rejected"]
+    SDM("<b>Spatial Durbin model (SDM)</b><br/>starting point")
+    SLX("<b>SLX</b><br/>ρ = 0<br/>rejected")
+    SAR("<b>SAR</b><br/>θ = 0<br/>not rejected")
+    SEM("<b>SEM</b><br/>θ + ρβ = 0<br/>not rejected")
 
     SDM -->|"LR ≈ 7.4, 1 df"| SLX
     SDM -->|"LR ≈ 2.0, 2 df"| SAR
     SDM -->|"LR ≈ 4.0, 2 df"| SEM
-
-    style SDM fill:#00d4c8,stroke:#141413,color:#141413
-    style SLX fill:#d97757,stroke:#141413,color:#141413
-    style SAR fill:#6a9bcc,stroke:#141413,color:#141413
-    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    class SDM teal
+    class SLX orange
+    class SAR,SEM blue
 ```
 
 The specification tests tell a nuanced story. Both the SAR restriction ($\theta = 0$) and the SEM common factor restriction ($\theta + \rho\beta = 0$) cannot be rejected at the 5% level. Only the SLX restriction ($\rho = 0$) is rejected, confirming that the spatial autoregressive parameter $\rho$ is essential. This leaves both SAR and SEM as statistically adequate simplifications. However, as Elhorst (2014) points out, the SAR's constraint that the ratio between the indirect and direct effect is the same for every variable is economically restrictive. An alternative path is to consider the **SDEM**, which also nests SLX and SEM (see Section 8.1).

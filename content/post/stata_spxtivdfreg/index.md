@@ -247,25 +247,26 @@ The diagram below illustrates the four sources of endogeneity that the `spxtivdf
 
 ```mermaid
 graph TD
-    Y["<b>NPL<sub>it</sub></b><br/>Non-performing<br/>loan ratio"]
-    WY["<b>W · NPL<sub>t</sub></b><br/>Spatial lag<br/><i>Bank interdependence</i>"]
-    LY["<b>NPL<sub>i,t-1</sub></b><br/>Temporal lag<br/><i>Risk persistence</i>"]
-    X["<b>INEFF<sub>it</sub></b><br/>Endogenous<br/>regressor"]
-    F["<b>f<sub>t</sub></b><br/>Common factors<br/><i>Macro shocks</i>"]
-    Z["<b>Z<sub>it</sub></b><br/>Instruments<br/><i>INTEREST, lags</i>"]
+    Y("<b>NPL<sub>it</sub></b><br/>non-performing<br/>loan ratio")
+    WY("<b>W · NPL<sub>t</sub></b><br/>spatial lag<br/><i>Bank interdependence</i>")
+    LY("<b>NPL<sub>i,t-1</sub></b><br/>temporal lag<br/><i>Risk persistence</i>")
+    X("<b>INEFF<sub>it</sub></b><br/>endogenous<br/>regressor")
+    F("<b>f<sub>t</sub></b><br/>common factors<br/><i>Macro shocks</i>")
+    Z("<b>Z<sub>it</sub></b><br/>instruments<br/><i>INTEREST, lags</i>")
 
     WY -->|"ψ"| Y
     LY -->|"ρ"| Y
     X -->|"β"| Y
     F -.->|"λ<sub>i</sub>"| Y
     Z -.->|"IV"| X
-
-    style Y fill:#d97757,stroke:#141413,color:#141413
-    style WY fill:#6a9bcc,stroke:#141413,color:#141413
-    style LY fill:#6a9bcc,stroke:#141413,color:#141413
-    style X fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#141413,stroke:#d97757,color:#fff
-    style Z fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class Y orange
+    class WY,LY,Z blue
+    class X teal
+    class F anchor
 ```
 
 The spatial lag ($W \cdot NPL$) creates endogeneity because bank $i$'s credit risk depends on bank $j$'s credit risk, and vice versa --- a simultaneity problem. The temporal lag ($NPL\_{i,t-1}$) is endogenous because it correlates with the bank-specific fixed effect. The endogenous regressor (operational inefficiency, $INEFF$) is correlated with the error term. And the common factors ($f\_t$) enter both the regressors and the error, inducing cross-sectional dependence and omitted variable bias.
@@ -345,19 +346,22 @@ The sample period is rich with major macro-financial events that all banks exper
 
 ```mermaid
 graph LR
-    A["<b>2006--2007</b><br/>Pre-crisis<br/>Housing bubble<br/>Low NPL ratios"]
-    B["<b>2007--2009</b><br/>Global Financial<br/>Crisis<br/>NPL surge"]
-    C["<b>2010--2011</b><br/>Dodd-Frank Act<br/>Stress tests<br/>Capital rebuilding"]
-    D["<b>2012--2014</b><br/>Recovery<br/>Basel III phase-in<br/>NPL normalization"]
+    A("<b>2006–2007</b><br/>Pre-crisis<br/>housing bubble<br/>low NPL ratios")
+    B("<b>2007–2009</b><br/>global financial<br/>crisis<br/>NPL surge")
+    C("<b>2010–2011</b><br/>Dodd-Frank Act<br/>stress tests<br/>capital rebuilding")
+    D("<b>2012–2014</b><br/>recovery<br/>Basel III phase-in<br/>NPL normalization")
 
     A --> B
     B --> C
     C --> D
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#141413,stroke:#d97757,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C anchor
+    class D teal
 ```
 
 These regime shifts (housing bubble, financial crisis, regulatory tightening, recovery) are exactly the unobserved common factors that the `spxtivdfreg` estimator extracts. Standard two-way fixed effects would capture them only if they affected all 350 banks equally --- but the interactive fixed effect structure $\lambda\_i' f\_t$ allows each bank to respond with different intensity to the same aggregate shock.
@@ -561,12 +565,12 @@ In words, this equation says that a permanent 1-unit increase in a covariate has
 
 ```mermaid
 graph LR
-    B["<b>Short-run<br/>coefficient</b><br/>β = 2.452<br/><i>(LIQUIDITY)</i>"]
-    T["<b>Temporal<br/>multiplier</b><br/>1/(1−ρ)<br/>= 1/(1−0.290)<br/>= 1.408"]
-    D["<b>Direct<br/>effect</b><br/>3.547"]
-    S["<b>Spatial<br/>multiplier</b><br/>1/(1−ψ)<br/>= 1/(1−0.394)<br/>= 1.650"]
-    I["<b>Indirect<br/>effect</b><br/>4.218"]
-    Tot["<b>Total<br/>effect</b><br/>7.765"]
+    B("<b>Short-run<br/>coefficient</b><br/>β = 2.452<br/><i>(LIQUIDITY)</i>")
+    T("<b>Temporal<br/>multiplier</b><br/>1/(1−ρ)<br/>= 1/(1−0.290)<br/>= 1.408")
+    D("<b>Direct<br/>effect</b><br/>3.547")
+    S("<b>Spatial<br/>multiplier</b><br/>1/(1−ψ)<br/>= 1/(1−0.394)<br/>= 1.650")
+    I("<b>Indirect<br/>effect</b><br/>4.218")
+    Tot("<b>Total<br/>effect</b><br/>7.765")
 
     B -->|"× temporal"| T
     T -->|"= direct"| D
@@ -574,13 +578,14 @@ graph LR
     S -->|"= indirect"| I
     D --> Tot
     I --> Tot
-
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style T fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style S fill:#d97757,stroke:#141413,color:#141413
-    style I fill:#141413,stroke:#d97757,color:#fff
-    style Tot fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class B,Tot blue
+    class T,S orange
+    class D teal
+    class I anchor
 ```
 
 ```stata
@@ -705,14 +710,14 @@ The decision diagram below provides a practical guide for choosing among these s
 
 ```mermaid
 graph TD
-    START["<b>Start</b><br/>Spatial dynamic panel<br/>with suspected factors"]
-    JTEST["<b>J-test</b><br/>Estimate with factors<br/>and without factors"]
-    FACTORS["<b>Include factors</b><br/>J-test fails without<br/>(p < 0.05)"]
-    NOFACT["<b>No factors needed</b><br/>J-test passes without<br/>(p ≥ 0.05)"]
-    SPLAG["<b>Spatial lag?</b><br/>Is ψ significant?"]
-    FULL["<b>Full model</b><br/>spxtivdfreg with<br/>splag + factors"]
-    NOSPL["<b>xtivdfreg</b><br/>Dynamic panel<br/>with factors only"]
-    MG["<b>MG estimator</b><br/>Test slope<br/>heterogeneity"]
+    START("<b>Start</b><br/>spatial dynamic panel<br/>with suspected factors")
+    JTEST("<b>J-test</b><br/>estimate with factors<br/>and without factors")
+    FACTORS("<b>Include factors</b><br/>J-test fails without<br/>(p < 0.05)")
+    NOFACT("<b>No factors needed</b><br/>J-test passes without<br/>(p ≥ 0.05)")
+    SPLAG("<b>Spatial lag?</b><br/>is ψ significant?")
+    FULL("<b>Full model</b><br/>spxtivdfreg with<br/>splag + factors")
+    NOSPL("<b>xtivdfreg</b><br/>dynamic panel<br/>with factors only")
+    MG("<b>MG estimator</b><br/>test slope<br/>heterogeneity")
 
     START --> JTEST
     JTEST -->|"J rejects without factors"| FACTORS
@@ -721,15 +726,14 @@ graph TD
     SPLAG -->|"ψ significant"| FULL
     SPLAG -->|"ψ not significant"| NOSPL
     FULL --> MG
-
-    style START fill:#141413,stroke:#d97757,color:#fff
-    style JTEST fill:#6a9bcc,stroke:#141413,color:#141413
-    style FACTORS fill:#00d4c8,stroke:#141413,color:#141413
-    style NOFACT fill:#d97757,stroke:#141413,color:#141413
-    style SPLAG fill:#6a9bcc,stroke:#141413,color:#141413
-    style FULL fill:#00d4c8,stroke:#141413,color:#141413
-    style NOSPL fill:#d97757,stroke:#141413,color:#141413
-    style MG fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class START anchor
+    class JTEST,SPLAG,MG blue
+    class FACTORS,FULL teal
+    class NOFACT,NOSPL orange
 ```
 
 The J-test is the first and most important diagnostic: in our application, it unambiguously rejects the no-factor specification (p < 0.001), confirming that common factors must be included. With factors, the spatial lag is highly significant ($\psi = 0.394$, z = 4.65), supporting the full model. The MG estimator provides a robustness check that reveals potential slope heterogeneity, but its insignificant spatial lag should be interpreted cautiously --- it may indicate genuine absence of spillovers, or it may reflect the difficulty of estimating bank-specific spatial parameters with only 35 time periods.

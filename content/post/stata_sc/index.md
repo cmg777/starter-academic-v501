@@ -84,25 +84,24 @@ The analysis follows a four-stage progression, from estimation to validation:
 
 ```mermaid
 graph TD
-    DATA["<b>Data</b><br/>39 states, 1970-2000<br/>Cigarette sales per capita"]
-    RAW["<b>Raw Trends</b><br/>California vs. donor pool average"]
-    SCM["<b>Baseline SCM</b><br/>Synthetic California from 5 donor states<br/>ATT = -19.0 packs"]
-    SPACE["<b>In-Space Placebo</b><br/>Apply SCM to each control state<br/>p = 0.026"]
-    TIME["<b>In-Time Placebo</b><br/>Fake treatment at 1985<br/>Confirms no spurious effect"]
-    LOO["<b>Leave-One-Out</b><br/>Exclude each donor state<br/>Estimates remain stable"]
+    DATA("<b>Data</b><br/>39 states, 1970-2000<br/>cigarette sales per capita")
+    RAW("<b>Raw trends</b><br/>California vs. donor pool average")
+    SCM("<b>Baseline SCM</b><br/>synthetic California from 5 donor states<br/>ATT = -19.0 packs")
+    SPACE("<b>In-Space placebo</b><br/>apply SCM to each control state<br/>p = 0.026")
+    TIME("<b>In-time placebo</b><br/>fake treatment at 1985<br/>confirms no spurious effect")
+    LOO("<b>Leave-one-out</b><br/>exclude each donor state<br/>estimates remain stable")
 
     DATA --> RAW
     RAW --> SCM
     SCM --> SPACE
     SCM --> TIME
     SCM --> LOO
-
-    style DATA fill:#6a9bcc,stroke:#141413,color:#141413
-    style RAW fill:#6a9bcc,stroke:#141413,color:#141413
-    style SCM fill:#d97757,stroke:#141413,color:#141413
-    style SPACE fill:#00d4c8,stroke:#141413,color:#141413
-    style TIME fill:#00d4c8,stroke:#141413,color:#141413
-    style LOO fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class DATA,RAW blue
+    class SCM orange
+    class SPACE,TIME,LOO teal
 ```
 
 The baseline SCM (orange) produces the core treatment effect estimate. The three inference tools (teal) each test the estimate's credibility from a different angle: the in-space placebo asks "is this effect unusual compared to other states?", the in-time placebo asks "does a fake treatment produce similar results?", and the leave-one-out analysis asks "does any single donor state drive the results?"

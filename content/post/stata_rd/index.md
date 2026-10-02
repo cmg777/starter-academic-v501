@@ -68,17 +68,19 @@ The central question is: **Did the tutoring program improve student performance 
 
 ```mermaid
 graph LR
-    A["Entrance Exam<br/>Score"] --> B{"Score <= 70?"}
-    B -- Yes --> C["Tutoring<br/>Program"]
-    B -- No --> D["No Tutoring"]
-    C --> E["Exit Exam<br/>Score"]
+    A("Entrance exam<br/>score") --> B{"Score <= 70?"}
+    B -- Yes --> C("Tutoring<br/>program")
+    B -- No --> D("No tutoring")
+    C --> E("Exit exam<br/>score")
     D --> E
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef sty_B fill:#d97757,stroke:#141413,color:#141413
+    classDef sty_B fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
     class B sty_B
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#141413,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A,E blue
+    class C teal
+    class D anchor
 ```
 
 The diagram above shows the assignment mechanism. The entrance exam score is the *running variable* --- the variable that determines treatment. The cutoff at 70 creates a sharp boundary: everyone below gets tutoring, everyone above does not. This sharp rule is what makes the design credible.
@@ -240,19 +242,18 @@ Our analysis follows a "see it, verify it, estimate it, stress-test it" logic:
 
 ```mermaid
 graph TD
-    A["Load data &<br/>explore"] --> B["Verify sharp<br/>design"]
-    B --> C["Visualize the<br/>discontinuity"]
-    C --> D["Parametric<br/>estimation (OLS)"]
-    D --> E["Nonparametric<br/>estimation (rdrobust)"]
-    E --> F["Robustness<br/>checks"]
-    F --> G["Conclusions"]
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#d97757,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style G fill:#00d4c8,stroke:#141413,color:#141413
+    A("Load data &<br/>explore") --> B("Verify sharp<br/>design")
+    B --> C("Visualize the<br/>discontinuity")
+    C --> D("Parametric<br/>estimation (OLS)")
+    D --> E("Nonparametric<br/>estimation (rdrobust)")
+    E --> F("Robustness<br/>checks")
+    F --> G("Conclusions")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,B,C blue
+    class D,E orange
+    class F,G teal
 ```
 
 We start by understanding the data and verifying the sharp design. Then we visualize the discontinuity to build intuition before any estimation. Next, we estimate the treatment effect using both parametric (OLS) and nonparametric (rdrobust) methods. Finally, we stress-test the results with bandwidth sensitivity analysis, kernel comparisons, a McCrary density test, and placebo cutoff tests.
