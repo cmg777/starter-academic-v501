@@ -19,6 +19,9 @@
   per page (Page.Scratch guard "panelLabAssets"), minified, fingerprinted, SRI.
   Labels are plain Unicode/HTML, never TeX. Keep this output free of blank
   lines, code/pre/img/table/h2/h3 elements and the dollar character.
+  Inside the SVGs every hook attribute needs a value (data-pts="toy", not
+  data-pts): the production HTML minifier (hugo --minify) drops valueless
+  attributes on SVG elements, and the JS then cannot find its groups.
 */ -}}
 {{- $id := .Get "id" | default (printf "panel-lab-%d" .Ordinal) -}}
 {{- $tab := .Get "tab" | default "selection" -}}
@@ -127,15 +130,15 @@
 <g data-ticks="y"></g>
 <rect class="pl-frame" x="46" y="12" width="244" height="180"/>
 <path class="pl-axis0" data-zero="x" d="" visibility="hidden"/>
-<text class="pl-axis0-label" data-zero-label x="0" y="24" visibility="hidden">stayers: x = 0</text>
+<text class="pl-axis0-label" data-zero-label="x" x="0" y="24" visibility="hidden">stayers: x = 0</text>
 <g clip-path="url(#{{ $id }}-sc-clip)">
-<g data-links></g>
+<g data-links="toy"></g>
 <path class="pl-halo" data-line="pols" d=""/>
 <path class="pl-fit pl-fit-pols" data-line="pols" d=""/>
 <path class="pl-halo" data-line="fe" d=""/>
 <path class="pl-fit pl-fit-fe" data-line="fe" d=""/>
 </g>
-<g data-pts></g>
+<g data-pts="toy"></g>
 <text class="pl-axlab" data-axlab="x" x="168" y="226" text-anchor="middle">Union status</text>
 <text class="pl-axlab" data-axlab="y" transform="translate(10 102) rotate(-90)" text-anchor="middle">Log wage</text>
 </svg>

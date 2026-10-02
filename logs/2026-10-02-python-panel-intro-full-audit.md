@@ -54,3 +54,15 @@ and the zip contents (each member byte-identical to its source).
 (19 output blocks match), the notebook (nbclient) and `tutorial.qmd` (fresh-bundle render) all run
 without errors. `hugo --gc --minify` succeeds; in Chrome: 0 MathJax errors, both Mermaid diagrams
 render, no console errors on the post, slides, web app or data dictionary, no overflow at 375px.
+
+## Follow-up: panel lab invisible in production
+
+Reported after the push: section 17 showed only the lab header (no tabs or controls) on the live
+site. Cause: the production HTML minifier (`hugo --minify`) strips valueless attributes on SVG
+elements, so `<g data-links>`, `<g data-pts>` and `<text data-zero-label>` lost their hooks; the
+Demeaning lab constructor threw (`appendChild` of null), `data-ready` was never set, and the CSS
+kept `.pl-body` hidden. The dev server does not minify, which is why the earlier Chrome check
+passed. Fix: the three attributes now carry values (`layouts/shortcodes/panel-lab.html`); the
+JS selectors are unchanged. Verified on a locally served minified build: lab ready, both tabs,
+16 toy points; `fwl-lab` on `python_fwl` unaffected. Rule recorded in
+`.claude/docs/learning-components.md`.
