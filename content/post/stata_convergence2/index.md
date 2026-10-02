@@ -84,19 +84,22 @@ The diagram below shows the logical progression of the tutorial. We first establ
 
 ```mermaid
 graph LR
-    A["<b>Establish the<br/>Facts</b><br/><i>Sections 3--6</i>"]
-    B["<b>Correlate<br/>Convergence</b><br/><i>Section 7</i>"]
-    C["<b>OVB<br/>Framework</b><br/><i>Sections 8--10</i>"]
-    D["<b>The<br/>Punchline</b><br/><i>Section 11</i>"]
+    A("<b>Establish the<br/>facts</b><br/><i>Sections 3–6</i>")
+    B("<b>Correlate<br/>convergence</b><br/><i>Section 7</i>")
+    C("<b>OVB<br/>framework</b><br/><i>Sections 8–10</i>")
+    D("<b>The<br/>Punchline</b><br/><i>Section 11</i>")
 
     A --> B
     B --> C
     C --> D
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#141413,stroke:#d97757,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D anchor
 ```
 
 We start by documenting the emergence of convergence (scatter plots, rolling coefficients, sigma-convergence, quartile decompositions). Then we show that growth correlates have themselves converged. Finally, the OVB framework links these two facts, revealing that the gap between unconditional and conditional convergence closed because growth regression coefficients for policy variables collapsed.

@@ -101,19 +101,19 @@ The diagram below shows the five stages of this tutorial, from data exploration 
 
 ```mermaid
 flowchart LR
-    A["<b>Data &<br/>Descriptives</b><br/><i>Sections 3--4</i>"]:::data
-    B["<b>Naive vs<br/>Ground Truth</b><br/><i>Section 5</i>"]:::naive
-    C["<b>ATE<br/>Estimation</b><br/><i>Sections 6--7</i>"]:::ate
-    D["<b>GATE<br/>Heterogeneity</b><br/><i>Section 8</i>"]:::gate
-    E["<b>Advanced<br/>Diagnostics</b><br/><i>Section 9</i>"]:::diag
+    A("<b>Data &<br/>descriptives</b><br/><i>Sections 3–4</i>"):::data
+    B("<b>Naive vs<br/>ground truth</b><br/><i>Section 5</i>"):::naive
+    C("<b>ATE<br/>estimation</b><br/><i>Sections 6–7</i>"):::ate
+    D("<b>GATE<br/>heterogeneity</b><br/><i>Section 8</i>"):::gate
+    E("<b>Advanced<br/>diagnostics</b><br/><i>Section 9</i>"):::diag
 
     A --> B --> C --> D --> E
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef naive fill:#d97757,stroke:#141413,color:#141413
-    classDef ate fill:#00d4c8,stroke:#141413,color:#141413
-    classDef gate fill:#d97757,stroke:#141413,color:#141413
-    classDef diag fill:#141413,stroke:#d97757,color:#fff
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef naive fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef ate fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gate fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef diag fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
 ```
 
 ### 1.3 Key concepts at a glance
@@ -306,21 +306,21 @@ Stata 19 provides two estimators for the CATE:
 
 ```mermaid
 flowchart LR
-    A["<b>Panel Data</b><br/>3,000 obs<br/>300 districts x 10 years"]:::data
-    A --> B["<b>cate po / aipw</b><br/>Binary pairwise<br/>comparisons"]:::main
-    B --> C["<b>IATEs</b><br/>Per-observation<br/>effects tau(x_i)"]:::iate
-    B --> D["<b>GATEs</b><br/>Group averages<br/>by institutions"]:::gate
-    B --> E["<b>ATE</b><br/>Overall population<br/>average"]:::ate
-    C --> F["categraph histogram<br/>categraph iateplot"]:::post
-    D --> G["categraph gateplot<br/>estat gatetest"]:::post
-    E --> H["estat heterogeneity<br/>estat ate"]:::post
+    A("<b>Panel data</b><br/>3,000 obs<br/>300 districts x 10 years"):::data
+    A --> B("<b>cate po / aipw</b><br/>binary pairwise<br/>comparisons"):::main
+    B --> C("<b>IATEs</b><br/>Per-observation<br/>effects tau(x_i)"):::iate
+    B --> D("<b>GATEs</b><br/>group averages<br/>by institutions"):::gate
+    B --> E("<b>ATE</b><br/>overall population<br/>average"):::ate
+    C --> F("categraph histogram<br/>categraph iateplot"):::post
+    D --> G("categraph gateplot<br/>estat gatetest"):::post
+    E --> H("estat heterogeneity<br/>estat ate"):::post
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef main fill:#141413,stroke:#141413,color:#fff
-    classDef iate fill:#00d4c8,stroke:#141413,color:#141413
-    classDef gate fill:#d97757,stroke:#141413,color:#141413
-    classDef ate fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef post fill:#f5f5f5,stroke:#141413,color:#141413
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef main fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef iate fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gate fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef ate fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef post fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
 ```
 
 - **IATE** (Individualized Average Treatment Effects): One effect per observation, $\tau(\mathbf{x}\_i)$
@@ -529,26 +529,28 @@ Stata 19's `cate` command requires a **binary treatment variable**. Since our tr
 
 ```mermaid
 graph TD
-    T["<b>4-Level Treatment</b><br/>0: No mining<br/>1: Low price<br/>2: Medium price<br/>3: High price"]:::data
+    T("<b>4-level treatment</b><br/>0: No mining<br/>1: low price<br/>2: medium price<br/>3: high price"):::data
 
-    subgraph F1["Finding 1: Mining Effect"]
-        C10["1 vs 0"]:::f1
-        C20["2 vs 0"]:::f1
-        C30["3 vs 0"]:::f1
+    subgraph F1["Finding 1: mining effect"]
+        C10("1 vs 0"):::f1
+        C20("2 vs 0"):::f1
+        C30("3 vs 0"):::f1
     end
 
-    subgraph F2["Finding 2: Price Non-linearity"]
-        C21["2 vs 1<br/><i>small ~ 0.05</i>"]:::f2
-        C31["3 vs 1<br/><i>large ~ 0.30</i>"]:::f2
-        C32["3 vs 2"]:::f2
+    subgraph F2["Finding 2: Price non-linearity"]
+        C21("2 vs 1<br/><i>small ~ 0.05</i>"):::f2
+        C31("3 vs 1<br/><i>large ~ 0.30</i>"):::f2
+        C32("3 vs 2"):::f2
     end
 
     T --> C10
     T --> C21
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef f1 fill:#00d4c8,stroke:#141413,color:#141413
-    classDef f2 fill:#d97757,stroke:#141413,color:#141413
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef f1 fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef f2 fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    style F1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style F2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
 ```
 
 | Contrast | Comparison | Finding | Ground Truth |

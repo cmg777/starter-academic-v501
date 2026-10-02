@@ -84,18 +84,21 @@ The diagram below maps the tutorial's progression. We start simple and build com
 
 ```mermaid
 graph LR
-    A["<b>EDA</b><br/>Savings data"] --> B["<b>Baseline FE</b><br/>Pooled &<br/>fixed effects"]
-    B --> C["<b>C-LASSO</b><br/>Static model<br/>(no lagged DV)"]
-    C --> D["<b>C-LASSO</b><br/>Dynamic model<br/>(jackknife)"]
-    D --> E["<b>Democracy</b><br/>Application<br/>(two-way FE)"]
-    E --> F["<b>Comparison</b><br/>Pooled vs<br/>group-specific"]
-
-    style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#d97757,stroke:#141413,color:#141413
-    style E fill:#00d4c8,stroke:#141413,color:#141413
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>EDA</b><br/>savings data") --> B("<b>Baseline FE</b><br/>pooled &<br/>fixed effects")
+    B --> C("<b>C-LASSO</b><br/>static model<br/>(no lagged DV)")
+    C --> D("<b>C-LASSO</b><br/>dynamic model<br/>(jackknife)")
+    D --> E("<b>Democracy</b><br/>application<br/>(two-way FE)")
+    E --> F("<b>Comparison</b><br/>pooled vs<br/>group-specific")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B blue
+    class C,D orange
+    class E teal
+    class F key
 ```
 
 ### Key concepts at a glance

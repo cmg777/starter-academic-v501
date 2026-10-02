@@ -85,26 +85,26 @@ The diagram below shows the two routes through the `cate` command and the postes
 
 ```mermaid
 flowchart TB
-    A["assets3 dataset<br/>9,913 households<br/>e401k -> assets"]:::data
-    A --> B{cate command}:::main
-    B -->|"<b>cate po</b><br/>Partial-linear model<br/>Robust to small propensities"| C["PO estimator<br/>Cross-fit lasso + causal forest"]:::po
-    B -->|"<b>cate aipw</b><br/>Fully interactive model<br/>Doubly robust, more efficient"| D["AIPW estimator<br/>Cross-fit lasso + causal forest"]:::aipw
-    C --> E["IATE function<br/>tau-hat(x_i) per household"]:::iate
+    A("assets3 dataset<br/>9,913 households<br/>e401k -> assets"):::data
+    A --> B{"cate command"}:::main
+    B -->|"<b>cate po</b><br/>Partial-linear model<br/>Robust to small propensities"| C("PO estimator<br/>cross-fit lasso + causal forest"):::po
+    B -->|"<b>cate aipw</b><br/>Fully interactive model<br/>Doubly robust, more efficient"| D("AIPW estimator<br/>cross-fit lasso + causal forest"):::aipw
+    C --> E("IATE function<br/>tau-hat(x_i) per household"):::iate
     D --> E
-    E --> F1["categraph histogram<br/>distribution of effects"]:::post
-    E --> F2["categraph iateplot<br/>tau vs covariate"]:::post
-    E --> F3["estat heterogeneity<br/>H0: tau(x) constant"]:::post
-    E --> F4["estat projection<br/>linear summary of who"]:::post
-    E --> F5["GATE / GATES<br/>group-level effects"]:::post
-    E --> F6["estat classification<br/>top vs bottom profile"]:::post
-    E --> F7["estat series<br/>smooth derivative"]:::post
+    E --> F1("categraph histogram<br/>distribution of effects"):::post
+    E --> F2("categraph iateplot<br/>tau vs covariate"):::post
+    E --> F3("estat heterogeneity<br/>H0: tau(x) constant"):::post
+    E --> F4("estat projection<br/>linear summary of who"):::post
+    E --> F5("GATE / GATES<br/>group-level effects"):::post
+    E --> F6("estat classification<br/>top vs bottom profile"):::post
+    E --> F7("estat series<br/>smooth derivative"):::post
 
-    classDef data fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef main fill:#141413,stroke:#141413,color:#fff
-    classDef po fill:#6a9bcc,stroke:#141413,color:#141413
-    classDef aipw fill:#d97757,stroke:#141413,color:#141413
-    classDef iate fill:#00d4c8,stroke:#141413,color:#141413
-    classDef post fill:#f5f5f5,stroke:#141413,color:#141413
+    classDef data fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef main fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef po fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef aipw fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef iate fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef post fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
 ```
 
 The two branches (PO and AIPW) make different model assumptions but produce the same kind of object: a function $\hat{\tau}(x\_i)$ that returns a predicted treatment effect for every household. Postestimation commands then summarize that function in different ways — as a distribution (histogram), a function of one covariate (`iateplot`), a test (`estat heterogeneity`), a regression summary (`estat projection`), or a group-level table (GATE / GATES). All seven postestimation views answer slightly different questions, and the last three sections of this post show why a beginner should look at all of them rather than picking one favorite.

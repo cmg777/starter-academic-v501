@@ -244,23 +244,27 @@ Why can't we simply regress conflict on economic activity? The diagram below ill
 
 ```mermaid
 graph TD
-    ECON["<b>Economic Activity</b><br/>(Nighttime lights)"]
-    CONF["<b>Civil Conflict</b>"]
-    U["<b>Unobservables</b><br/>(Institutions, geography,<br/>ethnic fractionalization)"]
-    ME["<b>Measurement Error</b><br/>(Lights ≠ true GDP)"]
-    REV["<b>Reverse Causality</b><br/>(Conflict destroys<br/>infrastructure)"]
+    ECON("<b>Economic activity</b><br/>(Nighttime lights)")
+    CONF("<b>Civil conflict</b>")
+    U("<b>Unobservables</b><br/>(Institutions, geography,<br/>ethnic fractionalization)")
+    ME("<b>Measurement error</b><br/>(Lights ≠ true GDP)")
+    REV("<b>Reverse causality</b><br/>(Conflict destroys<br/>infrastructure)")
 
     ECON -->|"Causal effect?"| CONF
     U -->|"Omitted variable bias"| ECON
     U -->|"Omitted variable bias"| CONF
     CONF -->|"Reverse causality"| ECON
     ME -->|"Attenuation bias"| ECON
-
-    style ECON fill:#6a9bcc,stroke:#141413,color:#141413
-    style CONF fill:#d97757,stroke:#141413,color:#141413
-    style U fill:#141413,stroke:#d97757,color:#fff
-    style ME fill:#141413,stroke:#6a9bcc,color:#fff
-    style REV fill:#141413,stroke:#00d4c8,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class ECON blue
+    class CONF teal
+    class U orange
+    class ME,REV anchor
+    linkStyle 0 stroke:#00d4c8,stroke-width:3px
+    linkStyle 1,2 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
 ```
 
 Three problems arise when estimating the causal effect of economic shocks on conflict with OLS:
@@ -279,17 +283,21 @@ Hodler and Raschky (2014) use **lagged rainfall** and **lagged drought intensity
 
 ```mermaid
 graph LR
-    W["<b>Weather(t-2)</b><br/>Rain / Drought"]
-    L["<b>Light(t-1)</b><br/>Economic activity"]
-    C["<b>Conflict(t)</b>"]
+    W("<b>Weather(t-2)</b><br/>rain / drought")
+    L("<b>Light(t-1)</b><br/>economic activity")
+    C("<b>Conflict(t)</b>")
 
     W -->|"First stage"| L
     L -->|"Second stage"| C
     W -.->|"Excluded"| C
-
-    style W fill:#6a9bcc,stroke:#141413,color:#141413
-    style L fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class W violet
+    class L blue
+    class C teal
+    linkStyle 1 stroke:#00d4c8,stroke-width:3px
 ```
 
 Weather in year $t-2$ affects economic activity in year $t-1$ (the **first stage**), and economic activity in year $t-1$ affects conflict in year $t$ (the **second stage**). The exclusion restriction requires that weather in $t-2$ has no direct effect on conflict in $t$ other than through economic activity --- a plausible assumption given the two-year lag.

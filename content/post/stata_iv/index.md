@@ -70,25 +70,32 @@ This tutorial replicates AJR's headline result on a sample of 64 ex-colonies usi
 
 ### The IV identification strategy at a glance
 
-Before we estimate anything, here is the picture of the strategy. The dashed red arrow is the assumption we cannot test directly — it is the heart of every IV paper.
+Before we estimate anything, here is the picture of the strategy. The dashed gray arrow is the assumption we cannot test directly — it is the heart of every IV paper.
 
 ```mermaid
 flowchart LR
-    Z["Settler mortality<br/>(logem4)"]
-    X["Modern institutions<br/>(avexpr)"]
-    Y["Log GDP per capita<br/>(logpgp95)"]
-    U["Unobserved confounders<br/>(geography? culture?<br/>human capital?)"]
+    Z("Settler mortality<br/>(logem4)")
+    X("Modern institutions<br/>(avexpr)")
+    Y("Log GDP per capita<br/>(logpgp95)")
+    U("Unobserved confounders<br/>(geography? culture?<br/>human capital?)")
 
     Z -->|"first stage<br/>relevance ✓"| X
     X -->|"causal effect<br/>(what we want)"| Y
     U -->|"bias OLS"| X
     U -->|"bias OLS"| Y
     Z -.->|"exclusion restriction:<br/>no direct arrow"| Y
-
-    style Z fill:#6a9bcc,stroke:#141413,color:#141413
-    style X fill:#d97757,stroke:#141413,color:#141413
-    style Y fill:#00d4c8,stroke:#141413,color:#141413
-    style U fill:#1a3a8a,stroke:#141413,color:#fff,stroke-dasharray: 5 5
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key_dash fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    classDef orange_dash fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2,stroke-dasharray:6 4
+    class Z violet
+    class X blue
+    class Y teal
+    class U orange_dash
+    linkStyle 1 stroke:#00d4c8,stroke-width:3px
+    linkStyle 2,3 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
 ```
 
 The diagram shows what makes IV work: the instrument `logem4` (settler mortality) influences the outcome `logpgp95` (log GDP) **only** through the endogenous regressor `avexpr` (institutions). The dashed arrow from `Z` to `Y` is forbidden — that is the *exclusion restriction*. Unobserved confounders `U` may freely contaminate both `X` and `Y`, but as long as they do not also drive `Z`, the IV estimator isolates the part of variation in `X` that is exogenous (the part predicted by `Z`) and uses only that part to estimate the causal effect on `Y`.

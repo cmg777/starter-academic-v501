@@ -246,16 +246,20 @@ The following diagram summarizes the methodological sequence of this tutorial. W
 
 ```mermaid
 graph LR
-    A["<b>EDA</b><br/>Scatter plot"] --> B["<b>Baseline FE</b><br/>Standard panel<br/>regressions"]
-    B --> C["<b>BMA</b><br/>Bayesian Model<br/>Averaging"]
-    C --> D["<b>DSL</b><br/>Double-Selection<br/>LASSO"]
-    D --> E["<b>Comparison</b><br/>Check against<br/>answer key"]
-
-    style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style E fill:#1a3a8a,stroke:#141413,color:#fff
+    A("<b>EDA</b><br/>scatter plot") --> B("<b>Baseline FE</b><br/>standard panel<br/>regressions")
+    B --> C("<b>BMA</b><br/>Bayesian model<br/>averaging")
+    C --> D("<b>DSL</b><br/>double-selection<br/>LASSO")
+    D --> E("<b>Comparison</b><br/>check against<br/>answer key")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class A anchor
+    class B blue
+    class C orange
+    class D teal
+    class E key
 ```
 
 ## 2. Setup and Synthetic Data
@@ -371,21 +375,22 @@ The scatter reveals a distinctly nonlinear pattern. At low income levels, CO<sub
 
 ```mermaid
 graph TD
-    EKC["<b>Environmental Kuznets Curve</b><br/>How does pollution change<br/>as income grows?"]
+    EKC("<b>Environmental Kuznets curve</b><br/>how does pollution change<br/>as income grows?")
 
-    EKC --> IU["<b>Inverted-U</b><br/>Quadratic: β₁ > 0, β₂ < 0<br/>One turning point"]
-    EKC --> IN["<b>Inverted-N</b><br/>Cubic: β₁ < 0, β₂ > 0, β₃ < 0<br/>Two turning points"]
+    EKC --> IU("<b>Inverted-U</b><br/>quadratic: β₁ > 0, β₂ < 0<br/>one turning point")
+    EKC --> IN("<b>Inverted-N</b><br/>cubic: β₁ < 0, β₂ > 0, β₃ < 0<br/>two turning points")
 
-    IN --> P1["<b>Phase 1: Declining</b><br/>Very poor countries"]
-    IN --> P2["<b>Phase 2: Rising</b><br/>Industrializing countries"]
-    IN --> P3["<b>Phase 3: Declining</b><br/>Wealthy countries"]
-
-    style EKC fill:#141413,stroke:#141413,color:#fff
-    style IU fill:#6a9bcc,stroke:#141413,color:#141413
-    style IN fill:#d97757,stroke:#141413,color:#141413
-    style P1 fill:#00d4c8,stroke:#141413,color:#141413
-    style P2 fill:#d97757,stroke:#141413,color:#141413
-    style P3 fill:#00d4c8,stroke:#141413,color:#141413
+    IN --> P1("<b>Phase 1: declining</b><br/>very poor countries")
+    IN --> P2("<b>Phase 2: rising</b><br/>industrializing countries")
+    IN --> P3("<b>Phase 3: declining</b><br/>Wealthy countries")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class EKC anchor
+    class IU blue
+    class IN,P2 orange
+    class P1,P3 teal
 ```
 
 For an inverted-N, we need $\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$. Our synthetic DGP was designed with exactly this sign pattern ($\beta\_1 = -7.1$, $\beta\_2 = 0.81$, $\beta\_3 = -0.03$), so BMA and DSL should recover it --- but can they also correctly identify which of the 12 controls truly matter? Let us start with standard panel regressions to see how sensitive the GDP coefficients are to the choice of controls.
@@ -508,16 +513,18 @@ Think of BMA as betting on a horse race. Instead of putting all your money on on
 
 ```mermaid
 graph TD
-    Start["<b>12 Candidate Controls</b><br/>2¹² = 4,096<br/>possible models"] --> MCMC["<b>MCMC Sampling</b><br/>Draw 50,000 models"]
-    MCMC --> Post["<b>Posterior Probability</b><br/>Weight by fit × parsimony"]
-    Post --> Avg["<b>Weighted Average</b><br/>Coefficients averaged<br/>across models"]
-    Post --> PIP["<b>PIPs</b><br/>Inclusion probability<br/>for each variable"]
-
-    style Start fill:#141413,stroke:#141413,color:#fff
-    style MCMC fill:#6a9bcc,stroke:#141413,color:#141413
-    style Post fill:#d97757,stroke:#141413,color:#141413
-    style Avg fill:#00d4c8,stroke:#141413,color:#141413
-    style PIP fill:#00d4c8,stroke:#141413,color:#141413
+    Start("<b>12 candidate controls</b><br/>2¹² = 4,096<br/>possible models") --> MCMC("<b>MCMC sampling</b><br/>draw 50,000 models")
+    MCMC --> Post("<b>Posterior probability</b><br/>weight by fit × parsimony")
+    Post --> Avg("<b>Weighted average</b><br/>coefficients averaged<br/>across models")
+    Post --> PIP("<b>PIPs</b><br/>inclusion probability<br/>for each variable")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Start anchor
+    class MCMC blue
+    class Post orange
+    class Avg,PIP teal
 ```
 
 Formally, this betting process follows Bayes' rule, which tells us how to weight models by their fit and complexity.
@@ -764,21 +771,25 @@ The algorithm has four steps:
 
 ```mermaid
 graph TD
-    Controls["<b>12 Candidate Controls</b><br/>+ country & year FE"]
+    Controls("<b>12 candidate controls</b><br/>+ country & year FE")
 
-    Controls --> Step1["<b>Step 1: LASSO on Outcome</b><br/>CO2 ~ all controls<br/>→ Selected set X̃y"]
-    Controls --> Step2["<b>Step 2: LASSO on Each Variable of Interest</b><br/>GDP ~ all controls → X̃₁<br/>GDP² ~ all controls → X̃₂<br/>GDP³ ~ all controls → X̃₃"]
+    Controls --> Step1("<b>Step 1: LASSO on outcome</b><br/>CO2 ~ all controls<br/>→ selected set X̃y")
+    Controls --> Step2("<b>Step 2: LASSO on each variable of interest</b><br/>GDP ~ all controls → X̃₁<br/>GDP² ~ all controls → X̃₂<br/>GDP³ ~ all controls → X̃₃")
 
-    Step1 --> Union["<b>Step 3: Take the Union</b><br/>X̂ = X̃y ∪ X̃₁ ∪ X̃₂ ∪ X̃₃<br/>Only controls surviving<br/>at least one selection"]
+    Step1 --> Union("<b>Step 3: take the union</b><br/>X̂ = X̃y ∪ X̃₁ ∪ X̃₂ ∪ X̃₃<br/>only controls surviving<br/>at least one selection")
     Step2 --> Union
 
-    Union --> OLS["<b>Step 4: Final OLS</b><br/>CO2 ~ GDP + GDP² + GDP³ + X̂<br/>Standard OLS with valid<br/>inference on GDP terms"]
-
-    style Controls fill:#141413,stroke:#141413,color:#fff
-    style Step1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style Step2 fill:#d97757,stroke:#141413,color:#141413
-    style Union fill:#1a3a8a,stroke:#141413,color:#fff
-    style OLS fill:#00d4c8,stroke:#141413,color:#141413
+    Union --> OLS("<b>Step 4: Final OLS</b><br/>CO2 ~ GDP + GDP² + GDP³ + X̂<br/>standard OLS with valid<br/>inference on GDP terms")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Controls anchor
+    class Step1 blue
+    class Step2 orange
+    class Union key
+    class OLS teal
 ```
 
 At the heart of each LASSO step is a penalized regression that shrinks irrelevant coefficients to exactly zero:

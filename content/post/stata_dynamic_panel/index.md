@@ -85,16 +85,16 @@ The diagram below summarises the analytical pipeline. Each stage builds on the p
 
 ```mermaid
 graph TD
-    DATA["<b>Raw panel</b><br/>1,663 country-years<br/>160 countries, 1955-2015"]
-    CLEAN["<b>Recode missing-as-zero</b><br/>mvdecode for lag variables"]
-    EDA["<b>Descriptive stats + EDA</b><br/>3 figures"]
-    XTSET["<b>xtset cty Year, delta(5)</b><br/>declare 5-year panel"]
-    M1["<b>Model 1</b><br/>War + Coup<br/>(no controls)"]
-    M2["<b>Model 2</b><br/>+ Economic Freedom"]
-    M3["<b>Model 3</b><br/>+ Political Freedom"]
-    M4["<b>Model 4</b><br/>+ both controls"]
-    LR["<b>Long-run effects</b><br/>ssta program<br/>nlcom sum of coeffs"]
-    DIAG["<b>Diagnostics</b><br/>AR(2) + Hansen J"]
+    DATA("<b>Raw panel</b><br/>1,663 country-years<br/>160 countries, 1955-2015")
+    CLEAN("<b>Recode missing-as-zero</b><br/>mvdecode for lag variables")
+    EDA("<b>Descriptive stats + EDA</b><br/>3 figures")
+    XTSET("<b>xtset cty Year, delta(5)</b><br/>declare 5-year panel")
+    M1("<b>Model 1</b><br/>war + coup<br/>(no controls)")
+    M2("<b>Model 2</b><br/>+ economic freedom")
+    M3("<b>Model 3</b><br/>+ political freedom")
+    M4("<b>Model 4</b><br/>+ both controls")
+    LR("<b>Long-run effects</b><br/>ssta program<br/>nlcom sum of coeffs")
+    DIAG("<b>Diagnostics</b><br/>AR(2) + Hansen J")
 
     DATA --> CLEAN
     CLEAN --> EDA
@@ -105,17 +105,14 @@ graph TD
     M3 --> M4
     M4 --> LR
     M4 --> DIAG
-
-    style DATA fill:#6a9bcc,stroke:#141413,color:#141413
-    style CLEAN fill:#d97757,stroke:#141413,color:#141413
-    style EDA fill:#6a9bcc,stroke:#141413,color:#141413
-    style XTSET fill:#d97757,stroke:#141413,color:#141413
-    style M1 fill:#00d4c8,stroke:#141413,color:#141413
-    style M2 fill:#00d4c8,stroke:#141413,color:#141413
-    style M3 fill:#00d4c8,stroke:#141413,color:#141413
-    style M4 fill:#00d4c8,stroke:#141413,color:#141413
-    style LR fill:#141413,stroke:#d97757,color:#fff
-    style DIAG fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class DATA,EDA blue
+    class CLEAN,XTSET orange
+    class M1,M2,M3,M4 teal
+    class LR,DIAG anchor
 ```
 
 The four GMM models are nested: Model 1 contains only war and coup variables, and each subsequent model adds an institutional control (economic freedom, political freedom, or both). This nesting lets us see how the war effect is mediated by institutions --- a question Models 1 through 4 answer collectively but no single model can answer alone.

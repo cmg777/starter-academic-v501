@@ -88,36 +88,41 @@ The following diagram summarizes the case study setup and the analytical approac
 
 ```mermaid
 graph LR
-    subgraph "Case Study Setting"
-    A["<b>35 High Schools</b><br/>in One Region"]
-    B["<b>10 Treated Schools</b><br/>(tutoring program)"]
-    C["<b>25 Comparison Schools</b><br/>(no program)"]
+    subgraph SG1["Case study setting"]
+    A("<b>35 high Schools</b><br/>in one region")
+    B("<b>10 treated Schools</b><br/>(tutoring program)")
+    C("<b>25 comparison Schools</b><br/>(no program)")
     A --> B
     A --> C
     end
 
-    subgraph "DiD Design"
-    D["<b>Pre-Program</b><br/>GPA at baseline"]
-    E["<b>Post-Program</b><br/>GPA after intervention"]
-    F["<b>DiD Estimate</b><br/>ATT = 25.32"]
+    subgraph SG2["DiD design"]
+    D("<b>Pre-program</b><br/>GPA at baseline")
+    E("<b>Post-program</b><br/>GPA after intervention")
+    F("<b>DiD estimate</b><br/>ATT = 25.32")
     D --> E --> F
     end
 
-    subgraph "Estimation Methods"
-    G["<b>Manual 2x2</b><br/>Subtraction"]
-    H["<b>TWFE Regression</b><br/>5 approaches"]
-    I["<b>Event Study</b><br/>Dynamic effects"]
+    subgraph SG3["Estimation methods"]
+    G("<b>Manual 2x2</b><br/>subtraction")
+    H("<b>TWFE regression</b><br/>5 approaches")
+    I("<b>Event study</b><br/>dynamic effects")
     G --> H --> I
     end
 
     C --> D
     F --> G
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style I fill:#00d4c8,stroke:#141413,color:#141413
+    style SG1 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG2 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style SG3 fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,C blue
+    class B orange
+    class D,E,G,H gray
+    class F,I teal
 ```
 
 The study uses panel data: the same 35 schools are observed at two time points (pre- and post-program), giving us 70 school-period observations. For the event study extension, we use an expanded dataset with 8 time periods (280 observations), allowing us to test for parallel pre-trends and examine dynamic treatment effects.

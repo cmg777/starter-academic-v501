@@ -240,14 +240,17 @@ The diagram below shows how the tutorial progresses. Each part is self-contained
 
 ```mermaid
 graph LR
-    A["<b>2x2 DiD</b><br/>Estimation"] --> B["<b>Sensitivity</b><br/>Relative Magnitudes"]
-    B --> C["<b>Event Study</b><br/>Estimation"]
-    C --> D["<b>Sensitivity</b><br/>RM + Smoothness"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#141413,stroke:#d97757,color:#fff
+    A("<b>2x2 DiD</b><br/>estimation") --> B("<b>Sensitivity</b><br/>relative magnitudes")
+    B --> C("<b>Event study</b><br/>estimation")
+    C --> D("<b>Sensitivity</b><br/>RM + smoothness")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D anchor
 ```
 
 Part 1 uses a simple before-and-after comparison where parallel trends is untestable. Part 2 leverages the full panel to run richer sensitivity analyses, including smoothness restrictions that require multiple pre-treatment periods.
@@ -369,22 +372,22 @@ The 2x2 DiD is the simplest version of difference-in-differences: two groups (tr
 
 ```mermaid
 graph TD
-    PRE_T["<b>Treated States</b><br/>Pre-2014 average"]
-    PRE_C["<b>Control States</b><br/>Pre-2014 average"]
-    POST_T["<b>Treated States</b><br/>Post-2014 average"]
-    POST_C["<b>Control States</b><br/>Post-2014 average"]
-    DID["<b>DiD Estimate</b>"]
+    PRE_T("<b>Treated States</b><br/>Pre-2014 average")
+    PRE_C("<b>Control States</b><br/>Pre-2014 average")
+    POST_T("<b>Treated States</b><br/>post-2014 average")
+    POST_C("<b>Control States</b><br/>post-2014 average")
+    DID("<b>DiD estimate</b>")
 
     PRE_T -->|"Change in Treated"| POST_T
     PRE_C -->|"Change in Control"| POST_C
     POST_T --> DID
     POST_C --> DID
-
-    style PRE_T fill:#00d4c8,stroke:#141413,color:#141413
-    style POST_T fill:#00d4c8,stroke:#141413,color:#141413
-    style PRE_C fill:#6a9bcc,stroke:#141413,color:#141413
-    style POST_C fill:#6a9bcc,stroke:#141413,color:#141413
-    style DID fill:#d97757,stroke:#141413,color:#141413
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class PRE_T,POST_T teal
+    class PRE_C,POST_C blue
+    class DID orange
 ```
 
 To see the four means that define the 2x2 DiD, we create a post-treatment indicator and compute group averages.
@@ -523,16 +526,18 @@ The diagram below summarizes the `honestdid` workflow --- from the event study c
 
 ```mermaid
 graph LR
-    A["<b>Event Study</b><br/>Coefficients + VCV"] --> B["<b>Choose Restriction</b><br/>DeltaRM or DeltaSD"]
-    B --> C["<b>Set M Values</b><br/>mvec(0, 0.5, 1, ...)"]
-    C --> D["<b>Robust CIs</b><br/>for each M"]
-    D --> E["<b>Breakdown Value</b><br/>CI first includes zero"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#d97757,stroke:#141413,color:#141413
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style E fill:#141413,stroke:#d97757,color:#fff
+    A("<b>Event study</b><br/>coefficients + VCV") --> B("<b>Choose restriction</b><br/>DeltaRM or DeltaSD")
+    B --> C("<b>Set M values</b><br/>mvec(0, 0.5, 1, ...)")
+    C --> D("<b>Robust CIs</b><br/>for each M")
+    D --> E("<b>Breakdown value</b><br/>CI first includes zero")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A blue
+    class B,C orange
+    class D teal
+    class E anchor
 ```
 
 ### 6.3 Running honestdid
@@ -694,22 +699,22 @@ The fundamental issue is that the pre-trends test asks a binary question --- "re
 
 ```mermaid
 graph TD
-    PT["<b>Parallel Trends Assumption</b><br/>(untestable)"]
-    CONV["<b>Conventional Approach</b><br/>Pre-trends test<br/>(binary: reject or not)"]
-    HONEST["<b>HonestDiD Approach</b><br/>Sensitivity analysis<br/>(how much violation<br/>can we tolerate?)"]
-    RESULT_C["Parallel trends holds<br/>(false confidence)"]
-    RESULT_H["Results robust up to<br/>M-bar = X violations<br/>(calibrated conclusion)"]
+    PT("<b>Parallel trends assumption</b><br/>(untestable)")
+    CONV("<b>Conventional approach</b><br/>Pre-trends test<br/>(binary: reject or not)")
+    HONEST("<b>HonestDiD approach</b><br/>sensitivity analysis<br/>(how much violation<br/>can we tolerate?)")
+    RESULT_C("Parallel trends holds<br/>(false confidence)")
+    RESULT_H("Results robust up to<br/>M-bar = X violations<br/>(calibrated conclusion)")
 
     PT --> CONV
     PT --> HONEST
     CONV --> RESULT_C
     HONEST --> RESULT_H
-
-    style PT fill:#141413,stroke:#d97757,color:#fff
-    style CONV fill:#d97757,stroke:#141413,color:#141413
-    style HONEST fill:#00d4c8,stroke:#141413,color:#141413
-    style RESULT_C fill:#d97757,stroke:#141413,color:#141413
-    style RESULT_H fill:#00d4c8,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class PT anchor
+    class CONV,RESULT_C orange
+    class HONEST,RESULT_H teal
 ```
 
 The `honestdid` approach replaces the binary verdict with a quantitative statement: "Our result is robust to violations of parallel trends up to $\bar{M}$ times the largest pre-treatment violation." This is like reporting the load at which a bridge fails, rather than just saying "the bridge passed inspection."

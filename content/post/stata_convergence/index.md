@@ -245,23 +245,21 @@ The tutorial progresses from the simplest possible convergence test to the most 
 
 ```mermaid
 graph LR
-    A["<b>Simple OLS</b><br/>1960-2019<br/><i>Section 4</i>"]
-    B["<b>Two Eras</b><br/>Structural Break<br/><i>Section 5</i>"]
-    C["<b>Speed from OLS</b><br/>λ → β conversion<br/><i>Section 6</i>"]
-    D["<b>NLS Framework</b><br/>Direct estimation<br/><i>Sections 7-9</i>"]
-    E["<b>Rolling Windows</b><br/>λ, then β<br/><i>Sections 10-11</i>"]
-    F["<b>Sigma</b><br/>Convergence<br/><i>Sections 12-14</i>"]
-    G["<b>Heatmaps</b><br/>OLS & NLS<br/><i>Section 15</i>"]
+    A("<b>Simple OLS</b><br/>1960-2019<br/><i>Section 4</i>")
+    B("<b>Two eras</b><br/>structural break<br/><i>Section 5</i>")
+    C("<b>Speed from OLS</b><br/>λ → β conversion<br/><i>Section 6</i>")
+    D("<b>NLS framework</b><br/>direct estimation<br/><i>Sections 7-9</i>")
+    E("<b>Rolling windows</b><br/>λ, then β<br/><i>Sections 10-11</i>")
+    F("<b>Sigma</b><br/>convergence<br/><i>Sections 12-14</i>")
+    G("<b>Heatmaps</b><br/>OLS & NLS<br/><i>Section 15</i>")
 
     A --> B --> C --> D --> E --> F --> G
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#d97757,stroke:#141413,color:#141413
-    style F fill:#00d4c8,stroke:#141413,color:#141413
-    style G fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class A,D,G blue
+    class B,E orange
+    class C,F teal
 ```
 
 We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we show how to extract the speed of convergence from OLS output using a straightforward algebraic conversion. We then introduce Nonlinear Least Squares (NLS) as a direct estimation method and compare the two approaches. A pedagogical introduction to rolling windows starts with the raw OLS coefficient $\lambda$ before progressing to the structural $\beta$, including a full walkthrough of how confidence intervals are constructed and transformed. We then shift from beta to sigma convergence, show why one does not imply the other, and track the income distribution over time. Finally, convergence heatmaps covering every possible time window provide the most comprehensive robustness check.
@@ -622,23 +620,23 @@ So far we have estimated convergence for specific time periods (1960--2019, 1960
 
 ```mermaid
 graph TD
-    A["Start = 1960, End = 2019<br/>(59 years)"] --> R1["OLS → λ₁"]
-    B["Start = 1961, End = 2019<br/>(58 years)"] --> R2["OLS → λ₂"]
-    C["Start = 1962, End = 2019<br/>(57 years)"] --> R3["OLS → λ₃"]
-    D["..."] --> R4["..."]
-    E["Start = 2010, End = 2019<br/>(9 years)"] --> R5["OLS → λ₅₁"]
+    A("Start = 1960, End = 2019<br/>(59 years)") --> R1("OLS → λ₁")
+    B("Start = 1961, End = 2019<br/>(58 years)") --> R2("OLS → λ₂")
+    C("Start = 1962, End = 2019<br/>(57 years)") --> R3("OLS → λ₃")
+    D("...") --> R4("...")
+    E("Start = 2010, End = 2019<br/>(9 years)") --> R5("OLS → λ₅₁")
 
-    R1 --> P["Plot all 51 λ values<br/>against start year"]
+    R1 --> P("Plot all 51 λ values<br/>against start year")
     R2 --> P
     R3 --> P
     R4 --> P
     R5 --> P
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
-    style P fill:#d97757,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A,B,C,E blue
+    class R1,R2,R3,D,R4,R5 gray
+    class P orange
 ```
 
 We start with the simplest rolling window: the raw OLS slope coefficient $\lambda$. This requires nothing beyond the `reg` command we already know.

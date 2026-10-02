@@ -310,18 +310,18 @@ Double LASSO runs **two** LASSOs, not one. The first LASSO predicts the outcome 
 
 ```mermaid
 flowchart TD
-    A["Data: outcome y, treatment d,<br/>controls X (p = 284)"] --> B["Step 1: rlasso y on X<br/>(no d on right-hand side)<br/>selected set I_y"]
-    A --> C["Step 2: rlasso d on X<br/>(no y on right-hand side)<br/>selected set I_d"]
-    B --> D["Union: I_y &cup; I_d"]
+    A("Data: outcome y, treatment d,<br/>controls X (p = 284)") --> B("Step 1: rlasso y on X<br/>(no d on right-hand side)<br/>selected set I_y")
+    A --> C("Step 2: rlasso d on X<br/>(no y on right-hand side)<br/>selected set I_d")
+    B --> D("Union: I_y &cup; I_d")
     C --> D
-    D --> E["Step 3: regress y d X[, union]<br/>noconstant vce(cluster state)"]
-    E --> F["Causal estimate alpha-hat"]
-    style A fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style B fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style C fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style D fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style E fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style F fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
+    D --> E("Step 3: regress y d X[, union]<br/>noconstant vce(cluster state)")
+    E --> F("Causal estimate alpha-hat")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class A,E anchor
+    class B,C,F teal
+    class D orange
 ```
 
 The intuition is rooted in the **Frisch–Waugh–Lovell theorem**. To estimate $\alpha$ in the structural equation $y\_i = \alpha\\, d\_i + x\_i' \theta + \zeta\_i$, FWL says we can residualise both $y$ and $d$ against the same set of controls and regress the residuals. Concretely, let $M\_X = I - X(X'X)^{-1}X'$ be the residual-maker matrix; then
@@ -388,18 +388,18 @@ The framework is from [Belloni, Chernozhukov, Hansen and Kozbur (2016)](#19-refe
 
 ```mermaid
 flowchart LR
-    Z["High-dim controls X (p = 284)"] --> Y["Outcome y (DyV)"]
-    Z --> D["Treatment d (DxV)"]
-    Y --> R1["residual y"]
-    D --> R2["residual d"]
-    R1 --> A["final OLS: y-tilde = &alpha; d-tilde + &epsilon;"]
+    Z("High-dim controls X (p = 284)") --> Y("Outcome y (DyV)")
+    Z --> D("Treatment d (DxV)")
+    Y --> R1("residual y")
+    D --> R2("residual d")
+    R1 --> A("final OLS: y-tilde = &alpha; d-tilde + &epsilon;")
     R2 --> A
-    style Z fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style Y fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style D fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style R1 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style R2 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style A fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class Z,A anchor
+    class Y,D teal
+    class R1,R2 orange
 ```
 
 All three estimators consume the same diagram. They diverge only at the residualisation step — how to "filter out" the controls. Method 1 uses Lasso coefficients directly; Method 2 uses OLS coefficients on the Lasso-selected controls; Method 3 skips residualisation entirely and just runs one big OLS on the union of selected controls plus the treatment.
@@ -439,15 +439,16 @@ All three estimators consume the same diagram. They diverge only at the residual
 
 ```mermaid
 flowchart LR
-    L1["rlasso y on X &rarr; I_y"] --> U["Union I_y &cup; I_d"]
-    L2["rlasso d on X &rarr; I_d"] --> U
-    U --> O["one big OLS:&nbsp; y = &alpha;&middot;d + X[union]&middot;&theta; + &epsilon;"]
-    O --> R["regression table with alpha-hat AND control coefficients"]
-    style L1 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style L2 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style U fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style O fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style R fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+    L1("rlasso y on X &rarr; I_y") --> U("Union I_y &cup; I_d")
+    L2("rlasso d on X &rarr; I_d") --> U
+    U --> O("one big OLS:&nbsp; y = &alpha;&middot;d + X[union]&middot;&theta; + &epsilon;")
+    O --> R("regression table with alpha-hat AND control coefficients")
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class L1,L2 teal
+    class U orange
+    class O,R anchor
 ```
 
 **Advantage.** Maximum transparency. You see $\hat\alpha$ alongside the coefficients of every selected control with proper SEs, t-stats, and p-values. The valid-inference guarantee from [Belloni, Chernozhukov, Hansen (2014)](#19-references) applies only to the $\hat\alpha$ row — the control-coefficient SEs are NOT valid (Stata flags this with the "Standard errors and test statistics valid for the following variables only: ..." note at the bottom of the panel).
@@ -658,29 +659,30 @@ The decision tree below offers practical guidance for a researcher facing a fres
 
 ```mermaid
 flowchart TD
-    Start["You have n observations,<br/>p candidate controls,<br/>and want a causal alpha-hat"] --> Q1{"p &ge; n?"}
-    Q1 -->|Yes| L["LASSO methods required<br/>(OLS infeasible)"]
+    Start("You have n observations,<br/>p candidate controls,<br/>and want a causal alpha-hat") --> Q1{"p &ge; n?"}
+    Q1 -->|Yes| L("LASSO methods required<br/>(OLS infeasible)")
     Q1 -->|No| Q2{"p / n &gt; 0.3?"}
     Q2 -->|Yes, like this post<br/>p=284, n=576| L
     Q2 -->|No| Q3{"n &ge; 5,000?"}
-    Q3 -->|Yes| O["Plain OLS with all<br/>controls is fine"]
+    Q3 -->|Yes| O("Plain OLS with all<br/>controls is fine")
     Q3 -->|No| L
     L --> Q4{"Need valid causal<br/>inference, not just<br/>prediction?"}
-    Q4 -->|Yes| DL["Double LASSO<br/>with rigorous penalty<br/>(rlasso or pdslasso)"]
-    Q4 -->|No| Pred["DL-CV or PSL via cvlasso<br/>are both fine for prediction"]
-    style Start fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    style DL fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
-    style Pred fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style O fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
-    style L fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
-    classDef sty_Q1 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    Q4 -->|Yes| DL("Double LASSO<br/>with rigorous penalty<br/>(rlasso or pdslasso)")
+    Q4 -->|No| Pred("DL-CV or PSL via cvlasso<br/>are both fine for prediction")
+    classDef sty_Q1 fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class Q1 sty_Q1
-    classDef sty_Q2 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    classDef sty_Q2 fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class Q2 sty_Q2
-    classDef sty_Q3 fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
+    classDef sty_Q3 fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
     class Q3 sty_Q3
-    classDef sty_Q4 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    classDef sty_Q4 fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
     class Q4 sty_Q4
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Start,L anchor
+    class O,Pred orange
+    class DL teal
 ```
 
 The thresholds are rough. Fitzgerald et al. (2026) section 3.2 shows DL's advantage shrinks rapidly as $n$ grows at fixed $p$; by $n = 3{,}000$ in their Monte Carlo, OLS is essentially indistinguishable from DL. The $p / n > 0.3$ cutoff is informal — it corresponds to the regime where $(X'X)^{-1}$ starts having visible numerical instability — but it is a reasonable diagnostic.

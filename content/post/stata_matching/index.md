@@ -247,16 +247,20 @@ The diagram below sketches the inferential challenge. We *observe* whether each 
 
 ```mermaid
 flowchart LR
-    X["X: maternal traits<br/>(age, education, marital,<br/>prenatal care, etc.)"] --> D["D: maternal smoking<br/>(mbsmoke)"]
-    X --> Y["Y: birth weight<br/>(bweight)"]
+    X("X: maternal traits<br/>(age, education, marital,<br/>prenatal care, etc.)") --> D("D: maternal smoking<br/>(mbsmoke)")
+    X --> Y("Y: birth weight<br/>(bweight)")
     D --> Y
-    style X fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style D fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style Y fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    linkStyle 0,1,2 stroke:#d97757,stroke-width:2.5px
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class X orange
+    class D blue
+    class Y teal
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
-Read the diagram from left to right. Maternal characteristics `X` (steel blue) influence both the *decision* to smoke `D` (warm orange) and the *outcome* `Y` --- birth weight (teal). The arrow `D → Y` is the causal effect we want to isolate. The arrows `X → D` and `X → Y` together form the **back-door path** that contaminates a naive comparison: if we just compare smokers to non-smokers, we are picking up the differences in `X` between the two groups in addition to the direct effect of smoking. Every method in this tutorial blocks the back-door path in a different way.
+Read the diagram from left to right. Maternal characteristics `X` (orange border) influence both the *decision* to smoke `D` (blue border) and the *outcome* `Y` --- birth weight (teal border). The arrow `D → Y` is the causal effect we want to isolate. The dashed orange arrows `X → D` and `X → Y` together form the **back-door path** that contaminates a naive comparison: if we just compare smokers to non-smokers, we are picking up the differences in `X` between the two groups in addition to the direct effect of smoking. Every method in this tutorial blocks the back-door path in a different way.
 
 The variables we will use are summarised below.
 
@@ -290,17 +294,21 @@ The diagram below visualizes the challenge.
 ```mermaid
 flowchart LR
     subgraph M["Mother i"]
-        Y1["Y_i(1):<br/>weight if smoker"]
-        Y0["Y_i(0):<br/>weight if non-smoker"]
+        Y1("Y_i(1):<br/>weight if smoker")
+        Y0("Y_i(0):<br/>weight if non-smoker")
     end
-    M --> O["We observe<br/>only ONE"]
-    O --> Q["Other is<br/>missing → must<br/>be estimated"]
-    style Y1 fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style Y0 fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style M fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
-    style O fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style Q fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
+    M --> O("We observe<br/>only ONE")
+    O --> Q("Other is<br/>missing → must<br/>be estimated")
     linkStyle 0,1 stroke:#d97757,stroke-width:2.5px
+    style M fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class Y1 orange
+    class Y0 blue
+    class O teal
+    class Q gray
 ```
 
 The fundamental problem is what makes causal inference a **missing-data problem in disguise**. Every estimator in this tutorial is, at heart, a different way of imputing the missing potential outcome. RA imputes it with a regression model. IPW imputes it implicitly by re-weighting. Matching imputes it with the actual outcome of a similar but un-treated unit.
@@ -405,31 +413,28 @@ The six methods we will run can be organized by which side of the data they mode
 
 ```mermaid
 flowchart TD
-    Start["What do we model?"]
-    Start --> Outcome["Outcome model<br/>only"]
-    Start --> Treatment["Treatment<br/>(propensity) model<br/>only"]
-    Start --> Both["Both models<br/>(doubly robust)"]
-    Start --> Direct["Match directly<br/>on covariates"]
+    Start("What do we model?")
+    Start --> Outcome("Outcome model<br/>only")
+    Start --> Treatment("Treatment<br/>(propensity) model<br/>only")
+    Start --> Both("Both models<br/>(doubly robust)")
+    Start --> Direct("Match directly<br/>on covariates")
 
-    Outcome --> RA["1. Regression Adjustment<br/>(RA)"]
-    Treatment --> IPW["2. Inverse-Probability<br/>Weighting (IPW)"]
-    Treatment --> PSM["6. Propensity-Score<br/>Matching (PSM)"]
-    Both --> IPWRA["3. IPWRA"]
-    Both --> AIPW["4. AIPW"]
-    Direct --> NNM["5. Nearest-Neighbor<br/>Matching (NNM)"]
+    Outcome --> RA("1. regression adjustment<br/>(RA)")
+    Treatment --> IPW("2. inverse-probability<br/>weighting (IPW)")
+    Treatment --> PSM("6. propensity-score<br/>matching (PSM)")
+    Both --> IPWRA("3. IPWRA")
+    Both --> AIPW("4. AIPW")
+    Direct --> NNM("5. nearest-neighbor<br/>matching (NNM)")
 
-    style Start fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style Outcome fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style Treatment fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style Both fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style Direct fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
-    style RA fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style IPW fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style PSM fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style IPWRA fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style AIPW fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style NNM fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
     linkStyle 0,1,2,3,4,5,6,7,8,9 stroke:#d97757,stroke-width:2.5px
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class Start,Outcome,RA blue
+    class Treatment,IPW,PSM orange
+    class Both,IPWRA,AIPW teal
+    class Direct,NNM gray
 ```
 
 Each branch of the tree answers a different design question. RA (the leftmost branch) is the only estimator that relies *purely* on an outcome model; if that model is wrong, RA is biased. IPW and PSM (the orange branch) both rely *purely* on a treatment model (the propensity score); if that model is wrong, they are biased. They differ from each other in *how* they use the propensity score: IPW reweights every observation by the inverse propensity, while PSM matches each treated unit to the untreated unit with the most similar propensity score. IPWRA and AIPW (the teal branch) fit *both* an outcome model *and* a treatment model and combine them in a way that delivers the **doubly robust** property: they remain consistent if *either* model is correctly specified --- you only need one of two to be right. NNM (the light-gray branch) is the odd one out: it does not fit a parametric model at all. It instead computes a multidimensional Mahalanobis distance between each treated mother and every untreated mother, picks the closest non-smoker(s), and compares outcomes directly. Before we run any method, we will also estimate a naive baseline (a one-variable regression with no covariates) so we have a number to put the adjustments against.
@@ -707,16 +712,17 @@ Each circle in the figure is one mother, plotted at her estimated propensity (x-
 
 ```mermaid
 flowchart LR
-    S["Smoker<br/>(D=1)"] --> P["Estimate<br/>e(X) for everyone"]
-    P --> N["Find non-smoker<br/>with closest e(X)"]
-    N --> C["Compare<br/>outcomes"]
-    C --> A["Average<br/>across all<br/>smokers"]
-    style S fill:#d97757,stroke:#d97757,stroke-width:2px,color:#141413
-    style P fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style N fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
-    style C fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
-    style A fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#141413
+    S("Smoker<br/>(D=1)") --> P("Estimate<br/>e(X) for everyone")
+    P --> N("Find non-smoker<br/>with closest e(X)")
+    N --> C("Compare<br/>outcomes")
+    C --> A("Average<br/>across all<br/>smokers")
     linkStyle 0,1,2,3 stroke:#d97757,stroke-width:2.5px
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class S orange
+    class P,N,A blue
+    class C teal
 ```
 
 The diagram restates the four steps. PSM is conceptually one of the simplest matching methods because the matching distance is one-dimensional: just the absolute difference in propensity scores.
