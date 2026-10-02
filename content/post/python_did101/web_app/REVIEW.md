@@ -60,3 +60,15 @@ No HIGH or MED issues remain.
 ```
 /project:review-app python_did101
 ```
+
+---
+
+## Addendum — 2026-10-02 content audit
+
+A pre-teaching audit of the whole `python_did101` folder changed the app. Smoke-checked afterwards in headless Chromium (Playwright): no console or page errors, every tab renders, and no request for `lasso.js`.
+
+- **Tab 1 animation replaced.** It was still the Double-LASSO "L1 vs L2 shrinkage" chart (penalty-strength axis, LASSO/Ridge legend). The new `parallel_trends_animation` (`charts.js`) draws the comparison, treated and counterfactual lines from the post's means and sweeps the treated post-period point from the counterfactual (71.05) to the observed mean (96.37), labelling the gap; it is static under `prefers-reduced-motion`.
+- **Dead code removed:** `lasso.js` (deleted), `simulate_lasso` / `simulate_dl` and their helpers in `dgp.js`, and the unused `coefficient_path`, `selection_bars`, `alpha_compare`, `alpha_histograms` builders in `charts.js`. The forest-plot tooltip label "α̂" became "Estimate".
+- **`data/results.json` regenerated** from pyfixest 0.50.1 at full precision. The naive before-after row previously carried a non-reproducible SE of 4.27 (CI 27.83–44.57); the regression SE is 0.525 (CI 35.10–37.30), and Tab 3 now points out that the naive estimate is precise but biased. The TWFE SE-type CIs now use PyFixest's t-based intervals. The t = 1 label now reads 24.71 (was 24.70 from 3-decimal storage).
+- Event-study value labels sit clear of the CI caps; pre-trend wording says "consistent with parallel trends" rather than "validate"; CRV3 is described as a jackknife, not Bell-McCaffrey.
+- Asset URLs carry `?v=20261002` cache-busting query strings.

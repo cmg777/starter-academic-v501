@@ -1,5 +1,5 @@
 // app.js — wires the DOM controls for the python_did101 web app.
-// Runs after window.DGP, window.LASSO, window.CHARTS are defined.
+// Runs after window.DGP and window.CHARTS are defined.
 
 (function () {
   "use strict";
@@ -39,19 +39,15 @@
 
   // ------------------------------------------------------------------
   // TAB 1 — parallel-trends / treatment-jump animation.
-  // We reuse the L1-vs-L2 chart-builder for now (its visual contract
-  // — two interlocking curves with markers — matches the parallel-trends
-  // metaphor reasonably well). Future enhancement: dedicated
-  // parallel_trends_animation chart-builder.
   // ------------------------------------------------------------------
-  CHARTS.l1_vs_l2_animation(document.getElementById("intro-anim"));
+  CHARTS.parallel_trends_animation(document.getElementById("intro-anim"));
 
   // ------------------------------------------------------------------
   // TAB 2 — DiD Simulator.
   //
   // DGP (2x2 panel):
   //   Y_{ig,t} = mu_g + tau*post_t + ATT*(post_t * treat_g) + eps
-  //   mu_treated = 60, mu_control = 71 (mimics the post's baseline gap)
+  //   mu_treated = 60.17, mu_control = 71.22 (the post's pre-period means)
   //   tau = secular trend slider
   //   ATT = true ATT slider
   //   eps ~ N(0, sigma^2)
@@ -529,7 +525,10 @@
           // Estimate label
           g.append("text")
             .attr("x", x(p.t))
-            .attr("y", y(p.est) - (p.est >= 0 ? 12 : -18))
+            // Sit clear of the CI cap: above the upper bound for positive
+            // estimates, below the lower bound for negative ones.
+            .attr("y", p.ref ? y(p.est) - 12
+                             : (p.est >= 0 ? y(p.hi) - 6 : y(p.lo) + 14))
             .attr("text-anchor", "middle")
             .attr("fill", fill).attr("font-size", 10)
             .text(p.ref ? "ref" : p.est.toFixed(2));
@@ -543,7 +542,7 @@
   // ------------------------------------------------------------------
   // Load results.json once for tabs 3 + 4.
   // ------------------------------------------------------------------
-  fetch("data/results.json").then(r => r.json()).then(data => {
+  fetch("data/results.json?v=20261002").then(r => r.json()).then(data => {
     fp.data = data;
     fp_refresh();
     const evRows = (data.estimates || []).filter(r => r.outcome === "Event-Study coefficients");

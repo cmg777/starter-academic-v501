@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 <title>DiD-101 Interactive Lab</title>
 <meta name="description" content="Interactive companion to 'Introduction to Difference-in-Differences (DiD) in Python'. A pedagogical web app with a parallel-trends animation, a 2x2 DiD simulator, a forest plot of the post's estimates, and an event-study explorer.">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261002">
 </head>
 <body>
 
@@ -44,7 +44,7 @@
     watch parallel trends collide with a treatment shock; simulate your own
     2×2 design and compare the naive before-after estimate to the DiD ATT;
     explore the post's actual estimates across specifications and SE types;
-    and inspect the event-study coefficients that test the parallel-trends
+    and inspect the event-study coefficients that probe the parallel-trends
     assumption.
   </p>
 
@@ -74,7 +74,7 @@
     <div class="cta-card" data-goto="pane-event" role="button" tabindex="0">
       <div class="cta-tag">Tab 4</div>
       <h4>Event Study</h4>
-      <p>The post's event-study coefficients with 95% CIs across 7 periods relative to treatment. Pre-treatment leads near zero validate parallel trends; post-treatment lags trace the dynamic effect.</p>
+      <p>The post's event-study coefficients with 95% CIs across 7 periods relative to treatment. Pre-treatment leads near zero are consistent with parallel trends; post-treatment lags trace the dynamic effect.</p>
     </div>
   </div>
 
@@ -100,7 +100,7 @@
         <div class="gloss-body">The biased estimator: treated group's pre-vs-post change, ignoring the control group. <em>Conflates the treatment effect with secular drift.</em></div>
       </details>
       <details class="gloss"><summary>Event study</summary>
-        <div class="gloss-body">A dynamic DiD specification that estimates a separate treatment effect for each period relative to treatment. <em>Pre-treatment leads test parallel trends; post-treatment lags trace dynamic effects.</em></div>
+        <div class="gloss-body">A dynamic DiD specification that estimates a separate treatment effect for each period relative to treatment. <em>Pre-treatment leads probe parallel trends (supportive evidence, not proof); post-treatment lags trace dynamic effects.</em></div>
       </details>
       <details class="gloss"><summary>SUTVA</summary>
         <div class="gloss-body">Stable Unit Treatment Value Assumption: no spillovers between units, and a single version of the treatment. <em>Required for the potential-outcomes framework to make sense.</em></div>
@@ -207,9 +207,9 @@
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>In "DiD estimate (2×2)"</strong>, watch the Naive Before-After bar sit ~11 points above the others. That gap (36.20 − 25.32 = 10.88) is exactly the secular trend. DiD is what removes it.</li>
+      <li><strong>In "DiD estimate (2×2)"</strong>, watch the Naive Before-After bar sit ~11 points above the others. That gap (36.20 − 25.32 = 10.88) is exactly the secular trend. DiD is what removes it. Note how <em>narrow</em> the naive CI is: the naive estimate is precise, just biased — no amount of precision fixes a missing comparison group.</li>
       <li><strong>Toggle to "TWFE under 4 SE types"</strong>: all four point estimates collapse to 25.315. Only the CIs differ. <em>Inference choice matters less than research design when the signal is this strong.</em></li>
-      <li><strong>CRV3 widens the CI most</strong> (Bell-McCaffrey small-sample correction). With only 35 clusters, it is the safer default — but the conclusion is unchanged.</li>
+      <li><strong>CRV3 widens the CI most</strong> (a leave-one-school-out jackknife). With only 10 treated schools, CRV1 can understate uncertainty, so CRV3 or the wild cluster bootstrap is the safer choice — but here the conclusion is unchanged.</li>
     </ul>
   </div>
 
@@ -267,21 +267,21 @@
 <!-- ====================== TAB 4: EVENT STUDY ====================== -->
 <section id="pane-event" class="tab-pane" role="tabpanel" aria-labelledby="tab-event">
 
-  <h2>Event Study — testing parallel trends and tracing dynamics</h2>
+  <h2>Event Study — probing parallel trends and tracing dynamics</h2>
   <p class="lede">
     The 2×2 design tells you <em>whether</em> the program worked. The event
     study tells you <em>when</em> the effect kicked in and whether it grew or
     faded. We estimate a separate treatment effect for each period
     <em>relative to treatment</em>, with t = −1 as the omitted reference.
-    <strong>Pre-treatment coefficients near zero validate parallel trends;
-    post-treatment coefficients trace the dynamic effect.</strong>
+    <strong>Pre-treatment coefficients near zero are consistent with parallel trends
+    (they cannot prove it); post-treatment coefficients trace the dynamic effect.</strong>
   </p>
 
   <div class="pedagogy">
     <h4>What to look for</h4>
     <ul>
-      <li><strong>Pre-treatment leads (t = −4, −3, −2) hover around zero</strong> with CIs that comfortably include zero (p = 0.40, 0.47, 0.17). Treated and control schools were on parallel trajectories before the program.</li>
-      <li><strong>Post-treatment lags (t = 0, 1, 2, 3) jump to ≈25</strong> immediately at t = 0 and stay there. <em>No fade-out, no delayed onset.</em> The program's effect is both immediate and sustained.</li>
+      <li><strong>Pre-treatment leads (t = −4, −3, −2) hover around zero</strong> with CIs that include zero (p = 0.40, 0.47, 0.17). Treated and control schools were on similar trajectories before the program — supportive evidence, though a pre-test with 10 treated schools has limited power to detect small violations.</li>
+      <li><strong>Post-treatment lags (t = 0, 1, 2, 3) jump to ≈25</strong> at t = 0 (relative to t = −1) and stay roughly flat (24.71 to 25.70). <em>No fade-out, no gradual build-up.</em></li>
       <li><strong>The omitted reference is t = −1</strong> (normalised to zero by construction). All other coefficients are differences from that baseline.</li>
     </ul>
   </div>
@@ -327,9 +327,8 @@
 </footer>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="dgp.js"></script>
-<script src="lasso.js"></script>
-<script src="charts.js"></script>
-<script src="app.js"></script>
+<script src="dgp.js?v=20261002"></script>
+<script src="charts.js?v=20261002"></script>
+<script src="app.js?v=20261002"></script>
 </body>
 </html>
