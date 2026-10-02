@@ -257,14 +257,17 @@ Most statistical software lets you jump straight from data to estimates, skippin
 
 ```mermaid
 graph LR
-    A["<b>1. Model</b><br/>Define causal<br/>assumptions"] --> B["<b>2. Identify</b><br/>Find the right<br/>formula"]
-    B --> C["<b>3. Estimate</b><br/>Compute the<br/>causal effect"]
-    C --> D["<b>4. Refute</b><br/>Stress-test<br/>the result"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#a78bfa,stroke:#141413,color:#141413
+    A("<b>1. Model</b><br/>define causal<br/>assumptions") --> B("<b>2. Identify</b><br/>find the right<br/>formula")
+    B --> C("<b>3. Estimate</b><br/>compute the<br/>causal effect")
+    C --> D("<b>4. Refute</b><br/>stress-test<br/>the result")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef violet fill:#1f2b5e,stroke:#a78bfa,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D violet
 ```
 
 Each step answers a specific question and builds on the previous one:
@@ -514,38 +517,49 @@ Not all variables play the same role. Understanding the three fundamental types 
 
 ```mermaid
 graph TD
-    C["<b>Confounder</b><br/>(e.g., prior earnings)"] -->|"affects"| T["Treatment"]
-    C -->|"affects"| Y["Outcome"]
-    T -.->|"causal effect"| Y
-
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style T fill:#6a9bcc,stroke:#141413,color:#141413
-    style Y fill:#d97757,stroke:#141413,color:#141413
+    C("<b>Confounder</b><br/>e.g., prior earnings") -.->|"affects"| T("<b>Treatment</b>")
+    C -.->|"affects"| Y("<b>Outcome</b>")
+    T ==>|"causal effect"| Y
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class C orange
+    class T blue
+    class Y teal
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
 - **Confounders** (common causes) --- A variable that affects *both* the treatment and the outcome. For example, prior earnings (`re74`) may influence whether someone enrolls in training *and* how much they earn later. Confounders create a spurious association between treatment and outcome. **You must adjust for confounders** to isolate the causal effect.
 
 ```mermaid
 graph LR
-    T["Treatment"] -->|"causes"| M["<b>Mediator</b><br/>(e.g., skills)"]
-    M -->|"causes"| Y["Outcome"]
-
-    style T fill:#6a9bcc,stroke:#141413,color:#141413
-    style M fill:#00d4c8,stroke:#141413,color:#141413
-    style Y fill:#d97757,stroke:#141413,color:#141413
+    T("<b>Treatment</b>") ==>|"causes"| M("<b>Mediator</b><br/>e.g., skills")
+    M ==>|"causes"| Y("<b>Outcome</b>")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class T blue
+    class M gray
+    class Y teal
+    linkStyle 0,1 stroke:#00d4c8,stroke-width:3px
 ```
 
 - **Mediators** --- A variable that lies *on* the causal path from treatment to outcome. For example, if job training increases skills, and skills increase earnings, then `skills` is a mediator. **You should NOT adjust for mediators** --- doing so would block the very causal pathway you are trying to measure, attenuating or eliminating the estimated effect.
 
 ```mermaid
 graph TD
-    T["Treatment"] -->|"affects"| Col["<b>Collider</b><br/>(e.g., in_survey)"]
-    Y["Outcome"] -->|"affects"| Col
-    T -.->|"causal effect"| Y
-
-    style T fill:#6a9bcc,stroke:#141413,color:#141413
-    style Col fill:#00d4c8,stroke:#141413,color:#141413
-    style Y fill:#d97757,stroke:#141413,color:#141413
+    T("<b>Treatment</b>") -.->|"affects"| Col("<b>Collider</b><br/>e.g., in_survey")
+    Y("<b>Outcome</b>") -.->|"affects"| Col
+    T ==>|"causal effect"| Y
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class T blue
+    class Col gray
+    class Y teal
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px,stroke-dasharray:7 5
+    linkStyle 2 stroke:#00d4c8,stroke-width:3px
 ```
 
 - **Colliders** --- A variable that is *caused by* both the treatment and the outcome (or by variables on both sides). For example, if both training and high earnings make someone likely to appear in a follow-up survey, then `in_survey` is a collider. **You should NOT condition on colliders** --- doing so can create a spurious association between treatment and outcome even where none exists (a phenomenon called *collider bias* or *selection bias*).
@@ -642,25 +656,23 @@ The following diagram shows how these paradigms relate to the five methods we wi
 
 ```mermaid
 graph TD
-    Root["<b>Estimation Methods</b>"] --> OM["<b>Outcome Modeling</b><br/><i>Models E[Y | X, T]</i>"]
-    Root --> TM["<b>Treatment Modeling</b><br/><i>Models P(T | X)</i>"]
-    Root --> DR_cat["<b>Doubly Robust</b><br/><i>Models both E[Y | X, T]<br/>and P(T | X)</i>"]
+    Root("<b>Estimation methods</b>") --> OM("<b>Outcome modeling</b><br/><i>models E[Y | X, T]</i>")
+    Root --> TM("<b>Treatment modeling</b><br/><i>models P(T | X)</i>")
+    Root --> DR_cat("<b>Doubly robust</b><br/><i>models both E[Y | X, T]<br/>and P(T | X)</i>")
 
-    OM --> RA["Regression<br/>Adjustment"]
-    TM --> IPW["Inverse Probability<br/>Weighting"]
-    TM --> PSS["PS<br/>Stratification"]
-    TM --> PSM["PS<br/>Matching"]
-    DR_cat --> DR["AIPW"]
-
-    style Root fill:#141413,stroke:#141413,color:#fff
-    style OM fill:#6a9bcc,stroke:#141413,color:#141413
-    style TM fill:#d97757,stroke:#141413,color:#141413
-    style DR_cat fill:#00d4c8,stroke:#141413,color:#141413
-    style RA fill:#6a9bcc,stroke:#141413,color:#141413
-    style IPW fill:#d97757,stroke:#141413,color:#141413
-    style PSS fill:#d97757,stroke:#141413,color:#141413
-    style PSM fill:#d97757,stroke:#141413,color:#141413
-    style DR fill:#00d4c8,stroke:#141413,color:#141413
+    OM --> RA("Regression<br/>adjustment")
+    TM --> IPW("Inverse probability<br/>weighting")
+    TM --> PSS("PS<br/>stratification")
+    TM --> PSM("PS<br/>matching")
+    DR_cat --> DR("AIPW")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class Root anchor
+    class OM,RA blue
+    class TM,IPW,PSS,PSM orange
+    class DR_cat,DR teal
 ```
 
 Understanding these paradigms helps clarify why different methods can give somewhat different estimates and why comparing across paradigms is a powerful robustness check. The key trade-offs are:

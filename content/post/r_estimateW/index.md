@@ -80,18 +80,21 @@ If you want the conventional treatment first — the same model family with the 
 
 ```mermaid
 graph LR
-    A["<b>Data</b><br/>90 NUTS-1 regions<br/>2001-2019, T = 19"] --> B["<b>Priors</b><br/>structure + sparsity<br/>k-bar = 7"]
-    B --> C["<b>Answer key</b><br/>sim_dgp()<br/>recover a known W"]
-    C --> D["<b>Estimate</b><br/>sarw()<br/>rho, beta, sigma2, W"]
-    D --> E["<b>Read the network</b><br/>links, chords,<br/>multipliers"]
-    E --> F["<b>Benchmark</b><br/>estimated W vs<br/>contiguity and 7-NN"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#1a3a8a,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#141413
-    style F fill:#141413,stroke:#6a9bcc,color:#fff
+    A("<b>Data</b><br/>90 NUTS-1 regions<br/>2001-2019, T = 19") --> B("<b>Priors</b><br/>structure + sparsity<br/>k-bar = 7")
+    B --> C("<b>Answer key</b><br/>sim_dgp()<br/>recover a known W")
+    C --> D("<b>Estimate</b><br/>sarw()<br/>rho, beta, sigma2, W")
+    D --> E("<b>Read the network</b><br/>links, chords,<br/>multipliers")
+    E --> F("<b>Benchmark</b><br/>estimated W vs<br/>contiguity and 7-NN")
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class A,E blue
+    class B orange
+    class C teal
+    class D key
+    class F anchor
 ```
 
 Read the arrows as escalating trust. Step 2 makes an impossible-looking problem tractable, step 3 shows the machinery works on a case where we know the answer, and only then does step 4 spend that credibility on real data. The last box is the payoff: one model, three different neighbourhood maps, three different answers.
@@ -485,25 +488,27 @@ c(unknown_links   = n^2 - n,
 ```mermaid
 graph TD
     subgraph CONV["Conventional spatial econometrics"]
-    C1["<b>W is ASSUMED</b><br/>contiguity, k-NN,<br/>or distance band"]
-    C2["<b>Estimate</b><br/>rho, sigma2, 4 betas<br/><b>6 unknowns</b>"]
+    C1("<b>W is ASSUMED</b><br/>contiguity, k-NN,<br/>or distance band")
+    C2("<b>Estimate</b><br/>rho, sigma2, 4 betas<br/><b>6 unknowns</b>")
     end
 
     subgraph EST["estimateW"]
-    E1["<b>Omega is UNKNOWN</b><br/>8,010 binary cells,<br/>diagonal fixed at zero"]
-    E2["<b>Estimate jointly</b><br/>Omega, rho, sigma2, 4 betas<br/><b>8,016 unknowns</b>"]
+    E1("<b>Omega is UNKNOWN</b><br/>8,010 binary cells,<br/>diagonal fixed at zero")
+    E2("<b>Estimate jointly</b><br/>Omega, rho, sigma2, 4 betas<br/><b>8,016 unknowns</b>")
     end
 
     C1 --> C2
     E1 --> E2
-    C2 --> Q["<b>Same data</b><br/>90 regions x 19 years<br/>= 1,710 observations"]
+    C2 --> Q("<b>Same data</b><br/>90 regions x 19 years<br/>= 1,710 observations")
     E2 --> Q
-
-    style C1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style C2 fill:#6a9bcc,stroke:#141413,color:#141413
-    style E1 fill:#d97757,stroke:#141413,color:#141413
-    style E2 fill:#d97757,stroke:#141413,color:#141413
-    style Q fill:#141413,stroke:#00d4c8,color:#fff
+    style CONV fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    style EST fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class C1,C2 blue
+    class E1,E2 orange
+    class Q anchor
 ```
 
 Both columns end at the same 1,710 numbers. The left column asks those numbers to pin down 6 unknowns, which is comfortable. The right column asks them to pin down 8,016, which is impossible by likelihood alone.
@@ -560,19 +565,22 @@ The remaining problem is speed. Every one of the 8,010 link updates changes $W$,
 
 ```mermaid
 graph TD
-    S["<b>Initialize</b><br/>random Omega drawn<br/>from the prior, seed 571"] --> A["<b>Step a</b><br/>sweep all 8,010 links<br/>in random row order,<br/>Bernoulli flip each"]
-    A --> B["<b>Step b</b><br/>draw beta<br/>Gaussian conditional"]
-    B --> C["<b>Step c</b><br/>draw sigma2<br/>inverse-Gamma conditional"]
-    C --> D["<b>Step d</b><br/>draw rho<br/>griddy Gibbs on a grid"]
+    S("<b>Initialize</b><br/>random Omega drawn<br/>from the prior, seed 571") --> A("<b>Step a</b><br/>sweep all 8,010 links<br/>in random row order,<br/>Bernoulli flip each")
+    A --> B("<b>Step b</b><br/>draw beta<br/>Gaussian conditional")
+    B --> C("<b>Step c</b><br/>draw sigma2<br/>inverse-Gamma conditional")
+    C --> D("<b>Step d</b><br/>draw rho<br/>griddy Gibbs on a grid")
     D -->|"iterations 1 to 100:<br/>discard as burn-in"| A
-    D -->|"iterations 101 to 200:<br/>keep"| K["<b>Retained output</b><br/>postw, postb,<br/>posts, postr"]
-
-    style S fill:#141413,stroke:#00d4c8,color:#fff
-    style A fill:#d97757,stroke:#141413,color:#141413
-    style B fill:#6a9bcc,stroke:#141413,color:#141413
-    style C fill:#6a9bcc,stroke:#141413,color:#141413
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style K fill:#1a3a8a,stroke:#141413,color:#fff
+    D -->|"iterations 101 to 200:<br/>keep"| K("<b>Retained output</b><br/>postw, postb,<br/>posts, postr")
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class S anchor
+    class A orange
+    class B,C blue
+    class D teal
+    class K key
 ```
 
 Step (a) is where the 8,010 unknowns live, and it is the reason the Sherman-Morrison update matters. Steps (b) and (c) are ordinary Bayesian regression. Step (d) is the grid. Notice that the map changes between every draw of $\beta$ — which is exactly why Section 11 has to check that $\beta$ mixes at all.
@@ -1066,23 +1074,24 @@ Everything so far has used one model, the spatial autoregressive panel. The pack
 
 ```mermaid
 graph TD
-    SDM["<b>SDM</b><br/>rho W y and W X<br/>sdm() / sdmw()"] -->|"beta2 = 0"| SAR["<b>SAR</b><br/>rho W y only<br/>sar() / sarw()"]
-    SDM -->|"rho = 0"| SLX["<b>SLX</b><br/>W X only<br/>slx() / slxw()"]
-    SDEM["<b>SDEM</b><br/>W X and spatial error<br/>sdem() / sdemw()"] -->|"beta2 = 0"| SEM["<b>SEM</b><br/>spatial error only<br/>sem() / semw()"]
+    SDM("<b>SDM</b><br/>rho W y and W X<br/>sdm() / sdmw()") -->|"beta2 = 0"| SAR("<b>SAR</b><br/>rho W y only<br/>sar() / sarw()")
+    SDM -->|"rho = 0"| SLX("<b>SLX</b><br/>W X only<br/>slx() / slxw()")
+    SDEM("<b>SDEM</b><br/>W X and spatial error<br/>sdem() / sdemw()") -->|"beta2 = 0"| SEM("<b>SEM</b><br/>spatial error only<br/>sem() / semw()")
     SDEM -->|"error not spatial"| SLX
-    SAR -->|"rho = 0"| OLS["<b>Pooled OLS</b><br/>no spatial term at all"]
+    SAR -->|"rho = 0"| OLS("<b>Pooled OLS</b><br/>no spatial term at all")
     SEM -->|"rho = 0"| OLS
     SLX -->|"beta2 = 0"| OLS
-
-    style SDM fill:#d97757,stroke:#141413,color:#141413
-    style SDEM fill:#d97757,stroke:#141413,color:#141413
-    style SAR fill:#00d4c8,stroke:#141413,color:#141413
-    style SEM fill:#6a9bcc,stroke:#141413,color:#141413
-    style SLX fill:#6a9bcc,stroke:#141413,color:#141413
-    style OLS fill:#141413,stroke:#141413,color:#fff
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    class SDM,SDEM orange
+    class SAR teal
+    class SEM,SLX blue
+    class OLS anchor
 ```
 
-The teal box is the model we estimated in Section 9. Every other box is one function call away, and every box has two doors — which is the package's whole design:
+The box with the teal border is the model we estimated in Section 9. Every other box is one function call away, and every box has two doors — which is the package's whole design:
 
 | Model | What carries the spatial lag | Fixed $W$ | Estimated $W$ |
 |---|---|---|---|

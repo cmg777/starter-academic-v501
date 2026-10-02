@@ -241,16 +241,16 @@ This RCT evaluates a cash transfer program designed to boost household consumpti
 
 ```mermaid
 graph TD
-    POP["<b>2,000 Households</b><br/>Balanced panel<br/>(observed in 2021 and 2024)"]
-    STRAT["<b>Stratified Randomization</b><br/>Within poverty strata"]
-    TRT["<b>Treatment Group</b><br/>(~1,000 households)<br/>Offered cash transfer"]
-    CTL["<b>Control Group</b><br/>(~1,000 households)<br/>No offer"]
-    COMP1["85% receive<br/>the transfer"]
-    COMP2["15% do not<br/>receive"]
-    COMP3["5% receive<br/>the transfer"]
-    COMP4["95% do not<br/>receive"]
-    BASE["<b>Baseline 2021</b><br/>Pre-treatment survey"]
-    END["<b>Endline 2024</b><br/>Post-treatment survey"]
+    POP("<b>2,000 households</b><br/>balanced panel,<br/>observed in 2021 and 2024")
+    STRAT("<b>Stratified randomization</b><br/>within poverty strata")
+    TRT("<b>Treatment group</b><br/>about 1,000 households<br/>offered the cash transfer")
+    CTL("<b>Control group</b><br/>about 1,000 households<br/>no offer")
+    COMP1("85% receive<br/>the transfer")
+    COMP2("15% do not<br/>receive it")
+    COMP3("5% receive<br/>the transfer")
+    COMP4("95% do not<br/>receive it")
+    BASE("<b>Baseline 2021</b><br/>pre-treatment survey")
+    END("<b>Endline 2024</b><br/>post-treatment survey")
 
     POP --> BASE
     BASE --> STRAT
@@ -264,17 +264,16 @@ graph TD
     COMP2 --> END
     COMP3 --> END
     COMP4 --> END
-
-    style POP fill:#6a9bcc,stroke:#141413,color:#141413
-    style STRAT fill:#d97757,stroke:#141413,color:#141413
-    style TRT fill:#00d4c8,stroke:#141413,color:#141413
-    style CTL fill:#6a9bcc,stroke:#141413,color:#141413
-    style BASE fill:#6a9bcc,stroke:#141413,color:#141413
-    style END fill:#d97757,stroke:#141413,color:#141413
-    style COMP1 fill:#00d4c8,stroke:#141413,color:#141413
-    style COMP2 fill:#141413,stroke:#d97757,color:#fff
-    style COMP3 fill:#d97757,stroke:#141413,color:#141413
-    style COMP4 fill:#141413,stroke:#6a9bcc,color:#fff
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class POP,BASE,END anchor
+    class STRAT orange
+    class TRT,COMP1,COMP3 teal
+    class CTL blue
+    class COMP2,COMP4 gray
 ```
 
 The randomization was **stratified by poverty status** (block randomization), ensuring that treatment and control groups started with similar proportions of poor and non-poor households. A critical real-world feature of this study is **imperfect compliance** --- only 85% of households offered the treatment actually received the cash transfer, while 5% of control households received it through other channels.
@@ -305,19 +304,22 @@ The diagram below shows the progression of methods we will use. Each stage build
 
 ```mermaid
 graph LR
-    A["<b>Balance<br/>Checks</b><br/><i>Section 5</i>"]
-    B["<b>Cross-sectional<br/>RA / IPW / DR</b><br/><i>Sections 7--8</i>"]
-    C["<b>Panel Data<br/>DiD / DR-DiD</b><br/><i>Section 9</i>"]
-    D["<b>Endogenous<br/>Treatment</b><br/><i>Section 10</i>"]
+    A("<b>Balance checks</b><br/><i>Section 5</i>")
+    B("<b>Cross-sectional</b><br/>RA, IPW, DR<br/><i>Sections 7–8</i>")
+    C("<b>Panel data</b><br/>DiD, DR-DiD<br/><i>Section 9</i>")
+    D("<b>Endogenous<br/>treatment</b><br/><i>Section 10</i>")
 
     A --> B
     B --> C
     C --> D
-
-    style A fill:#6a9bcc,stroke:#141413,color:#141413
-    style B fill:#d97757,stroke:#141413,color:#141413
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style D fill:#141413,stroke:#d97757,color:#fff
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    classDef gray fill:#1f2b5e,stroke:#c8d0e0,stroke-width:3px,color:#e8ecf2
+    class A blue
+    class B orange
+    class C teal
+    class D gray
 ```
 
 We first establish that randomization worked (balance checks). Then we estimate treatment effects three ways using only endline data --- regression adjustment, inverse probability weighting, and doubly robust methods. Next, we leverage the full panel structure with difference-in-differences. Finally, we address imperfect compliance by separating the effect of the offer from the effect of receipt.
@@ -609,12 +611,12 @@ The Stata documentation describes this succinctly: *"RA estimators use means of 
 
 ```mermaid
 graph TD
-    DATA["<b>Observed Data</b><br/>Each household observed<br/>under ONE treatment only"]
-    M0["<b>Fit outcome model</b><br/>using control group<br/><i>Y = f(age, edu, female, poverty)</i>"]
-    M1["<b>Fit outcome model</b><br/>using treated group<br/><i>Y = f(age, edu, female, poverty)</i>"]
-    P0["Predict <b>Ŷ₀</b><br/>for ALL households"]
-    P1["Predict <b>Ŷ₁</b><br/>for ALL households"]
-    ATE["<b>ATE</b> = Average of<br/>(Ŷ₁ − Ŷ₀)"]
+    DATA("<b>Observed data</b><br/>each household observed<br/>under ONE treatment only")
+    M0("<b>Fit outcome model</b><br/>on the control group<br/><i>Y = f(age, edu, female, poverty)</i>")
+    M1("<b>Fit outcome model</b><br/>on the treated group<br/><i>Y = f(age, edu, female, poverty)</i>")
+    P0("Predict <b>Ŷ₀</b><br/>for ALL households")
+    P1("Predict <b>Ŷ₁</b><br/>for ALL households")
+    ATE("<b>ATE</b> = average of<br/>(Ŷ₁ − Ŷ₀)")
 
     DATA --> M0
     DATA --> M1
@@ -622,13 +624,12 @@ graph TD
     M1 --> P1
     P0 --> ATE
     P1 --> ATE
-
-    style DATA fill:#141413,stroke:#6a9bcc,color:#fff
-    style M0 fill:#6a9bcc,stroke:#141413,color:#141413
-    style M1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style P0 fill:#6a9bcc,stroke:#141413,color:#141413
-    style P1 fill:#6a9bcc,stroke:#141413,color:#141413
-    style ATE fill:#6a9bcc,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class DATA anchor
+    class M0,M1,P0,P1 blue
+    class ATE key
 ```
 
 **The RA estimator.** Formally, the ATE under regression adjustment is:
@@ -661,12 +662,12 @@ The logic is elegant: in a perfectly randomized experiment, every household has 
 
 ```mermaid
 graph TD
-    DATA["<b>Observed Data</b><br/>Treatment and control groups<br/>may have imbalances"]
-    PS["<b>Estimate propensity score</b><br/>p(X) = Pr(T=1 | X)<br/><i>via logistic regression</i>"]
-    WT["<b>Compute weights</b>"]
-    WTR["Treated: weight = 1/p(X)"]
-    WCT["Control: weight = 1/(1−p(X))"]
-    ATE["<b>ATE</b> = Weighted mean(treated)<br/>− Weighted mean(control)"]
+    DATA("<b>Observed data</b><br/>treatment and control groups<br/>may be imbalanced")
+    PS("<b>Estimate propensity score</b><br/>p(X) = Pr(T=1 | X)<br/><i>via logistic regression</i>")
+    WT("<b>Compute weights</b>")
+    WTR("Treated:<br/>weight = 1/p(X)")
+    WCT("Control:<br/>weight = 1/(1−p(X))")
+    ATE("<b>ATE</b> = weighted mean (treated)<br/>− weighted mean (control)")
 
     DATA --> PS
     PS --> WT
@@ -674,13 +675,12 @@ graph TD
     WT --> WCT
     WTR --> ATE
     WCT --> ATE
-
-    style DATA fill:#141413,stroke:#d97757,color:#fff
-    style PS fill:#d97757,stroke:#141413,color:#141413
-    style WT fill:#d97757,stroke:#141413,color:#141413
-    style WTR fill:#d97757,stroke:#141413,color:#141413
-    style WCT fill:#d97757,stroke:#141413,color:#141413
-    style ATE fill:#d97757,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef key fill:#1f2b5e,stroke:#e8ecf2,stroke-width:3px,color:#e8ecf2
+    class DATA anchor
+    class PS,WT,WTR,WCT orange
+    class ATE key
 ```
 
 **The propensity score.** The propensity score is estimated via logistic regression:
@@ -719,12 +719,12 @@ The Stata manual describes this property: *"AIPW estimators model both the outco
 
 ```mermaid
 graph TD
-    DATA["<b>Observed Data</b>"]
-    RA_C["<b>RA component</b><br/>Predict Ŷ₁ and Ŷ₀<br/>for each household"]
-    IPW_C["<b>IPW component</b><br/>Estimate propensity<br/>score p(X)"]
-    RESID["<b>Prediction errors</b><br/>Y − Ŷ for each<br/>household"]
-    CORRECT["<b>Bias-correction term</b><br/>IPW-weighted residuals"]
-    DR["<b>DR estimate</b><br/>= RA prediction<br/>+ Bias correction"]
+    DATA("<b>Observed data</b>")
+    RA_C("<b>RA component</b><br/>predict Ŷ₁ and Ŷ₀<br/>for each household")
+    IPW_C("<b>IPW component</b><br/>estimate the propensity<br/>score p(X)")
+    RESID("<b>Prediction errors</b><br/>Y − Ŷ for each<br/>household")
+    CORRECT("<b>Bias-correction term</b><br/>IPW-weighted residuals")
+    DR("<b>DR estimate</b><br/>= RA prediction<br/>+ bias correction")
 
     DATA --> RA_C
     DATA --> IPW_C
@@ -733,13 +733,14 @@ graph TD
     RESID --> CORRECT
     RA_C --> DR
     CORRECT --> DR
-
-    style DATA fill:#141413,stroke:#00d4c8,color:#fff
-    style RA_C fill:#6a9bcc,stroke:#141413,color:#141413
-    style IPW_C fill:#d97757,stroke:#141413,color:#141413
-    style RESID fill:#6a9bcc,stroke:#141413,color:#141413
-    style CORRECT fill:#d97757,stroke:#141413,color:#141413
-    style DR fill:#00d4c8,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class DATA anchor
+    class RA_C,RESID blue
+    class IPW_C,CORRECT orange
+    class DR teal
 ```
 
 **The AIPW estimator.** The most common doubly robust form is Augmented Inverse Probability Weighting (AIPW):
@@ -781,16 +782,18 @@ In plain language: start with the RA prediction of each household's treatment ef
 
 ```mermaid
 graph LR
-    RA["<b>Regression Adjustment</b><br/>Models the outcome"]
-    IPW["<b>Inverse Probability<br/>Weighting</b><br/>Models the treatment"]
-    DR["<b>Doubly Robust</b><br/>Models both<br/><i>Consistent if either<br/>model is correct</i>"]
+    RA("<b>Regression adjustment</b><br/>models the outcome")
+    IPW("<b>Inverse probability<br/>weighting</b><br/>models the treatment")
+    DR("<b>Doubly robust</b><br/>models both<br/><i>consistent if either<br/>model is correct</i>")
 
     RA --> DR
     IPW --> DR
-
-    style RA fill:#6a9bcc,stroke:#141413,color:#141413
-    style IPW fill:#d97757,stroke:#141413,color:#141413
-    style DR fill:#00d4c8,stroke:#141413,color:#141413
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class RA blue
+    class IPW orange
+    class DR teal
 ```
 
 The doubly robust estimator combines the strengths of both RA and IPW. It is the **standard recommendation in modern causal inference** because it provides an extra layer of protection against model misspecification. Now that we understand what each method does, what it assumes, and what can go wrong, let us apply all three to our cash transfer data and compare their results.
@@ -1080,16 +1083,18 @@ In an RCT, the parallel trends assumption is very plausible because randomizatio
 
 ```mermaid
 graph LR
-    subgraph "Parallel Trends Assumption"
-    PRE["<b>Baseline 2021</b>"]
-    POST["<b>Endline 2024</b>"]
+    subgraph PT["Parallel trends assumption"]
+    PRE("<b>Baseline 2021</b>")
+    POST("<b>Endline 2024</b>")
     end
 
-    PRE -->|"Treated group<br/>change = effect + trend"| POST
-    PRE -->|"Control group<br/>change = trend only"| POST
-
-    style PRE fill:#6a9bcc,stroke:#141413,color:#141413
-    style POST fill:#d97757,stroke:#141413,color:#141413
+    PRE -->|"treated group:<br/>change = effect + trend"| POST
+    PRE -->|"control group:<br/>change = trend only"| POST
+    style PT fill:none,stroke:#c8d0e0,stroke-width:1px,stroke-dasharray:4 4
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    class PRE blue
+    class POST orange
 ```
 
 ### 9.2 Why does DiD estimate ATT and not ATE?
@@ -1196,25 +1201,26 @@ The doubly robust property works through the same logic as in the cross-sectiona
 
 ```mermaid
 graph TD
-    DY["<b>Panel data</b><br/>ΔY = Y_post − Y_pre<br/>for each household"]
-    OR["<b>Outcome model</b><br/>Predict control group's<br/>consumption change<br/>μ̂₀,Δ(X)"]
-    PS["<b>Propensity score</b><br/>Estimate p(X)<br/>= Pr(D=1 | X)"]
-    RES["<b>Residuals</b><br/>ΔY − μ̂₀,Δ(X)"]
-    IPW_W["<b>IPW reweighting</b><br/>Make controls look<br/>like treated group"]
-    DRDID["<b>DR-DiD estimate</b><br/>ATT = weighted average<br/>of residuals"]
+    DY("<b>Panel data</b><br/>ΔY = Y_post − Y_pre<br/>for each household")
+    OR("<b>Outcome model</b><br/>predict the control group's<br/>consumption change<br/>μ̂₀,Δ(X)")
+    PS("<b>Propensity score</b><br/>estimate p(X)<br/>= Pr(D=1 | X)")
+    RES("<b>Residuals</b><br/>ΔY − μ̂₀,Δ(X)")
+    IPW_W("<b>IPW reweighting</b><br/>make controls look<br/>like the treated group")
+    DRDID("<b>DR-DiD estimate</b><br/>ATT = weighted average<br/>of residuals")
 
     DY --> RES
     OR --> RES
     PS --> IPW_W
     RES --> DRDID
     IPW_W --> DRDID
-
-    style DY fill:#141413,stroke:#00d4c8,color:#fff
-    style OR fill:#6a9bcc,stroke:#141413,color:#141413
-    style PS fill:#d97757,stroke:#141413,color:#141413
-    style RES fill:#6a9bcc,stroke:#141413,color:#141413
-    style IPW_W fill:#d97757,stroke:#141413,color:#141413
-    style DRDID fill:#00d4c8,stroke:#141413,color:#141413
+    classDef anchor fill:#0f1729,stroke:#c8d0e0,stroke-width:2px,color:#e8ecf2
+    classDef blue fill:#1f2b5e,stroke:#6a9bcc,stroke-width:3px,color:#e8ecf2
+    classDef orange fill:#1f2b5e,stroke:#d97757,stroke-width:3px,color:#e8ecf2
+    classDef teal fill:#1f2b5e,stroke:#00d4c8,stroke-width:3px,color:#e8ecf2
+    class DY anchor
+    class OR,RES blue
+    class PS,IPW_W orange
+    class DRDID teal
 ```
 
 #### What DRDID adds over basic DiD and TWFE
