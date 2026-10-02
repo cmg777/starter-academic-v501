@@ -17,6 +17,10 @@ links:
     icon_pack: fas
     name: "Slides (HTML)"
     url: slides/index.html
+  - icon: file-pdf
+    icon_pack: fas
+    name: "AI Slides (PDF)"
+    url: https://carlos-mendez.org/post/python_panel_intro/slides/ai-slides.pdf
   - icon: laptop-code
     icon_pack: fas
     name: "Web app"
