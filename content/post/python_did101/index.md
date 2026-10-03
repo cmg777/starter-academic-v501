@@ -25,6 +25,18 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: bolt
+  icon_pack: fas
+  name: "Python cheat sheet"
+  url: cheatsheet_python.py
+- icon: bolt
+  icon_pack: fas
+  name: "R cheat sheet"
+  url: cheatsheet_R.R
+- icon: bolt
+  icon_pack: fas
+  name: "Stata cheat sheet"
+  url: cheatsheet_stata.do
 - icon: file-code
   icon_pack: fas
   name: "Quarto project (.zip)"
