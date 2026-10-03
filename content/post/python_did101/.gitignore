@@ -1,0 +1,8 @@
+# Build artifacts for python_did101 (not source).
+
+# AhaSlides upload payload, regenerated on demand.
+ahaslides/payload.json
+
+# Python bytecode.
+__pycache__/
+*.pyc

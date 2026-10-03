@@ -183,3 +183,11 @@ $presentation-list-bullet-color: $steel;
 
 // --- Code blocks: teal left rule ---
 .reveal div.sourceCode, .reveal pre.sourceCode { border-left: 3px solid $teal; }
+
+// --- Mermaid diagrams: readable edge labels on the navy slide background ---
+// Same treatment as the website (assets/scss/custom.scss §23): dark chip, light text.
+// Quarto renders the diagram as svg.mermaid-js (no .mermaid wrapper).
+.reveal svg.mermaid-js .edgeLabel,
+.reveal svg.mermaid-js .edgeLabel p,
+.reveal svg.mermaid-js .edgeLabel span { background-color: #0f1729 !important; color: #e8ecf2 !important; }
+.reveal svg.mermaid-js .edgeLabel rect { fill: #0f1729 !important; opacity: 1 !important; }

@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-10-02">
+  <meta name="dcterms.date" content="2026-10-03">
   <title>Introduction to Difference-in-Differences in Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -95,7 +95,7 @@
     code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-db6389aca580c90ada52aff7de3e23ec.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -189,6 +189,11 @@
       margin-right: 0; 
     }
   </style>
+  <script>
+    // MathJax 2 (the reveal math plugin): use the TeX web fonts, never locally installed
+    // STIX fonts, whose accent metrics misplace hats and tildes (macOS ships STIX).
+    window.MathJax = { "HTML-CSS": { availableFonts: [], preferredFont: null, webFont: "TeX" } };
+  </script>
 </head>
 <body class="quarto-dark">
   <div class="reveal">
@@ -204,7 +209,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">October 2, 2026</p>
+  <p class="date">October 3, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -217,7 +222,7 @@
 <div class="fragment">
 <p>A <strong>36.20-point</strong> leap. <em>But the 25 untreated schools also improved — from 71.22 to 82.10.</em> How much of the jump is really the program?</p>
 <aside class="notes">
-<p>This is the central hook. The naive before-after story looks like a triumph, but a chunk of the gain is a district-wide trend that would have happened anyway. The whole tutorial exists to separate the program from the trend.</p>
+<p>This is the central hook. The naive before-after story looks like a triumph, but part of the gain is a district-wide trend that would have happened anyway. The whole tutorial exists to separate the program from the trend.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -231,11 +236,11 @@
       }</style></aside>
 </div>
 </section>
-<section id="the-naive-before-after-attributes-the-entire-36-point-rise-to-the-program" class="slide level2 center">
-<h2>The naive before-after attributes the entire 36-point rise to the program</h2>
+<section id="the-naive-before-after-credits-the-entire-36-point-rise-to-the-program" class="slide level2 center">
+<h2>The naive before-after credits the entire 36-point rise to the program</h2>
 
-<img data-src="../did101_its.png" class="r-stretch quarto-figure-center"><p class="caption">Treated-group GPA rising from 60.17 to 96.37 — the naive estimator credits the full 36.20-point increase to tutoring, ignoring everything else that changed.</p><aside class="notes">
-<p>The spoiler figure for Act I. Don’t resolve it yet — just plant the suspicion. Curriculum reforms, new textbooks, students maturing: any of these could lift GPA in all schools, not just the treated ones. The naive approach conflates the treatment effect with the secular trend.</p>
+<img data-src="../did101_its.png" class="r-stretch quarto-figure-center"><p class="caption">Treated-group GPA rising from 60.17 to 96.37: the naive estimator credits the full 36.20-point increase to tutoring, ignoring everything else that changed.</p><aside class="notes">
+<p>Plant the suspicion without resolving it. Curriculum reforms, new textbooks, students maturing: any of these could lift GPA in all schools, not just the treated ones. The naive approach conflates the treatment effect with the secular trend.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -248,26 +253,59 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-plan-from-naive-before-after-to-an-8-period-event-study" class="slide level2 center">
-<h2>The plan: from naive before-after to an 8-period event study</h2>
+<section id="the-plan-from-a-naive-before-after-to-an-8-period-event-study" class="slide level2 center">
+<h2>The plan: from a naive before-after to an 8-period event study</h2>
 <ul>
-<li class="fragment">The lab: a 35-school, 2-period panel — a clean 2×2 design</li>
-<li class="fragment">Why naive before-after overstates, and how a comparison group fixes it</li>
+<li class="fragment">The lab: 35 schools in 2 periods, a clean 2×2 design</li>
+<li class="fragment">Why the naive estimate overstates, and how a comparison group fixes it</li>
 <li class="fragment">Manual double-differencing, then OLS and two-way fixed effects in PyFixest</li>
-<li class="fragment">Four standard-error flavours — does inference change the verdict?</li>
-<li class="fragment">An 8-period event study to probe parallel trends</li>
+<li class="fragment">Four standard errors: does inference change the verdict?</li>
+<li class="fragment">An 8-period event study, then five tempting misreadings</li>
 </ul>
+<aside class="notes">
+<p>Teaching deck, so we signpost. Five “Before you look” slides along the way ask the room to predict before each reveal; on AhaSlides each one is followed by a live quiz.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
 <section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
 <h1>The Investigation</h1>
 <p><span class="act">Act II</span></p>
 </section>
-<section id="a-clean-22-lab-35-schools-2-periods-simultaneous-treatment" class="slide level2 center">
-<h2>A clean 2×2 lab: 35 schools, 2 periods, simultaneous treatment</h2>
+<section id="a-clean-22-lab-35-schools-2-periods-simultaneous-adoption" class="slide level2 center">
+<h2>A clean 2×2 lab: 35 schools, 2 periods, simultaneous adoption</h2>
 
-<img data-src="../did101_panelview.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure — 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. Timing is simultaneous and treatment, once on, stays on.</p><aside class="notes">
-<p>The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods), outcome is average GPA of low-income students on a 0–100 scale. This is a textbook 2×2 — all 10 treated schools adopt at the same moment, no school ever drops out of treatment, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.</p>
+<img data-src="../did101_panelview.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure: 10 treated schools (orange) switch on after the intervention; 25 comparison schools (steel blue) never do. Timing is simultaneous and treatment, once on, stays on.</p><aside class="notes">
+<p>The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods); the outcome is the average GPA of low-income students. A textbook 2×2: all 10 treated schools (ids 26–35) adopt at the same moment, no school drops out of treatment, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-what-happened-in-the-schools-without-tutoring" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: what happened in the schools <em>without</em> tutoring?</h2>
+<p>Tutored schools rose 36.20 points. What did the 25 comparison schools do, and where does that leave DiD?</p>
+<p><strong>A.</strong>&nbsp; They stayed flat, so DiD is about 36</p>
+<p><strong>B.</strong>&nbsp; They rose by about 11 points, so DiD is about 25</p>
+<p><strong>C.</strong>&nbsp; They fell, so DiD is larger than 36</p>
+<aside class="notes">
+<p>Ask the room to commit before the means table. Give 20 seconds, then take the vote. Answer on the next slide: B. Comparison schools rose by 10.88 points (71.22 to 82.10) with no program at all; that region-wide drift is part of the treated schools’ 36.20 too, so the DiD effect is 36.20 − 10.88 = 25.32. (AhaSlides interactive I1 follows.)</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -306,9 +344,9 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">The comparison group’s +10.88 is the secular trend — the rise that would have happened anyway.</span></p>
+<p><span class="takeaway fragment">The comparison group’s +10.88 is the secular trend: the rise that would have happened anyway.</span></p>
 <aside class="notes">
-<p>The comparison schools never got tutoring, yet their GPA still rose 10.88 points. Under parallel trends we assume the treated schools would have drifted by the same 10.88 absent the program. That single number is what the naive estimator wrongly handed to the program.</p>
+<p>The answer to the vote: B. The comparison schools never got tutoring, yet their GPA still rose 10.88 points. Under parallel trends we assume the treated schools would have drifted by the same amount without the program. That single number is what the naive estimator wrongly handed to the program.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -325,9 +363,9 @@
 <h2>DiD is a double difference: 36.20 minus 10.88 equals 25.32</h2>
 <p><span class="math display">\[DiD = \Big(\bar{Y}^{post}_{treat} - \bar{Y}^{pre}_{treat}\Big) - \Big(\bar{Y}^{post}_{ctrl} - \bar{Y}^{pre}_{ctrl}\Big)\]</span></p>
 <p><span class="math display">\[DiD = (96.37 - 60.17) - (82.10 - 71.22) = 36.20 - 10.88 = 25.32\]</span></p>
-<p><span class="takeaway fragment">Subtract the trend the control group reveals; what’s left is the program’s causal effect.</span></p>
+<p><span class="takeaway fragment">Subtract the trend the comparison group reveals; what is left is the program’s effect.</span></p>
 <aside class="notes">
-<p>The treated runner sped up by 36.20 units; the comparison runner sped up by 10.88. The coaching effect is the extra 25.32 units only the coached runner gained. This is the entire idea — everything that follows just implements it more flexibly with regression.</p>
+<p>The treated runner sped up by 36.20 units; the comparison runner by 10.88. The coaching effect is the extra 25.32 units only the coached runner gained. Rounding note: 25.32 is the arithmetic on means rounded to two decimals; with unrounded means the DiD is 25.315 (trend 10.886), exactly the regression coefficient on the coming slides. The naive 36.20 overstates 25.32 by 43%.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -343,8 +381,8 @@
 <section id="the-counterfactual-where-treated-schools-would-have-landed-without-tutoring" class="slide level2 center">
 <h2>The counterfactual: where treated schools would have landed without tutoring</h2>
 
-<img data-src="../did101_counterfactual.png" class="r-stretch quarto-figure-center"><p class="caption">Three lines — comparison (steel, 71.22→82.10), treated (orange, 60.17→96.37), and the counterfactual (teal dashed, 60.17→71.05). The 25.32 gap between the actual and counterfactual treated outcome is the ATT.</p><aside class="notes">
-<p>The counterfactual is treated-pre level (60.17) plus the control’s secular change (10.88) = 71.05 — what we’d expect if treated schools had only drifted with the trend. The actual post mean is 96.37; the gap of 25.32 is the program’s effect. Parallel trends doesn’t require equal levels (treated schools start lower), only equal trends.</p>
+<img data-src="../did101_counterfactual.png" class="r-stretch quarto-figure-center"><p class="caption">Three lines: comparison (steel, 71.22→82.10), treated (orange, 60.17→96.37) and the counterfactual (teal dashed, 60.17→71.05). The 25.32 gap between the actual and counterfactual treated outcome is the ATT.</p><aside class="notes">
+<p>The counterfactual is the treated pre-period level (60.17) plus the comparison group’s change (10.88) = 71.05: where treated schools would be if they had only drifted with the trend. The actual post mean is 96.37; the gap of 25.32 is the program’s effect. Parallel trends does not require equal levels (treated schools start lower), only equal trends.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -360,10 +398,10 @@
 <section id="did-identifies-the-att-not-the-ate-under-parallel-trends" class="slide level2 center">
 <h2>DiD identifies the ATT, not the ATE, under parallel trends</h2>
 <p><span class="math display">\[E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=1] = E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=0]\]</span></p>
-<p>The <em>change</em> in untreated potential outcomes is the same for both groups — so the control’s trend stands in for the treated group’s missing counterfactual.</p>
+<p>Without the program, both groups would have <em>changed</em> by the same amount.</p>
 <p><span class="takeaway fragment">The estimand is the ATT: the average effect for the schools that actually got the program.</span></p>
 <aside class="notes">
-<p>State the estimand explicitly. DiD recovers the ATT — the effect on the treated — not the ATE. The two diverge when treatment effects vary with selection into treatment. Parallel trends is the identifying assumption; SUTVA (no spillovers between schools) is the other load-bearing assumption.</p>
+<p>State the estimand explicitly. DiD recovers the ATT, the effect on the treated, not the ATE. The two diverge when treatment effects vary with selection into treatment. Parallel trends is the identifying assumption, and it concerns an unobserved counterfactual, so no test can prove it. SUTVA (no spillovers between schools) is the other load-bearing assumption.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -376,8 +414,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="a-treatedpost-interaction-recovers-the-same-25.32-with-every-coefficient-a-group-mean" class="slide level2 center">
-<h2>A treated×post interaction recovers the same 25.32 — with every coefficient a group mean</h2>
+<section id="a-treatedpost-interaction-recovers-the-same-25.32-and-every-coefficient-is-a-group-mean" class="slide level2 center">
+<h2>A treated×post interaction recovers the same 25.32, and every coefficient is a group mean</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>fit_ols <span class="op">=</span> pf.feols(<span class="st">"gpa ~ treated + post + txp"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span><span class="st">"HC1"</span>)</span>
 <span id="cb1-2"><a href=""></a><span class="bu">print</span>(fit_ols.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <table class="caption-top">
@@ -391,28 +429,28 @@
 <tbody>
 <tr class="odd">
 <td>Intercept</td>
-<td style="text-align: right;">71.22</td>
+<td style="text-align: right;">71.215</td>
 <td>comparison pre-mean</td>
 </tr>
 <tr class="even">
 <td>treated</td>
-<td style="text-align: right;">−11.05</td>
+<td style="text-align: right;">−11.049</td>
 <td>baseline level gap</td>
 </tr>
 <tr class="odd">
 <td>post</td>
-<td style="text-align: right;">+10.89</td>
+<td style="text-align: right;">+10.886</td>
 <td>common time trend</td>
 </tr>
 <tr class="even">
 <td>txp</td>
-<td style="text-align: right;"><span class="key">25.32</span></td>
+<td style="text-align: right;"><span class="key">25.315</span></td>
 <td>the DiD estimate</td>
 </tr>
 </tbody>
 </table>
 <aside class="notes">
-<p>The manual double-difference is exactly an OLS regression with a treated dummy, a post dummy, and their interaction. Every coefficient is a group mean or a difference of group means. txp = 25.315 is the ATT; the manual 25.32 is the same number computed from means rounded to two decimals (likewise post = 10.886 here versus 10.88 from the rounded means). HC1 gives heteroskedasticity-robust standard errors, but it treats each school’s two observations as independent; the next slide clusters by school.</p>
+<p>The manual double difference is exactly an OLS regression with a treated dummy, a post dummy and their interaction. Every coefficient is a group mean or a difference of group means; txp = 25.315 is the ATT. HC1 is heteroskedasticity-robust but treats each school’s two observations as independent; the next model clusters by school.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -425,13 +463,53 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-way-fixed-effects-absorb-school-and-time-leaving-only-the-interaction" class="slide level2 center">
-<h2>Two-way fixed effects absorb school and time — leaving only the interaction</h2>
+<section id="before-you-look-replace-treated-and-post-with-fixed-effects" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: replace <code>treated</code> and <code>post</code> with fixed effects</h2>
+<p>Swap them for school and period fixed effects, and cluster by school. What changes?</p>
+<p><strong>A.</strong>&nbsp; The coefficient stays at 25.315; only the standard error changes</p>
+<p><strong>B.</strong>&nbsp; Both the coefficient and the standard error change</p>
+<p><strong>C.</strong>&nbsp; Nothing changes: same coefficient, same standard error</p>
+<aside class="notes">
+<p>Ask: does absorbing the groups and periods with fixed effects move the DiD coefficient? Answer on the next slide: A. In a balanced 2×2 panel the school effects absorb <code>treated</code> and the period effects absorb <code>post</code> without touching the interaction, so the coefficient stays 25.315. The standard error moves from 0.615 (HC1) to 0.585 (clustered by school). (AhaSlides interactive I2 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-way-fixed-effects-the-same-25.315-now-with-school-clustered-errors" class="slide level2 center">
+<h2>Two-way fixed effects: the same 25.315, now with school-clustered errors</h2>
 <p><span class="math display">\[Y_{it} = \beta\,(\text{Treat}_i \times \text{Post}_t) + \gamma_i + \vartheta_t + \varepsilon_{it}\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>fit_twfe <span class="op">=</span> pf.feols(<span class="st">"gpa ~ txp | id + time"</span>, data<span class="op">=</span>df, vcov<span class="op">=</span>{<span class="st">"CRV1"</span>: <span class="st">"id"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="takeaway fragment"><span class="math inline">\(\gamma_i\)</span> wipes school stains, <span class="math inline">\(\vartheta_t\)</span> wipes period glare. PyFixest’s <code>|</code> pipe absorbs both — no dummy bookkeeping.</span></p>
+<p><span class="takeaway fragment">Coefficient unchanged at 25.315; the SE moves from 0.615 (HC1) to 0.585 (clustered by school).</span></p>
 <aside class="notes">
-<p>Because treated is collinear with school fixed effects and post is collinear with time fixed effects, only txp survives — and it’s still 25.315. Everything left of the pipe is estimated; everything right is absorbed. CRV1 clusters standard errors at the school level, the right choice when treatment varies by school and within-school observations are correlated.</p>
+<p>The answer to the vote: A. Because treated is collinear with the school fixed effects and post with the period fixed effects, only txp survives, and it is still 25.315. Everything left of the pipe is estimated; everything right of it is absorbed. Clustering by school allows each school’s two observations to be correlated.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-does-female_share-move-the-estimate" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: does <code>female_share</code> move the estimate?</h2>
+<p>The share of female students varies a little within schools. Add it to the model: what happens to 25.315?</p>
+<p><strong>A.</strong>&nbsp; It falls by more than one GPA point</p>
+<p><strong>B.</strong>&nbsp; It rises by more than one GPA point</p>
+<p><strong>C.</strong>&nbsp; It barely moves: less than 0.1 points</p>
+<aside class="notes">
+<p>Ask the room to commit before the coefficient plot. Answer on the next slide: C. The estimate moves from 25.315 to 25.328, a shift of 0.013, and female_share itself is insignificant (p = 0.714). (AhaSlides interactive I3 follows.)</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -447,8 +525,9 @@
 <section id="three-specifications-one-answer-25.315-to-25.328" class="slide level2 center">
 <h2>Three specifications, one answer: 25.315 to 25.328</h2>
 
-<img data-src="../did101_coefplot.png" class="r-stretch quarto-figure-center"><p class="caption">The txp estimate across OLS/HC1, TWFE/CRV1, and TWFE+covariate/CRV1 — all clustered tightly around 25.32 with narrow CIs nowhere near zero.</p><aside class="notes">
-<p>Add female_share and the estimate moves by 0.013 (25.315 → 25.328); the covariate itself is insignificant (p = 0.714). The point estimates span just 0.013 GPA points. The design — treatment assignment plus fixed effects — does the heavy lifting; specification choice barely registers.</p>
+<img data-src="../did101_coefplot.png" class="r-stretch quarto-figure-center"><p class="caption">The txp estimate across OLS/HC1, TWFE/CRV1 and TWFE + covariate/CRV1: all clustered tightly around 25.32, with narrow intervals far from zero.</p><p><span class="takeaway fragment">Stability is the reassuring part; an insignificant covariate does not prove the fixed effects capture everything.</span></p>
+<aside class="notes">
+<p>The answer to the vote: C. Adding female_share moves the estimate by 0.013 (25.315 to 25.328), and the covariate is insignificant (p = 0.714). The design, not the controls, does the heavy lifting. One caution: a covariate the program itself could change (for example, if tutoring attracted more female students) is a bad control and should be measured before treatment or left out.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -461,11 +540,32 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="inference-flavours-barely-move-the-needle-when-the-signal-is-this-strong" class="slide level2 center">
-<h2>Inference flavours barely move the needle when the signal is this strong</h2>
+<section id="before-you-look-which-standard-error-is-largest" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: which standard error is largest?</h2>
+<p>Same model, same coefficient (25.315), four variance estimators: iid, HC1, CRV1 (clustered by school) and CRV3 (a leave-one-school-out jackknife). Which reports the largest standard error?</p>
+<p><strong>A.</strong>&nbsp; iid</p>
+<p><strong>B.</strong>&nbsp; HC1</p>
+<p><strong>C.</strong>&nbsp; CRV3</p>
+<aside class="notes">
+<p>Ask: which estimator is the most conservative here? Answer on the next slide: C. CRV3 gives 0.637, then iid 0.607; HC1 and CRV1 are nearly identical at 0.585. None comes close to changing the conclusion: the smallest t-statistic is 39.72. (AhaSlides interactive I4 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="inference-choices-barely-move-the-needle-when-the-signal-is-this-strong" class="slide level2 center">
+<h2>Inference choices barely move the needle when the signal is this strong</h2>
 
-<img data-src="../did101_se_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Standard errors across iid, HC1, CRV1, and CRV3. CRV3 is largest (0.637); HC1 and CRV1 are nearly identical (0.585). All four yield overwhelmingly significant results.</p><aside class="notes">
-<p>Four variance estimators on the same model. SEs range from 0.585 to 0.637 — but with an effect of 25 GPA points, even the largest SE leaves a t-statistic above 39. What matters for inference is the 10 treated schools, not the 35 clusters in total: with few treated clusters CRV1 can understate uncertainty, so CRV3 (a leave-one-school-out jackknife) or the wild cluster bootstrap is the safer choice. Here the effect is so large that the choice is practically irrelevant. The lesson: design beats variance estimator.</p>
+<img data-src="../did101_se_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Standard errors across iid, HC1, CRV1 and CRV3. CRV3 is largest (0.637); HC1 and CRV1 are nearly identical (0.585). All four give overwhelmingly significant results.</p><p><span class="takeaway fragment">Here the design, not the variance estimator, decides the verdict: every t-statistic is above 39.</span></p>
+<aside class="notes">
+<p>The answer to the vote: C. CRV3 re-estimates the model leaving out one school at a time; it corrects CRV1’s tendency to understate uncertainty when clusters are few or influential. What matters is the 10 treated schools, not the 35 clusters: with few treated clusters, prefer CRV3 or the wild cluster bootstrap. With an effect of 25 points, an estimate would need to fall to about 1.2 to 1.3 points before the choice mattered (Exercise 4 in the post).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -484,11 +584,11 @@
 <p><span class="act">Act III</span></p>
 </section>
 <section id="the-program-raises-gpa-by-25.32-points-not-36.20" class="slide level2 center" data-background-color="#141413">
-<h2>The program raises GPA by 25.32 points — not 36.20</h2>
+<h2>The program raises GPA by 25.32 points, not 36.20</h2>
 <p><span class="bignum">25.32</span></p>
 <p><span class="bignum-label">ATT, stable across specifications (25.315–25.328) · the naive 36.20 overstated it by 43%</span></p>
 <aside class="notes">
-<p>The Act-III payoff. The naive before-after said 36.20; DiD says 25.32. The 10.88-point gap is the secular trend the naive estimator wrongly credited to the program — a 43% overstatement. R² near 0.995 across the TWFE specifications.</p>
+<p>The Act III payoff. The naive before-after said 36.20; DiD says 25.32. The 10.88-point gap is the secular trend the naive estimator wrongly credited to the program: a 43% overstatement. R² is near 0.995 in the two-way fixed-effects models, unrealistically high because the data are simulated.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -501,11 +601,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="pre-trends-are-flat-and-effects-jump-immediately-a-textbook-event-study" class="slide level2 center">
-<h2>Pre-trends are flat and effects jump immediately — a textbook event study</h2>
+<section id="the-event-study-panel-treatment-switches-on-in-period-5" class="slide level2 center">
+<h2>The event-study panel: treatment switches on in period 5</h2>
 
-<img data-src="../did101_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Event-study coefficients by period relative to treatment. Leads (t = −4 to −2) sit near zero with CIs covering zero; lags (t = 0 to 3) jump to ≈25 and stay flat.</p><aside class="notes">
-<p>The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. Pre-treatment coefficients (0.34, −0.32, 0.59) are all insignificant (p &gt; 0.17) — consistent with parallel trends, though no pre-test can prove it. Post-treatment effects jump to ~25 at t = 0 and hold across all four lags: immediate and sustained, no fade-out.</p>
+<img data-src="../did101_panelview_event.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure for the event study: 35 schools across 8 periods. Treatment begins in period 5; the 10 treated schools switch from light to dark orange, and the 25 comparison schools stay steel blue.</p><aside class="notes">
+<p>Four pre-treatment and four post-treatment periods; each of the 10 treated schools contributes one observation per event time. Simultaneous adoption, with no staggering, is what lets this simple event study separate leads from lags cleanly. Comparison schools have no event time; the code gives them a placeholder so they stay in the sample.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -518,8 +618,45 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-numbers-behind-the-picture-silent-leads-loud-lags" class="slide level2 center">
-<h2>The numbers behind the picture: silent leads, loud lags</h2>
+<section id="before-you-look-what-should-the-event-study-show" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: what should the event study show?</h2>
+<p>Eight periods, one coefficient per period, each relative to t = −1. If parallel trends holds, what do we see?</p>
+<p><strong>A.</strong>&nbsp; Leads near zero; lags jump to about 25 and stay roughly flat</p>
+<p><strong>B.</strong>&nbsp; Leads near zero; lags climb steadily from about 10 to about 40</p>
+<p><strong>C.</strong>&nbsp; Leads already around 25</p>
+<aside class="notes">
+<p>Ask: what is the signature of a credible design with this program? Answer on the next slide: A. The leads are 0.34, −0.32 and 0.59 (all p &gt; 0.17); the lags are 25.03, 24.71, 24.77 and 25.70, roughly flat. (AhaSlides interactive I5 follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="leads-near-zero-and-an-effect-from-the-first-treated-period-a-textbook-event-study" class="slide level2 center">
+<h2>Leads near zero and an effect from the first treated period: a textbook event study</h2>
+
+<img data-src="../did101_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Event-study coefficients by period relative to treatment. Leads (t = −4 to −2) sit near zero with intervals covering zero; lags (t = 0 to 3) jump to about 25 and stay flat.</p><aside class="notes">
+<p>The answer to the vote: A. The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. The leads are consistent with parallel trends, though no pre-test can prove it. The effect appears at t = 0 relative to t = −1 and holds across all four lags: no build-up, no fade-out.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-numbers-behind-the-picture-quiet-leads-loud-lags" class="slide level2 center">
+<h2>The numbers behind the picture: quiet leads, loud lags</h2>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -564,7 +701,25 @@
 </table>
 <p><span class="takeaway fragment">Three near-zero leads are consistent with parallel trends; four large lags trace a stable effect.</span></p>
 <aside class="notes">
-<p>t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant, which supports (but cannot prove) the design. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p &lt; 0.001 and remarkably flat: the effect appears in the first treated period (relative to t = −1) and shows no decay over four periods.</p>
+<p>t = −1 is the omitted reference (normalized to zero). The three leads are small and insignificant, which supports (but cannot prove) the design. The four lags (25.03, 24.71, 24.77, 25.70) are all significant at p &lt; 0.001 and roughly flat: the effect appears in the first treated period and shows no decay over four periods.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="five-tempting-misreadings" class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Five tempting misreadings</h1>
+<p><span class="act">Common misconceptions</span></p>
+<aside class="notes">
+<p>DiD looks simple, and that simplicity invites a few recurring misreadings. Each of the next five slides states a tempting claim and answers it with this tutorial’s own numbers.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -577,11 +732,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="event-study-panel-confirms-the-design-treatment-switches-on-at-period-5" class="slide level2 center">
-<h2>Event-study panel confirms the design: treatment switches on at period 5</h2>
-
-<img data-src="../did101_panelview_event.png" class="r-stretch quarto-figure-center"><p class="caption">Panel structure for the event study — 35 schools across 8 periods. Treatment begins at period 5; 10 treated schools switch from light to dark orange, 25 comparison schools stay steel blue.</p><aside class="notes">
-<p>Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. Simultaneous adoption, with no staggering, is what lets this simple event study separate leads from lags cleanly.</p>
+<section id="insignificant-leads-prove-parallel-trends-they-are-evidence-not-proof" class="slide level2 center">
+<h2>“Insignificant leads prove parallel trends”: they are evidence, not proof</h2>
+<p><span class="objection">Myth.</span> The leads (0.34, −0.32, 0.59; all p &gt; 0.17) are insignificant, so parallel trends holds.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> Parallel trends concerns an unobserved counterfactual, which no data can show. And pre-tests have little power: a one-point gap would still fit inside the t = −2 interval, [−0.27, 1.45].</p>
+<aside class="notes">
+<p>Roth (2022), “Pretest with caution”. In the post’s interactive lab, a pre-trend of 0.2 GPA points per period leaves every lead insignificant, yet biases the pooled DiD estimate by +0.70.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -593,14 +750,95 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</div>
+</section>
+<section id="the-groups-must-start-at-the-same-gpa-only-the-trends-must-match" class="slide level2 center">
+<h2>“The groups must start at the same GPA”: only the trends must match</h2>
+<p><span class="objection">Myth.</span> DiD needs the treated and comparison schools to start from the same level.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> Treated schools start <strong>11.05 points below</strong> comparison schools (60.17 versus 71.22), and DiD is still valid. Differencing removes any gap in levels; only the <em>trends</em> must be parallel.</p>
+<aside class="notes">
+<p>The <code>treated</code> coefficient in the OLS interaction model is exactly this baseline gap, −11.049. The school fixed effects absorb it in the two-way model.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="is-the-programs-effect-for-every-school-it-is-the-att" class="slide level2 center">
+<h2>“25.32 is the program’s effect for every school”: it is the ATT</h2>
+<p><span class="objection">Myth.</span> The estimate tells us what tutoring would do in any school.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> DiD identifies the <strong>average effect on the 10 treated schools</strong>. It says nothing about how the 25 comparison schools would have responded, which could differ if schools chose the program because they expected to benefit.</p>
+<aside class="notes">
+<p>ATT and ATE diverge when the treatment effect varies in ways related to selection into treatment. Report the estimand explicitly.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="adding-controls-always-makes-did-more-credible-design-does-controls-may-not" class="slide level2 center">
+<h2>“Adding controls always makes DiD more credible”: design does, controls may not</h2>
+<p><span class="objection">Myth.</span> The more covariates, the more believable the estimate.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> Adding <code>female_share</code> moved the estimate by <strong>0.013</strong> (25.315 to 25.328): the credibility comes from the design. A covariate the program itself can change is a <strong>bad control</strong> and can bias the estimate.</p>
+<aside class="notes">
+<p>Measure time-varying covariates before treatment, or leave them out, whenever the program could plausibly affect them.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-se-choice-never-matters-it-can-decide-the-result-for-smaller-effects" class="slide level2 center">
+<h2>“The SE choice never matters”: it can decide the result for smaller effects</h2>
+<p><span class="objection">Myth.</span> All four standard errors agreed here, so the choice of estimator is irrelevant.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> They agree because the effect is about <strong>40 standard errors</strong> from zero. An estimate of <strong>1.19</strong> points would pass with CRV1 but fail with CRV3 (threshold <strong>1.30</strong>): with small effects, the choice decides the verdict.</p>
+<aside class="notes">
+<p>Exercise 4 in the post computes these thresholds: 2.03 standard errors with 34 degrees of freedom (35 schools minus one).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
 </section>
 <section id="does-precision-make-this-causal-no-the-assumptions-still-carry-it" class="slide level2 center">
 <h2>Does precision make this causal? No — the assumptions still carry it</h2>
-<p><span class="objection">Objection.</span> The estimate is precise and the pre-trends are flat — surely DiD has proven tutoring caused the gain.</p>
+<p><span class="objection">Objection.</span> The estimate is precise and the pre-trends are flat, so DiD has proven that tutoring caused the gain.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Precision is not identification. The 25.32 ATT is valid only under <strong>parallel trends</strong> and <strong>SUTVA</strong>. Flat pre-trends are supportive, not proof; and this is <em>simulated</em> data with parallel trends built in. In the field, expect imperfect pre-trends, smaller effects, and R² well below 0.99.</p>
+<p><span class="rebuttal">Response.</span> Precision is not identification. The 25.32 ATT rests on <strong>parallel trends</strong> and <strong>SUTVA</strong>; flat pre-trends support them but cannot prove them. The data are <em>simulated</em>: in the field, expect imperfect pre-trends, smaller effects and R² well below 0.99.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. The event study tests but cannot confirm parallel trends — it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. And with staggered real-world timing and effects that vary across adoption cohorts, the standard TWFE estimator can be badly biased (Goodman-Bacon; Callaway–Sant’Anna; Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.</p>
+<p>Steelman, do not strawman. The event study probes but cannot confirm parallel trends; it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. With staggered real-world timing and effects that vary across adoption cohorts, the standard TWFE estimator can be badly biased (Goodman-Bacon; Callaway–Sant’Anna; Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -617,7 +855,7 @@
 <section id="a-credible-comparison-group-not-the-variance-estimator-is-what-makes-the-effect-causal." class="title-slide slide level1 divider center" data-background-color="#141413">
 <h1>A credible comparison group, not the variance estimator, is what makes the effect causal.</h1>
 <aside class="notes">
-<p>The single takeaway. DiD strips the 10.88-point common trend the naive estimator wrongly credited to the program, leaving a stable 25.32-point ATT. The design — comparison group, fixed effects, flat pre-trends — does the work; the choice of standard error is a footnote.</p>
+<p>The single takeaway. DiD strips the 10.88-point common trend that the naive estimator wrongly credited to the program, leaving a stable 25.32-point ATT. The design (a comparison group, fixed effects, quiet pre-trends) does the work; the choice of standard error is a footnote here, and only here.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

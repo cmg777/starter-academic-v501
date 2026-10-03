@@ -193,3 +193,21 @@ A pre-teaching audit of the whole `python_did101` folder edited `slides.qmd` and
 - Pre-trend claims softened from "validate" / "strong support" to "consistent with parallel trends" (pre-tests cannot prove the assumption).
 - "+43%" key-result caption now reads "naive overstates the DiD effect".
 - Speaker notes: CRV3 described as a leave-one-school-out jackknife; inference caveat reframed around the 10 treated clusters; "staggered-on-simultaneously" corrected to simultaneous adoption; staggered-TWFE bias tied to heterogeneous effects; note that 25.32 / 10.88 are differences of rounded means (exact: 25.315 / 10.886).
+
+---
+
+## Addendum — 2026-10-03 revision (33 slides) and AhaSlides deck
+
+The deck was revised to the audited post and rebuilt for teaching (outline approved by the author):
+21 → 33 printed pages (1 title, 5 dividers, 27 slides).
+
+- **Five "Before you look" cue slides** (`#1a3a8a` background) mirroring the post's predict cards, each
+  followed on AhaSlides by a scored quiz (deck `10254213`, see `../ahaslides/README.md`).
+- **New "Five tempting misreadings" section**: one myth/truth slide per misconception card in the post
+  (pre-trends ≠ proof, levels may differ, ATT not ATE, controls and bad controls, SE choice for small
+  effects: 1.19 vs 1.30).
+- Reveal slides' notes begin "The answer to the vote"; notes updated for the rounding note (25.32 vs
+  25.315), CRV3 as a jackknife and the 10 treated clusters.
+- Theme refreshed to the current `site-brand.scss` template; `mathjax-fonts.html` added (TeX web fonts).
+- Verified with `slide-audit.cjs`: 33 slides, 0 raw LaTeX, 0 overflow, branding checks pass; 7 slides
+  over 60 words, all dominated by equations, tables or code. Visual check of all 33 printed pages.

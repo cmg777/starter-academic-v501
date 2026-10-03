@@ -1,0 +1,381 @@
+{
+  "presentation": {
+    "title": "Introduction to Difference-in-Differences in Python",
+    "subtitle": "Does after-school tutoring raise GPA? Separating the program from the trend",
+    "author": "Carlos Mendez — Nagoya University (GSID)",
+    "language": "en",
+    "source": "content/post/python_did101/slides/slides.qmd",
+    "post": "https://carlos-mendez.org/post/python_did101/",
+    "presentationId": 10254213,
+    "publicViewLink": "https://presenter.ahaslides.com/share/1790995456625-cj6th2dfd9",
+    "editorUrl": "https://presenter.ahaslides.com/presentation/10254213",
+    "joinCode": "KYSMB",
+    "architecture": "content slides are imported PDF pages; only the interactive slides are created through the MCP",
+    "imagePages": 33,
+    "interactivePositions": [
+      9,
+      16,
+      19,
+      22,
+      28
+    ],
+    "freePlanTypesOnly": true,
+    "freePlanParticipantCap": 3
+  },
+  "slides": [
+    {
+      "n": 1,
+      "kind": "title",
+      "title": "Introduction to Difference-in-Differences in Python",
+      "subtitle": "Does after-school tutoring raise GPA? Separating the program from the trend",
+      "imagePage": 1
+    },
+    {
+      "n": 2,
+      "kind": "heading",
+      "title": "The Tension",
+      "background": "#d97757",
+      "imagePage": 2
+    },
+    {
+      "n": 3,
+      "kind": "content",
+      "title": "Tutored schools' GPA jumped 36 points — case closed?",
+      "imagePage": 3,
+      "notes": "This is the central hook. The naive before-after story looks like a triumph, but part of the gain is a district-wide trend that would have happened anyway. The whole tutorial exists to separate the program from the trend."
+    },
+    {
+      "n": 4,
+      "kind": "content",
+      "title": "The naive before-after credits the entire 36-point rise to the program",
+      "imagePage": 4,
+      "notes": "Plant the suspicion without resolving it. Curriculum reforms, new textbooks, students maturing: any of these could lift GPA in all schools, not just the treated ones. The naive approach conflates the treatment effect with the secular trend."
+    },
+    {
+      "n": 5,
+      "kind": "content",
+      "title": "The plan: from a naive before-after to an 8-period event study",
+      "imagePage": 5,
+      "notes": "Teaching deck, so we signpost. Five \"Before you look\" slides along the way ask the room to predict before each reveal; on AhaSlides each one is followed by a live quiz."
+    },
+    {
+      "n": 6,
+      "kind": "heading",
+      "title": "The Investigation",
+      "background": "#6a9bcc",
+      "imagePage": 6
+    },
+    {
+      "n": 7,
+      "kind": "content",
+      "title": "A clean 2×2 lab: 35 schools, 2 periods, simultaneous adoption",
+      "imagePage": 7,
+      "notes": "The simulated case study from Corral and Yang (2024): 70 observations (35 schools × 2 periods); the outcome is the average GPA of low-income students. A textbook 2×2: all 10 treated schools (ids 26–35) adopt at the same moment, no school drops out of treatment, perfectly balanced. The cleanliness is deliberate: it isolates the DiD logic."
+    },
+    {
+      "n": 8,
+      "kind": "content",
+      "title": "Before you look: what happened in the schools without tutoring?",
+      "background": "#1a3a8a",
+      "imagePage": 8,
+      "notes": "Ask the room to commit before the means table. Give 20 seconds, then take the vote. Answer on the next slide: B. Comparison schools rose by 10.88 points (71.22 to 82.10) with no program at all; that region-wide drift is part of the treated schools' 36.20 too, so the DiD effect is 36.20 − 10.88 = 25.32. (AhaSlides interactive I1 follows.)"
+    },
+    {
+      "n": 9,
+      "kind": "quiz",
+      "question": "Tutored schools rose by 36.20 GPA points. What did the 25 comparison schools do, and where does that leave the DiD effect?",
+      "options": [
+        {
+          "text": "They stayed flat, so DiD is about 36",
+          "correct": false
+        },
+        {
+          "text": "They rose by about 11 points, so DiD is about 25",
+          "correct": true
+        },
+        {
+          "text": "They fell, so DiD is larger than 36",
+          "correct": false
+        }
+      ],
+      "points": 1000,
+      "timeLimitSeconds": 30,
+      "interactive": true,
+      "notes": "Answer: B. Comparison schools rose by 10.88 points (71.22 to 82.10) with no program at all. That region-wide drift is also part of the treated schools' 36.20, so DiD = 36.20 − 10.88 = 25.32. If A draws votes, that is the naive before-after in disguise: it assumes nothing else changed. The next slide shows the means table."
+    },
+    {
+      "n": 10,
+      "kind": "content",
+      "title": "The comparison group reveals an 11-point trend the program never caused",
+      "imagePage": 9,
+      "notes": "The answer to the vote: B. The comparison schools never got tutoring, yet their GPA still rose 10.88 points. Under parallel trends we assume the treated schools would have drifted by the same amount without the program. That single number is what the naive estimator wrongly handed to the program."
+    },
+    {
+      "n": 11,
+      "kind": "content",
+      "title": "DiD is a double difference: 36.20 minus 10.88 equals 25.32",
+      "imagePage": 10,
+      "notes": "The treated runner sped up by 36.20 units; the comparison runner by 10.88. The coaching effect is the extra 25.32 units only the coached runner gained. Rounding note: 25.32 is the arithmetic on means rounded to two decimals; with unrounded means the DiD is 25.315 (trend 10.886), exactly the regression coefficient on the coming slides. The naive 36.20 overstates 25.32 by 43%."
+    },
+    {
+      "n": 12,
+      "kind": "content",
+      "title": "The counterfactual: where treated schools would have landed without tutoring",
+      "imagePage": 11,
+      "notes": "The counterfactual is the treated pre-period level (60.17) plus the comparison group's change (10.88) = 71.05: where treated schools would be if they had only drifted with the trend. The actual post mean is 96.37; the gap of 25.32 is the program's effect. Parallel trends does not require equal levels (treated schools start lower), only equal trends."
+    },
+    {
+      "n": 13,
+      "kind": "content",
+      "title": "DiD identifies the ATT, not the ATE, under parallel trends",
+      "imagePage": 12,
+      "notes": "State the estimand explicitly. DiD recovers the ATT, the effect on the treated, not the ATE. The two diverge when treatment effects vary with selection into treatment. Parallel trends is the identifying assumption, and it concerns an unobserved counterfactual, so no test can prove it. SUTVA (no spillovers between schools) is the other load-bearing assumption."
+    },
+    {
+      "n": 14,
+      "kind": "content",
+      "title": "A treated×post interaction recovers the same 25.32, and every coefficient is a group mean",
+      "imagePage": 13,
+      "notes": "The manual double difference is exactly an OLS regression with a treated dummy, a post dummy and their interaction. Every coefficient is a group mean or a difference of group means; txp = 25.315 is the ATT. HC1 is heteroskedasticity-robust but treats each school's two observations as independent; the next model clusters by school."
+    },
+    {
+      "n": 15,
+      "kind": "content",
+      "title": "Before you look: replace `treated` and `post` with fixed effects",
+      "background": "#1a3a8a",
+      "imagePage": 14,
+      "notes": "Ask: does absorbing the groups and periods with fixed effects move the DiD coefficient? Answer on the next slide: A. In a balanced 2×2 panel the school effects absorb `treated` and the period effects absorb `post` without touching the interaction, so the coefficient stays 25.315. The standard error moves from 0.615 (HC1) to 0.585 (clustered by school). (AhaSlides interactive I2 follows.)"
+    },
+    {
+      "n": 16,
+      "kind": "quiz",
+      "question": "Replace treated and post with school and period fixed effects, and cluster by school. What changes?",
+      "options": [
+        {
+          "text": "The coefficient stays at 25.315; only the standard error changes",
+          "correct": true
+        },
+        {
+          "text": "Both the coefficient and the standard error change",
+          "correct": false
+        },
+        {
+          "text": "Nothing changes: same coefficient, same standard error",
+          "correct": false
+        }
+      ],
+      "points": 1000,
+      "timeLimitSeconds": 30,
+      "interactive": true,
+      "notes": "Answer: A. In a balanced 2×2 panel the school effects absorb `treated` and the period effects absorb `post` without touching the interaction, so the coefficient stays 25.315. The standard error moves from 0.615 (HC1) to 0.585 (clustered by school) because each school's two observations may now be correlated. The next slide shows the two-way fixed-effects model."
+    },
+    {
+      "n": 17,
+      "kind": "content",
+      "title": "Two-way fixed effects: the same 25.315, now with school-clustered errors",
+      "imagePage": 15,
+      "notes": "The answer to the vote: A. Because treated is collinear with the school fixed effects and post with the period fixed effects, only txp survives, and it is still 25.315. Everything left of the pipe is estimated; everything right of it is absorbed. Clustering by school allows each school's two observations to be correlated."
+    },
+    {
+      "n": 18,
+      "kind": "content",
+      "title": "Before you look: does `female_share` move the estimate?",
+      "background": "#1a3a8a",
+      "imagePage": 16,
+      "notes": "Ask the room to commit before the coefficient plot. Answer on the next slide: C. The estimate moves from 25.315 to 25.328, a shift of 0.013, and female_share itself is insignificant (p = 0.714). (AhaSlides interactive I3 follows.)"
+    },
+    {
+      "n": 19,
+      "kind": "quiz",
+      "question": "Add female_share, which varies a little within schools, to the two-way fixed-effects model. What happens to the DiD estimate of 25.315?",
+      "options": [
+        {
+          "text": "It falls by more than one GPA point",
+          "correct": false
+        },
+        {
+          "text": "It rises by more than one GPA point",
+          "correct": false
+        },
+        {
+          "text": "It barely moves: less than 0.1 points",
+          "correct": true
+        }
+      ],
+      "points": 1000,
+      "timeLimitSeconds": 30,
+      "interactive": true,
+      "notes": "Answer: C. It moves from 25.315 to 25.328, a shift of 0.013, and female_share itself is insignificant (p = 0.714). Stability is the reassuring part; it does not prove the fixed effects capture everything, and a covariate the program can change is a bad control. The next slide shows the three specifications side by side."
+    },
+    {
+      "n": 20,
+      "kind": "content",
+      "title": "Three specifications, one answer: 25.315 to 25.328",
+      "imagePage": 17,
+      "notes": "The answer to the vote: C. Adding female_share moves the estimate by 0.013 (25.315 to 25.328), and the covariate is insignificant (p = 0.714). The design, not the controls, does the heavy lifting. One caution: a covariate the program itself could change (for example, if tutoring attracted more female students) is a bad control and should be measured before treatment or left out."
+    },
+    {
+      "n": 21,
+      "kind": "content",
+      "title": "Before you look: which standard error is largest?",
+      "background": "#1a3a8a",
+      "imagePage": 18,
+      "notes": "Ask: which estimator is the most conservative here? Answer on the next slide: C. CRV3 gives 0.637, then iid 0.607; HC1 and CRV1 are nearly identical at 0.585. None comes close to changing the conclusion: the smallest t-statistic is 39.72. (AhaSlides interactive I4 follows.)"
+    },
+    {
+      "n": 22,
+      "kind": "quiz",
+      "question": "Same model, same coefficient (25.315), four variance estimators. Which reports the largest standard error?",
+      "options": [
+        {
+          "text": "iid",
+          "correct": false
+        },
+        {
+          "text": "HC1",
+          "correct": false
+        },
+        {
+          "text": "CRV3",
+          "correct": true
+        }
+      ],
+      "points": 1000,
+      "timeLimitSeconds": 30,
+      "interactive": true,
+      "notes": "Answer: C. CRV3, the leave-one-school-out jackknife, gives 0.637; then iid 0.607; HC1 and CRV1 are nearly identical at 0.585. Every t-statistic is above 39, so the choice cannot change the verdict here. With only 10 treated schools it would matter for smaller effects. The next slide shows the four standard errors."
+    },
+    {
+      "n": 23,
+      "kind": "content",
+      "title": "Inference choices barely move the needle when the signal is this strong",
+      "imagePage": 19,
+      "notes": "The answer to the vote: C. CRV3 re-estimates the model leaving out one school at a time; it corrects CRV1's tendency to understate uncertainty when clusters are few or influential. What matters is the 10 treated schools, not the 35 clusters: with few treated clusters, prefer CRV3 or the wild cluster bootstrap. With an effect of 25 points, an estimate would need to fall to about 1.2 to 1.3 points before the choice mattered (Exercise 4 in the post)."
+    },
+    {
+      "n": 24,
+      "kind": "heading",
+      "title": "The Resolution",
+      "background": "#00d4c8",
+      "imagePage": 20
+    },
+    {
+      "n": 25,
+      "kind": "content",
+      "title": "The program raises GPA by 25.32 points, not 36.20",
+      "background": "#141413",
+      "imagePage": 21,
+      "notes": "The Act III payoff. The naive before-after said 36.20; DiD says 25.32. The 10.88-point gap is the secular trend the naive estimator wrongly credited to the program: a 43% overstatement. R² is near 0.995 in the two-way fixed-effects models, unrealistically high because the data are simulated."
+    },
+    {
+      "n": 26,
+      "kind": "content",
+      "title": "The event-study panel: treatment switches on in period 5",
+      "imagePage": 22,
+      "notes": "Four pre-treatment and four post-treatment periods; each of the 10 treated schools contributes one observation per event time. Simultaneous adoption, with no staggering, is what lets this simple event study separate leads from lags cleanly. Comparison schools have no event time; the code gives them a placeholder so they stay in the sample."
+    },
+    {
+      "n": 27,
+      "kind": "content",
+      "title": "Before you look: what should the event study show?",
+      "background": "#1a3a8a",
+      "imagePage": 23,
+      "notes": "Ask: what is the signature of a credible design with this program? Answer on the next slide: A. The leads are 0.34, −0.32 and 0.59 (all p > 0.17); the lags are 25.03, 24.71, 24.77 and 25.70, roughly flat. (AhaSlides interactive I5 follows.)"
+    },
+    {
+      "n": 28,
+      "kind": "quiz",
+      "question": "Eight periods, one coefficient per period, each relative to t = −1. If parallel trends holds, what should the event study show?",
+      "options": [
+        {
+          "text": "Leads near zero; lags jump to about 25 and stay roughly flat",
+          "correct": true
+        },
+        {
+          "text": "Leads near zero; lags climb steadily from about 10 to about 40",
+          "correct": false
+        },
+        {
+          "text": "Leads already around 25",
+          "correct": false
+        }
+      ],
+      "points": 1000,
+      "timeLimitSeconds": 30,
+      "interactive": true,
+      "notes": "Answer: A. The leads are 0.34, −0.32 and 0.59 (all p > 0.17) and the lags are 25.03, 24.71, 24.77 and 25.70: an effect that appears in the first treated period and stays roughly flat. Stress that quiet leads are consistent with parallel trends, not proof of it. The next slide shows the event-study plot."
+    },
+    {
+      "n": 29,
+      "kind": "content",
+      "title": "Leads near zero and an effect from the first treated period: a textbook event study",
+      "imagePage": 24,
+      "notes": "The answer to the vote: A. The 8-period extension (280 observations) replaces the single interaction with one coefficient per event time, omitting t = −1 as the reference. The leads are consistent with parallel trends, though no pre-test can prove it. The effect appears at t = 0 relative to t = −1 and holds across all four lags: no build-up, no fade-out."
+    },
+    {
+      "n": 30,
+      "kind": "content",
+      "title": "The numbers behind the picture: quiet leads, loud lags",
+      "imagePage": 25,
+      "notes": "t = −1 is the omitted reference (normalized to zero). The three leads are small and insignificant, which supports (but cannot prove) the design. The four lags (25.03, 24.71, 24.77, 25.70) are all significant at p < 0.001 and roughly flat: the effect appears in the first treated period and shows no decay over four periods."
+    },
+    {
+      "n": 31,
+      "kind": "heading",
+      "title": "Five tempting misreadings",
+      "background": "#1a3a8a",
+      "imagePage": 26,
+      "notes": "DiD looks simple, and that simplicity invites a few recurring misreadings. Each of the next five slides states a tempting claim and answers it with this tutorial's own numbers."
+    },
+    {
+      "n": 32,
+      "kind": "content",
+      "title": "\"Insignificant leads prove parallel trends\": they are evidence, not proof",
+      "imagePage": 27,
+      "notes": "Roth (2022), \"Pretest with caution\". In the post's interactive lab, a pre-trend of 0.2 GPA points per period leaves every lead insignificant, yet biases the pooled DiD estimate by +0.70."
+    },
+    {
+      "n": 33,
+      "kind": "content",
+      "title": "\"The groups must start at the same GPA\": only the trends must match",
+      "imagePage": 28,
+      "notes": "The `treated` coefficient in the OLS interaction model is exactly this baseline gap, −11.049. The school fixed effects absorb it in the two-way model."
+    },
+    {
+      "n": 34,
+      "kind": "content",
+      "title": "\"25.32 is the program's effect for every school\": it is the ATT",
+      "imagePage": 29,
+      "notes": "ATT and ATE diverge when the treatment effect varies in ways related to selection into treatment. Report the estimand explicitly."
+    },
+    {
+      "n": 35,
+      "kind": "content",
+      "title": "\"Adding controls always makes DiD more credible\": design does, controls may not",
+      "imagePage": 30,
+      "notes": "Measure time-varying covariates before treatment, or leave them out, whenever the program could plausibly affect them."
+    },
+    {
+      "n": 36,
+      "kind": "content",
+      "title": "\"The SE choice never matters\": it can decide the result for smaller effects",
+      "imagePage": 31,
+      "notes": "Exercise 4 in the post computes these thresholds: 2.03 standard errors with 34 degrees of freedom (35 schools minus one)."
+    },
+    {
+      "n": 37,
+      "kind": "content",
+      "title": "Does precision make this causal? No — the assumptions still carry it",
+      "imagePage": 32,
+      "notes": "Steelman, do not strawman. The event study probes but cannot confirm parallel trends; it only checks the pre-period. SUTVA (no spillovers) is assumed, not tested. With staggered real-world timing and effects that vary across adoption cohorts, the standard TWFE estimator can be badly biased (Goodman-Bacon; Callaway–Sant'Anna; Gardner). This deck evaluates a method on clean data, not a substantive claim about tutoring."
+    },
+    {
+      "n": 38,
+      "kind": "heading",
+      "title": "A credible comparison group, not the variance estimator, is what makes the effect causal.",
+      "background": "#141413",
+      "imagePage": 33,
+      "notes": "The single takeaway. DiD strips the 10.88-point common trend that the naive estimator wrongly credited to the program, leaving a stable 25.32-point ATT. The design (a comparison group, fixed effects, quiet pre-trends) does the work; the choice of standard error is a footnote here, and only here."
+    }
+  ]
+}
