@@ -4,8 +4,8 @@ Two patterns attach an AI-generated podcast summary to a post. Pick by **where t
 
 | Audio source | Pattern | Posts using it |
 |---|---|---|
-| Raw audio file URL (`.m4a` / `.wav`, e.g. a catbox.moe link) | **A. Inline HTML5 player** — self-contained `<style>` + `<div>` + `<script>` overlay appended to the post | `python_dowhy_intro`, `python_did101`, `r_sc_multi_country`, … |
-| Episode published on Spotify (an `open.spotify.com/episode/…` link, or a Spotify for Creators share link) | **B. Spotify embed** — `links:` button + Spotify iframe above the Abstract | `python_bridge_impact`, `python_dowhy`, `python_sc_dsc_sdid`, `python_sc_bayes_spatial`, `r_sc_dsc_sdid`, `r_estimateW` (button only) |
+| Raw audio file URL (`.m4a` / `.wav`, e.g. a catbox.moe link) | **A. Inline HTML5 player** — self-contained `<style>` + `<div>` + `<script>` overlay appended to the post | `python_dowhy_intro`, `stata_did`, `r_sc_multi_country`, … |
+| Episode published on Spotify (an `open.spotify.com/episode/…` link, or a Spotify for Creators share link) | **B. Spotify embed** — `links:` button + Spotify iframe above the Abstract | `python_bridge_impact`, `python_dowhy`, `python_fwl`, `python_panel_intro`, `python_did101`, `python_sc_dsc_sdid`, `python_sc_bayes_spatial`, `r_sc_dsc_sdid`, `r_estimateW` (button only) |
 
 The two are not interchangeable: the inline player needs a direct audio file and cannot play a Spotify episode, and the Spotify iframe cannot play a raw audio URL. If the user gives a Spotify link, use Pattern B; if they give a file URL, use Pattern A.
 
@@ -31,7 +31,7 @@ An embedded audio player overlay. The player is self-contained inline HTML/CSS/J
 ### Reference implementations
 
 - `content/post/python_dowhy_intro/index.md` — podcast only (m4a, stream link)
-- `content/post/python_did101/index.md` — podcast + video player (wav, download link)
+- `content/post/stata_did/index.md` — podcast + video player (wav, download link)
 - `content/post/r_sc_multi_country/index.md` — podcast only (m4a, stream link; R post)
 
 ### Player features
@@ -70,11 +70,17 @@ curl -sL -A "Mozilla/5.0" "$LINK" | sed 's/\\u002F/\//g' \
   | grep -oE '[A-Za-z0-9]{22}$'
 ```
 
-(Verified 2026-09-28 on the `r_estimateW` link — it resolves to `6Fa4vFJBGEdUV7QvQu8FFm`.) If it prints nothing (the Creators page layout changed), ask the user for the episode's `open.spotify.com/episode/…` link instead of guessing. Then confirm:
+(Verified 2026-09-28 on the `r_estimateW` link — it resolves to `6Fa4vFJBGEdUV7QvQu8FFm`.)
+
+If it prints nothing (the Creators page layout changed), ask the user for the episode's `open.spotify.com/episode/…` link instead of guessing. Then confirm:
 - `https://open.spotify.com/embed/episode/<ID>?utm_source=generator&theme=0` returns HTTP 200, and
 - the `<title>` of `https://open.spotify.com/episode/<ID>` matches the post's topic.
 
 Use the resolved `open.spotify.com/episode/<ID>` URL in the `links:` button as well. Two buttons still point at raw Creators links. They are legacy exceptions, not a pattern to copy. One is `r_estimateW`, which has the button only and no embed. The other is the secondary "Podcast (2)" button in `python_sc_dsc_sdid`, a second episode that resolves to `7jwAgiW5XOeGFThLk4jsWV` (checked 2026-09-28). A new post gets exactly one "Podcast" button, with the resolved URL.
+
+A **short share link** (`https://spotifycreators-web.app.link/e/…`) is a Branch redirect: `curl -sL -A "Mozilla/5.0" "$SHORT" | sed 's/\\u002F/\//g' | grep -oE 'creators.spotify.com/pod/profile/[^/]+/episodes/[^?"]+' | head -1` yields the Creators URL (prefix `https://`); then run the command above on it. (Verified 2026-10-03 on the `python_did101` link → `7dxl297Eflm60F76p88MoF`.)
+
+If the post already has a Pattern A inline player for the same episode, **replace** it: swap the `AI Podcast` button for the Spotify one and delete the `.podcast-*` CSS, the `podOverlay` div and its `<script>` — any `video-*` CSS and `vidOverlay` block can stay, since its click handler matches only `AI Video`. Video overviews in the newer posts (`python_fwl`, `python_panel_intro`, `python_did101`) are plain `fab youtube` "Video overview" buttons to `youtube.com/watch?v=…`, listed right after "Podcast"; a second video is "Video overview (2)".
 
 ### Reference implementations
 
