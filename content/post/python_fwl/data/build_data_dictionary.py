@@ -141,7 +141,8 @@ def load_frame(fname, ext):
     path = os.path.join(BASE, fname)
     labels = {}
     if ext == ".csv":
-        df = pd.read_csv(path, low_memory=False)
+        # round_trip: the default fast parser can be off by 1e-14 on 17-digit values
+        df = pd.read_csv(path, low_memory=False, float_precision="round_trip")
     elif ext == ".parquet":
         df = pd.read_parquet(path)
     elif ext == ".xlsx":

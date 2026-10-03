@@ -58,7 +58,7 @@ Subsequent renders are instant — step 2 is only needed once per machine.
 - **macOS Intel:** the bundle pins `numba==0.62.1` + `llvmlite==0.45.0`, the last releases with Intel (x86_64) wheels, so the install never falls back to a slow LLVM source build.
 - **`mlsynth` install fails:** it installs from a pinned GitHub commit, so the first render needs internet and `git`. If your network blocks GitHub, install it manually inside the venv: `.venv/bin/python -m pip install "git+https://github.com/jgreathouse9/mlsynth.git"`.
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
-- **Kernel not found:** if Render reports `Jupyter kernel 'python_did_sc_tsunami-tutorial' not found`, run `python3 setup_env.py` in a terminal and try again. The one-click wrapper avoids this entirely.
+- **Kernel not found:** Quarto looks for Jupyter kernels through a Python interpreter. `setup_env.py` therefore writes `_environment.local`, which points Quarto (`QUARTO_PYTHON`) at the `.venv/`, so `quarto render` works even when your default `python3` is unsupported. If Render still reports `Jupyter kernel 'python_did_sc_tsunami-tutorial' not found`, run `python3 setup_env.py` in a terminal and try again. If you move the folder, re-run `setup_env.py`, because `_environment.local` stores an absolute path.
 
 ## Source
 

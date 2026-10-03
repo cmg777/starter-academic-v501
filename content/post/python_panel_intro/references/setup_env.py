@@ -373,6 +373,22 @@ def preflight() -> None:
     sys.exit(1)
 
 
+def write_quarto_environment() -> None:
+    # Quarto finds Jupyter kernels through a Python interpreter: QUARTO_PYTHON if
+    # set, otherwise the python3 on PATH. When that python3 is unsupported (for
+    # example 3.14, which preflight() relaunched away from), it has no Jupyter and
+    # Quarto reports "kernel not found". Quarto loads _environment.local into the
+    # environment of every project render, so pointing QUARTO_PYTHON at the .venv
+    # here makes a bare `quarto render` work, not just the one-click wrappers.
+    # The absolute path is machine-specific, which is what the .local file is for.
+    env_file = THIS_DIR / "_environment.local"
+    line = f"QUARTO_PYTHON={venv_python(VENV_DIR)}\n"
+    if env_file.exists() and env_file.read_text() == line:
+        return
+    env_file.write_text(line)
+    print(f"  wrote {env_file.name} (QUARTO_PYTHON -> .venv)")
+
+
 def main() -> None:
     preflight()
     print(f"Setting up tutorial environment for '{KERNEL_NAME}'...")
@@ -381,6 +397,7 @@ def main() -> None:
     ensure_packages_in_venv()
     register_kernel()
     ensure_outer_jupyter()
+    write_quarto_environment()
     print("Setup complete. Quarto will now render the tutorial.")
 
 

@@ -136,3 +136,6 @@ content/post/r_estimateW/references/
 # `Rscript analysis.R` reproduces every figure and table in about a minute, and
 # tutorial.qmd renders without sampling at all. Delete the directory (or set
 # ESTIMATEW_REFIT=TRUE) to force a genuine recompute.
+
+# setup_env.py writes a machine-specific QUARTO_PYTHON pointer next to the tutorial
+content/post/*/references/_environment.local

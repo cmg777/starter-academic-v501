@@ -42,8 +42,14 @@ is in use. Two fixes:
 
 1. **`QUARTO_PYTHON` not set.** The wrapper scripts export
    `QUARTO_PYTHON=$PWD/.venv/bin/python` before invoking
-   `quarto render`. If the user invoked `quarto render` directly
-   without the wrapper, set the env var manually:
+   `quarto render`. Since 2026-10-03, `setup_env.py` also writes
+   `_environment.local` (`QUARTO_PYTHON=<abs path to .venv python>`),
+   which Quarto loads for every project render, so a bare
+   `quarto render` works too, even on the first run (the pre-render
+   hook writes it before Quarto looks up the kernel). Verified on a
+   machine whose `python3` is 3.14, where a bare render previously
+   failed with "Jupyter kernel ... not found". If a bundle predates
+   that change, set the env var manually:
 
    ```bash
    export QUARTO_PYTHON="$PWD/.venv/bin/python"
