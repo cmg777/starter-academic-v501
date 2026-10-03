@@ -1,0 +1,26 @@
+{{ $t := .t }}
+{{/* Share the existing gallery across languages; no duplicate photo collections. */}}
+{{ $home := (index site.Sites 0).GetPage "/home/index.md" }}
+{{ $photos := where ($home.Resources.Match "gallery/gallery/*") "ResourceType" "image" }}
+{{ with $photos }}
+<section id="gallery" class="section shell lab-gallery" aria-labelledby="gallery-title" data-gallery data-gallery-start="5">
+  <div class="section-heading">
+    <div><p class="eyebrow">{{ $t.galleryKicker }}</p><h2 id="gallery-title">{{ $t.galleryTitle }}</h2><p class="section-description">{{ $t.galleryIntro }}</p></div>
+    <div class="gallery-controls" hidden>
+      <button type="button" data-gallery-prev aria-controls="gallery-track" aria-label="{{ $t.galleryPrevious }}">←</button>
+      <span class="gallery-count" aria-live="polite" aria-atomic="true"><span data-gallery-current>1</span> / {{ len . }}</span>
+      <button type="button" data-gallery-next aria-controls="gallery-track" aria-label="{{ $t.galleryNext }}">→</button>
+    </div>
+  </div>
+  <p id="gallery-help" class="sr-only">{{ $t.galleryHelp }}</p>
+  <div id="gallery-track" class="gallery-track" tabindex="0" role="region" aria-label="{{ $t.galleryTitle }}" aria-describedby="gallery-help">
+    {{ range $i, $photo := . }}
+      {{ $large := .Fit "1400x900 webp q85" }}
+      {{ $small := .Fit "700x450 webp q80" }}
+      <figure class="gallery-slide">
+        <img src="{{ $large.RelPermalink }}" srcset="{{ $small.RelPermalink }} {{ $small.Width }}w, {{ $large.RelPermalink }} {{ $large.Width }}w" sizes="(max-width: 679px) calc(100vw - 40px), (max-width: 1199px) calc(100vw - 64px), (max-width: 1472px) calc(100vw - 112px), 1360px" alt="{{ $t.galleryAlt }} {{ add $i 1 }}" width="{{ $large.Width }}" height="{{ $large.Height }}" loading="lazy" decoding="async">
+      </figure>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

@@ -6,7 +6,7 @@
 # Appearance
 
 theme: nightlights
-day_night: true
+day_night: false
 font: 'Native'
 font_size: M
 
@@ -57,7 +57,7 @@ main_menu:
   align: c
   show_logo: true
   show_language: true
-  show_day_night: true
+  show_day_night: false
   show_search: true
   highlight_active_link: true
 

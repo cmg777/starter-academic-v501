@@ -1,0 +1,25 @@
+Earth at night imagery
+======================
+NASA Earth Observatory / Black Marble, 2016 global nighttime-light composite.
+These are historical composite images, not current or live observations.
+
+Source pages:
+https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/
+https://science.nasa.gov/earth/earth-observatory/earth-at-night/spheres-and-animations/
+
+black-marble-2016.jpg (3600 x 1800):
+https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_01deg.jpg
+
+black-marble-2016-mobile.jpg (1800 x 900, NASA image service):
+https://assets.science.nasa.gov/dynamicimage/assets/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_01deg.jpg?w=1800&h=900&fit=clip
+
+Static Asia globe source, stored in assets/media/orbital/earth-at-night-asia.png
+and converted to WebP by Hugo:
+https://assets.science.nasa.gov/dynamicimage/assets/science/esd/eo/content-feature/nightlights/images/media/BlackMarble_2016_Asia_composite.png?w=992&h=800&fit=clip
+
+The interactive globe projects the real map onto a sphere with a subtle
+illustrative atmospheric rim. No generated or simulated light locations are
+added. Decorative rings and grids are interface elements, not observations.
+Brightness is a qualitative indicator of human activity, not a direct measure
+of income. The image is not a calibrated radiance dataset or analytical tool.
+Retrieved 2026-10-03.

@@ -1,0 +1,12 @@
+{{ $p := .page }}
+{{ $link := $p.RelPermalink }}
+{{ with $p.Params.card_url }}{{ $link = . }}{{ end }}
+{{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
+{{/* Translated tutorial stubs intentionally share their English source images. */}}
+{{ if not $img }}{{ with $p.Params.card_url }}{{ with (index site.Sites 0).GetPage . }}{{ $img = (.Resources.ByType "image").GetMatch "*featured*" }}{{ end }}{{ end }}{{ end }}
+<article class="content-card">
+  <a class="card-image" href="{{ $link }}" tabindex="-1" aria-hidden="true">
+    {{ with $img }}{{ $thumb := .Fit "720x440 webp q80" }}<img src="{{ $thumb.RelPermalink }}" alt="" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy">{{ else }}<span class="card-placeholder">{{ $.kind }}</span>{{ end }}
+  </a>
+  <div class="card-copy"><p class="meta">{{ .kind }} <span aria-hidden="true">/</span> {{ $p.Date.Format "2006" }}</p><h3><a href="{{ $link }}">{{ $p.Title }}</a></h3>{{ with $p.Params.summary }}<p>{{ . | plainify | truncate 160 }}</p>{{ end }}<a class="text-link" href="{{ $link }}">{{ .label }} <span aria-hidden="true">↗</span></a></div>
+</article>

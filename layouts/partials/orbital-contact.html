@@ -1,0 +1,27 @@
+{{ $t := .t }}
+{{ $phone := replaceRE "[^0-9+]" "" (replaceRE "^\\+81\\s+0" "+81" site.Params.phone) }}
+<div class="contact-details">
+  <section class="contact-block" aria-labelledby="contact-visit-title">
+    <h3 id="contact-visit-title">{{ $t.contactVisit }}</h3>
+    <address>
+      <a class="contact-phone" href="tel:{{ $phone }}">{{ site.Params.phone }}</a>
+      <p>{{ site.Params.address.street }}, {{ site.Params.address.city }}, {{ site.Params.address.region }} {{ site.Params.address.postcode }}</p>
+    </address>
+    <p class="contact-directions">{{ $t.contactDirections }}</p>
+    <p class="contact-hours"><strong>{{ $t.contactHoursLabel }}</strong><span>{{ $t.contactHours }}</span><span class="contact-note">{{ $t.contactBookingNote }}</span></p>
+  </section>
+  <section class="contact-block" aria-labelledby="contact-online-title">
+    <h3 id="contact-online-title">{{ $t.contactOnline }}</h3>
+    <a class="contact-email" href="mailto:{{ site.Params.email }}">{{ replace site.Params.email "@" " [at] " }}</a>
+    <ul class="contact-options">
+      <li><a href="{{ site.Params.appointment_url }}"><span>{{ $t.contactBook }}</span><span aria-hidden="true">↗</span></a></li>
+      {{ range site.Params.contact_links }}
+        {{ if eq .icon "video" }}
+          <li><a href="{{ .link }}"><span>{{ $t.contactZoom }}<small>{{ $t.contactBookingNote }}</small></span><span aria-hidden="true">↗</span></a></li>
+        {{ else if eq .icon "twitter" }}
+          <li><a href="{{ .link }}"><span>{{ $t.contactX }}</span><span aria-hidden="true">↗</span></a></li>
+        {{ end }}
+      {{ end }}
+    </ul>
+  </section>
+</div>

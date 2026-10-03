@@ -1,0 +1,184 @@
+{{/* A self-contained homepage: Hugo still supplies all content and translations,
+     but the landing page needs none of the legacy theme's browser dependencies. */}}
+{{ $t := index site.Data.orbital site.Language.Lang }}
+{{ $fallback := (resources.Get "media/orbital/earth-at-night-asia.png").Resize "992x webp q82" }}
+{{ $style := slice (resources.Get "css/orbital-palette.css") (resources.Get "css/orbital.css") | resources.Concat "css/orbital.css" | minify | fingerprint }}
+{{ $script := resources.Get "js/orbital.js" | minify | fingerprint }}
+{{ $langScript := resources.Get "js/lang-pref.js" | minify | fingerprint }}
+{{ $galleryScript := resources.Get "js/orbital-gallery.js" | minify | fingerprint }}
+<!doctype html>
+<html lang="{{ site.LanguageCode }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050a12">
+  {{ $icon := (resources.Get "media/icon.png").Resize "64x64 png" }}<link rel="icon" href="{{ $icon.RelPermalink }}" type="image/png">
+  <title>Carlos Mendez — {{ $t.title }} {{ $t.titleAccent }}</title>
+  <meta name="description" content="{{ $t.description }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+  {{ range site.Sites }}<link rel="alternate" hreflang="{{ .LanguageCode }}" href="{{ .Home.Permalink }}">{{ end }}
+  <link rel="alternate" hreflang="x-default" href="{{ (index site.Sites 0).Home.Permalink }}">
+  <link rel="alternate" type="application/rss+xml" title="Carlos Mendez" href="{{ "index.xml" | relLangURL }}">
+  <meta property="og:title" content="Carlos Mendez — {{ $t.title }} {{ $t.titleAccent }}">
+  <meta property="og:description" content="{{ $t.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:image" content="{{ $fallback.Permalink }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+  <link rel="preload" as="image" href="{{ $fallback.RelPermalink }}">
+  <script defer src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
+  <script defer src="{{ $langScript.RelPermalink }}" integrity="{{ $langScript.Data.Integrity }}"></script>
+  <script defer src="{{ $galleryScript.RelPermalink }}" integrity="{{ $galleryScript.Data.Integrity }}"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">{{ $t.skip }}</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="{{ site.Home.RelPermalink }}" aria-label="Carlos Mendez">
+        <span>Carlos Mendez<span class="brand-sub">{{ $t.discipline }}</span></span>
+      </a>
+      <nav class="desktop-nav" aria-label="{{ $t.menu }}">
+        {{ range site.Menus.main }}<a href="{{ if hasPrefix .URL "#" }}{{ .URL }}{{ else }}{{ .URL | relURL }}{{ end }}">{{ .Name }}</a>{{ end }}
+      </nav>
+      <div class="header-tools">
+        <nav class="languages i18n-dropdown" aria-label="{{ $t.languageLabel }}">
+          {{ range site.Sites }}<a class="dropdown-item" href="{{ .Home.RelPermalink }}" lang="{{ .Language.Lang }}" hreflang="{{ .Language.Lang }}" aria-label="{{ .Language.LanguageName }}"{{ if eq .Language.Lang $.Site.Language.Lang }} aria-current="page"{{ end }}>{{ if eq .Language.Lang "ja" }}日本語{{ else }}{{ upper .Language.Lang }}{{ end }}</a>{{ end }}
+        </nav>
+        <details class="mobile-menu">
+          <summary>{{ $t.menu }} <span aria-hidden="true">＋</span></summary>
+          <nav aria-label="{{ $t.menu }}">
+            {{ range site.Menus.main }}<a href="{{ if hasPrefix .URL "#" }}{{ .URL }}{{ else }}{{ .URL | relURL }}{{ end }}">{{ .Name }}</a>{{ end }}
+          </nav>
+        </details>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="starfield" aria-hidden="true"></div>
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="signal" aria-hidden="true"></span>{{ $t.eyebrow }}</p>
+          <h1 id="hero-title">{{ $t.title }}<br><span>{{ $t.titleAccent }}</span></h1>
+          <p class="hero-intro">{{ $t.intro }}</p>
+          <div class="actions"><a class="button button-primary" href="#researchLab">{{ $t.explore }} <span aria-hidden="true">↗</span></a><a class="text-link" href="#posts">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
+          <div class="hero-identity"><span class="identity-line" aria-hidden="true"></span><div><strong>{{ $t.identity }}</strong><span>{{ $t.role }}</span></div></div>
+        </div>
+        <figure class="earth" data-earth data-texture="{{ "media/orbital/black-marble-2016.jpg" | relURL }}" data-mobile-texture="{{ "media/orbital/black-marble-2016-mobile.jpg" | relURL }}">
+          <div class="earth-stage">
+            <div class="orbital-ring" aria-hidden="true"></div>
+            <img class="earth-fallback" src="{{ $fallback.RelPermalink }}" alt="{{ $t.globeAlt }}" width="{{ $fallback.Width }}" height="{{ $fallback.Height }}" fetchpriority="high">
+            <canvas class="earth-canvas" aria-label="{{ $t.globeLabel }}" aria-describedby="earth-help" role="img" hidden></canvas>
+            <span class="earth-caption"><span aria-hidden="true">＋</span> {{ $t.globeLabel }} <span class="earth-caption-sub">VIIRS / 2016</span></span>
+            <span class="earth-instruction" data-globe-hint data-interactive="{{ $t.globeHint }}">{{ $t.staticHint }}</span>
+          </div>
+          <p id="earth-help" class="sr-only" hidden>{{ $t.globeHelp }}</p>
+          <div class="earth-controls" hidden>
+            <div class="region-controls" role="group" aria-label="{{ $t.regions }}">
+              {{ range $i, $name := $t.regionNames }}<button type="button" data-region="{{ $i }}" aria-pressed="false">{{ $name }}</button>{{ end }}
+            </div>
+            <div class="motion-controls" role="group" aria-label="{{ $t.globeLabel }}">
+              <button type="button" data-action="west" aria-label="{{ $t.left }}">←</button>
+              <button type="button" data-action="pause" data-play="{{ $t.play }}" data-pause="{{ $t.pause }}" aria-label="{{ $t.pause }}"><span aria-hidden="true">Ⅱ</span></button>
+              <button type="button" data-action="east" aria-label="{{ $t.right }}">→</button>
+              <span class="control-divider" aria-hidden="true"></span>
+              <button type="button" data-action="out" aria-label="{{ $t.zoomOut }}">−</button>
+              <button type="button" data-action="in" aria-label="{{ $t.zoomIn }}">＋</button>
+            </div>
+          </div>
+          <span class="sr-only" data-globe-status role="status" aria-live="polite"></span>
+        </figure>
+      </div>
+      <div class="shell hero-bottom"><a href="#researchLab"><span aria-hidden="true">↓</span> {{ $t.scroll }}</a><span class="coordinates" aria-hidden="true">35.15° N &nbsp; 136.97° E &nbsp; / &nbsp; NAGOYA, JP</span></div>
+    </section>
+    <div class="perspective-strip"><div class="shell">{{ range $i, $pillar := $t.pillars }}<span><b>0{{ add $i 1 }}</b>{{ $pillar }}</span>{{ end }}</div></div>
+
+
+    <section id="researchLab" class="section shell" aria-labelledby="research-title">
+      <p class="eyebrow">{{ $t.researchKicker }}</p>
+      <div class="section-intro">
+        <div><h2 id="research-title">{{ replace $t.researchTitle "\n" "<br>" | safeHTML }}</h2><p class="section-description">{{ $t.researchMethods }}</p></div>
+        <div>
+          <p>{{ $t.researchIntro }}</p>
+          <h3 id="research-themes-title" class="research-themes-title">{{ $t.researchThemesLabel }}</h3>
+          <ul class="research-themes" aria-labelledby="research-themes-title">{{ range $t.researchThemes }}<li>{{ . }}</li>{{ end }}</ul>
+          <a class="text-link" href="https://quarcs.netlify.app/">{{ $t.labLink }} <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="research-grid">
+        {{ $urls := slice "https://carlosmendez777.users.earthengine.app/view/worldviirs-like" "https://carlosmendez777.users.earthengine.app/view/dmsp-reg" "https://carlos-mendez.projects.earthengine.app/view/geoexplorer1" }}
+        {{ range $i, $card := $t.researchCards }}
+        <article class="research-card research-card-{{ $i }}">
+          <div class="research-art" aria-hidden="true"><span class="art-cross">+</span><span class="art-grid"></span><span class="art-number">0{{ add $i 1 }}</span></div>
+          <div class="research-card-copy"><p class="eyebrow">{{ .tag }}</p><h3>{{ .title }}</h3><p>{{ .text }}</p><a class="text-link" href="{{ index $urls $i }}">{{ .link }} <span aria-hidden="true">↗</span></a></div>
+        </article>
+        {{ end }}
+      </div>
+    </section>
+
+
+    <section id="about" class="section shell about-grid" aria-labelledby="about-title">
+      <div class="portrait-wrap">{{ with site.GetPage "authors/admin" }}{{ with .Resources.GetMatch "avatar*" }}{{ $portrait := .Fill "640x800 Center webp q85" }}<img src="{{ $portrait.RelPermalink }}" alt="Carlos Mendez" width="640" height="800" loading="lazy">{{ end }}{{ end }}<span class="portrait-coordinate">NAGOYA, JAPAN / 35° N</span></div>
+      <div class="about-copy">
+        <p class="eyebrow">{{ $t.aboutKicker }}</p>
+        <h2 id="about-title">{{ replace $t.aboutTitle "\n" "<br>" | safeHTML }}</h2>
+        <p class="about-intro">{{ $t.aboutIntro }}</p>
+        <div class="about-research">
+          <h3 id="about-research-title">{{ $t.aboutResearchLabel }}</h3>
+          <ul aria-labelledby="about-research-title">{{ range $t.aboutResearchAreas }}<li>{{ . }}</li>{{ end }}</ul>
+        </div>
+        <div class="actions"><a class="button button-outline" href="{{ "media/CV.pdf" | relURL }}">{{ $t.cv }} <span aria-hidden="true">↓</span></a><a class="text-link" href="https://profs.provost.nagoya-u.ac.jp/html/100010240_en.html">{{ $t.profile }} <span aria-hidden="true">↗</span></a></div>
+      </div>
+    </section>
+
+    <section id="featured" class="section section-lined shell" aria-labelledby="publications-title">
+      <p class="eyebrow">{{ $t.pubKicker }}</p><div class="section-heading"><h2 id="publications-title">{{ $t.pubTitle }}</h2><a class="text-link" href="{{ "publication/" | relLangURL }}">{{ $t.allPubs }} <span aria-hidden="true">↗</span></a></div>
+      <div class="publication-list">
+      {{/* Academic papers only: conference papers, journal articles, and preprints.
+           Use publication dates, excluding forthcoming papers even in future-enabled builds. */}}
+      {{ $papers := where (where site.RegularPages "Section" "publication") "Params.publication_types" "intersect" (slice "1" "2" "3") }}
+      {{ $papers = where $papers "Date" "le" now }}
+      {{ range $i, $paper := first 3 $papers.ByDate.Reverse }}
+        {{ $image := (.Resources.ByType "image").GetMatch "*featured*" }}
+        <article class="publication-row{{ if $image }} has-thumbnail{{ end }}">
+          {{ with $image }}
+            <a class="publication-thumbnail" href="{{ $paper.RelPermalink }}" tabindex="-1" aria-hidden="true">{{ partial "orbital-thumbnail.html" . }}</a>
+          {{ else }}
+            <span class="row-number" aria-hidden="true">0{{ add $i 1 }}</span>
+          {{ end }}
+          <div class="publication-copy"><p class="meta">{{ .Date.Format "2006" }} <span aria-hidden="true">/</span> {{ .Params.publication | markdownify | plainify }}</p><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>{{ with .Params.summary }}<p>{{ . | plainify }}</p>{{ end }}</div>
+          <a class="round-link" href="{{ .RelPermalink }}" aria-label="{{ $t.read }}: {{ .Title }}">↗</a>
+        </article>
+      {{ end }}
+      </div>
+    </section>
+
+    {{ partial "orbital-talks.html" (dict "t" $t) }}
+
+    <section id="projects" class="section shell" aria-labelledby="projects-title">
+      <p class="eyebrow">{{ $t.projectKicker }}</p><div class="section-heading"><div><h2 id="projects-title">{{ $t.projectTitle }}</h2><p class="section-description">{{ $t.projectIntro }}</p></div><a class="text-link" href="{{ "projects/" | relLangURL }}">{{ $t.allProjects }} <span aria-hidden="true">↗</span></a></div>
+      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "projects").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.projectLink "kind" $t.project) }}{{ end }}</div>
+    </section>
+
+    <section id="posts" class="learning-section" aria-labelledby="learn-title"><div class="shell section">
+      <p class="eyebrow">{{ $t.learnKicker }}</p><div class="section-heading"><div><h2 id="learn-title">{{ $t.learnTitle }}</h2><p class="section-description">{{ $t.learnIntro }}</p></div><a class="text-link" href="{{ "post/" | relLangURL }}">{{ $t.allPosts }} <span aria-hidden="true">↗</span></a></div>
+      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "post").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
+      <a class="text-link courses-link" href="{{ "courses/" | relLangURL }}">{{ $t.courses }} <span aria-hidden="true">→</span></a>
+    </div></section>
+
+    {{ partial "orbital-community.html" (dict "t" $t) }}
+    {{ partial "orbital-gallery.html" (dict "t" $t) }}
+  </main>
+  <footer id="contact" class="site-footer"><div class="shell">
+    <div class="contact-intro">
+      <div><p class="eyebrow">{{ $t.contactKicker }}</p><h2>{{ $t.contactTitle }}</h2></div>
+      <div class="contact-lead"><p>{{ $t.contactIntro }}</p><div class="actions"><a class="button button-primary" href="mailto:{{ site.Params.email }}">{{ $t.email }} <span aria-hidden="true">↗</span></a><a class="text-link" href="https://lu.ma/cmg">{{ $t.events }} <span aria-hidden="true">↗</span></a></div></div>
+    </div>
+    {{ partial "orbital-contact.html" (dict "t" $t) }}
+    <div class="footer-links"><span>{{ $t.footer }}</span><nav aria-label="Carlos Mendez"><a href="https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&amp;hl=en">Google Scholar ↗</a><a href="https://orcid.org/0000-0001-7978-2815">ORCID ↗</a><a href="https://github.com/cmg777">GitHub ↗</a></nav></div>
+    <div class="footer-bottom"><span>© {{ now.Year }} Carlos Mendez. {{ $t.rights }}</span><a href="#top">{{ $t.back }} ↑</a></div>
+  </div></footer>
+</body>
+</html>

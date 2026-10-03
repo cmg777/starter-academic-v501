@@ -1,0 +1,3 @@
+{{/* Preserve the complete featured image, including diagrams and slide titles. */}}
+{{ $thumb := .Fit "480x270 webp q82" }}
+<img class="item-thumbnail" src="{{ $thumb.RelPermalink }}" alt="" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async">

@@ -1,0 +1,13 @@
+/* Shared by the standalone landing page and every Hugo content page. */
+:root {
+  color-scheme: dark;
+  --orbital-bg: #050a12;
+  --orbital-panel: #0a121d;
+  --orbital-ink: #edf2f6;
+  --orbital-muted: #9baaba;
+  --orbital-line: #22303e;
+  --orbital-blue: #88b9de;
+  --orbital-gold: #e9c184;
+  --orbital-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --orbital-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}

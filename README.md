@@ -11,7 +11,7 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 | Static site generator | [Hugo](https://gohugo.io/) 0.111.3 (extended) |
 | Theme | [Wowchemy](https://wowchemy.com/) v5 (via Hugo Modules) |
 | Markup | Goldmark (with `unsafe: true` for inline HTML, Mermaid diagrams) |
-| Styling | SCSS (`assets/scss/custom.scss`) |
+| Styling | Shared palette (`assets/css/orbital-palette.css`), homepage CSS (`orbital.css`), content-page layer (`orbital-subpages.css`), existing component SCSS (`assets/scss/custom.scss`) |
 | Deployment | [Netlify](https://www.netlify.com/) with auto-deploy on push |
 | CMS | Netlify CMS (optional) |
 | Analytics | Google Analytics (`UA-119157933-1`) |
@@ -83,9 +83,58 @@ Site appearance and features:
 
 Navigation links: AboutMe, ResearchLab, Publications, Presentations, Projects, Students, Courses, Events, Posts & Tutorials, Contact.
 
-## Homepage Widgets
+## Cinematic landing page
 
-The homepage is assembled from individual markdown files in `content/home/`, each with a `weight` controlling display order:
+The English, Spanish, and Japanese homepages now use `layouts/index.html`, a
+standalone Hugo template with a real Earth-at-night globe. Hugo and Netlify's
+existing build remain in place; all academic content keeps its current URLs.
+The home template deliberately omits the legacy theme's browser dependencies.
+
+- **Copy and translations:** `data/orbital.json` (EN, ES, JA).
+- **Navigation:** `config/_default/menus.yaml` and the localized menus in
+  `config/_default/languages.yaml` supply both desktop and mobile navigation.
+- **Design:** `assets/css/orbital.css`; only loaded by the landing page.
+- **Shared site theme:** `assets/css/orbital-palette.css` supplies the dark background,
+  reading panels, text, blue links, gold accents, and system fonts for both the
+  landing page and all Wowchemy content pages. `orbital-subpages.css` applies these
+  to archives, profiles, courses, articles, search, filters, and the footer via
+  `layouts/partials/custom_head.html`. Each page gets one combined, fingerprinted
+  CSS bundle. `data/themes/nightlights.toml` mirrors the colors for Wowchemy's
+  build-time styles. Dark mode is server-rendered with `day_night: false` so saved
+  legacy preferences cannot produce a different palette on internal pages.
+  Standalone teaching apps and slide decks keep their own designs; scientific
+  figures and syntax highlighting retain their semantic colors.
+- **Globe and navigation:** `assets/js/orbital.js`; native WebGL, no library or CDN.
+- **Cards, student directory, presentations:** `layouts/partials/orbital-*.html`.
+- **Imagery and attribution:** `static/media/orbital/CREDITS.txt`. The real NASA
+  Black Marble 2016 map has desktop and mobile variants. Hugo generates a 53 KiB
+  WebP static fallback from `assets/media/orbital/earth-at-night-asia.png`.
+- **Featured research:** three satellite-data papers selected by bundle slug in
+  `layouts/index.html`. Projects and tutorials continue to sort by last edit;
+  presentations sort by date. Set `date_tba: true` for an unknown event date.
+- **Students:** the directory uses the localized `content/home/people.md` group
+  configuration and existing author profiles; every matching student has a visible
+  photo card, name, and role, without an expandable directory.
+- **Photo carousel:** `layouts/partials/orbital-gallery.html` and
+  `assets/js/orbital-gallery.js` reuse all photos in `content/home/gallery/gallery/`.
+  Native scrolling, swipe, arrow buttons, and keyboard navigation are supported.
+  Photos advance on request; no automatic slide changes. All locales share the
+  same optimized images, with full frames preserved.
+- **Accessibility:** keyboard rotation, region selection, pause and zoom controls,
+  system reduced-motion support, ordinary mobile scrolling, and a static fallback
+  when JavaScript, WebGL, or the texture is unavailable. Rendering sleeps when
+  offscreen or in a background tab. Language preference cookies are preserved.
+
+Run `node --test tests/orbital.test.cjs` for globe lifecycle checks. Build with
+`"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --minify --buildFuture`.
+The legacy theme still emits its existing `.Path` deprecation warning.
+
+## Legacy Homepage Widgets
+
+These widget files are retained for reference, their student-group configuration,
+and their photo collection. The new `layouts/index.html` controls homepage layout and copy;
+changing a widget's weight or hero text no longer changes the landing page:
+
 
 | Widget | File | Weight | Type |
 |--------|------|--------|------|

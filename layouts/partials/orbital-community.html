@@ -1,0 +1,36 @@
+{{ $t := .t }}
+{{/* Read the same localized student groups as the original People widget. */}}
+{{ $groups := slice }}
+{{ range (site.GetPage "/home/index.md").Resources.ByType "page" }}
+  {{ if eq .Params.widget "people" }}{{ $groups = .Params.content.user_groups }}{{ end }}
+{{ end }}
+{{ $students := where (where site.Pages "Section" "authors") "Params.user_groups" "intersect" $groups }}
+<section id="people" class="section section-lined shell community" aria-labelledby="people-title">
+  <div class="section-heading">
+    <div>
+    <p class="eyebrow">QUARCS LAB / NAGOYA</p>
+    <h2 id="people-title">{{ $t.students }}</h2>
+    <p>{{ $t.studentsIntro }}</p>
+    </div>
+    <a class="text-link" href="{{ "alumni/" | relLangURL }}">{{ $t.alumni }} <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="member-grid">
+    {{ range $students }}
+      {{ $p := . }}
+      {{ $portrait := .Resources.GetMatch "avatar*" }}
+      {{ $crop := "320x320 Center webp q85" }}
+      {{ with index site.Data.orbital_portraits (path.Base .RelPermalink) }}
+        {{ $portrait = resources.Get . }}
+        {{ $crop = "640x640 Center webp q90" }}
+      {{ end }}
+      <a class="member-card" href="{{ .RelPermalink }}">
+        {{ with $portrait }}
+          {{/* Keep existing circular portraits concentric with the CSS mask. */}}
+          {{ $img := .Fill $crop }}
+          <img src="{{ $img.RelPermalink }}" alt="{{ $p.Title }}" width="320" height="320" loading="lazy">
+        {{ end }}
+        <strong>{{ .Title }}</strong>{{ with .Params.role }}<span>{{ . }}</span>{{ end }}
+      </a>
+    {{ end }}
+  </div>
+</section>

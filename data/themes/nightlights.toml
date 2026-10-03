@@ -1,34 +1,25 @@
-# Nightlights theme — derived from the NTL world map background image
-# Color palette: deep navy, cyan/teal accents, with warm highlights
-
-# Theme metadata
+# Wowchemy's build-time colors mirror assets/css/orbital-palette.css.
+# The shared CSS supplies the final colors for both page systems.
 name = "Nightlights"
+light = false
+primary = "#88b9de"
+background = "#050a12"
+link = "#88b9de"
+link_hover = "#e9c184"
+menu_primary = "#050a12"
+menu_text = "#9baaba"
+menu_text_active = "#e9c184"
+menu_title = "#edf2f6"
+home_section_odd = "#050a12"
+home_section_even = "#0a121d"
 
-# Is theme light or dark?
-light = true
-
-# Primary
-primary = "#1e40af"
-
-# Menu
-menu_primary = "#0e1545"
-menu_text = "rgba(255, 255, 255, 0.85)"
-menu_text_active = "#00d4c8"
-menu_title = "#fff"
-
-# Home sections
-home_section_odd = "rgb(255, 255, 255)"
-home_section_even = "rgb(240, 245, 250)"
-
-# Dark mode variant — deep navy palette continuous with navbar
 [dark]
-background = "#0f1729"
-home_section_odd = "#0f1729"
-home_section_even = "#131d33"
-menu_primary = "#0e1545"
-menu_text = "rgba(255, 255, 255, 0.85)"
-menu_text_active = "#00d4c8"
-menu_title = "#fff"
-link = "#6a9bcc"
-link_hover = "#00d4c8"
-
+background = "#050a12"
+home_section_odd = "#050a12"
+home_section_even = "#0a121d"
+menu_primary = "#050a12"
+menu_text = "#9baaba"
+menu_text_active = "#e9c184"
+menu_title = "#edf2f6"
+link = "#88b9de"
+link_hover = "#e9c184"
