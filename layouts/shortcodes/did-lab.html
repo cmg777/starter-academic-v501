@@ -1,0 +1,191 @@
+{{- /*
+  did-lab.html — inline interactive Difference-in-Differences lab (two tabs)
+  for content/post/python_did101 (tutoring and GPA, Corral and Yang 2024).
+
+  Usage:
+    {{< did-lab >}}                                  opens on the 2×2 lab
+    {{< did-lab id="lab-two" tab="event" >}}         opens on the event-study lab
+  Params:
+    id   element id (default "did-lab-<ordinal>"); must be unique on the page
+    tab  "twobytwo" (default) or "event": the tab shown first
+
+  Tab A "2×2 lab": the post's 70 school-periods. Sliders set the true effect,
+  the common trend and a violation of parallel trends; the data are shifted
+  exactly, so the defaults reproduce the post (naive 36.20, DiD 25.315).
+  Tab B "Event-study lab": the post's 280 school-periods. Sliders set the
+  effect at adoption, its growth per period, anticipation at t = −1 and a
+  pre-trend; the defaults reproduce the post's event study and the pooled
+  TWFE estimate (24.897).
+
+  Assets: assets/css/did-lab.css and assets/js/did-lab.js are emitted ONCE per
+  page (Page.Scratch guard "didLabAssets"), minified, fingerprinted, SRI.
+  Labels are plain Unicode/HTML, never TeX. Keep this output free of blank
+  lines, code/pre/img/table/h2/h3 elements and the dollar character.
+  Inside the SVGs every hook attribute needs a value (data-pts="pts", not
+  data-pts): the production HTML minifier drops valueless attributes on SVG
+  elements, and the JS then cannot find its groups.
+*/ -}}
+{{- $id := .Get "id" | default (printf "did-lab-%d" .Ordinal) -}}
+{{- $tab := .Get "tab" | default "twobytwo" -}}
+{{- if not (in (slice "twobytwo" "event") $tab) -}}
+{{- errorf "did-lab: tab must be \"twobytwo\" or \"event\" (got %q) in %s" $tab .Position -}}
+{{- end -}}
+{{- $a := eq $tab "twobytwo" -}}
+{{- if not (.Page.Scratch.Get "didLabAssets") -}}
+{{- .Page.Scratch.Set "didLabAssets" true -}}
+{{- $css := resources.Get "css/did-lab.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $js := resources.Get "js/did-lab.js" | js.Build (dict "minify" true "target" "es2017") | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}
+<section class="did-lab" id="{{ $id }}" data-did-lab data-tab="{{ $tab }}" aria-labelledby="{{ $id }}-title">
+<div class="dl-head">
+<p class="dl-title" id="{{ $id }}-title">Interactive DiD lab</p>
+<p class="dl-status" data-out="status">The post’s data</p>
+</div>
+<noscript><p class="dl-noscript">This interactive lab needs JavaScript. The static figures in this post show the same 2×2 comparison and the same event study.</p></noscript>
+<div class="dl-body">
+<div class="dl-tabs" role="tablist" aria-label="DiD lab views">
+<button type="button" class="dl-tab" role="tab" id="{{ $id }}-tab-a" data-tab="twobytwo" aria-controls="{{ $id }}-panel-a" aria-selected="{{ if $a }}true{{ else }}false{{ end }}" tabindex="{{ if $a }}0{{ else }}-1{{ end }}">2×2 lab: parallel trends</button>
+<button type="button" class="dl-tab" role="tab" id="{{ $id }}-tab-b" data-tab="event" aria-controls="{{ $id }}-panel-b" aria-selected="{{ if $a }}false{{ else }}true{{ end }}" tabindex="{{ if $a }}-1{{ else }}0{{ end }}">Event-study lab</button>
+</div>
+<div class="dl-panel" role="tabpanel" id="{{ $id }}-panel-a" data-panel="twobytwo" aria-labelledby="{{ $id }}-tab-a"{{ if not $a }} hidden{{ end }}>
+<p class="dl-intro">The post’s 35 schools in two periods. The sliders shift the data exactly: the true effect moves the treated schools after the program, the common trend moves every school after the program, and the violation adds a drift that only treated schools would have had even without tutoring. Compare what the naive and DiD estimates recover.</p>
+<div class="dl-controls">
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-att">True effect of tutoring</label><output for="{{ $id }}-att" data-param-out="att">25.31</output></div>
+<input type="range" id="{{ $id }}-att" data-param="att" min="0" max="40" step="0.5" value="25.5" autocomplete="off" aria-describedby="{{ $id }}-att-help">
+<p class="dl-help" id="{{ $id }}-att-help">GPA points the program adds in treated schools (the ATT). Default 25.31, the post’s estimate treated as the truth.</p>
+</div>
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-trend">Common trend</label><output for="{{ $id }}-trend" data-param-out="trend">10.89</output></div>
+<input type="range" id="{{ $id }}-trend" data-param="trend" min="-10" max="30" step="0.5" value="11" autocomplete="off" aria-describedby="{{ $id }}-trend-help">
+<p class="dl-help" id="{{ $id }}-trend-help">Change in GPA that every school experiences between the periods. Default 10.89, the comparison schools’ change in the post.</p>
+</div>
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-viol">Parallel-trends violation</label><output for="{{ $id }}-viol" data-param-out="viol">0.00</output></div>
+<input type="range" id="{{ $id }}-viol" data-param="viol" min="-10" max="10" step="0.5" value="0" autocomplete="off" aria-describedby="{{ $id }}-viol-help">
+<p class="dl-help" id="{{ $id }}-viol-help">Extra drift of treated schools that is not caused by the program. Default 0: parallel trends holds.</p>
+</div>
+</div>
+<div class="dl-actions">
+<button type="button" class="dl-btn" data-act="reset">Reset to the post’s data</button>
+</div>
+<div class="dl-grid">
+<div class="dl-plot">
+<p class="dl-cap">GPA by school and period, group means and counterfactuals</p>
+<svg viewBox="0 0 320 236" role="img" aria-labelledby="{{ $id }}-a-t" aria-describedby="{{ $id }}-a-d" data-plot="twobytwo">
+<title id="{{ $id }}-a-t">GPA of treated and comparison schools before and after the program</title>
+<desc id="{{ $id }}-a-d">Each dot is a school in one period. Lines join the group means; the dashed line is the counterfactual DiD assumes, the dotted line the true counterfactual.</desc>
+<g data-ticks="y"></g>
+<rect class="dl-frame" x="46" y="12" width="262" height="180"/>
+<g data-pts="pts"></g>
+<path class="dl-line dl-line-truecf" data-line="truecf" d=""/>
+<path class="dl-line dl-line-cf" data-line="cf" d=""/>
+<path class="dl-line dl-line-comp" data-line="comp" d=""/>
+<path class="dl-line dl-line-treat" data-line="treat" d=""/>
+<path class="dl-gap" data-line="gap" d=""/>
+<text class="dl-gaplab" data-lab="gap" x="0" y="0" text-anchor="start"></text>
+<text class="dl-axlab" x="112" y="208" text-anchor="middle">Before</text>
+<text class="dl-axlab" x="242" y="208" text-anchor="middle">After</text>
+<text class="dl-axlab" transform="translate(12 102) rotate(-90)" text-anchor="middle">GPA</text>
+</svg>
+<ul class="dl-legend">
+<li><span class="dl-sw dl-sw-comp" aria-hidden="true"></span>Comparison schools (25)</li>
+<li><span class="dl-sw dl-sw-treat" aria-hidden="true"></span>Treated schools (10)</li>
+<li><span class="dl-sw dl-sw-cf" aria-hidden="true"></span>Counterfactual DiD assumes</li>
+<li><span class="dl-sw dl-sw-truecf" aria-hidden="true"></span>True counterfactual</li>
+</ul>
+</div>
+<div class="dl-side">
+<p class="dl-cap">Three numbers on one scale</p>
+<svg class="dl-strip" viewBox="0 0 300 60" role="img" aria-labelledby="{{ $id }}-s-t" aria-describedby="{{ $id }}-s-d" data-strip="strip">
+<title id="{{ $id }}-s-t">True effect, naive estimate and DiD estimate</title>
+<desc id="{{ $id }}-s-d">Positions of the true effect, the naive before-after estimate and the DiD estimate on a common scale.</desc>
+<g data-ticks="x"></g>
+<path class="dl-strip-axis" d="M16 34L284 34"/>
+<g class="dl-mk dl-mk-truth" data-mk="truth"><path d="M0 22L0 46"/></g>
+<g class="dl-mk dl-mk-naive" data-mk="naive"><circle cx="0" cy="34" r="5"/></g>
+<g class="dl-mk dl-mk-did" data-mk="did"><path d="M0 27.5L6.5 34L0 40.5L-6.5 34Z"/></g>
+<text class="dl-mk-label dl-mk-label-truth" data-mk-label="truth" x="0" y="15" text-anchor="middle">true</text>
+<text class="dl-mk-label dl-mk-label-naive" data-mk-label="naive" x="0" y="15" text-anchor="middle">naive</text>
+<text class="dl-mk-label dl-mk-label-did" data-mk-label="did" x="0" y="15" text-anchor="middle">DiD</text>
+</svg>
+<dl class="dl-readout">
+<div class="dl-row"><dt><span class="dl-key dl-key-truth" aria-hidden="true"></span>True effect</dt><dd><span data-out="att"></span></dd></div>
+<div class="dl-row"><dt><span class="dl-key dl-key-naive" aria-hidden="true"></span>Naive before-after<span class="dl-sub">treated schools only</span></dt><dd><span data-out="naive"></span></dd></div>
+<div class="dl-row"><dt><span class="dl-key dl-key-did" aria-hidden="true"></span>DiD estimate<span class="dl-sub">two-way FE, SE clustered by school</span></dt><dd><span data-out="did"></span></dd></div>
+<div class="dl-row"><dt>Comparison schools’ change<span class="dl-sub">the trend DiD subtracts</span></dt><dd><span data-out="ctrend"></span></dd></div>
+<div class="dl-row"><dt>Bias of the naive estimate<span class="dl-sub">= common trend + violation</span></dt><dd><span data-out="biasNaive"></span></dd></div>
+<div class="dl-row"><dt>Bias of the DiD estimate<span class="dl-sub">= violation, exactly</span></dt><dd><span data-out="biasDid"></span></dd></div>
+</dl>
+</div>
+</div>
+<p class="dl-flag" data-state="ok" data-flag="a"><span data-out="flagA"></span><span class="dl-sub" data-out="flagSubA"></span></p>
+</div>
+<div class="dl-panel" role="tabpanel" id="{{ $id }}-panel-b" data-panel="event" aria-labelledby="{{ $id }}-tab-b"{{ if $a }} hidden{{ end }}>
+<p class="dl-intro">The post’s 35 schools in eight periods, with adoption in period 5. Set the true effect path and two ways parallel trends can fail, then compare the event-study coefficients (each a gap relative to t = −1) and the single pooled DiD estimate with the truth.</p>
+<div class="dl-controls">
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-e0">Effect at adoption (t = 0)</label><output for="{{ $id }}-e0" data-param-out="e0">25.0</output></div>
+<input type="range" id="{{ $id }}-e0" data-param="e0" min="0" max="40" step="0.5" value="25" autocomplete="off" aria-describedby="{{ $id }}-e0-help">
+<p class="dl-help" id="{{ $id }}-e0-help">GPA points the program adds in its first period. Default 25.</p>
+</div>
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-g">Growth per period</label><output for="{{ $id }}-g" data-param-out="g">0.0</output></div>
+<input type="range" id="{{ $id }}-g" data-param="g" min="-4" max="4" step="0.1" value="0" autocomplete="off" aria-describedby="{{ $id }}-g-help">
+<p class="dl-help" id="{{ $id }}-g-help">How much the effect rises (or fades, if negative) in each later period. Default 0: a flat effect.</p>
+</div>
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-a">Anticipation at t = −1</label><output for="{{ $id }}-a" data-param-out="a">0.0</output></div>
+<input type="range" id="{{ $id }}-a" data-param="a" min="-10" max="10" step="0.5" value="0" autocomplete="off" aria-describedby="{{ $id }}-a-help">
+<p class="dl-help" id="{{ $id }}-a-help">Effect that starts one period early, in the reference period. Default 0.</p>
+</div>
+<div class="dl-ctl">
+<div class="dl-ctl-top"><label for="{{ $id }}-s">Pre-trend slope</label><output for="{{ $id }}-s" data-param-out="s">0.0</output></div>
+<input type="range" id="{{ $id }}-s" data-param="s" min="-3" max="3" step="0.1" value="0" autocomplete="off" aria-describedby="{{ $id }}-s-help">
+<p class="dl-help" id="{{ $id }}-s-help">Extra drift per period of treated schools, before and after adoption, that is not the program. Default 0.</p>
+</div>
+</div>
+<div class="dl-actions">
+<button type="button" class="dl-btn" data-act="reset">Reset to the post’s data</button>
+</div>
+<div class="dl-plot dl-plot-wide">
+<p class="dl-cap">Event-study coefficients with 95% intervals, the true effect and the pooled DiD</p>
+<svg viewBox="0 0 560 300" role="img" aria-labelledby="{{ $id }}-b-t" aria-describedby="{{ $id }}-b-d" data-plot="event">
+<title id="{{ $id }}-b-t">Event-study coefficients by period relative to adoption</title>
+<desc id="{{ $id }}-b-d">Estimated coefficients with 95 percent intervals for t = −4 to 3, the reference period t = −1 at zero, the true effect path, and the pooled DiD estimate over the post-adoption periods.</desc>
+<g data-ticks="y"></g>
+<g data-ticks="x"></g>
+<rect class="dl-frame" x="56" y="14" width="434" height="234"/>
+<path class="dl-zero" data-line="zero" d=""/>
+<path class="dl-onset" data-line="onset" d=""/>
+<path class="dl-line dl-line-truth" data-line="truth" d=""/>
+<path class="dl-line dl-line-pooled" data-line="pooled" d=""/>
+<text class="dl-pooledlab" data-lab="pooled" x="496" y="0" text-anchor="start"></text>
+<text class="dl-pooledlab" data-lab="pooledv" x="496" y="0" text-anchor="start"></text>
+<g data-ci="ci"></g>
+<g data-mk="est"></g>
+<text class="dl-axlab" x="273" y="288" text-anchor="middle">Periods relative to adoption (t = −1 is the reference)</text>
+<text class="dl-axlab" transform="translate(14 131) rotate(-90)" text-anchor="middle">Effect on GPA</text>
+</svg>
+<ul class="dl-legend">
+<li><span class="dl-sw dl-sw-est" aria-hidden="true"></span>Event-study estimate (95% CI)</li>
+<li><span class="dl-sw dl-sw-truth" aria-hidden="true"></span>True effect</li>
+<li><span class="dl-sw dl-sw-pooled" aria-hidden="true"></span>Pooled DiD (one post dummy)</li>
+</ul>
+</div>
+<dl class="dl-readout dl-readout-b">
+<div class="dl-row"><dt>Average true effect, t = 0 to 3</dt><dd><span data-out="avgTrue"></span></dd></div>
+<div class="dl-row"><dt><span class="dl-key dl-key-pooled" aria-hidden="true"></span>Pooled DiD estimate<span class="dl-sub">gpa ~ txp | id + time, SE clustered by school</span></dt><dd><span data-out="pooled"></span></dd></div>
+<div class="dl-row"><dt>Bias of the pooled estimate</dt><dd><span data-out="biasPooled"></span></dd></div>
+<div class="dl-row"><dt>Leads t = −4, −3, −2<span class="dl-sub">should be near zero under parallel trends</span></dt><dd><span data-out="leads"></span></dd></div>
+<div class="dl-row"><dt>Lags t = 0, 1, 2, 3</dt><dd><span data-out="lags"></span></dd></div>
+<div class="dl-row"><dt>Significant leads<span class="dl-sub">95% interval excludes zero</span></dt><dd><span data-out="sigLeads"></span></dd></div>
+</dl>
+<p class="dl-flag" data-state="ok" data-flag="b"><span data-out="flagB"></span><span class="dl-sub" data-out="flagSubB"></span></p>
+</div>
+<p class="dl-sr" aria-live="polite" data-live="live"></p>
+</div>
+</section>
+{{- /* end did-lab */ -}}

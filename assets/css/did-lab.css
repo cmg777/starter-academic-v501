@@ -1,0 +1,588 @@
+/*
+ * did-lab.css — styles for the inline interactive DiD lab
+ * (layouts/shortcodes/did-lab.html + assets/js/did-lab.js).
+ *
+ * Every color is a CSS variable; SVG marks are styled by class, so switching
+ * Wowchemy's light/dark theme (the `dark` class on <body>) restyles the lab
+ * instantly without JavaScript. Colors follow the post's figures: comparison
+ * schools steel blue, treated schools warm orange, counterfactual and
+ * estimates teal; deepened in light mode where the hue is too pale on white.
+ * "-ink" twins are for text.
+ */
+
+.did-lab {
+  --dl-text: #141413;
+  --dl-muted: #4a5568;
+  --dl-bg: rgba(106, 155, 204, 0.04);
+  --dl-surface: #f9fbfd;
+  --dl-border: rgba(61, 110, 165, 0.35);
+  --dl-grid: rgba(20, 20, 19, 0.09);
+  --dl-frame: rgba(20, 20, 19, 0.28);
+  --dl-zero: rgba(20, 20, 19, 0.45);
+  --dl-comp: #4a82bd;
+  --dl-comp-soft: rgba(74, 130, 189, 0.45);
+  --dl-treat: #c8643f;
+  --dl-treat-soft: rgba(200, 100, 63, 0.45);
+  --dl-teal: #00897f;
+  --dl-teal-ink: #00776e;
+  --dl-truecf: #6b7280;
+  --dl-truth: #141413;
+  --dl-onset: #c8643f;
+  --dl-accent: #2f639a;
+  --dl-accent-ink: #ffffff;
+  --dl-accent-soft: rgba(47, 99, 154, 0.1);
+  --dl-focus: #1a5fb4;
+  --dl-flag-bg: rgba(106, 155, 204, 0.08);
+  --dl-flag-bias: #c8643f;
+  --dl-flag-mild: #2f5f94;
+  --dl-flag-ok: #00897f;
+
+  margin: 2rem 0;
+  padding: 1rem 1rem 1.1rem;
+  border: 1px solid var(--dl-border);
+  border-radius: 12px;
+  background: var(--dl-bg);
+  color: var(--dl-text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.dark .did-lab {
+  --dl-text: #e8ecf2;
+  --dl-muted: #c8d0e0;
+  --dl-bg: rgba(106, 155, 204, 0.06);
+  --dl-surface: #101a39;
+  --dl-border: rgba(106, 155, 204, 0.4);
+  --dl-grid: rgba(200, 208, 224, 0.11);
+  --dl-frame: rgba(200, 208, 224, 0.3);
+  --dl-zero: rgba(232, 236, 242, 0.5);
+  --dl-comp: #6a9bcc;
+  --dl-comp-soft: rgba(106, 155, 204, 0.5);
+  --dl-treat: #e8896a;
+  --dl-treat-soft: rgba(232, 137, 106, 0.5);
+  --dl-teal: #00d4c8;
+  --dl-teal-ink: #00d4c8;
+  --dl-truecf: #9aa5b8;
+  --dl-truth: #e8ecf2;
+  --dl-onset: #e8896a;
+  --dl-accent: #6a9bcc;
+  --dl-accent-ink: #0a1230;
+  --dl-accent-soft: rgba(106, 155, 204, 0.16);
+  --dl-focus: #00d4c8;
+  --dl-flag-bg: rgba(106, 155, 204, 0.1);
+  --dl-flag-bias: #e8896a;
+  --dl-flag-mild: #8fb3de;
+  --dl-flag-ok: #00d4c8;
+}
+
+.did-lab *,
+.did-lab *::before,
+.did-lab *::after {
+  box-sizing: border-box;
+}
+
+/* Neutralize article typography that would otherwise leak in. */
+.did-lab p,
+.did-lab ul,
+.did-lab li,
+.did-lab dl,
+.did-lab dt,
+.did-lab dd,
+.did-lab label {
+  margin: 0;
+  padding: 0;
+}
+
+.did-lab [hidden] {
+  display: none !important;
+}
+
+/* Until the script has drawn the lab, only the header and <noscript> show. */
+.did-lab[data-did-lab]:not([data-ready]) .dl-body {
+  display: none;
+}
+
+.did-lab[data-did-lab]:not([data-ready]) .dl-status {
+  visibility: hidden;
+}
+
+.did-lab .dl-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Header ---- */
+.did-lab .dl-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.did-lab .dl-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.did-lab .dl-status {
+  color: var(--dl-muted);
+  font-size: 0.875rem;
+}
+
+.did-lab .dl-intro {
+  margin-top: 0.75rem;
+  color: var(--dl-muted);
+  font-size: 0.9rem;
+}
+
+.did-lab .dl-noscript {
+  margin-top: 0.5rem;
+  color: var(--dl-muted);
+}
+
+/* ---- Tabs ---- */
+.did-lab .dl-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.85rem;
+  border-bottom: 1px solid var(--dl-border);
+}
+
+.did-lab .dl-tab {
+  flex: 1 1 0;
+  min-height: 44px;
+  margin: 0 0 -1px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--dl-muted);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.did-lab .dl-tab:hover {
+  background: var(--dl-accent-soft);
+  color: var(--dl-text);
+}
+
+.did-lab .dl-tab[aria-selected="true"] {
+  border-bottom-color: var(--dl-accent);
+  color: var(--dl-text);
+  font-weight: 700;
+}
+
+/* ---- Controls ---- */
+.did-lab .dl-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.did-lab .dl-ctl-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.did-lab .dl-ctl label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+
+.did-lab .dl-ctl output {
+  flex: none;
+  min-width: 3.4em;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.did-lab input[type="range"],
+.dark .did-lab input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 2.25rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  background: transparent;
+  accent-color: var(--dl-accent);
+  cursor: pointer;
+}
+
+.did-lab .dl-help {
+  color: var(--dl-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.did-lab .dl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.did-lab .dl-btn {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--dl-accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dl-text);
+  font: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.did-lab .dl-btn:hover {
+  background: var(--dl-accent-soft);
+}
+
+.did-lab input[type="range"]:focus-visible,
+.did-lab .dl-btn:focus-visible,
+.did-lab .dl-tab:focus-visible {
+  outline: 3px solid var(--dl-focus);
+  outline-offset: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Layout of plots and readouts ---- */
+.did-lab .dl-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.did-lab .dl-plot-wide {
+  margin-top: 1rem;
+  max-width: 720px;
+}
+
+/* ---- SVG common ---- */
+.did-lab .dl-cap {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.did-lab svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.did-lab svg text {
+  font-family: inherit;
+  font-size: 10px;
+  fill: var(--dl-muted);
+}
+
+.did-lab svg .dl-axlab {
+  font-size: 10.5px;
+  font-weight: 600;
+  fill: var(--dl-text);
+}
+
+.did-lab .dl-frame {
+  fill: none;
+  stroke: var(--dl-frame);
+  stroke-width: 1;
+}
+
+.did-lab .dl-gridline {
+  fill: none;
+  stroke: var(--dl-grid);
+  stroke-width: 1;
+}
+
+.did-lab .dl-zero {
+  fill: none;
+  stroke: var(--dl-zero);
+  stroke-width: 1;
+}
+
+.did-lab .dl-onset {
+  fill: none;
+  stroke: var(--dl-onset);
+  stroke-width: 1.3;
+  stroke-dasharray: 4 3;
+}
+
+/* ---- Tab A: scatter and means ---- */
+.did-lab .dl-pt-comp { fill: var(--dl-comp-soft); }
+.did-lab .dl-pt-treat { fill: var(--dl-treat-soft); }
+
+.did-lab .dl-line {
+  fill: none;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.did-lab .dl-line-comp { stroke: var(--dl-comp); }
+.did-lab .dl-line-treat { stroke: var(--dl-treat); }
+.did-lab .dl-line-cf { stroke: var(--dl-teal); stroke-width: 2.2; stroke-dasharray: 6 4; }
+.did-lab .dl-line-truecf { stroke: var(--dl-truecf); stroke-width: 2; stroke-dasharray: 1.5 3.5; }
+
+.did-lab .dl-gap {
+  fill: none;
+  stroke: var(--dl-text);
+  stroke-width: 1.3;
+}
+
+.did-lab svg .dl-gaplab,
+.did-lab svg .dl-pooledlab {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--dl-text);
+  paint-order: stroke;
+  stroke: var(--dl-surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.did-lab svg .dl-pooledlab { fill: var(--dl-teal-ink); }
+
+/* ---- Tab A: strip ---- */
+.did-lab .dl-strip { max-width: 420px; }
+
+.did-lab .dl-strip-axis,
+.did-lab .dl-strip-tick {
+  fill: none;
+  stroke: var(--dl-frame);
+  stroke-width: 1.2;
+}
+
+.did-lab .dl-mk-truth path { stroke: var(--dl-truth); stroke-width: 2; stroke-dasharray: 3 2; }
+.did-lab .dl-mk-naive circle { fill: var(--dl-treat); stroke: var(--dl-surface); stroke-width: 1.2; }
+.did-lab .dl-mk-did path { fill: var(--dl-teal); stroke: var(--dl-surface); stroke-width: 1.2; }
+
+.did-lab svg .dl-mk-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--dl-surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.did-lab svg .dl-mk-label-truth { fill: var(--dl-truth); }
+.did-lab svg .dl-mk-label-naive { fill: var(--dl-treat); }
+.did-lab svg .dl-mk-label-did { fill: var(--dl-teal-ink); }
+
+/* ---- Tab B: event-study marks ---- */
+.did-lab .dl-ci {
+  fill: none;
+  stroke: var(--dl-comp);
+  stroke-width: 1.6;
+}
+
+.did-lab .dl-est {
+  fill: var(--dl-comp);
+  stroke: var(--dl-surface);
+  stroke-width: 1.2;
+}
+
+.did-lab .dl-est-ref {
+  fill: var(--dl-surface);
+  stroke: var(--dl-text);
+  stroke-width: 1.4;
+}
+
+.did-lab .dl-line-truth { stroke: var(--dl-truth); stroke-width: 1.8; stroke-dasharray: 5 4; }
+.did-lab .dl-line-pooled { stroke: var(--dl-teal); stroke-width: 2.6; }
+
+/* ---- Legends ---- */
+.did-lab .dl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  margin-top: 0.4rem;
+  list-style: none;
+  color: var(--dl-muted);
+  font-size: 0.8125rem;
+}
+
+.did-lab .dl-sw {
+  display: inline-block;
+  width: 1.5em;
+  height: 0;
+  margin-right: 0.4em;
+  vertical-align: 0.3em;
+  border-top: 3px solid;
+}
+
+.did-lab .dl-sw-comp { border-top-color: var(--dl-comp); }
+.did-lab .dl-sw-treat { border-top-color: var(--dl-treat); }
+.did-lab .dl-sw-cf { border-top: 3px dashed var(--dl-teal); }
+.did-lab .dl-sw-truecf { border-top: 3px dotted var(--dl-truecf); }
+.did-lab .dl-sw-truth { border-top: 2px dashed var(--dl-truth); }
+.did-lab .dl-sw-pooled { border-top-color: var(--dl-teal); }
+
+.did-lab .dl-sw-est {
+  width: 0.7em;
+  height: 0.7em;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dl-comp);
+  vertical-align: -0.02em;
+}
+
+/* ---- Readouts ---- */
+.did-lab dl.dl-readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 1.75rem;
+  margin: 0.75rem 0 0;
+}
+
+.did-lab .dl-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--dl-grid);
+}
+
+.did-lab .dl-row dt {
+  font-weight: 400;
+  min-width: 0;
+}
+
+.did-lab .dl-row dd {
+  flex: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.did-lab .dl-sub {
+  display: block;
+  color: var(--dl-muted);
+  font-size: 0.8125rem;
+}
+
+.did-lab .dl-key {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-right: 0.4em;
+  vertical-align: 0.02em;
+}
+
+.did-lab .dl-key-truth { width: 0; height: 0.9em; border-left: 2px dashed var(--dl-truth); margin-right: 0.6em; vertical-align: -0.1em; }
+.did-lab .dl-key-naive { background: var(--dl-treat); border-radius: 50%; }
+.did-lab .dl-key-did { background: var(--dl-teal); transform: rotate(45deg) scale(0.85); }
+.did-lab .dl-key-pooled { width: 1em; height: 0; border-top: 3px solid var(--dl-teal); vertical-align: 0.25em; }
+
+/* ---- Flag line: the text carries the message; the bar only reinforces it ---- */
+.did-lab .dl-flag {
+  margin-top: 1rem;
+  padding: 0.6rem 0.85rem;
+  border-left: 5px solid var(--dl-flag-mild);
+  border-radius: 0 8px 8px 0;
+  background: var(--dl-flag-bg);
+  font-weight: 600;
+}
+
+.did-lab .dl-flag[data-state="bias"] { border-left-color: var(--dl-flag-bias); }
+.did-lab .dl-flag[data-state="ok"] { border-left-color: var(--dl-flag-ok); }
+
+.did-lab .dl-flag .dl-sub {
+  margin-top: 0.2rem;
+  font-weight: 400;
+}
+
+/* ---- Motion: nothing animates; keep it that way for reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .did-lab *,
+  .did-lab *::before,
+  .did-lab *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---- Phones: the event-study SVG (viewBox 560 wide) renders at ~0.55x,
+   so enlarge its text in user units to stay legible (~8-9 px on screen). ---- */
+@media (max-width: 575.98px) {
+  .did-lab [data-plot="event"] text {
+    font-size: 15px;
+  }
+
+  .did-lab [data-plot="event"] .dl-axlab {
+    font-size: 15.5px;
+  }
+
+  .did-lab [data-plot="event"] .dl-pooledlab {
+    font-size: 14px;
+  }
+}
+
+/* ---- Layout: one column on phones, more from 576px ---- */
+@media (min-width: 576px) {
+  .did-lab {
+    padding: 1.25rem 1.4rem 1.35rem;
+  }
+
+  .did-lab dl.dl-readout-b {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .did-lab .dl-controls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .did-lab [data-panel="event"] .dl-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .did-lab .dl-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+@media print {
+  .did-lab .dl-actions,
+  .did-lab .dl-controls input[type="range"],
+  .did-lab .dl-tabs {
+    display: none;
+  }
+
+  .did-lab .dl-panel[hidden] {
+    display: block !important;
+  }
+}

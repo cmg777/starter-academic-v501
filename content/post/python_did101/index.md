@@ -39,6 +39,10 @@ links:
   url: cheatsheet_stata.do
 - icon: file-code
   icon_pack: fas
+  name: "Stata do-file"
+  url: analysis.do
+- icon: file-code
+  icon_pack: fas
   name: "Quarto project (.zip)"
   url: python_did101.zip
 - icon: database
@@ -49,6 +53,10 @@ links:
   icon_pack: fas
   name: "Dataset (Event Study)"
   url: https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_didevent.dta
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: google-colab
   icon_pack: ai
   name: "Google Colab"
@@ -232,7 +240,7 @@ The regression implementation of DiD with multiple periods or multiple groups. I
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. TWFE extends mechanically to more periods, which the manual 2×2 does not. One warning: with *staggered* adoption and effects that differ across adoption cohorts or over time, TWFE can be badly biased (see Section 13.2). With a single adoption date, as here, it is fine.
+The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. TWFE extends mechanically to more periods, which the manual 2×2 does not. One warning: with *staggered* adoption and effects that differ across adoption cohorts or over time, TWFE can be badly biased (see Section 14.2). With a single adoption date, as here, it is fine.
 
 </details>
 
@@ -1154,7 +1162,28 @@ The plot shows a textbook event study pattern:
 The event study supports three findings: (1) **no detectable pre-trends**, which supports (but cannot prove) the design; (2) **an effect from the first treated period**, measured relative to $t = -1$; and (3) **sustained impact**, with no fade-out over four post-treatment periods.
 
 
-## 12. Common misconceptions
+## 12. Try it yourself: an interactive DiD lab
+
+The two tabs below run on the post's own data. Each slider shifts the GPA values exactly, so at the defaults the lab reproduces the numbers above: 36.20 and 25.31 in the 2×2 tab, and the event-study coefficients 0.34, −0.32, 0.59, 25.03, 24.71, 24.77 and 25.70 in the second tab. Moving a slider changes what the "truth" is and shows what each estimator recovers.
+
+{{< did-lab >}}
+
+**In the 2×2 lab:**
+
+1. **Remove the common trend.** Set the common trend to 0. The naive estimate falls to 25.31 and now equals the DiD estimate: without a shared trend there is nothing for the comparison group to remove. Every point of the naive bias in the post (10.89) is trend.
+2. **Break parallel trends.** Reset, then set the violation to +5. DiD rises to 30.31, a bias of exactly +5. The standard error stays at 0.585, because the slider moves group means, not noise. Nothing in the regression output warns you.
+3. **Manufacture an effect from nothing.** Set the true effect to 0 and the violation to +5. DiD reports 5.00 GPA points with t ≈ 8.5: a program that does nothing looks highly significant. This is why parallel trends has to be argued from the design, not read off the estimate.
+
+**In the event-study lab:**
+
+4. **Let the effect grow.** Set the growth to +2 per period. The lags follow the new path (25.03, 26.71, 28.77, 31.70), and the pooled DiD (27.90) stays within 0.10 of the average true effect (28.00). With a single adoption date, a pooled estimate averages dynamic effects reasonably; with staggered adoption it would not (Section 14.2).
+5. **Add anticipation.** Reset, then set anticipation to +5. Every coefficient, leads included, drops by 5 (the leads become −4.66, −5.32 and −4.41, all significant), because the reference period t = −1 already contains part of the effect. The pooled DiD is off by −1.35.
+6. **Hide a pre-trend.** Reset, then set the pre-trend slope to +0.2. No lead is significant, yet the pooled DiD is 25.70 against a true 25.00, a bias of +0.70. At +0.3 one lead turns significant; at +0.5 two do. A pre-trend test that passes is evidence, not proof (Roth, 2022).
+
+The lab makes the assumptions behind DiD concrete. Its estimates can only be as good as the counterfactual: a trend violation of any size passes straight into the DiD estimate, with the same small standard error. The event study helps by showing the leads, but anticipation can contaminate the reference period, and a modest pre-trend can stay inside the confidence intervals.
+
+
+## 13. Common misconceptions
 
 DiD looks simple, and that simplicity invites a few recurring misreadings. Each card below states a tempting claim and what this tutorial's own numbers say instead.
 
@@ -1194,9 +1223,9 @@ DiD looks simple, and that simplicity invites a few recurring misreadings. Each 
 </details>
 
 
-## 13. Discussion
+## 14. Discussion
 
-### 13.1 Four key findings
+### 14.1 Four key findings
 
 1. **The naive before-after comparison overstates the effect by 43%.** The raw change in treated schools is 36.20 GPA points, but 10.88 of these points reflect a common upward trend shared by all schools. DiD correctly attributes only 25.32 points to the program.
 
@@ -1206,7 +1235,7 @@ DiD looks simple, and that simplicity invites a few recurring misreadings. Each 
 
 4. **Inference choice matters less than design.** Standard errors ranged from 0.585 (CRV1) to 0.637 (CRV3) across four inference methods, but all produced t-statistics above 39. When the research design is clean and the signal is this strong, the choice of variance estimator is practically irrelevant; with a small effect and only 10 treated schools, it would not be.
 
-### 13.2 Caveats
+### 14.2 Caveats
 
 This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. In real applications, you should expect:
 
@@ -1217,7 +1246,7 @@ This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. 
 - **Few treated clusters:** Only 10 schools are treated. With effects of realistic size, cluster-robust inference becomes fragile, and CRV3 or the wild cluster bootstrap should be preferred over CRV1 (MacKinnon, Nielsen & Webb, 2023).
 
 
-## 14. Summary and Takeaways
+## 15. Summary and Takeaways
 
 1. **DiD removes common time trends.** The naive approach overstated the effect by 10.88 GPA points — exactly the secular trend captured by the comparison group.
 
@@ -1232,11 +1261,11 @@ This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. 
 6. **etable() and Great Tables replace manual table construction.** The `csw()` operator estimates multiple specifications in one call, and `etable()` produces publication-ready output. For custom formatting, Great Tables provides full control via `.tab_header()`, `.fmt_number()`, `.tab_style()`, and `.save()`.
 
 
-## 15. Exercises
+## 16. Exercises
 
 The exercises go from a warm-up to a stretch problem. Try each one before opening its solution; every solution was run with the package versions pinned in Section 2.
 
-### 15.1 Warm-up
+### 16.1 Warm-up
 
 **Exercise 1 — DiD as a first-difference regression.** With two periods, DiD is the same as regressing each school's *change* in GPA on the treatment indicator. Reshape `df` to one row per school, compute the change `dgpa`, and regress it on `treated`. Compare the slope with the TWFE estimate.
 
@@ -1262,7 +1291,7 @@ The slope on `treated` is 25.315, identical to the TWFE estimate, and the interc
 
 </details>
 
-### 15.2 Core
+### 16.2 Core
 
 **Exercise 2 — Collapse the event study to a 2×2.** Load the event-study dataset and average GPA over the four pre-treatment periods and over the four post-treatment periods for each school. Re-estimate the DiD on the collapsed data. Does the estimate match the 2×2 result? Why or why not?
 
@@ -1311,7 +1340,7 @@ The placebo "effect" is 0.287 points (p = 0.485, 95% CI [−0.54, 1.11]): nothin
 
 </details>
 
-### 15.3 Stretch
+### 16.3 Stretch
 
 **Exercise 4 — When would the standard-error choice matter?** With 35 school clusters, PyFixest uses a t distribution with 34 degrees of freedom for clustered inference. For each of the four variance estimators in Section 8, compute the smallest DiD estimate that would still be significant at the 5% level. How far is the actual estimate from these thresholds?
 
