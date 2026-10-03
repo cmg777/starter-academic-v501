@@ -151,7 +151,7 @@ The 2×2 estimator. Compare the change in outcomes for the treated group to the 
 **2. Parallel trends assumption.**
 The identifying assumption: in the absence of treatment, the treated and control groups' average outcomes would have followed the *same* trajectory. Differences in *levels* are fine. Differences in *changes* (slopes) would invalidate DiD.
 
-*Example.* The simulation generates data with parallel pre-trends by construction. In the 8-period extension, the event-study leads (`lead-1`, `lead-2`, etc.) are all near zero — no pre-treatment divergence between treated and control schools. The assumption holds visually and statistically.
+*Example.* The simulation generates data with parallel pre-trends by construction. In the 8-period extension, the pre-treatment event-study coefficients ($t = -4, -3, -2$) are small (0.34, −0.32, 0.59) and statistically insignificant; $t = -1$ is the reference period, so it is zero by construction. The data are *consistent with* parallel trends, but no test can prove the assumption: it is a claim about the treated schools' unobserved post-period counterfactual.
 
 *Analogy.* Sister cars on parallel tracks. They started at different speeds, but they accelerate identically. Without the treatment, both stay parallel. With the treatment, the treated car accelerates more — and we measure that extra acceleration.
 
@@ -172,14 +172,14 @@ The hypothetical outcome the treated unit would have had *without* treatment. Ne
 **5. Two-Way Fixed Effects (TWFE)** $\alpha_i + \delta_t$.
 The regression implementation of DiD with multiple periods or multiple groups. Includes a fixed effect for each unit and a fixed effect for each time period. The coefficient on the treatment-period interaction is the DiD estimate.
 
-*Example.* The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. With more periods, TWFE generalizes naturally; the manual 2×2 does not.
+*Example.* The 2×2 TWFE specification with fixed effects on `id` and `time` and the regressor `txp` returns the same 25.32 ATT as the manual difference-of-differences calculation. TWFE extends mechanically to more periods, which the manual 2×2 does not. One warning: with *staggered* adoption and effects that differ across adoption cohorts or over time, TWFE can be badly biased (see Section 14.2). With a single adoption date, as here, it is fine.
 
 *Analogy.* Wiping the negative twice. First wipe removes school-specific stains (their starting GPA, demographics). Second wipe removes period-specific glare (district-wide policy shocks). What remains is the change attributable to the treatment.
 
 **6. Event study.**
 A dynamic specification that estimates a separate treatment effect for each period before and after the treatment date. Pre-treatment coefficients (leads) test parallel trends. Post-treatment coefficients (lags) trace out the dynamic effect.
 
-*Example.* The 8-period event-study specification returns near-zero coefficients for the pre-treatment leads and large positive coefficients for post-treatment lags. The post-treatment effects grow modestly over time, suggesting the program's benefit accumulates.
+*Example.* The 8-period event-study specification returns near-zero coefficients for the pre-treatment leads and large positive coefficients for the post-treatment lags. The post-treatment coefficients stay roughly flat (25.03, 24.71, 24.77, 25.70): the effect appears in the first treated period and neither builds up nor fades.
 
 *Analogy.* Recording the radio signal frame-by-frame. Instead of one big "before vs after" reading, you record each year separately. The pre-treatment frames should be silent. Post-treatment frames trace out the unfolding signal.
 
@@ -193,7 +193,7 @@ The biased estimator: compute the treated group's pre-vs-post change and call th
 **8. SUTVA** (Stable Unit Treatment Value Assumption).
 Two parts. (a) *No interference*: one unit's treatment status does not affect another unit's outcome (no spillovers). (b) *Single version*: the treatment is "the same" treatment across units; no hidden variation. SUTVA is required for the potential-outcomes framework to make sense.
 
-*Example.* SUTVA assumes that one school's tutoring program does not boost or depress neighbouring schools' `gpa` (no interference) and that all 10 treated schools received the *same* program (single version). The simulation enforces both by construction; in field data, both are testable concerns.
+*Example.* SUTVA assumes that one school's tutoring program does not boost or depress neighbouring schools' `gpa` (no interference) and that all 10 treated schools received the *same* program (single version). The simulation enforces both by construction. In field data, SUTVA is mostly argued from institutional knowledge (how students are assigned to schools, whether tutors or funds were shared). Spillovers can sometimes be probed, for example by comparing untreated schools near and far from treated ones, but SUTVA cannot be fully tested.
 
 *Analogy.* No contagion between patients. Patient A taking the drug should not affect Patient B's outcome. If they live in the same household and share medication, SUTVA fails. The "no spillover" assumption is the medical version.
 
@@ -203,6 +203,8 @@ The pinned packages were installed by `setup_env.py` (see the verification chunk
 
 ```{python}
 #| label: imports
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -233,13 +235,21 @@ TEAL = "#00d4c8"
 
 ## 3. Data Loading and Exploration
 
-We load the 2×2 dataset directly from GitHub. This Stata `.dta` file contains 35 schools observed across 2 time periods:
+We load the 2×2 dataset, which contains 35 schools observed across 2 time periods. The original is a Stata `.dta` file on GitHub. This bundle also ships CSV copies of both datasets (`tutoring_did.csv` and `tutoring_didevent.csv`), written at full precision, so the notebook reads those when they sit next to it and needs no internet connection. Both sources give identical numbers. (In Google Colab there is no local copy, so the notebook downloads the `.dta` file.)
 
 ```{python}
 #| label: data-download
 
-url_did = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_did.dta"
-df = pd.read_stata(url_did).astype(float)
+def load_data(name):
+    """Read the bundled CSV copy if present, else the original .dta from GitHub."""
+    csv_path = Path(f"{name}.csv")
+    if csv_path.exists():
+        return pd.read_csv(csv_path, float_precision="round_trip").astype(float), csv_path.name
+    url = f"https://github.com/quarcs-lab/data-open/raw/master/isds/{name}.dta"
+    return pd.read_stata(url).astype(float), url
+
+df, source = load_data("tutoring_did")
+print("Loaded:", source)
 print(df.shape)
 print(df.dtypes)
 ```
@@ -933,8 +943,8 @@ The 2×2 design tells us *whether* the program had an effect, but not *when* the
 ```{python}
 #| label: data-event-download
 
-url_event = "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_didevent.dta"
-df_event = pd.read_stata(url_event).astype(float)
+df_event, source_event = load_data("tutoring_didevent")
+print("Loaded:", source_event)
 print(f"Shape: {df_event.shape}")
 ```
 
@@ -1187,7 +1197,31 @@ gt_event
 
 The event study supports three findings: (1) **no detectable pre-trends**, which supports (but cannot prove) the design; (2) **an effect from the first treated period**, measured relative to $t = -1$; and (3) **sustained impact**, with no fade-out over four post-treatment periods.
 
-## 12. Common misconceptions
+## 12. Try it yourself: an interactive DiD lab
+
+The lab in the post has two tabs, and both run on the post's own data. Each slider shifts the GPA values exactly, so at the defaults the lab reproduces the numbers above: 36.20 and 25.31 in the 2×2 tab, and the event-study coefficients 0.34, −0.32, 0.59, 25.03, 24.71, 24.77 and 25.70 in the second tab. Moving a slider changes what the "truth" is and shows what each estimator recovers.
+
+::: {.callout-note}
+## Interactive lab (web version only)
+
+The interactive DiD lab runs in the browser, so it cannot be embedded in this rendered notebook. Open it in section 12 of the [published post](https://carlos-mendez.org/post/python_did101/#12-try-it-yourself-an-interactive-did-lab). The steps below refer to its sliders and readouts.
+:::
+
+**In the 2×2 lab:**
+
+1. **Remove the common trend.** Set the common trend to 0. The naive estimate falls to 25.31 and now equals the DiD estimate: without a shared trend there is nothing for the comparison group to remove. Every point of the naive bias in the post (10.89) is trend.
+2. **Break parallel trends.** Reset, then set the violation to +5. DiD rises to 30.31, a bias of exactly +5. The standard error stays at 0.585, because the slider moves group means, not noise. Nothing in the regression output warns you.
+3. **Manufacture an effect from nothing.** Set the true effect to 0 and the violation to +5. DiD reports 5.00 GPA points with t ≈ 8.5: a program that does nothing looks highly significant. This is why parallel trends has to be argued from the design, not read off the estimate.
+
+**In the event-study lab:**
+
+4. **Let the effect grow.** Set the growth to +2 per period. The lags follow the new path (25.03, 26.71, 28.77, 31.70), and the pooled DiD (27.90) stays within 0.10 of the average true effect (28.00). With a single adoption date, a pooled estimate averages dynamic effects reasonably; with staggered adoption it would not (Section 14.2).
+5. **Add anticipation.** Reset, then set anticipation to +5. Every coefficient, leads included, drops by 5 (the leads become −4.66, −5.32 and −4.41, all significant), because the reference period t = −1 already contains part of the effect. The pooled DiD is off by −1.35.
+6. **Hide a pre-trend.** Reset, then set the pre-trend slope to +0.2. No lead is significant, yet the pooled DiD is 25.70 against a true 25.00, a bias of +0.70. At +0.3 one lead turns significant; at +0.5 two do. A pre-trend test that passes is evidence, not proof (Roth, 2022).
+
+The lab makes the assumptions behind DiD concrete. Its estimates can only be as good as the counterfactual: a trend violation of any size passes straight into the DiD estimate, with the same small standard error. The event study helps by showing the leads, but anticipation can contaminate the reference period, and a modest pre-trend can stay inside the confidence intervals.
+
+## 13. Common misconceptions
 
 DiD looks simple, and that simplicity invites a few recurring misreadings. Each card below states a tempting claim and what this tutorial's own numbers say instead.
 
@@ -1221,9 +1255,9 @@ DiD looks simple, and that simplicity invites a few recurring misreadings. Each 
 **What is actually true.** They agree here because the effect is about 40 standard errors away from zero. Exercise 4 shows that an effect of 1.19 points would be significant with CRV1 but not with CRV3 (threshold 1.30). With smaller effects and only 10 treated schools, the choice can decide the result.
 :::
 
-## 13. Discussion
+## 14. Discussion
 
-### 13.1 Four key findings
+### 14.1 Four key findings
 
 1. **The naive before-after comparison overstates the effect by 43%.** The raw change in treated schools is 36.20 GPA points, but 10.88 of these points reflect a common upward trend shared by all schools. DiD correctly attributes only 25.32 points to the program.
 
@@ -1233,7 +1267,7 @@ DiD looks simple, and that simplicity invites a few recurring misreadings. Each 
 
 4. **Inference choice matters less than design.** Standard errors ranged from 0.585 (CRV1) to 0.637 (CRV3) across four inference methods, but all produced t-statistics above 39. When the research design is clean and the signal is this strong, the choice of variance estimator is practically irrelevant; with a small effect and only 10 treated schools, it would not be.
 
-### 13.2 Caveats
+### 14.2 Caveats
 
 This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. In real applications, you should expect:
 
@@ -1243,7 +1277,7 @@ This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. 
 - **Staggered treatment timing:** When different units receive treatment at different times *and* the effect varies across adoption cohorts or over time, the standard TWFE estimator can be badly biased, because already-treated units end up serving as controls for later-treated ones (Goodman-Bacon, 2021). Modern estimators address this (Callaway & Sant'Anna, 2021; Sun & Abraham, 2021; Gardner, 2022; Borusyak, Jaravel & Spiess, 2024).
 - **Few treated clusters:** Only 10 schools are treated. With effects of realistic size, cluster-robust inference becomes fragile, and CRV3 or the wild cluster bootstrap should be preferred over CRV1 (MacKinnon, Nielsen & Webb, 2023).
 
-## 14. Summary and Takeaways
+## 15. Summary and Takeaways
 
 1. **DiD removes common time trends.** The naive approach overstated the effect by 10.88 GPA points — exactly the secular trend captured by the comparison group.
 
@@ -1257,11 +1291,11 @@ This tutorial uses simulated data designed to illustrate DiD mechanics cleanly. 
 
 6. **etable() and Great Tables replace manual table construction.** The `csw()` operator estimates multiple specifications in one call, and `etable()` produces publication-ready output. For custom formatting, Great Tables provides full control via `.tab_header()`, `.fmt_number()`, `.tab_style()`, and `.save()`.
 
-## 15. Exercises
+## 16. Exercises
 
 The exercises go from a warm-up to a stretch problem. Try each one before opening its solution; every solution was run with the package versions pinned in Section 2.
 
-### 15.1 Warm-up
+### 16.1 Warm-up
 
 **Exercise 1 — DiD as a first-difference regression.** With two periods, DiD is the same as regressing each school's *change* in GPA on the treatment indicator. Reshape `df` to one row per school, compute the change `dgpa`, and regress it on `treated`. Compare the slope with the TWFE estimate.
 
@@ -1281,7 +1315,7 @@ print(fit_fd.tidy()[["Estimate", "Std. Error"]].round(3))
 The slope on `treated` is 25.315, identical to the TWFE estimate, and the intercept (10.886) is the comparison schools' trend. Even the HC1 standard error on the differenced data (0.585) matches the school-clustered CRV1 standard error from Section 7.2: with two periods, differencing within each school and clustering by school use the same information.
 :::
 
-### 15.2 Core
+### 16.2 Core
 
 **Exercise 2 — Collapse the event study to a 2×2.** Load the event-study dataset and average GPA over the four pre-treatment periods and over the four post-treatment periods for each school. Re-estimate the DiD on the collapsed data. Does the estimate match the 2×2 result? Why or why not?
 
@@ -1291,7 +1325,7 @@ The slope on `treated` is 25.315, identical to the TWFE estimate, and the interc
 ```{python}
 #| label: exercise-2-solution
 
-df_event = pd.read_stata(url_event).astype(float)
+df_event, _ = load_data("tutoring_didevent")
 collapsed = (df_event.groupby(["id", "post"], as_index=False)
              .agg(gpa=("gpa", "mean"), treated=("treated", "first")))
 collapsed["txp"] = collapsed["treated"] * collapsed["post"]
@@ -1320,7 +1354,7 @@ print(fit_placebo.tidy()[["Estimate", "Std. Error", "Pr(>|t|)", "2.5%", "97.5%"]
 The placebo "effect" is 0.287 points (p = 0.485, 95% CI [−0.54, 1.11]): nothing, as it should be when no program was running. Like the event-study leads, a placebo test can raise a red flag, but passing it does not prove parallel trends.
 :::
 
-### 15.3 Stretch
+### 16.3 Stretch
 
 **Exercise 4 — When would the standard-error choice matter?** With 35 school clusters, PyFixest uses a t distribution with 34 degrees of freedom for clustered inference. For each of the four variance estimators in Section 8, compute the smallest DiD estimate that would still be significant at the 5% level. How far is the actual estimate from these thresholds?
 
@@ -1363,6 +1397,12 @@ An estimate is significant at 5% only if it exceeds about 2.03 standard errors: 
 
 ## Source files
 
-- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did101/script.py)
+- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did101/script.py) (also in this bundle)
+- Cheat sheets in this bundle: `cheatsheet_python.py`, `cheatsheet_R.R`, `cheatsheet_stata.do` (the same twelve estimates in three languages); Stata replication: `analysis.do`
+- Data in this bundle: `tutoring_did.csv` (the 2×2 panel, 35 schools × 2 periods) and `tutoring_didevent.csv` (the event-study panel, 35 schools × 8 periods), identical to the `.dta` files on GitHub
+- Data dictionary: <https://carlos-mendez.org/post/python_did101/data/index.html>
+- Slides: [HTML](https://carlos-mendez.org/post/python_did101/slides/index.html), [AI slides (PDF)](https://carlos-mendez.org/post/python_did101/slides/ai-slides.pdf), [interactive slides (AhaSlides)](https://presenter.ahaslides.com/share/1790995456625-cj6th2dfd9)
+- Podcast: <https://open.spotify.com/episode/7dxl297Eflm60F76p88MoF>; video overview: <https://www.youtube.com/watch?v=VnSwS0g-jTE>
+- Interactive web app: <https://carlos-mendez.org/post/python_did101/web_app/index.html>
 - Published post: <https://carlos-mendez.org/post/python_did101/>
 - GitHub repo: <https://github.com/cmg777/starter-academic-v501>
