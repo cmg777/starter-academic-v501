@@ -29,6 +29,10 @@ links:
   icon_pack: fas
   name: "Slides (HTML)"
   url: slides/index.html
+- icon: file-pdf
+  icon_pack: fas
+  name: "AI Slides (PDF)"
+  url: https://carlos-mendez.org/post/python_did101/slides/ai-slides.pdf
 - icon: poll
   icon_pack: fas
   name: "Interactive slides (AhaSlides)"
