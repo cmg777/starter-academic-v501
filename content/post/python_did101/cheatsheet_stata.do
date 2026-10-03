@@ -66,7 +66,8 @@ version 17               // etable needs 17+
 *-------------------------------------------------------------------------------
 * 1. LOAD THE DATA (LOCAL COPY, THEN URL)
 *    Corral & Yang (2024): 35 high schools, 10 adopt an after-school tutoring
-*    program at the same time. gpa = average GPA of low-income students (0-100).
+*    program at the same time. gpa = average GPA of low-income students (nominally 0-100;
+*    the simulated event-study file reaches 107.68).
 *      tutoring_did.csv       35 schools x 2 periods  (the 2x2 design)
 *      tutoring_didevent.csv  35 schools x 8 periods  (the event study; adoption
 *                             in period 5; timeToTreat is empty for comparison

@@ -261,7 +261,7 @@ The dataset has **70 observations** (35 schools × 2 periods) and **7 variables*
 - `treated`: Treatment indicator (1 = received tutoring program)
 - `post`: Post-period indicator (1 = after program implementation)
 - `txp`: Interaction term (treated × post)
-- `gpa`: Outcome, the average GPA of low-income students (0–100 scale)
+- `gpa`: Outcome, the average GPA of low-income students (nominally a 0–100 score)
 - `female_share`: Share of female students (covariate)
 
 ```{python}
@@ -957,6 +957,8 @@ print(df_event["timeToTreat"].value_counts().sort_index())
 ```
 
 Each of the 10 treated schools contributes one observation per relative time period. This structure yields 10 observations at each event time. The treated schools are therefore balanced in event time, just as they are in the 2×2 design.
+
+One feature of the simulated outcome deserves attention. GPA is nominally a 0–100 score, yet 27 of the 280 school-periods in this file exceed 100, with a maximum of 107.68. All of them belong to the 10 treated schools after the program starts, because the simulation adds the treatment effect without capping the score. These values are therefore an artifact of the simulated data, not an error in the analysis, and they do not affect any estimate in this tutorial.
 
 ```{python}
 #| label: fig-panelview-event

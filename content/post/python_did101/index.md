@@ -105,7 +105,7 @@ diagram: true
 
 ## Abstract
 
-Evaluating whether an educational intervention works is difficult because outcomes often drift upward for reasons unrelated to the program. A simple before-after comparison therefore conflates the treatment effect with secular trends. This tutorial introduces the Difference-in-Differences (DiD) design in Python as a method to recover the causal effect of an after-school tutoring program on student performance. It uses the simulated case study of Corral and Yang (2024), in which 10 of 35 high schools in one region adopt a tutoring program. The outcome is the average GPA of low-income students on a 0–100 scale. The 2×2 dataset has 70 observations (35 schools over 2 periods), and an event-study extension has 280 observations across 8 periods. Estimation proceeds through manual 2×2 double differencing, classical OLS with a treated×post interaction, and two-way fixed effects (TWFE) with the PyFixest package. The tutorial also compares iid, HC1, CRV1, and CRV3 standard errors and builds publication-quality tables with etable() and Great Tables. The naive before-after change of 36.20 GPA points overstates the effect by 43%, because 10.88 points reflect a region-wide trend. DiD isolates an ATT of 25.32 points, which is stable across specifications (25.315 to 25.328), with an R² near 0.995. The event study shows small and statistically insignificant pre-period coefficients (0.34, −0.32, 0.59). These estimates are consistent with parallel trends, although they do not prove it. The post-treatment effect appears in the first treated period and stays roughly flat, between 24.71 and 25.70. The results demonstrate that valid causal conclusions depend on a credible comparison group and a clean research design, not on the choice of variance estimator.
+Evaluating whether an educational intervention works is difficult because outcomes often drift upward for reasons unrelated to the program. A simple before-after comparison therefore conflates the treatment effect with secular trends. This tutorial introduces the Difference-in-Differences (DiD) design in Python as a method to recover the causal effect of an after-school tutoring program on student performance. It uses the simulated case study of Corral and Yang (2024), in which 10 of 35 high schools in one region adopt a tutoring program. The outcome is the average GPA of low-income students, measured on a nominal 0–100 scale. The 2×2 dataset has 70 observations (35 schools over 2 periods), and an event-study extension has 280 observations across 8 periods. Estimation proceeds through manual 2×2 double differencing, classical OLS with a treated×post interaction, and two-way fixed effects (TWFE) with the PyFixest package. The tutorial also compares iid, HC1, CRV1, and CRV3 standard errors and builds publication-quality tables with etable() and Great Tables. The naive before-after change of 36.20 GPA points overstates the effect by 43%, because 10.88 points reflect a region-wide trend. DiD isolates an ATT of 25.32 points, which is stable across specifications (25.315 to 25.328), with an R² near 0.995. The event study shows small and statistically insignificant pre-period coefficients (0.34, −0.32, 0.59). These estimates are consistent with parallel trends, although they do not prove it. The post-treatment effect appears in the first treated period and stays roughly flat, between 24.71 and 25.70. The results demonstrate that valid causal conclusions depend on a credible comparison group and a clean research design, not on the choice of variance estimator.
 
 ## 1. Overview
 
@@ -428,7 +428,7 @@ The dataset has **70 observations** (35 schools × 2 periods) and **7 variables*
 - `treated`: Treatment indicator (1 = received tutoring program)
 - `post`: Post-period indicator (1 = after program implementation)
 - `txp`: Interaction term (treated × post)
-- `gpa`: Outcome, the average GPA of low-income students (0–100 scale)
+- `gpa`: Outcome, the average GPA of low-income students (nominally a 0–100 score)
 - `female_share`: Share of female students (covariate)
 
 ```python
@@ -1085,6 +1085,8 @@ timeToTreat
 ```
 
 Each of the 10 treated schools contributes one observation per relative time period. This structure yields 10 observations at each event time. The treated schools are therefore balanced in event time, just as they are in the 2×2 design.
+
+One feature of the simulated outcome deserves attention. GPA is nominally a 0–100 score, yet 27 of the 280 school-periods in this file exceed 100, with a maximum of 107.68. All of them belong to the 10 treated schools after the program starts, because the simulation adds the treatment effect without capping the score. These values are therefore an artifact of the simulated data, not an error in the analysis, and they do not affect any estimate in this tutorial.
 
 ![Panel structure for the event study design showing 35 schools across 8 time periods. Treatment begins at period 5, with 10 treated schools switching from light to dark orange while 25 comparison schools remain in steel blue.](did101_panelview_event.png)
 

@@ -45,8 +45,9 @@ The author accepted a 3-participant cap before the build, as for the four earlie
 (seven or eight interactive slides capped those at **0 / 3**). **Observed on this deck
 (2026-10-03):** with five quizzes, a fresh editor reload about ten minutes after they were
 created still read **0 / 50** — *"As a free user, you can host up to 50 live participants"* —
-with no crown on any quiz. The doc warns that crowns are computed lazily, so this is one
-reading, not a rule: check the badge again, and test a live session, before teaching from it.
+with no crown on any quiz. A second check several hours later (same day, fresh editor load)
+still read **0 / 50**. The doc warns that crowns are computed lazily, so treat this as two
+readings, not a rule, and test a live session before teaching from it.
 
 ## Interactive slides
 
