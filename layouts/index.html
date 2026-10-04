@@ -74,7 +74,7 @@
           <p class="eyebrow"><span class="signal" aria-hidden="true"></span>{{ $t.eyebrow }}</p>
           <h1 id="hero-title"><span class="h1-line">{{ $t.title | safeHTML }}</span> <br><span class="h1-accent">{{ $t.titleAccent | safeHTML }}</span></h1>
           <p class="hero-intro">{{ $t.intro }}</p>
-          <div class="actions"><div class="hero-action-buttons"><button class="button button-video" type="button" data-video-open aria-haspopup="dialog" aria-controls="video-overview">{{ $t.videoOverview }} <span aria-hidden="true">▶</span></button><a class="button button-primary" href="#researchLab">{{ $t.explore }} <span aria-hidden="true">↗</span></a></div><a class="text-link" href="#posts">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
+          <div class="actions"><div class="hero-action-buttons"><button class="button button-video" type="button" data-video-open aria-haspopup="dialog" aria-controls="video-overview">{{ $t.videoOverview }} <span aria-hidden="true">▶</span></button><a class="button button-primary" href="{{ $t.keynoteUrl }}" target="_blank" rel="noopener">{{ $t.keynote }} <span aria-hidden="true">↗</span></a></div><a class="text-link" href="#projects">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
           <div class="hero-identity"><span class="identity-line" aria-hidden="true"></span><div><strong>{{ $t.identity }}</strong><span>{{ $t.role }}</span></div></div>
         </div>
         <figure class="earth" data-earth data-texture="{{ "media/orbital/black-marble-2016.jpg" | relURL }}" data-mobile-texture="{{ "media/orbital/black-marble-2016-mobile.jpg" | relURL }}">
@@ -113,7 +113,7 @@
       </div>
       <div class="shell hero-bottom"><a href="#researchLab"><span aria-hidden="true">↓</span> {{ $t.scroll }}</a><span class="coordinates" aria-hidden="true">35.15° N &nbsp; 136.97° E &nbsp; / &nbsp; NAGOYA, JP</span></div>
     </section>
-    <dialog id="video-overview" class="video-modal" data-video-modal data-video-src="https://www.youtube-nocookie.com/embed/Hy-b7kjLFds?autoplay=1&amp;rel=0" aria-labelledby="video-overview-title">
+    <dialog id="video-overview" class="video-modal" data-video-modal data-video-src="{{ $t.videoUrl }}" aria-labelledby="video-overview-title">
       <div class="video-modal-panel">
         <div class="video-modal-header"><p id="video-overview-title">{{ $t.videoOverview }}</p><button type="button" data-video-close aria-label="{{ $t.closeVideo }}"><span aria-hidden="true">×</span></button></div>
         <div class="video-modal-frame"><iframe data-video-frame title="{{ $t.videoOverview }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe></div>
