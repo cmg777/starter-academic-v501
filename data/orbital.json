@@ -47,8 +47,8 @@
     ],
     "researchKicker": "01 / THE RESEARCH QUESTIONS",
     "researchTitle": "Why do subnational regions follow different development paths?",
-    "researchIntro": "Through the QuaRCS lab—Quantitative Regional and Computational Science—I work with an international research network on sustainable regional development, from growth and inequality to structural change and energy.",
-    "labLink": "Explore the QuaRCS lab",
+    "researchIntro": "The QuaRCS Network is an international and interdisciplinary research network in Quantitative Regional and Computational Science.",
+    "labLink": "Explore the QuaRCS network",
     "researchCards": [
       {
         "title": "Map human activity",
@@ -188,8 +188,8 @@
     ],
     "researchKicker": "01 / LAS PREGUNTAS DE INVESTIGACIÓN",
     "researchTitle": "¿Por qué las regiones subnacionales siguen distintas trayectorias de desarrollo?",
-    "researchIntro": "Desde el laboratorio QuaRCS —Ciencia Regional Cuantitativa y Computacional— colaboro con una red internacional de investigación sobre desarrollo regional sostenible, desde el crecimiento y la desigualdad hasta el cambio estructural y la energía.",
-    "labLink": "Explore el laboratorio QuaRCS",
+    "researchIntro": "La Red QuaRCS es una red de investigación internacional e interdisciplinaria en Ciencia Regional Cuantitativa y Computacional.",
+    "labLink": "Explore la red QuaRCS",
     "researchCards": [
       {
         "title": "Mapear la actividad humana",
@@ -329,8 +329,8 @@
     ],
     "researchKicker": "01 / 研究の問い",
     "researchTitle": "なぜ国内の地域は、異なる発展の道を歩むのでしょうか。",
-    "researchIntro": "QuaRCSラボ（Quantitative Regional and Computational Science：定量的地域科学・計算科学）を通じて国際研究ネットワークに参加し、地域の成長と格差、産業構造の変化、エネルギーなど、持続可能な地域開発に関わる課題を研究しています。",
-    "labLink": "QuaRCSラボについて",
+    "researchIntro": "QuaRCSネットワークは、定量的地域科学・計算科学（Quantitative Regional and Computational Science）における国際的かつ学際的な研究ネットワークです。",
+    "labLink": "QuaRCSネットワークについて",
     "researchCards": [
       {
         "title": "人間活動を地図で捉える",
