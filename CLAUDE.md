@@ -74,6 +74,12 @@ The new template reads projects/tutorials/events and author images from existing
 Hugo content. Keep all three `data/orbital.json` locales synchronized. Run
 `node --test tests/orbital.test.cjs` after changing globe behavior.
 
+The cinematic layer (starfield, 3D orbits, network arcs, reveals, tilt cards,
+coverflow, earthrise) lives in `assets/css/orbital-cinema.css` and
+`assets/js/orbital-cinema.js`; see `logs/2026-10-04-cinematic-landing.md`. Every
+effect must keep a still fallback (reduced motion, touch, print, no JS). The hero
+headline markup (`.kicker`, `<em>` keywords) is in `data/orbital.json`.
+
 The homepage's **Recent research** section automatically lists the three newest
 academic papers by publication `date`, using publication types 1, 2, and 3
 (conference papers, journal articles, and preprints). Books and future-dated papers

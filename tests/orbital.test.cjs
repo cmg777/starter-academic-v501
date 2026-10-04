@@ -45,7 +45,7 @@ function setup({ reduced = false, mobile = false, noWebGL = false, saveData = fa
   context.window = context; context.addEventListener = () => {};
   vm.runInNewContext(source, context);
   const advance = (n = 150) => { for (let i = 0; i < n && frames.size; i++) { time += 34; const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(time)); } };
-  return { document, canvas, fallback, controls, hint, status, pause, motion, regions, frames, advance, drawn,
+  return { document, earth, canvas, fallback, controls, hint, status, pause, motion, regions, frames, advance, drawn,
     load: () => image?.onload(), error: () => image?.onerror(), texture: () => image?.src,
     action: key => controls.fire('click', { target: buttons[key] }),
     visibility: shown => intersection([{ isIntersecting: shown }]),
@@ -96,6 +96,15 @@ test('rendering suspends offscreen and in a background tab, then resumes', () =>
   s.visibility(true); assert.equal(s.frames.size, 1);
   s.document.hidden = true; s.document.fire('visibilitychange'); assert.equal(s.frames.size, 0);
   s.document.hidden = false; s.document.fire('visibilitychange'); assert.equal(s.frames.size, 1);
+});
+test('decorative overlays receive the globe projection on every draw, and know when it is still', () => {
+  const s = setup(); const calls = [];
+  s.earth.onGlobeDraw = (yaw, pitch, zoom, animated) => calls.push({ yaw, pitch, zoom, animated });
+  s.load(); s.advance(4);
+  assert.equal(calls.length, s.draws()); assert.ok(calls.at(-1).animated);
+  assert.ok(Math.abs(calls.at(-1).yaw - s.drawn.at(-1)[0]) < 1e-9);
+  s.action('pause'); s.advance();
+  assert.equal(calls.at(-1).animated, false);
 });
 test('a changed motion preference and context loss stop the animation safely', () => {
   const s = setup(); s.load(); s.advance(3);

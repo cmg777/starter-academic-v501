@@ -105,6 +105,17 @@ The home template deliberately omits the legacy theme's browser dependencies.
   Standalone teaching apps and slide decks keep their own designs; scientific
   figures and syntax highlighting retain their semantic colors.
 - **Globe and navigation:** `assets/js/orbital.js`; native WebGL, no library or CDN.
+- **Cinematic layer:** `assets/css/orbital-cinema.css` + `assets/js/orbital-cinema.js`
+  (homepage only, ~4 KB gzipped, no library). Depth starfield with meteors, cursor
+  spotlight and nebula; opening title sequence; 3D orbital rings that pass behind
+  and in front of the globe; network arcs from Nagoya to the lab's home regions
+  (drawn through `earth.onGlobeDraw`, the projection hook in `orbital.js`); scroll
+  reveals, 3D tilt-and-glare cards, magnetic buttons, pillar ticker, coverflow
+  gallery, scroll-progress line, and a footer earthrise. Reduced motion, touch
+  screens, print, and a missing script all fall back to the still page.
+- **Headline:** `title` / `titleAccent` in `data/orbital.json` may carry markup:
+  `<span class="kicker">` (small lead-in) and `<em>` (highlighted keywords —
+  *Local Development* and *outer space*). Page titles use the plain text.
 - **Cards, student directory, presentations:** `layouts/partials/orbital-*.html`.
 - **Imagery and attribution:** `static/media/orbital/CREDITS.txt`. The real NASA
   Black Marble 2016 map has desktop and mobile variants. Hugo generates a 53 KiB
@@ -125,7 +136,7 @@ The home template deliberately omits the legacy theme's browser dependencies.
   when JavaScript, WebGL, or the texture is unavailable. Rendering sleeps when
   offscreen or in a background tab. Language preference cookies are preserved.
 
-Run `node --test tests/orbital.test.cjs` for globe lifecycle checks. Build with
+Run `node --test tests/orbital.test.cjs` for globe lifecycle and overlay-hook checks. Build with
 `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --minify --buildFuture`.
 The legacy theme still emits its existing `.Path` deprecation warning.
 

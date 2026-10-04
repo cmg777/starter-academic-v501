@@ -221,3 +221,54 @@ body.page-wrapper.dark .cz-footer-copy { color: var(--orbital-muted); border-col
 @media (max-width: 360px) {
   body.page-wrapper.dark .tg-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Cinematic ambience shared with the landing page (orbital-cinema.css):
+   a faint fixed star backdrop with nebula light, a reading-progress line,
+   and luminous hover states. Pure CSS; content and layouts are unchanged. */
+body.page-wrapper { background: transparent; }
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 8% 14%, rgba(201, 216, 232, .55), transparent),
+    radial-gradient(1px 1px at 23% 71%, rgba(201, 216, 232, .4), transparent),
+    radial-gradient(1.5px 1.5px at 37% 32%, rgba(233, 193, 132, .45), transparent),
+    radial-gradient(1px 1px at 52% 88%, rgba(201, 216, 232, .4), transparent),
+    radial-gradient(1px 1px at 64% 9%, rgba(201, 216, 232, .5), transparent),
+    radial-gradient(1.5px 1.5px at 78% 46%, rgba(201, 216, 232, .5), transparent),
+    radial-gradient(1px 1px at 91% 77%, rgba(201, 216, 232, .4), transparent),
+    radial-gradient(ellipse at 88% -8%, rgba(38, 92, 168, .2), transparent 52%),
+    radial-gradient(ellipse at -6% 104%, rgba(110, 76, 168, .1), transparent 48%);
+  background-size: 640px 560px, 640px 560px, 640px 560px, 640px 560px, 640px 560px, 640px 560px, 640px 560px, 100% 100%, 100% 100%;
+}
+@supports (animation-timeline: scroll()) {
+  body.page-wrapper #navbar-main::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--orbital-blue), var(--orbital-gold));
+    box-shadow: 0 0 12px rgba(233, 193, 132, .5);
+    animation: orbitalReadProgress linear both;
+    animation-timeline: scroll(root);
+  }
+  @keyframes orbitalReadProgress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+}
+body.page-wrapper.dark :is(.card-simple, .course-card, .dashboard-card, .cz-showcase-item, .tg-card) {
+  transition: border-color .35s, box-shadow .35s;
+}
+body.page-wrapper.dark :is(.card-simple, .course-card, .dashboard-card, .tg-card):hover {
+  box-shadow: 0 26px 60px -30px rgba(136, 185, 222, .45), 0 0 0 1px rgba(136, 185, 222, .12);
+}
+body.page-wrapper.dark .article-title {
+  text-shadow: 0 0 40px rgba(136, 185, 222, .18);
+}

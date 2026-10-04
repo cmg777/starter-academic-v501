@@ -2,8 +2,9 @@
      but the landing page needs none of the legacy theme's browser dependencies. */}}
 {{ $t := index site.Data.orbital site.Language.Lang }}
 {{ $fallback := (resources.Get "media/orbital/earth-at-night-asia.png").Resize "992x webp q82" }}
-{{ $style := slice (resources.Get "css/orbital-palette.css") (resources.Get "css/orbital.css") | resources.Concat "css/orbital.css" | minify | fingerprint }}
+{{ $style := slice (resources.Get "css/orbital-palette.css") (resources.Get "css/orbital.css") (resources.Get "css/orbital-cinema.css") | resources.Concat "css/orbital.css" | minify | fingerprint }}
 {{ $script := resources.Get "js/orbital.js" | minify | fingerprint }}
+{{ $cinemaScript := resources.Get "js/orbital-cinema.js" | minify | fingerprint }}
 {{ $langScript := resources.Get "js/lang-pref.js" | minify | fingerprint }}
 {{ $galleryScript := resources.Get "js/orbital-gallery.js" | minify | fingerprint }}
 <!doctype html>
@@ -14,13 +15,13 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#050a12">
   {{ $icon := (resources.Get "media/icon.png").Resize "64x64 png" }}<link rel="icon" href="{{ $icon.RelPermalink }}" type="image/png">
-  <title>Carlos Mendez — {{ $t.title }} {{ $t.titleAccent }}</title>
+  <title>Carlos Mendez — {{ $t.title | plainify }}{{ if ne site.Language.Lang "ja" }} {{ end }}{{ $t.titleAccent | plainify }}</title>
   <meta name="description" content="{{ $t.description }}">
   <link rel="canonical" href="{{ .Permalink }}">
   {{ range site.Sites }}<link rel="alternate" hreflang="{{ .LanguageCode }}" href="{{ .Home.Permalink }}">{{ end }}
   <link rel="alternate" hreflang="x-default" href="{{ (index site.Sites 0).Home.Permalink }}">
   <link rel="alternate" type="application/rss+xml" title="Carlos Mendez" href="{{ "index.xml" | relLangURL }}">
-  <meta property="og:title" content="Carlos Mendez — {{ $t.title }} {{ $t.titleAccent }}">
+  <meta property="og:title" content="Carlos Mendez — {{ $t.title | plainify }}{{ if ne site.Language.Lang "ja" }} {{ end }}{{ $t.titleAccent | plainify }}">
   <meta property="og:description" content="{{ $t.description }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ .Permalink }}">
@@ -31,10 +32,15 @@
   <script defer src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
   <script defer src="{{ $langScript.RelPermalink }}" integrity="{{ $langScript.Data.Integrity }}"></script>
   <script defer src="{{ $galleryScript.RelPermalink }}" integrity="{{ $galleryScript.Data.Integrity }}"></script>
+  <script defer src="{{ $cinemaScript.RelPermalink }}" integrity="{{ $cinemaScript.Data.Integrity }}"></script>
 </head>
 <body id="top">
+  {{/* Decorative depth layers; orbital-cinema.js animates them. */}}
+  <canvas class="cosmos" aria-hidden="true"></canvas>
+  <div class="spotlight" aria-hidden="true"></div>
   <a class="skip-link" href="#main">{{ $t.skip }}</a>
   <header class="site-header">
+    <div class="scroll-progress" aria-hidden="true"><span></span></div>
     <div class="shell header-inner">
       <a class="brand" href="{{ site.Home.RelPermalink }}" aria-label="Carlos Mendez">
         <span>Carlos Mendez<span class="brand-sub">{{ $t.discipline }}</span></span>
@@ -58,20 +64,28 @@
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="starfield" aria-hidden="true"></div>
+      <div class="nebula" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="shell hero-grid">
         <div class="hero-copy">
           <p class="eyebrow"><span class="signal" aria-hidden="true"></span>{{ $t.eyebrow }}</p>
-          <h1 id="hero-title">{{ $t.title }}<br><span>{{ $t.titleAccent }}</span></h1>
+          <h1 id="hero-title"><span class="h1-line">{{ $t.title | safeHTML }}</span> <br><span class="h1-accent">{{ $t.titleAccent | safeHTML }}</span></h1>
           <p class="hero-intro">{{ $t.intro }}</p>
           <div class="actions"><a class="button button-primary" href="#researchLab">{{ $t.explore }} <span aria-hidden="true">↗</span></a><a class="text-link" href="#posts">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
           <div class="hero-identity"><span class="identity-line" aria-hidden="true"></span><div><strong>{{ $t.identity }}</strong><span>{{ $t.role }}</span></div></div>
         </div>
         <figure class="earth" data-earth data-texture="{{ "media/orbital/black-marble-2016.jpg" | relURL }}" data-mobile-texture="{{ "media/orbital/black-marble-2016-mobile.jpg" | relURL }}">
           <div class="earth-stage">
-            <div class="orbital-ring" aria-hidden="true"></div>
+            {{/* Each orbit is drawn twice: the far half behind the globe, the near half in front. */}}
+            {{ range slice "back" "front" }}
+            <div class="orbits orbits-{{ . }}" aria-hidden="true">
+              <div class="orbit orbit-a"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span><span class="satellite"></span></span></div></div>
+              <div class="orbit orbit-b"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span><span class="satellite"></span></span></div></div>
+            </div>
+            {{ end }}
             <img class="earth-fallback" src="{{ $fallback.RelPermalink }}" alt="{{ $t.globeAlt }}" width="{{ $fallback.Width }}" height="{{ $fallback.Height }}" fetchpriority="high">
             <canvas class="earth-canvas" aria-label="{{ $t.globeLabel }}" aria-describedby="earth-help" role="img" hidden></canvas>
-            <span class="earth-caption"><span aria-hidden="true">＋</span> {{ $t.globeLabel }} <span class="earth-caption-sub">VIIRS / 2016</span></span>
+            <canvas class="earth-arcs" aria-hidden="true"></canvas>
+            <span class="earth-caption"><span aria-hidden="true">＋</span> {{ $t.globeLabel }} <span class="earth-caption-sub">VIIRS / 2016 · {{ $t.globeNetwork }}</span></span>
             <span class="earth-instruction" data-globe-hint data-interactive="{{ $t.globeHint }}">{{ $t.staticHint }}</span>
           </div>
           <p id="earth-help" class="sr-only" hidden>{{ $t.globeHelp }}</p>
@@ -93,7 +107,8 @@
       </div>
       <div class="shell hero-bottom"><a href="#researchLab"><span aria-hidden="true">↓</span> {{ $t.scroll }}</a><span class="coordinates" aria-hidden="true">35.15° N &nbsp; 136.97° E &nbsp; / &nbsp; NAGOYA, JP</span></div>
     </section>
-    <div class="perspective-strip"><div class="shell">{{ range $i, $pillar := $t.pillars }}<span><b>0{{ add $i 1 }}</b>{{ $pillar }}</span>{{ end }}</div></div>
+    {{/* The ticker repeats the pillars for a seamless loop; copies are hidden from assistive tech. */}}
+    <div class="perspective-strip"><div class="ticker">{{ range $copy := seq 4 }}<div class="ticker-group"{{ if gt $copy 1 }} aria-hidden="true"{{ end }}>{{ range $i, $pillar := $t.pillars }}<span><b>0{{ add $i 1 }}</b>{{ $pillar }}<i aria-hidden="true">✦</i></span>{{ end }}</div>{{ end }}</div></div>
 
 
     <section id="researchLab" class="section shell" aria-labelledby="research-title">
@@ -120,7 +135,7 @@
 
 
     <section id="about" class="section shell about-grid" aria-labelledby="about-title">
-      <div class="portrait-wrap">{{ with site.GetPage "authors/admin" }}{{ with .Resources.GetMatch "avatar*" }}{{ $portrait := .Fill "640x800 Center webp q85" }}<img src="{{ $portrait.RelPermalink }}" alt="Carlos Mendez" width="640" height="800" loading="lazy">{{ end }}{{ end }}<span class="portrait-coordinate">NAGOYA, JAPAN / 35° N</span></div>
+      <div class="portrait-wrap"><div class="portrait-frame">{{ with site.GetPage "authors/admin" }}{{ with .Resources.GetMatch "avatar*" }}{{ $portrait := .Fill "640x800 Center webp q85" }}<img src="{{ $portrait.RelPermalink }}" alt="Carlos Mendez" width="640" height="800" loading="lazy">{{ end }}{{ end }}<span class="portrait-corner" aria-hidden="true"></span></div><span class="portrait-coordinate">NAGOYA, JAPAN / 35° N</span></div>
       <div class="about-copy">
         <p class="eyebrow">{{ $t.aboutKicker }}</p>
         <h2 id="about-title">{{ replace $t.aboutTitle "\n" "<br>" | safeHTML }}</h2>
@@ -171,7 +186,7 @@
     {{ partial "orbital-community.html" (dict "t" $t) }}
     {{ partial "orbital-gallery.html" (dict "t" $t) }}
   </main>
-  <footer id="contact" class="site-footer"><div class="shell">
+  <footer id="contact" class="site-footer"><div class="earthrise" aria-hidden="true"><span></span></div><div class="shell">
     <div class="contact-intro">
       <div><p class="eyebrow">{{ $t.contactKicker }}</p><h2>{{ $t.contactTitle }}</h2></div>
       <div class="contact-lead"><p>{{ $t.contactIntro }}</p><div class="actions"><a class="button button-primary" href="mailto:{{ site.Params.email }}">{{ $t.email }} <span aria-hidden="true">↗</span></a><a class="text-link" href="https://lu.ma/cmg">{{ $t.events }} <span aria-hidden="true">↗</span></a></div></div>

@@ -59,6 +59,8 @@
     gl.uniform2f(uniforms.size, canvas.width, canvas.height);
     gl.uniform2f(uniforms.angle, yaw, pitch); gl.uniform1f(uniforms.zoom, zoom);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+    // Decorative overlays (orbital-cinema.js) follow the same projection.
+    if (typeof earth.onGlobeDraw === 'function') earth.onGlobeDraw(yaw, pitch, zoom, playing && !reduce.matches);
   }
   function tick(time) {
     frame = 0;
@@ -93,12 +95,21 @@
       uniform float zoom;
       uniform sampler2D earthMap;
       const float PI=3.141592653589793;
+      float gridLine(float a,float step,float scale){
+        float d=abs(fract(a/step+.5)-.5)*step*scale;
+        return 1.-smoothstep(0.,.0045,d);
+      }
       void main(){
         vec2 p=(gl_FragCoord.xy/size*2.-1.)*1.27/zoom;
         float r2=dot(p,p);
+        // Cinematic key light from the upper left: a brighter atmospheric limb on that side.
+        vec2 key=normalize(vec2(-.62,.78));
         if(r2>1.){
-          float glow=exp(-(sqrt(r2)-1.)*48.)*.42;
-          gl_FragColor=vec4(vec3(.16,.39,.65),glow);
+          float r=sqrt(r2);
+          float side=.55+.45*dot(p/r,key);
+          float glow=exp(-(r-1.)*30.)*.5*side+exp(-(r-1.)*9.)*.12;
+          vec3 halo=mix(vec3(.10,.30,.62),vec3(.36,.72,.95),exp(-(r-1.)*42.));
+          gl_FragColor=vec4(halo,clamp(glow,0.,1.));
           return;
         }
         float z=sqrt(1.-r2);
@@ -109,9 +120,17 @@
         float lat=asin(clamp(globe.y,-1.,1.));
         vec2 uv=vec2(fract(lon/(2.*PI)+.5),lat/PI+.5);
         vec3 color=texture2D(earthMap,uv).rgb;
-        color=pow(color,vec3(.9))*(.55+.45*pow(z,.35));
-        float rim=pow(1.-z,4.);
-        color+=vec3(.075,.23,.40)*rim*.7;
+        float shade=.5+.5*pow(z,.35);
+        color=pow(color,vec3(.9))*shade;
+        // Let NASA's brightest city pixels bloom warmly; positions are unchanged.
+        float lum=dot(color,vec3(.299,.587,.114));
+        color+=vec3(1.,.72,.38)*smoothstep(.28,.9,lum)*.55;
+        // Faint 30-degree graticule, fading towards the limb.
+        float g=max(gridLine(lat,PI/6.,1.),gridLine(lon,PI/6.,cos(lat)));
+        color+=vec3(.32,.55,.85)*g*.075*z;
+        float rim=pow(1.-z,3.);
+        float side=.45+.55*dot(normalize(p+1e-5),key);
+        color+=vec3(.09,.27,.48)*rim*(.55+.6*side);
         gl_FragColor=vec4(color,1.);
       }
     `);
