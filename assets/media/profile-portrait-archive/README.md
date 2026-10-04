@@ -4,7 +4,7 @@ This directory preserves every profile-picture option generated during the Octob
 
 ## Active selection
 
-- `option-c-natural-backgrounds/cn1-natural-faculty-office.png` is the source for the active website avatar at `content/authors/admin/avatar.jpg`.
+- `option-c-natural-backgrounds/cn1-natural-faculty-office.png` is the source for the active website avatar in the default, Spanish, and Japanese author profiles.
 
 ## Contents
 
