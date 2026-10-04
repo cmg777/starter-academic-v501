@@ -834,12 +834,7 @@ html[lang^="en"] .hero h1 .h1-accent {
 .card-image img {
   width:100%;
   height:100%;
-  object-fit:cover;
-  transition:transform .5s
-}
-
-.content-card:hover .card-image img {
-  transform:scale(1.035)
+  object-fit:cover
 }
 
 .card-placeholder {

@@ -1,3 +1,4 @@
 {{/* Preserve the complete featured image, including diagrams and slide titles. */}}
-{{ $thumb := .Fit "480x270 webp q82" }}
-<img class="item-thumbnail" src="{{ $thumb.RelPermalink }}" alt="" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async">
+{{ $thumbSmall := .Fit "320x180 webp q88" }}
+{{ $thumbLarge := .Fit "640x360 webp q92" }}
+<img class="item-thumbnail" src="{{ $thumbSmall.RelPermalink }}" srcset="{{ $thumbSmall.RelPermalink }} {{ $thumbSmall.Width }}w, {{ $thumbLarge.RelPermalink }} {{ $thumbLarge.Width }}w" sizes="160px" alt="" width="{{ $thumbLarge.Width }}" height="{{ $thumbLarge.Height }}" loading="lazy" decoding="async">

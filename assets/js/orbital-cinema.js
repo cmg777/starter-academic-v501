@@ -168,7 +168,9 @@
   } else revealables.forEach(el => el.classList.add('is-in', 'settled'));
 
   /* ---------- 3D tilt with moving glare ---------- */
-  const tiltTargets = document.querySelectorAll('.research-card, .content-card .card-image, .portrait-frame, .publication-thumbnail, .talk-list .item-thumbnail');
+  /* Keep product thumbnails on the pixel grid: perspective transforms and
+     glare make diagrams, slide titles and screenshots look soft. */
+  const tiltTargets = document.querySelectorAll('.research-card, .portrait-frame');
   tiltTargets.forEach(el => {
     el.classList.add('tilt');
     if (el.tagName !== 'IMG') { const glare = document.createElement('span'); glare.className = 'glare'; glare.setAttribute('aria-hidden', 'true'); el.appendChild(glare); }

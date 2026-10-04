@@ -732,6 +732,13 @@ html[lang^="ja"] #hero-title .h1-accent {
   .cinema [data-reveal].settled {
     transition:opacity .3s,transform .4s var(--ease-out),filter .3s,border-color .35s,box-shadow .35s,background .35s
   }
+
+  /* Product imagery should arrive crisp instead of resolving from a blur. */
+  .cinema .publication-row[data-reveal]:not(.is-in),
+  .cinema .talk-list>a[data-reveal]:not(.is-in),
+  .cinema .content-card[data-reveal]:not(.is-in) {
+    filter:none
+  }
 }
 
 /* ---------- 7. 3D tilt, glare and magnetic controls ---------- */
@@ -892,7 +899,7 @@ html[lang^="ja"] #hero-title .h1-accent {
 }
 
 .item-thumbnail {
-  transition:transform .5s var(--ease-out),box-shadow .5s,border-color .5s
+  transition:box-shadow .5s,border-color .5s
 }
 
 .publication-row:hover .item-thumbnail,.talk-list>a:hover .item-thumbnail {
@@ -926,11 +933,7 @@ html[lang^="ja"] #hero-title .h1-accent {
 }
 
 .card-image::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(180deg,transparent 55%,rgba(5,10,18,.45));
-  pointer-events:none
+  content:none
 }
 
 /* ---------- 11. Portrait: HUD frame and ambient glow ---------- */
