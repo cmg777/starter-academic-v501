@@ -74,7 +74,7 @@
           <p class="eyebrow"><span class="signal" aria-hidden="true"></span>{{ $t.eyebrow }}</p>
           <h1 id="hero-title"><span class="h1-line">{{ $t.title | safeHTML }}</span> <br><span class="h1-accent">{{ $t.titleAccent | safeHTML }}</span></h1>
           <p class="hero-intro">{{ $t.intro }}</p>
-          <div class="actions"><button class="button button-video" type="button" data-video-open aria-haspopup="dialog" aria-controls="video-overview">{{ $t.videoOverview }} <span aria-hidden="true">▶</span></button><a class="button button-primary" href="#researchLab">{{ $t.explore }} <span aria-hidden="true">↗</span></a><a class="text-link" href="#posts">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
+          <div class="actions"><div class="hero-action-buttons"><button class="button button-video" type="button" data-video-open aria-haspopup="dialog" aria-controls="video-overview">{{ $t.videoOverview }} <span aria-hidden="true">▶</span></button><a class="button button-primary" href="#researchLab">{{ $t.explore }} <span aria-hidden="true">↗</span></a></div><a class="text-link" href="#posts">{{ $t.learn }} <span aria-hidden="true">→</span></a></div>
           <div class="hero-identity"><span class="identity-line" aria-hidden="true"></span><div><strong>{{ $t.identity }}</strong><span>{{ $t.role }}</span></div></div>
         </div>
         <figure class="earth" data-earth data-texture="{{ "media/orbital/black-marble-2016.jpg" | relURL }}" data-mobile-texture="{{ "media/orbital/black-marble-2016-mobile.jpg" | relURL }}">

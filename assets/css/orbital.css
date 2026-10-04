@@ -238,7 +238,7 @@ button {
   pointer-events:none
 }
 
-.hero-copy a {
+.hero-copy a,.hero-copy button {
   pointer-events:auto
 }
 
@@ -295,6 +295,19 @@ html[lang^="en"] .hero h1 .h1-accent {
   align-items:center;
   gap:28px;
   margin-top:34px
+}
+
+.hero .actions {
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px
+}
+
+.hero-action-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:14px
 }
 
 .button {
