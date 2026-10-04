@@ -10,13 +10,18 @@
       <a href="{{ .RelPermalink }}"{{ if $image }} class="has-thumbnail"{{ end }}>
         {{ with $image }}{{ partial "orbital-thumbnail.html" . }}{{ end }}
         <div class="talk-copy">
-          {{/* The existing TBA bundle uses Dec 31 as an ordering placeholder. */}}
-          {{ if or .Params.date_tba (in .File.Dir "20261231TBA") }}
-            <span class="talk-date">{{ $t.tba }}</span>
-          {{ else }}
-            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
-          {{ end }}
+          {{/* Meta line mirrors the publication rows: DATE / EVENT. */}}
+          <p class="talk-meta">
+            {{/* The existing TBA bundle uses Dec 31 as an ordering placeholder. */}}
+            {{ if or .Params.date_tba (in .File.Dir "20261231TBA") }}
+              <span class="talk-date">{{ $t.tba }}</span>
+            {{ else }}
+              <time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format "Jan 2006" .Date }}</time>
+            {{ end }}
+            {{ with .Params.event }} <span aria-hidden="true">/</span> {{ . }}{{ end }}
+          </p>
           <h3 class="talk-title">{{ .Title }}</h3>
+          {{ with .Params.summary }}<p class="talk-summary">{{ . | plainify }}</p>{{ end }}
         </div>
         <span class="talk-arrow" aria-hidden="true">↗</span>
       </a>
