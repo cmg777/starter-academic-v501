@@ -143,6 +143,30 @@
   if (ctx) { sizeCosmos(); addEventListener('resize', sizeCosmos, { passive: true }); }
   start();
 
+  /* ---------- Full-viewport video overview ---------- */
+  const videoModal = document.querySelector('[data-video-modal]');
+  const videoOpen = document.querySelector('[data-video-open]');
+  if (videoModal && videoOpen) {
+    const videoClose = videoModal.querySelector('[data-video-close]');
+    const videoFrame = videoModal.querySelector('[data-video-frame]');
+    const unloadVideo = () => {
+      videoFrame.removeAttribute('src');
+      videoOpen.focus();
+    };
+    const closeVideo = () => {
+      if (videoModal.open && typeof videoModal.close === 'function') videoModal.close();
+      else { videoModal.removeAttribute('open'); unloadVideo(); }
+    };
+    videoOpen.addEventListener('click', () => {
+      videoFrame.src = videoModal.dataset.videoSrc;
+      if (typeof videoModal.showModal === 'function') videoModal.showModal();
+      else videoModal.setAttribute('open', '');
+    });
+    videoClose.addEventListener('click', closeVideo);
+    videoModal.addEventListener('click', event => { if (event.target === videoModal) closeVideo(); });
+    videoModal.addEventListener('close', unloadVideo);
+  }
+
   /* ---------- Scroll reveals ---------- */
   const revealGroups = [
     ['.section-intro, .section-heading, .about-copy, .contact-intro, .contact-details', 0],

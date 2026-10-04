@@ -10,6 +10,8 @@
     "titleAccent": "from <em>outer space</em>.",
     "intro": "Our mission is to promote interdisciplinary science for economic, social, and environmental sustainability. We integrate insights from spatial data science, machine learning, and development economics to understand and inform the process of sustainable development.",
     "explore": "Explore the research",
+    "videoOverview": "Video Overview",
+    "closeVideo": "Close video",
     "learn": "Learn the methods",
     "identity": "Carlos Mendez",
     "role": "Associate Professor · Nagoya University, Japan",
@@ -26,6 +28,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "regions": "Explore a region",
+    "exploreMore": "Explore more",
     "regionNames": [
       "Asia",
       "Europe & Africa",
@@ -87,7 +90,7 @@
     "aboutResearchAreas": [
       "Geospatial inequality, poverty, and growth interactions",
       "Geospatial big data analytics and impact evaluation",
-      "Regional infrastructure and spatial structural change"
+      "Regional infrastructure, natural disasters, and structural change"
     ],
     "cv": "Download CV",
     "profile": "Academic profile",
@@ -146,6 +149,8 @@
     "titleAccent": "desde el <em>espacio exterior</em>.",
     "intro": "Nuestra misión es promover la ciencia interdisciplinaria para impulsar la sostenibilidad económica, social y ambiental. Integramos conocimientos de la ciencia de datos espaciales, el aprendizaje automático y la economía del desarrollo para comprender y orientar el proceso de desarrollo sostenible.",
     "explore": "Explore la investigación",
+    "videoOverview": "Resumen en video",
+    "closeVideo": "Cerrar video",
     "learn": "Aprenda los métodos",
     "identity": "Carlos Mendez",
     "role": "Profesor Asociado · Universidad de Nagoya, Japón",
@@ -162,6 +167,7 @@
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "regions": "Explore una región",
+    "exploreMore": "Explorar más",
     "regionNames": [
       "Asia",
       "Europa y África",
@@ -223,7 +229,7 @@
     "aboutResearchAreas": [
       "Interacciones entre desigualdad geoespacial, pobreza y crecimiento",
       "Análisis de big data geoespacial y evaluación de impacto",
-      "Infraestructura regional y cambio estructural espacial"
+      "Infraestructura regional, desastres naturales y cambio estructural"
     ],
     "cv": "Descargue el CV",
     "profile": "Perfil académico",
@@ -282,6 +288,8 @@
     "titleAccent": "<em>宇宙</em>から観測する。",
     "intro": "私たちの使命は、経済・社会・環境の持続可能性に貢献する学際的な科学を推進することです。空間データサイエンス、機械学習、開発経済学の知見を統合し、持続可能な開発のプロセスを理解するとともに、その実現に役立つ知見を提供します。",
     "explore": "研究を探る",
+    "videoOverview": "動画概要",
+    "closeVideo": "動画を閉じる",
     "learn": "分析手法を学ぶ",
     "identity": "カルロス・メンデス",
     "role": "准教授 · 名古屋大学（日本）",
@@ -298,6 +306,7 @@
     "zoomIn": "拡大",
     "zoomOut": "縮小",
     "regions": "地域を選択",
+    "exploreMore": "さらに探索",
     "regionNames": [
       "アジア",
       "ヨーロッパ・アフリカ",
@@ -359,7 +368,7 @@
     "aboutResearchAreas": [
       "地理空間的格差・貧困・成長の相互作用",
       "地理空間ビッグデータ分析とインパクト評価",
-      "地域インフラと空間的な構造変化"
+      "地域インフラ、自然災害、構造変化"
     ],
     "cv": "履歴書をダウンロード",
     "profile": "研究者プロフィール",
