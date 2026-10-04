@@ -23,3 +23,18 @@ added. Decorative rings and grids are interface elements, not observations.
 Brightness is a qualitative indicator of human activity, not a direct measure
 of income. The image is not a calibrated radiance dataset or analytical tool.
 Retrieved 2026-10-03.
+
+Generated decorative imagery
+=============================
+The following homepage assets were generated with OpenAI's built-in image
+generation tool on 2026-10-04 and are illustrative rather than observational
+data or official ESA/NASA mission photography:
+
+- assets/media/orbital/sentinel-2-foreground-v1.png
+- assets/media/orbital/sentinel-2-distant-v1.png
+- assets/media/orbital/earth-night-asia-footer-v1.png
+
+The spacecraft are scientifically grounded Sentinel-2 visualizations without
+logos or labels. The footer is a cinematic East Asia and Japan night horizon;
+its light locations are illustrative and must not be used for analysis. Hugo
+creates the smaller WebP files served by the homepage.

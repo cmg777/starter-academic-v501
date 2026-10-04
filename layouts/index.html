@@ -2,6 +2,11 @@
      but the landing page needs none of the legacy theme's browser dependencies. */}}
 {{ $t := index site.Data.orbital site.Language.Lang }}
 {{ $fallback := (resources.Get "media/orbital/earth-at-night-asia.png").Resize "992x webp q82" }}
+{{ $satelliteForeground := (resources.Get "media/orbital/sentinel-2-foreground-v1.png").Resize "960x webp q84" }}
+{{ $satelliteDistant := (resources.Get "media/orbital/sentinel-2-distant-v1.png").Resize "720x webp q82" }}
+{{ $footerEarthSource := resources.Get "media/orbital/earth-night-asia-footer-v1.png" }}
+{{ $footerEarth := $footerEarthSource.Resize "1983x webp q82" }}
+{{ $footerEarthMobile := $footerEarthSource.Fill "900x991 Center webp q80" }}
 {{ $style := slice (resources.Get "css/orbital-palette.css") (resources.Get "css/orbital.css") (resources.Get "css/orbital-cinema.css") | resources.Concat "css/orbital.css" | minify | fingerprint }}
 {{ $script := resources.Get "js/orbital.js" | minify | fingerprint }}
 {{ $cinemaScript := resources.Get "js/orbital-cinema.js" | minify | fingerprint }}
@@ -78,8 +83,8 @@
             {{/* Each orbit is drawn twice: the far half behind the globe, the near half in front. */}}
             {{ range slice "back" "front" }}
             <div class="orbits orbits-{{ . }}" aria-hidden="true">
-              <div class="orbit orbit-a"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span><span class="satellite"></span></span></div></div>
-              <div class="orbit orbit-b"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span><span class="satellite"></span></span></div></div>
+              <div class="orbit orbit-a"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span></span></div>{{ if eq . "front" }}<span class="satellite"><img src="{{ $satelliteForeground.RelPermalink }}" alt="" width="{{ $satelliteForeground.Width }}" height="{{ $satelliteForeground.Height }}" decoding="async" fetchpriority="low"></span>{{ end }}</div>
+              <div class="orbit orbit-b"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span></span></div>{{ if eq . "front" }}<span class="satellite"><img src="{{ $satelliteDistant.RelPermalink }}" alt="" width="{{ $satelliteDistant.Width }}" height="{{ $satelliteDistant.Height }}" decoding="async" fetchpriority="low"></span>{{ end }}</div>
             </div>
             {{ end }}
             <img class="earth-fallback" src="{{ $fallback.RelPermalink }}" alt="{{ $t.globeAlt }}" width="{{ $fallback.Width }}" height="{{ $fallback.Height }}" fetchpriority="high">
@@ -186,7 +191,7 @@
     {{ partial "orbital-community.html" (dict "t" $t) }}
     {{ partial "orbital-gallery.html" (dict "t" $t) }}
   </main>
-  <footer id="contact" class="site-footer"><div class="earthrise" aria-hidden="true"><span></span></div><div class="shell">
+  <footer id="contact" class="site-footer"><picture class="earthrise" aria-hidden="true"><source media="(max-width: 679px)" srcset="{{ $footerEarthMobile.RelPermalink }}"><img src="{{ $footerEarth.RelPermalink }}" alt="" width="{{ $footerEarth.Width }}" height="{{ $footerEarth.Height }}" loading="lazy" decoding="async"></picture><div class="shell">
     <div class="contact-intro">
       <div><p class="eyebrow">{{ $t.contactKicker }}</p><h2>{{ $t.contactTitle }}</h2></div>
       <div class="contact-lead"><p>{{ $t.contactIntro }}</p><div class="actions"><a class="button button-primary" href="mailto:{{ site.Params.email }}">{{ $t.email }} <span aria-hidden="true">↗</span></a><a class="text-link" href="https://lu.ma/cmg">{{ $t.events }} <span aria-hidden="true">↗</span></a></div></div>

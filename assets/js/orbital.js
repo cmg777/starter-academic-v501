@@ -31,13 +31,15 @@
 
   function fallbackOnly() {
     failed = true; ready = false; cancelAnimationFrame(frame); frame = 0;
-    earth.classList.remove('is-ready'); canvas.hidden = true;
+    earth.classList.remove('is-ready'); earth.classList.remove('is-playing'); canvas.hidden = true;
     canvas.removeAttribute('tabindex'); controls.hidden = true;
     fallback.removeAttribute('aria-hidden'); hint.textContent = staticHint;
   }
   function updatePause() {
     pause.setAttribute('aria-label', playing ? pause.dataset.pause : pause.dataset.play);
     pause.querySelector('span').textContent = playing ? 'Ⅱ' : '▷';
+    if (playing && !reduce.matches) earth.classList.add('is-playing');
+    else earth.classList.remove('is-playing');
   }
   function clearRegion() { regions.forEach(b => b.setAttribute('aria-pressed', 'false')); }
   function stop() { playing = false; updatePause(); }

@@ -107,19 +107,23 @@ The home template deliberately omits the legacy theme's browser dependencies.
 - **Globe and navigation:** `assets/js/orbital.js`; native WebGL, no library or CDN.
 - **Cinematic layer:** `assets/css/orbital-cinema.css` + `assets/js/orbital-cinema.js`
   (homepage only, ~4 KB gzipped, no library). Depth starfield with meteors, cursor
-  spotlight and nebula; opening title sequence; 3D orbital rings that pass behind
-  and in front of the globe; network arcs from Nagoya to the lab's home regions
+  spotlight and nebula; opening title sequence; two camera-facing Sentinel-2
+  spacecraft on slow orbital paths; 3D orbital rings that pass behind and in front
+  of the globe; network arcs from Nagoya to the lab's home regions
   (drawn through `earth.onGlobeDraw`, the projection hook in `orbital.js`); scroll
   reveals, 3D tilt-and-glare cards, magnetic buttons, pillar ticker, coverflow
-  gallery, scroll-progress line, and a footer earthrise. Reduced motion, touch
-  screens, print, and a missing script all fall back to the still page.
+  gallery, scroll-progress line, and a photorealistic East Asia night-horizon
+  footer. Reduced motion, touch screens, older motion-path implementations, print,
+  and a missing script all fall back to the still page.
 - **Headline:** `title` / `titleAccent` in `data/orbital.json` may carry markup:
   `<span class="kicker">` (small lead-in) and `<em>` (highlighted keywords —
   *Local Development* and *outer space*). Page titles use the plain text.
 - **Cards, student directory, presentations:** `layouts/partials/orbital-*.html`.
 - **Imagery and attribution:** `static/media/orbital/CREDITS.txt`. The real NASA
   Black Marble 2016 map has desktop and mobile variants. Hugo generates a 53 KiB
-  WebP static fallback from `assets/media/orbital/earth-at-night-asia.png`.
+  WebP static fallback from `assets/media/orbital/earth-at-night-asia.png`. The
+  Sentinel-2 spacecraft and footer horizon are generated decorative imagery under
+  `assets/media/orbital/`; Hugo serves optimized responsive WebP derivatives.
 - **Featured research:** three satellite-data papers selected by bundle slug in
   `layouts/index.html`. Projects and tutorials continue to sort by last edit;
   presentations sort by date. Set `date_tba: true` for an unknown event date.

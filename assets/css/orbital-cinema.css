@@ -439,11 +439,11 @@ html[lang^="ja"] #hero-title .h1-accent {
 }
 
 /* The far half of each ellipse sits behind the globe, the near half in front. */
-.orbits-back .orbit {
+.orbits-back .orbit-plane {
   clip-path:inset(0 0 50% 0)
 }
 
-.orbits-front .orbit {
+.orbits-front .orbit-plane {
   clip-path:inset(50% 0 0 0)
 }
 
@@ -474,12 +474,18 @@ html[lang^="ja"] #hero-title .h1-accent {
 }
 
 .orbit-spin {
-  animation:orbitSpin 30s linear infinite
+  animation:orbitSpin 36s linear infinite;
+  animation-delay:-8s
 }
 
 .orbit-b .orbit-spin {
-  animation-duration:52s;
+  animation-duration:58s;
+  animation-delay:-12s;
   animation-direction:reverse
+}
+
+.earth:not(.is-playing) .orbit-spin,.earth:not(.is-playing) .satellite {
+  animation-play-state:paused
 }
 
 .orbit-trail {
@@ -495,26 +501,63 @@ html[lang^="ja"] #hero-title .h1-accent {
 
 .satellite {
   position:absolute;
-  left:50%;
+  left:0;
   top:0;
-  width:7px;
-  height:7px;
-  margin:-3.5px 0 0 -3.5px;
-  border-radius:50%;
-  background:#fff1d8;
-  box-shadow:0 0 10px 3px var(--glow-gold);
-  transform:scaleY(4.1)
+  width:28%;
+  aspect-ratio:3/2;
+  offset-path:ellipse(50% 12% at 50% 50%);
+  offset-anchor:center;
+  offset-rotate:0deg;
+  animation:satelliteOrbit 36s -8s linear infinite;
+  filter:drop-shadow(0 0 7px rgba(217,236,255,.34)) drop-shadow(0 12px 18px rgba(0,0,0,.7));
+  will-change:offset-distance
+}
+
+.satellite img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transform:rotate(-7deg);
+  transform-origin:center
 }
 
 .orbit-b .satellite {
-  background:#d9ecff;
-  box-shadow:0 0 10px 3px var(--glow-blue);
-  transform:scaleY(2.9)
+  width:19%;
+  offset-path:ellipse(50% 17% at 50% 50%);
+  animation-duration:58s;
+  animation-delay:-12s;
+  animation-direction:reverse;
+  filter:drop-shadow(0 0 6px rgba(136,185,222,.3)) drop-shadow(0 8px 13px rgba(0,0,0,.72))
+}
+
+.orbit-b .satellite img {
+  transform:rotate(10deg)
 }
 
 @keyframes orbitSpin {
   to {
     transform:rotate(360deg)
+  }
+}
+
+@keyframes satelliteOrbit {
+  to {
+    offset-distance:100%
+  }
+}
+
+@supports not (offset-path:ellipse(50% 12% at 50% 50%)) {
+  .satellite {
+    left:22%;
+    top:62%;
+    animation:none;
+    transform:translate(-50%,-50%)
+  }
+
+  .orbit-b .satellite {
+    left:76%;
+    top:28%
   }
 }
 
@@ -924,47 +967,39 @@ html[lang^="ja"] #hero-title .h1-accent {
 .site-footer {
   position:relative;
   overflow:hidden;
-  isolation:isolate
+  isolation:isolate;
+  background:#050a12
 }
 
 .site-footer>.shell {
   position:relative;
-  z-index:1
+  z-index:2
 }
 
 .earthrise {
   position:absolute;
-  left:50%;
-  top:calc(100% - 132px);
-  width:max(1800px,170vw);
-  aspect-ratio:1;
-  transform:translateX(-50%);
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
   z-index:0;
-  border-radius:50%;
-  pointer-events:none;
-  background:radial-gradient(circle at 50% 0,#10233a,#08111c 12%,var(--bg) 34%);
-  box-shadow:0 -1px 0 rgba(160,205,240,.55),0 -14px 60px rgba(80,145,220,.32),0 -60px 160px rgba(60,120,200,.18),inset 0 14px 50px rgba(136,185,222,.2);
-  animation:earthriseGlow 9s ease-in-out infinite alternate
+  pointer-events:none
 }
 
-.earthrise span {
+.earthrise img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center bottom;
+  opacity:.82;
+  filter:saturate(.86) contrast(1.08) brightness(.72)
+}
+
+.earthrise::after {
+  content:"";
   position:absolute;
-  left:50%;
-  top:-3px;
-  width:min(46%,820px);
-  height:6px;
-  transform:translateX(-50%);
-  background:radial-gradient(ellipse,rgba(255,236,205,.95),rgba(233,193,132,.4) 40%,transparent 72%);
-  filter:blur(2px)
-}
-
-@keyframes earthriseGlow {
-  from {
-    box-shadow:0 -1px 0 rgba(160,205,240,.45),0 -12px 50px rgba(80,145,220,.26),0 -50px 140px rgba(60,120,200,.14),inset 0 14px 50px rgba(136,185,222,.16)
-  }
-  to {
-    box-shadow:0 -1px 0 rgba(170,215,245,.65),0 -16px 70px rgba(80,145,220,.4),0 -70px 180px rgba(60,120,200,.22),inset 0 14px 50px rgba(136,185,222,.24)
-  }
+  inset:0;
+  background:linear-gradient(180deg,rgba(5,10,18,.98) 0%,rgba(5,10,18,.88) 28%,rgba(5,10,18,.54) 57%,rgba(5,10,18,.7) 100%),radial-gradient(ellipse at 50% 66%,transparent 0 34%,rgba(5,10,18,.3) 72%)
 }
 
 /* ---------- 15. Small screens and still preferences ---------- */
@@ -978,8 +1013,14 @@ html[lang^="ja"] #hero-title .h1-accent {
     flex-basis:84%
   }
 
-  .earthrise {
-    top:calc(100% - 96px)
+  .earthrise img {
+    object-position:center bottom;
+    opacity:.76;
+    filter:saturate(.82) contrast(1.08) brightness(.67)
+  }
+
+  .earthrise::after {
+    background:linear-gradient(180deg,rgba(5,10,18,.98) 0%,rgba(5,10,18,.91) 34%,rgba(5,10,18,.6) 62%,rgba(5,10,18,.78) 100%)
   }
 
   .nebula span:nth-child(1) {
@@ -993,6 +1034,24 @@ html[lang^="ja"] #hero-title .h1-accent {
 @media(hover:none),(pointer:coarse) {
   .research-art::before {
     animation-duration:8s
+  }
+
+  .orbit-spin {
+    animation:none;
+    transform:rotate(38deg)
+  }
+
+  .orbit-b .orbit-spin {
+    transform:rotate(218deg)
+  }
+
+  .satellite {
+    animation:none;
+    offset-distance:29%
+  }
+
+  .orbit-b .satellite {
+    offset-distance:75%
   }
 }
 
@@ -1026,6 +1085,22 @@ html[lang^="ja"] #hero-title .h1-accent {
 
   #hero-title .h1-line em {
     background-size:100% 2px
+  }
+
+  .orbit-spin {
+    transform:rotate(38deg)
+  }
+
+  .orbit-b .orbit-spin {
+    transform:rotate(218deg)
+  }
+
+  .satellite {
+    offset-distance:29%
+  }
+
+  .orbit-b .satellite {
+    offset-distance:75%
   }
 }
 
