@@ -23,6 +23,7 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const radians = Math.PI / 180;
   const positions = [[105, 22], [20, 25], [-80, 15]];
+  const minZoom = .85, maxZoom = 3, zoomStep = .14;
   let gl, program, texture, frame = 0, ready = false, visible = true, failed = false;
   let yaw = 105 * radians, pitch = 22 * radians, zoom = 1;
   let targetYaw = yaw, targetPitch = pitch, targetZoom = zoom;
@@ -41,7 +42,16 @@
     if (playing && !reduce.matches) earth.classList.add('is-playing');
     else earth.classList.remove('is-playing');
   }
-  function clearRegion() { regions.forEach(b => b.setAttribute('aria-pressed', 'false')); }
+  function clearRegion() {
+    regions.forEach(b => b.setAttribute('aria-pressed', 'false'));
+    earth.classList.remove('region-pulse-0', 'region-pulse-1', 'region-pulse-2');
+  }
+  function pulseRegion(index) {
+    earth.classList.remove('region-pulse-0', 'region-pulse-1', 'region-pulse-2');
+    // Force a style boundary so selecting the same destination restarts the pulse.
+    void earth.offsetWidth;
+    earth.classList.add(`region-pulse-${index}`);
+  }
   function stop() { playing = false; updatePause(); }
   function compile(type, source) {
     const shader = gl.createShader(type);
@@ -81,9 +91,9 @@
     if (ready && !failed && visible && !document.hidden && !frame) frame = requestAnimationFrame(tick);
   }
   function setZoom(next) {
-    targetZoom = Math.max(.85, Math.min(1.18, next));
-    earth.querySelector('[data-action="in"]').disabled = targetZoom >= 1.18;
-    earth.querySelector('[data-action="out"]').disabled = targetZoom <= .85;
+    targetZoom = Math.max(minZoom, Math.min(maxZoom, next));
+    earth.querySelector('[data-action="in"]').disabled = targetZoom >= maxZoom;
+    earth.querySelector('[data-action="out"]').disabled = targetZoom <= minZoom;
     stop(); wake();
   }
   try {
@@ -124,15 +134,23 @@
         vec3 color=texture2D(earthMap,uv).rgb;
         float shade=.5+.5*pow(z,.35);
         color=pow(color,vec3(.9))*shade;
+        // A restrained upper-left daylight/terminator lift adds spherical depth
+        // while leaving the source nighttime city lights dominant.
+        vec3 lightDir=normalize(vec3(-.62,.78,.36));
+        float solar=dot(n,lightDir);
+        float daylight=smoothstep(-.22,.72,solar);
+        float terminator=exp(-abs(solar)*15.)*(.28+.72*z);
+        color+=vec3(.025,.07,.13)*daylight*.38;
+        color+=vec3(.26,.11,.035)*terminator*.055;
         // Let NASA's brightest city pixels bloom warmly; positions are unchanged.
         float lum=dot(color,vec3(.299,.587,.114));
         color+=vec3(1.,.72,.38)*smoothstep(.28,.9,lum)*.55;
         // Faint 30-degree graticule, fading towards the limb.
         float g=max(gridLine(lat,PI/6.,1.),gridLine(lon,PI/6.,cos(lat)));
         color+=vec3(.32,.55,.85)*g*.075*z;
-        float rim=pow(1.-z,3.);
+        float rim=pow(1.-z,2.65);
         float side=.45+.55*dot(normalize(p+1e-5),key);
-        color+=vec3(.09,.27,.48)*rim*(.55+.6*side);
+        color+=vec3(.09,.29,.54)*rim*(.5+.76*side);
         gl_FragColor=vec4(color,1.);
       }
     `);
@@ -171,7 +189,7 @@
     const desired = positions[i][0] * radians;
     const delta = Math.atan2(Math.sin(desired - yaw), Math.cos(desired - yaw));
     targetYaw = yaw + delta; targetPitch = positions[i][1] * radians;
-    status.textContent = button.textContent; wake();
+    pulseRegion(i); status.textContent = button.textContent; wake();
   }));
   controls.addEventListener('click', e => {
     const button = e.target.closest('[data-action]'); if (!button) return;
@@ -179,8 +197,8 @@
       case 'pause': playing = !playing; clearRegion(); updatePause(); wake(); break;
       case 'west': stop(); clearRegion(); targetYaw -= 20 * radians; wake(); break;
       case 'east': stop(); clearRegion(); targetYaw += 20 * radians; wake(); break;
-      case 'in': setZoom(targetZoom + .1); break;
-      case 'out': setZoom(targetZoom - .1); break;
+      case 'in': setZoom(targetZoom + zoomStep); break;
+      case 'out': setZoom(targetZoom - zoomStep); break;
     }
   });
   canvas.addEventListener('pointerdown', e => {
@@ -205,8 +223,8 @@
     if (e.key === 'ArrowUp') targetPitch = Math.min(1.2, targetPitch + .15);
     if (e.key === 'ArrowDown') targetPitch = Math.max(-1.2, targetPitch - .15);
     if (e.key === 'Home') { targetYaw = yaw + Math.atan2(Math.sin(105 * radians - yaw), Math.cos(105 * radians - yaw)); targetPitch = 22 * radians; setZoom(1); }
-    if (e.key === '+') setZoom(targetZoom + .1);
-    if (e.key === '-') setZoom(targetZoom - .1);
+    if (e.key === '+') setZoom(targetZoom + zoomStep);
+    if (e.key === '-') setZoom(targetZoom - zoomStep);
     wake();
   });
   canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); fallbackOnly(); });

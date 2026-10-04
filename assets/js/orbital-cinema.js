@@ -27,6 +27,9 @@
   const bar = document.querySelector('.scroll-progress span');
   const header = document.querySelector('.site-header');
   const hero = document.querySelector('.hero');
+  const stage = hero && hero.querySelector('.earth-stage');
+  const scanner = stage && stage.querySelector('.orbits-front .orbit-a .satellite');
+  const beam = stage && stage.querySelector('.observation-beam');
   let scrollQueued = false;
   function onScroll() {
     scrollQueued = false;
@@ -34,7 +37,11 @@
     const y = scrollY;
     if (bar) bar.style.transform = `scaleX(${max > 0 ? clamp(y / max, 0, 1) : 0})`;
     if (header) header.classList.toggle('is-scrolled', y > 24);
-    if (hero && !reduce.matches) hero.style.setProperty('--hs', clamp(y / hero.offsetHeight, 0, 1).toFixed(3));
+    if (hero) {
+      const exit = reduce.matches ? 0 : clamp(y / hero.offsetHeight, 0, 1);
+      hero.style.setProperty('--hs', exit.toFixed(3));
+      root.style.setProperty('--hero-exit', exit.toFixed(3));
+    }
   }
   addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   onScroll();
@@ -42,7 +49,7 @@
   /* ---------- Deep-space starfield (fixed, behind everything) ---------- */
   const cosmos = document.querySelector('.cosmos');
   const ctx = cosmos && cosmos.getContext('2d');
-  let stars = [], meteors = [], W = 0, H = 0, running = false, last = 0, nextMeteor = 4000;
+  let stars = [], meteors = [], W = 0, H = 0, running = false, last = 0, nextMeteor = 4000, nextBeamMeasure = 0;
   const sprite = document.createElement('canvas');
   (() => {
     sprite.width = sprite.height = 32;
@@ -104,12 +111,26 @@
   }
 
   /* ---------- One animation loop for pointer easing + stars ---------- */
+  function placeObservationBeam(time) {
+    if (!beam || !scanner || !stage || !fine.matches || time < nextBeamMeasure) return;
+    nextBeamMeasure = time + 66;
+    const frameRect = stage.getBoundingClientRect(), satelliteRect = scanner.getBoundingClientRect();
+    const x = satelliteRect.left + satelliteRect.width * .48 - frameRect.left;
+    const y = satelliteRect.top + satelliteRect.height * .52 - frameRect.top;
+    const targetX = frameRect.width * .5, targetY = frameRect.height * .5;
+    beam.style.setProperty('--beam-x', `${x.toFixed(1)}px`);
+    beam.style.setProperty('--beam-y', `${y.toFixed(1)}px`);
+    beam.style.setProperty('--beam-length', `${Math.hypot(targetX - x, targetY - y).toFixed(1)}px`);
+    beam.style.setProperty('--beam-angle', `${Math.atan2(targetY - y, targetX - x).toFixed(4)}rad`);
+  }
+
   function frame(time) {
     if (!running) return;
     const dt = last ? Math.min(time - last, 50) : 16; last = time;
     pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * .004);
     pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * .004);
     if (hero) { hero.style.setProperty('--hx', pointer.x.toFixed(4)); hero.style.setProperty('--hy', pointer.y.toFixed(4)); }
+    placeObservationBeam(time);
     if (ctx) drawCosmos(time, dt);
     requestAnimationFrame(frame);
   }

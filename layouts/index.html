@@ -3,7 +3,6 @@
 {{ $t := index site.Data.orbital site.Language.Lang }}
 {{ $fallback := (resources.Get "media/orbital/earth-at-night-asia.png").Resize "992x webp q82" }}
 {{ $satelliteForeground := (resources.Get "media/orbital/sentinel-2-foreground-v1.png").Resize "960x webp q84" }}
-{{ $satelliteDistant := (resources.Get "media/orbital/sentinel-2-distant-v1.png").Resize "720x webp q82" }}
 {{ $footerEarthSource := resources.Get "media/orbital/earth-night-asia-footer-v1.png" }}
 {{ $footerEarth := $footerEarthSource.Resize "1983x webp q82" }}
 {{ $footerEarthMobile := $footerEarthSource.Fill "900x991 Center webp q80" }}
@@ -84,12 +83,13 @@
             {{ range slice "back" "front" }}
             <div class="orbits orbits-{{ . }}" aria-hidden="true">
               <div class="orbit orbit-a"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span></span></div>{{ if eq . "front" }}<span class="satellite"><img src="{{ $satelliteForeground.RelPermalink }}" alt="" width="{{ $satelliteForeground.Width }}" height="{{ $satelliteForeground.Height }}" decoding="async" fetchpriority="low"></span>{{ end }}</div>
-              <div class="orbit orbit-b"><div class="orbit-plane"><span class="orbit-path"></span><span class="orbit-spin"><span class="orbit-trail"></span></span></div>{{ if eq . "front" }}<span class="satellite"><img src="{{ $satelliteDistant.RelPermalink }}" alt="" width="{{ $satelliteDistant.Width }}" height="{{ $satelliteDistant.Height }}" decoding="async" fetchpriority="low"></span>{{ end }}</div>
             </div>
             {{ end }}
             <img class="earth-fallback" src="{{ $fallback.RelPermalink }}" alt="{{ $t.globeAlt }}" width="{{ $fallback.Width }}" height="{{ $fallback.Height }}" fetchpriority="high">
             <canvas class="earth-canvas" aria-label="{{ $t.globeLabel }}" aria-describedby="earth-help" role="img" hidden></canvas>
             <canvas class="earth-arcs" aria-hidden="true"></canvas>
+            <span class="observation-beam" aria-hidden="true"></span>
+            <span class="region-pulse" aria-hidden="true"></span>
             <span class="earth-caption"><span aria-hidden="true">＋</span> {{ $t.globeLabel }} <span class="earth-caption-sub">VIIRS / 2016 · {{ $t.globeNetwork }}</span></span>
             <span class="earth-instruction" data-globe-hint data-interactive="{{ $t.globeHint }}">{{ $t.staticHint }}</span>
           </div>
