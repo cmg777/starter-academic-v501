@@ -160,6 +160,9 @@
       </div>
     </section>
 
+    {{ partial "orbital-community.html" (dict "t" $t) }}
+    {{ partial "orbital-gallery.html" (dict "t" $t) }}
+
     <section id="featured" class="section section-lined shell" aria-labelledby="publications-title">
       <p class="eyebrow">{{ $t.pubKicker }}</p><div class="section-heading"><h2 id="publications-title">{{ $t.pubTitle }}</h2><a class="text-link" href="{{ "publication/" | relLangURL }}">{{ $t.allPubs }} <span aria-hidden="true">↗</span></a></div>
       <div class="publication-list">
@@ -194,9 +197,6 @@
       <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "post").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
       <a class="text-link courses-link" href="{{ "courses/" | relLangURL }}">{{ $t.courses }} <span aria-hidden="true">→</span></a>
     </div></section>
-
-    {{ partial "orbital-community.html" (dict "t" $t) }}
-    {{ partial "orbital-gallery.html" (dict "t" $t) }}
   </main>
   <footer id="contact" class="site-footer"><picture class="earthrise" aria-hidden="true"><source media="(max-width: 679px)" srcset="{{ $footerEarthMobile.RelPermalink }}"><img src="{{ $footerEarth.RelPermalink }}" alt="" width="{{ $footerEarth.Width }}" height="{{ $footerEarth.Height }}" loading="lazy" decoding="async"></picture><div class="shell">
     <div class="contact-intro">
