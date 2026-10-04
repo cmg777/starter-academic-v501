@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A Python library to explore, analyze, and learn panel data interactively — composable Plotly figures and publication-quality tables, plus three no-code Streamlit web apps (Explore, Analyze, Learn).
+summary: "What patterns and relationships hide in your panel data? expdpy reveals them in Python, with Plotly figures, publication tables, and no-code Streamlit apps."
 tags:
 - python
 - panel

@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: ドナープールに対するSUTVAを外した合成コントロールモデルのPythonパッケージ。処理がコントロール群に及ぶことを許し、いずれのモデルも2つの推定対象——汚染を取り除いた処理群への効果と、各ドナーが受け取るスピルオーバー——を報告します。
+summary: "比較対象の地域にも影響が及んだ政策は本当に効果があったのか？Pythonパッケージscspillは、真の効果と比較地域へのスピルオーバーの両方を推定します。"
 tags:
 - python
 - causal

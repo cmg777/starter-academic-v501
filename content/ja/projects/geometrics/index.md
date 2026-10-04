@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: 地域の成長・収束・格差を空間的に探索・分析・学習するためのPythonライブラリ。明示的な空間手法、インタラクティブなPlotlyの図や出版品質の表に加え、ノーコードの3つのStreamlitウェブアプリ（探索・分析・学習）を提供します。
+summary: "貧しい地域は豊かな地域に追いついているのか、格差は縮小しているのか？geometricsは、Pythonの空間手法、Plotlyの図、ノーコードのStreamlitアプリで答えます。"
 tags:
 - python
 - spatial

@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: "Una biblioteca de Python para explorar, analizar y aprender datos de panel de forma interactiva: funciones componibles que generan figuras de Plotly y tablas con calidad de publicación, además de tres aplicaciones web sin código en Streamlit (Explorar, Analizar y Aprender)."
+summary: "¿Qué patrones y relaciones esconden sus datos de panel? expdpy los revela en Python, con figuras Plotly, tablas de publicación y apps Streamlit sin código."
 tags:
 - python
 - panel

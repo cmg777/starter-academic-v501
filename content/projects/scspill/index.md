@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: "A Python package of synthetic control models that drop SUTVA on the donor pool — the treatment is allowed to reach the controls, and every model reports two estimands: the effect on the treated unit, purged of contamination, and the spillover received by each donor."
+summary: "Did a policy really work if it also affected the comparison regions? scspill, a Python package, estimates both the true effect and the spillover to them."
 tags:
 - python
 - causal

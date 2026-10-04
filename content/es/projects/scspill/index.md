@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: "Un paquete de Python con modelos de control sintético que abandonan el supuesto SUTVA sobre el grupo de donantes: se permite que el tratamiento alcance a los controles y cada modelo informa dos estimandos, el efecto sobre la unidad tratada, libre de contaminación, y el desbordamiento (spillover) que recibe cada donante."
+summary: "¿Funcionó realmente una política si también afectó a las regiones de comparación? scspill, un paquete de Python, estima el efecto real y el desbordamiento."
 tags:
 - python
 - causal

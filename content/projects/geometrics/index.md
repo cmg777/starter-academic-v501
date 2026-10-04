@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A Python library to explore, analyze, and learn regional growth, convergence, and inequality — with explicit spatial methods, interactive Plotly figures and publication-quality tables, plus three no-code Streamlit apps (Explore, Analyze, Learn).
+summary: "Are poorer regions catching up, and is inequality falling? geometrics answers with spatial methods in Python, Plotly figures, and no-code Streamlit apps."
 tags:
 - python
 - spatial

@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: パネルデータをインタラクティブに探索・分析・学習するためのPythonライブラリ。Plotlyの図や出版品質の表を生成する組み合わせ可能な関数に加え、ノーコードの3つのStreamlitウェブアプリ（探索・分析・学習）を提供します。
+summary: "パネルデータにはどんなパターンや関係が隠れているのか？expdpyは、Python、Plotlyの図、出版品質の表、ノーコードのStreamlitアプリでそれを明らかにします。"
 tags:
 - python
 - panel

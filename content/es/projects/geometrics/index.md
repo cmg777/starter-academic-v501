@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: "Una biblioteca de Python para explorar, analizar y aprender sobre el crecimiento, la convergencia y la desigualdad regionales, con métodos espaciales explícitos, figuras interactivas de Plotly y tablas con calidad de publicación, además de tres aplicaciones web sin código en Streamlit (Explorar, Analizar y Aprender)."
+summary: "¿Alcanzan las regiones pobres a las ricas? ¿Cae la desigualdad? geometrics lo mide con métodos espaciales en Python, figuras Plotly y apps Streamlit sin código."
 tags:
 - python
 - spatial
