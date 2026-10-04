@@ -910,7 +910,6 @@ html[lang^="en"] .hero h1 .h1-accent {
   aspect-ratio:4/5;
   border-radius:8px;
   object-fit:cover;
-  filter:saturate(.65);
   border:1px solid var(--line)
 }
 

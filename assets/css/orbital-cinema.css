@@ -954,11 +954,10 @@ html[lang^="ja"] #hero-title .h1-accent {
 }
 
 .portrait-frame img {
-  transition:filter .8s,transform 1.2s var(--ease-out)
+  transition:transform 1.2s var(--ease-out)
 }
 
 .portrait-frame:hover img {
-  filter:saturate(1);
   transform:scale(1.03)
 }
 
