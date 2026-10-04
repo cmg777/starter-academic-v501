@@ -23,7 +23,7 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const radians = Math.PI / 180;
   const positions = [[105, 22], [20, 25], [-80, 15]];
-  const minZoom = .85, maxZoom = 3, zoomStep = .14;
+  const minZoom = .85, maxZoom = 6, zoomStep = .14;
   let gl, program, texture, frame = 0, ready = false, visible = true, failed = false;
   let yaw = 105 * radians, pitch = 22 * radians, zoom = 1;
   let targetYaw = yaw, targetPitch = pitch, targetZoom = zoom;
