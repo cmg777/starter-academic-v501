@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-07-08">
+  <meta name="dcterms.date" content="2026-10-05">
   <title>The Synthetic Control Method in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -196,15 +196,15 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">The Synthetic Control Method in Stata</h1>
-  <p class="subtitle">Did California’s Proposition 99 tobacco tax cut smoking?</p>
+  <p class="subtitle">Did Proposition 99 cut smoking in California?</p>
   <div class="title-result-strip">
-    <div class="kr"><span class="kr-num">−19.0</span><span class="kr-cap">ATT · packs per capita / yr</span></div>
-    <div class="kr"><span class="kr-num">0.974</span><span class="kr-cap">pre-treatment fit (R²)</span></div>
+    <div class="kr"><span class="kr-num">−19.00</span><span class="kr-cap">ATT · packs per capita / yr</span></div>
+    <div class="kr"><span class="kr-num">0.974</span><span class="kr-cap">pre-treatment R² (synth2)</span></div>
     <div class="kr"><span class="kr-num">0.026</span><span class="kr-cap">in-space placebo p-value</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">July 8, 2026</p>
+  <p class="date">October 5, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -212,12 +212,12 @@
 <p><span class="act">Act I</span></p>
 </section>
 <section id="smoking-was-falling-everywhere-so-did-the-tax-change-anything" class="slide level2 center">
-<h2>Smoking was falling everywhere — so did the tax change anything?</h2>
-<p>In 1988, California voters passed <strong>Proposition 99</strong>: a 25-cents-per-pack cigarette tax plus funded anti-smoking education, effective January 1989.</p>
+<h2>Smoking was falling everywhere, so did the tax change anything?</h2>
+<p>In 1988, California voters passed <strong>Proposition 99</strong>, effective January 1989. It raised the cigarette tax by 25 cents per pack. It also funded anti-smoking education.</p>
 <div class="fragment">
-<p>But national smoking was already falling. <em>What would California have done without the law?</em></p>
+<p>Yet cigarette sales were already falling nationwide. In California, the decline began in the late 1970s. <em>What would California have done without the law?</em></p>
 <aside class="notes">
-<p>A simple before-and-after comparison confounds the policy with a trend pushing sales down everywhere. This is the central problem of single-unit policy evaluation. We cannot just compare California before and after 1989, because secular trends — rising health awareness, federal regulation — were already lowering sales nationwide. We need a credible counterfactual: a “California that never passed Prop 99.”</p>
+<p>A simple before-and-after comparison confounds the policy with a trend that pushed sales down everywhere. This is the central problem of policy evaluation with a single treated unit. We cannot simply compare California before and after 1989. Secular trends, such as rising health awareness and federal regulation, were already lowering sales across the country. We therefore need a credible counterfactual: a California that never passed Proposition 99.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -232,10 +232,10 @@
 </div>
 </section>
 <section id="a-raw-comparison-hints-at-an-effect-but-the-comparator-is-crude" class="slide level2 center">
-<h2>A raw comparison hints at an effect — but the comparator is crude</h2>
+<h2>A raw comparison hints at an effect, but the comparator is crude</h2>
 
-<img data-src="../stata_sc_raw_trends.png" class="r-stretch quarto-figure-center"><p class="caption">Cigarette sales per capita: California (solid blue) vs.&nbsp;the unweighted average of 38 control states (dashed grey), 1970–2000. Orange line marks Prop 99 (1989).</p><aside class="notes">
-<p>Before 1989 California broadly tracks the donor-pool average, then drops sharply. But the unweighted average gives equal weight to Kentucky (213 packs) and Utah (64 packs) — states with nothing like California’s smoking profile. We need an <em>optimal</em> weighted comparator. That is the synthetic control.</p>
+<img data-src="../stata_sc_raw_trends.png" class="r-stretch quarto-figure-center"><p class="caption">Cigarette sales per capita, 1970–2000: California (solid blue) versus the unweighted average of 38 control states (dashed gray). The orange line marks Proposition 99 (1989).</p><aside class="notes">
+<p>California starts close to the donor average in 1970. The gap then widens through the 1970s and stays near 20 packs for most of the 1980s. By 1988, California sold 90.1 packs per capita against a donor average of 113.8, already 23.72 packs below it before the law. The unweighted average also gives equal weight to New Hampshire and Utah, which average 213 and 64 packs per capita over 1970–2000. Their smoking levels are very different from those of California. We need an <em>optimal</em> weighted comparator, and that comparator is the synthetic control.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -248,13 +248,13 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="where-were-going" class="slide level2 center">
-<h2>Where we’re going</h2>
+<section id="where-we-are-going" class="slide level2 center">
+<h2>Where we are going</h2>
 <ul>
 <li class="fragment">The lab: a 39-state, 31-year panel and the ATT estimand</li>
-<li class="fragment">Build “synthetic California” with <code>synth2</code> — a weighted blend of donor states</li>
-<li class="fragment">Three inference tools: in-space placebo, in-time placebo, leave-one-out</li>
-<li class="fragment">The lesson: a transparent counterfactual beats parallel-trends faith</li>
+<li class="fragment">Build “synthetic California” with <code>synth2</code>, a weighted blend of donor states</li>
+<li class="fragment">Three inference tools: in-space placebo, in-time placebo, and leave-one-out</li>
+<li class="fragment">The lesson: prefer a transparent counterfactual to an untestable parallel-trends assumption</li>
 </ul>
 </section></section>
 <section>
@@ -265,13 +265,13 @@
 <section id="the-lab-39-states-31-years-one-treated-unit-the-att" class="slide level2 center">
 <h2>The lab: 39 states × 31 years, one treated unit, the ATT</h2>
 <ul>
-<li class="fragment"><strong>Outcome</strong> — <code>cigsale</code>, per-capita cigarette sales (packs)</li>
-<li class="fragment"><strong>Treatment</strong> — Prop 99, California only, from 1989</li>
-<li class="fragment"><strong>Predictors</strong> — log income, share aged 15–24, retail price, beer, plus <code>cigsale</code> in 1975/1980/1988</li>
+<li class="fragment"><strong>Outcome</strong>: <code>cigsale</code>, cigarette sales per capita (packs)</li>
+<li class="fragment"><strong>Treatment</strong>: Proposition 99, California only, from 1989</li>
+<li class="fragment"><strong>Predictors</strong>: log GDP per capita, share aged 15–24, retail price, beer, and <code>cigsale</code> in 1975, 1980, and 1988</li>
 </ul>
-<p><span class="takeaway fragment">Strongly balanced: 1,209 observations, 19 pre-treatment years and 12 post-treatment years. The estimand is the <strong>ATT</strong> — the effect on California, the one treated unit — <em>not</em> the ATE.</span></p>
+<p><span class="takeaway fragment">Strongly balanced panel: 1,209 observations, 19 pre-treatment years, and 12 post-treatment years. The estimand is the <strong>ATT</strong> for California, the one treated unit, <em>not</em> the ATE.</span></p>
 <aside class="notes">
-<p>With a single treated unit and aggregate data, difference-in-differences’ parallel-trends assumption is hard to test. SCM instead builds an explicit counterfactual and lets you <em>see</em> the match quality in the pre-treatment period. California is state == 3 in the data.</p>
+<p>With a single treated unit and aggregate data, the parallel-trends assumption of difference-in-differences is hard to test. SCM instead builds an explicit counterfactual, so we can <em>see</em> the quality of the match in the pre-treatment period. California is state == 3 in the data.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -287,11 +287,10 @@
 <section id="scm-builds-a-counterfactual-by-matching-pre-treatment-predictors" class="slide level2 center">
 <h2>SCM builds a counterfactual by matching pre-treatment predictors</h2>
 <p><span class="math display">\[\min_{W} \sum_{m=1}^{M} v_m \left( X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm} \right)^2\]</span></p>
-<p>Pick donor weights <span class="math inline">\(w_j \ge 0\)</span> that sum to one and match California’s predictors <span class="math inline">\(X_{1m}\)</span>.</p>
-<p>The weights <span class="math inline">\(v_m\)</span> set how much each covariate matters.</p>
-<p><span class="takeaway fragment">The synthetic control is a <strong>convex combination</strong> of real states — no extrapolation beyond the donor pool.</span></p>
+<p>We pick donor weights <span class="math inline">\(w_j \ge 0\)</span> that sum to one and match the predictors <span class="math inline">\(X_{1m}\)</span> of California. The weights <span class="math inline">\(v_m\)</span> set how much each predictor matters. The solution is the closest feasible blend of donors.</p>
+<p><span class="takeaway fragment">The synthetic control is a <strong>convex combination</strong> of real states, so it never extrapolates beyond the donor pool.</span></p>
 <aside class="notes">
-<p>This is a nested optimization. The outer problem picks the V-weights (predictor importance); the inner problem picks the W-weights (donor shares) that minimize the weighted predictor distance. The non-negativity and sum-to-one constraints are what keep the synthetic interpretable and guard against overfitting.</p>
+<p>This is a nested optimization. The outer problem picks the V-weights to minimize the pre-1989 prediction error of the outcome. These weights set how much each predictor counts in the matching distance. The inner problem picks the W-weights, the donor shares, that minimize the weighted predictor distance. The nonnegativity and sum-to-one constraints keep the synthetic control interpretable and limit overfitting.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -307,10 +306,10 @@
 <section id="the-treatment-effect-is-the-gap-between-actual-and-synthetic-california" class="slide level2 center">
 <h2>The treatment effect is the gap between actual and synthetic California</h2>
 <p><span class="math display">\[\hat{\tau}_t = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}\]</span></p>
-<p>The effect in year <span class="math inline">\(t\)</span> is California’s actual sales minus the synthetic’s prediction. A negative <span class="math inline">\(\hat{\tau}_t\)</span> means Prop 99 <em>lowered</em> sales.</p>
-<p><span class="takeaway fragment">Identification rests on <strong>good pre-treatment fit</strong>, <strong>no interference</strong>, and <strong>no anticipation</strong> — assumptions you can largely inspect, not just assume.</span></p>
+<p>The effect in year <span class="math inline">\(t\)</span> is actual minus synthetic sales. A negative <span class="math inline">\(\hat{\tau}_t\)</span> means that the law <em>lowered</em> sales. Each year from 1989 to 2000 yields one such gap.</p>
+<p><span class="takeaway fragment">Identification rests on <strong>good pre-treatment fit</strong>, <strong>no interference</strong>, <strong>no anticipation</strong>, and <strong>no donor contamination</strong>; only the fit is directly visible in the data.</span></p>
 <aside class="notes">
-<p>The ATT is the mean of these yearly gaps over 1989–2000. Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states’ sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).</p>
+<p>The ATT is the mean of these yearly gaps over 1989–2000. Unlike difference-in-differences, the method does not ask us to accept parallel trends on faith. If the synthetic control tracks California closely before 1989, the later divergence is a credible estimate of the effect. No interference means that Proposition 99 did not change sales in other states. No anticipation means that sales in California did not respond before 1989. No donor contamination means that the donor states adopted no similar programs during the sample period. Good fit means that the synthetic control reproduces the pre-1989 path.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -328,9 +327,9 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a>synth2 cigsale lnincome age15to24 retprice beer <span class="co">///</span></span>
 <span id="cb1-2"><a href=""></a>    cigsale(1988) cigsale(1980) cigsale(1975), <span class="co">///</span></span>
 <span id="cb1-3"><a href=""></a>    trunit(3) trperiod(1989) xperiod(1980(1)1988) nested allopt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="takeaway fragment"><code>trunit(3)</code> = California · <code>trperiod(1989)</code> = treatment year · <code>nested</code> = outer V / inner W · <code>allopt</code> = multiple starts to dodge local optima.</span></p>
+<p><span class="takeaway fragment"><code>trunit(3)</code> = California · <code>trperiod(1989)</code> = treatment year · <code>nested</code> = outer V / inner W · <code>allopt</code> = multiple starts to avoid local optima.</span></p>
 <aside class="notes">
-<p>Seven predictors: four economic/demographic variables averaged over 1980–1988, plus cigarette sales at three pre-treatment anchor years (1975, 1980, 1988). The <code>nested allopt</code> combination is the gold-standard specification — slower, but it avoids spurious local optima in the V-weight search.</p>
+<p>The specification uses seven predictors. Four economic and demographic variables are averaged over 1980–1988, and cigarette sales enter at three anchor years before treatment (1975, 1980, and 1988). The <code>nested allopt</code> combination is slower, but it lowers the risk of a spurious local optimum in the search over the V-weights. It is a careful choice, not a gold standard.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -343,11 +342,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="synthetic-california-reproduces-97.4-of-the-pre-1989-path" class="slide level2 center">
-<h2>Synthetic California reproduces 97.4% of the pre-1989 path</h2>
+<section id="synthetic-california-tracks-the-pre-1989-path-closely-but-not-exactly" class="slide level2 center">
+<h2>Synthetic California tracks the pre-1989 path closely, but not exactly</h2>
 
-<img data-src="../stata_sc_pred.png" class="r-stretch quarto-figure-center"><p class="caption">California actual vs.&nbsp;synthetic California, 1970–2000: near-indistinguishable before 1989, then a widening gap.</p><aside class="notes">
-<p>R-squared = 0.974, RMSE = 1.76 packs over 19 pre-treatment years — an excellent fit. The two lines are visually inseparable from 1970 to 1988. Because the match is this good, we can trust that the post-1989 divergence reflects the policy, not pre-existing differences.</p>
+<img data-src="../stata_sc_pred.png" class="r-stretch quarto-figure-center"><p class="caption">Actual versus synthetic California, 1970–2000: close before 1989 apart from 1970, then a widening gap.</p><aside class="notes">
+<p>The synth2 command reports an R² of 0.974 and an RMSE of 1.756 packs over the 19 pre-treatment years. Its R² divides by the variation of the synthetic series; the conventional R² with the same weights is 0.976. The fit is close but not exact: the largest pre-period gap is 5.88 packs, in 1970, and the later gaps are much smaller. This close match makes it unlikely that the post-1989 divergence merely continues a pre-existing difference.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -360,11 +359,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-predictors-carry-the-match-age-1524-and-1975-sales" class="slide level2 center">
-<h2>Two predictors carry the match: age 15–24 and 1975 sales</h2>
+<section id="age-1524-and-1975-sales-dominate-the-v-weights-but-v-is-fragile" class="slide level2 center">
+<h2>Age 15–24 and 1975 sales dominate the V-weights, but V is fragile</h2>
 
-<img data-src="../stata_sc_weight_vars.png" class="r-stretch quarto-figure-center"><p class="caption">Predictor (V-matrix) weights: how much each covariate drives the SCM optimization.</p><aside class="notes">
-<p>The dominant V-weights are age 15–24 (0.546) and cigsale(1975) (0.422). Log income gets essentially zero weight — it does little to distinguish California from its synthetic twin. All seven predictor biases are below 2.2%, with five below 0.3%; the simple average control, by contrast, is off by 26% on 1988 sales.</p>
+<img data-src="../stata_sc_weight_vars.png" class="r-stretch quarto-figure-center"><p class="caption">Predictor (V-matrix) weights: how much each predictor counts in the matching distance.</p><aside class="notes">
+<p>The dominant V-weights are age 15–24 (0.546) and cigsale(1975) (0.422), while log GDP per capita gets essentially zero weight. These weights are fragile, because V is poorly identified. The placebo refit of the same model gives age 15–24 only 0.002 and cigsale(1975) 0.768, while the donor weights barely change. We should therefore read V as one of many near-equivalent solutions, not as a ranking of what matters. In the baseline fit, six of the seven predictors are closely matched, and five biases are below 0.3%. Log GDP per capita is the exception: its −2.16% bias compares logarithms, so synthetic California falls short by 0.22 log points, a GDP per capita about 20% lower. The simple average of the controls misses 1988 sales by 26.3%, against 1.74% for the synthetic control.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -377,11 +376,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="synthetic-california-is-just-five-states-one-third-utah" class="slide level2 center">
-<h2>Synthetic California is just five states — one-third Utah</h2>
+<section id="synthetic-california-is-a-blend-of-five-states-led-by-utah-at-one-third" class="slide level2 center">
+<h2>Synthetic California is a blend of five states, led by Utah at one-third</h2>
 
-<img data-src="../stata_sc_weight_unit.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights: the five states that compose synthetic California (33 others get exactly zero).</p><aside class="notes">
-<p>Utah 33.4%, Nevada 23.5%, Montana 20.2%, Colorado 16.1%, Connecticut 6.8%. SCM is inherently sparse — it picks states by trajectory similarity, not geographic proximity. That Utah carries a third of the weight is exactly why we will run leave-one-out later.</p>
+<img data-src="../stata_sc_weight_unit.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights: the five states that compose synthetic California (33 others get a reported weight of zero).</p><aside class="notes">
+<p>The weights are Utah 33.4%, Nevada 23.5%, Montana 20.2%, Colorado 16.1%, and Connecticut 6.8%. SCM solutions are typically sparse. The method selects the blend whose weighted predictors, including past sales, match California, not individually similar or nearby states. Low-sales Utah and high-sales Nevada, for example, bracket California. Because Utah carries a third of the weight, we later drop each donor in turn in a leave-one-out check.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -396,10 +395,10 @@
 </section>
 <section id="by-2000-real-california-sold-38-fewer-packs-than-its-synthetic-twin" class="slide level2 center" data-background-color="#141413">
 <h2>By 2000, real California sold 38% fewer packs than its synthetic twin</h2>
-<p><span class="bignum">−19.0</span></p>
-<p><span class="bignum-label">average ATT, packs per capita / yr (1989–2000); −7.6 in 1989 deepening to −26.4 by 1999</span></p>
+<p><span class="bignum">−19.00</span></p>
+<p><span class="bignum-label">average ATT, packs per capita / yr (1989–2000); −7.59 in 1989 deepening to −26.37 by 1999</span></p>
 <aside class="notes">
-<p>The effect compounds. By 2000 California’s actual sales (41.6 packs) sit 25.8 packs below the synthetic (67.4) — a 38% reduction. For ~34 million residents that is roughly 900 million fewer packs sold per year. The growing gap is consistent with cumulative behavioral change and shifting social norms.</p>
+<p>The effect grows over time. By 2000, actual sales in California (41.6 packs) sit 25.76 packs below the synthetic control (67.4), a reduction of 38%. With about 34 million residents, that gap implies roughly 900 million fewer packs in 2000 alone. The growing gap is consistent with cumulative behavioral change and shifting social norms. Part of the gap in 1999–2000 may also reflect Proposition 10, which raised the tax by a further 50 cents per pack in January 1999.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -412,11 +411,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-gap-deepens-steadily-through-the-1990s" class="slide level2 center">
-<h2>The gap deepens steadily through the 1990s</h2>
+<section id="the-gap-widens-through-the-1990s-though-not-in-every-year" class="slide level2 center">
+<h2>The gap widens through the 1990s, though not in every year</h2>
 
 <img data-src="../stata_sc_eff.png" class="r-stretch quarto-figure-center"><p class="caption">Treatment effect (actual minus synthetic California) over time; the negative gap widens after 1989.</p><aside class="notes">
-<p>Effect starts at −7.6 packs (1989), reaches −26.4 by 1999, plateaus near −25 to −26 in 1999–2000. But is this real, or could a never-treated state show a gap this large by chance? Act III stress-tests it three ways.</p>
+<p>The effect starts at −7.59 packs in 1989, reaches −26.37 by 1999, and stands at −25.76 in 2000. The path is not monotonic; for instance, the gap narrows briefly in 1998. Is the gap real, or could a state that was never treated show a gap this large by chance? Act III tests the result in three ways.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -434,8 +433,8 @@
 <h1>The Resolution</h1>
 <p><span class="act">Act III</span></p>
 </section>
-<section id="californias-signal-to-noise-ratio-is-the-most-extreme-of-all-39-states" class="slide level2 center">
-<h2>California’s signal-to-noise ratio is the most extreme of all 39 states</h2>
+<section id="california-has-the-most-extreme-signal-to-noise-ratio-of-all-39-states" class="slide level2 center">
+<h2>California has the most extreme signal-to-noise ratio of all 39 states</h2>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -467,9 +466,9 @@
 </tr>
 </tbody>
 </table>
-<p><span class="takeaway fragment">The post/pre MSPE ratio asks: how much worse does fit get <em>after</em> 1989 than before? California’s is highest by far.</span></p>
+<p><span class="takeaway fragment">The post/pre MSPE ratio asks how much worse the fit becomes <em>after</em> 1989 than before. California has the highest ratio, well above the runner-up.</span></p>
 <aside class="notes">
-<p>A genuine effect should blow up the post-treatment prediction error relative to a small pre-treatment error. California’s ratio of 123.5 dwarfs the runners-up. This is the conservative inference statistic — it rewards both a large gap AND a tight pre-treatment fit.</p>
+<p>A genuine effect should inflate the post-treatment prediction error relative to a small pre-treatment error. California has a ratio of 123.5, well above Georgia (80.0) and Virginia (79.0). The table comes from the placebo run, which refits California with <code>sigf(6)</code> and without <code>allopt</code>. That refit has an RMSE of 1.780 (pre-MSPE 3.17), slightly worse than the baseline RMSE of 1.756. The ratio is the preferred statistic because it rewards both a large gap and a tight pre-treatment fit.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -482,11 +481,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="run-the-placebo-on-every-state-california-is-the-lone-outlier" class="slide level2 center">
-<h2>Run the placebo on every state — California is the lone outlier</h2>
+<section id="run-the-placebo-on-every-state-california-is-the-clear-outlier" class="slide level2 center">
+<h2>Run the placebo on every state: California is the clear outlier</h2>
 
-<img data-src="../stata_sc_eff_pboUnit.png" class="r-stretch quarto-figure-center"><p class="caption">Treatment effects for all states: California (bold) plunges away from the tight grey band of placebo gaps near zero.</p><aside class="notes">
-<p>The in-space placebo applies the same SCM to each control state, pretending each was treated in 1989. This is a permutation test: if we randomly assigned “treatment” to any state, how often would we see a gap as large as California’s? Almost never — California’s trajectory is a dramatic visual outlier.</p>
+<img data-src="../stata_sc_eff_pboUnit.png" class="r-stretch quarto-figure-center"><p class="caption">Gaps for California (purple) and the 19 placebo states retained by cut(2): the lines overlap near zero before 1989, and California falls below almost every placebo afterward.</p><aside class="notes">
+<p>The in-space placebo applies the same SCM to each control state, as if each had been treated in 1989. This is a permutation test: if treatment were assigned to one state at random, how often would we see a gap as large as the one for California? Rarely: by the post/pre MSPE ratio, California ranks first among all 39 units. The figure shows its path as a clear outlier among the 19 retained placebos.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -499,12 +498,12 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="across-all-39-states-a-gap-this-large-appears-2.6-of-the-time" class="slide level2 center" data-background-color="#141413">
-<h2>Across all 39 states, a gap this large appears 2.6% of the time</h2>
+<section id="across-all-39-states-a-ratio-this-large-occurs-2.6-of-the-time" class="slide level2 center" data-background-color="#141413">
+<h2>Across all 39 states, a ratio this large occurs 2.6% of the time</h2>
 <p><span class="bignum">0.026</span></p>
-<p><span class="bignum-label">in-space placebo p-value, all controls (1/39); p = 0.05 after the cut(2) fit filter (1/20)</span></p>
+<p><span class="bignum-label">in-space placebo p-value, all controls (1/39); p = 0.050 after the cut(2) fit filter (1/20)</span></p>
 <aside class="notes">
-<p>Using all states, p = 0.026. After the cut(2) filter removes 19 states whose pre-treatment MSPE exceeds twice California’s, 20 states remain and p = 1/20 = 0.05 — right at the threshold, a mechanical consequence of having few comparison units. Report both: the unfiltered p is more conservative; the filtered one is fairer.</p>
+<p>Using all states, p = 1/39 = 0.026. The cut(2) filter removes the 19 states whose pre-treatment MSPE exceeds twice that of California, which leaves 20 states, California included, and p = 1/20 = 0.050. That value sits right at the conventional threshold, a mechanical consequence of having few comparison units. We report both: the unfiltered p is the less conservative of the two, while the filtered p compares California only with placebos that fit well.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -520,8 +519,8 @@
 <section id="significance-holds-in-most-post-treatment-years" class="slide level2 center">
 <h2>Significance holds in most post-treatment years</h2>
 
-<img data-src="../stata_sc_pvalLeft_pboUnit.png" class="r-stretch quarto-figure-center"><p class="caption">Left-sided Fisher exact p-values over time (left-sided, because the effect is negative): p = 0.05 in most years.</p><aside class="notes">
-<p>Left-sided p-values are the right choice for a negative effect. They equal 0.05 in 8 of 12 post-treatment years; the weaker years (1990–1992 and 1998, p = 0.10–0.15) are exactly when the effect was still small in magnitude. From 1993 on, California is the most extreme state in most years.</p>
+<img data-src="../stata_sc_pvalLeft_pboUnit.png" class="r-stretch quarto-figure-center"><p class="caption">Left-sided permutation p-values over time (left-sided, because the effect is negative): p = 0.050 in most years.</p><aside class="notes">
+<p>Left-sided p-values are the right choice for a negative effect. They are computed on the 20 units retained by cut(2), and they equal 0.050 in 8 of 12 post-treatment years. In 1990–1992 and 1998, one or two retained placebos show a gap at least as negative as that of California, so p rises to 0.100–0.150. Effect size alone does not explain this, because the smallest gap, in 1989, still reaches p = 0.050. From 1993 onward, California is the most extreme state in every year except 1998.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -534,11 +533,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="a-fake-1985-treatment-produces-no-comparable-gap" class="slide level2 center">
-<h2>A fake 1985 treatment produces no comparable gap</h2>
+<section id="a-fake-1985-treatment-produces-much-smaller-gaps" class="slide level2 center">
+<h2>A fake 1985 treatment produces much smaller gaps</h2>
 
-<img data-src="../stata_sc_pred_pboTime1985.png" class="r-stretch quarto-figure-center"><p class="caption">In-time placebo: California actual vs.&nbsp;synthetic with a fake treatment at 1985. Lines stay close through 1988, then split after the real 1989 policy.</p><aside class="notes">
-<p>If the design were spurious, a fake earlier treatment date would manufacture an effect. Instead, fake-period effects (1985–1988) are only −3.3 to −8.7 packs — versus −14.1 to −25.6 after 1989. The sharp discontinuity lands precisely at 1989. The non-zero fake effects reflect the shorter training window (R² drops to 0.953), not a real pre-trend.</p>
+<img data-src="../stata_sc_pred_pboTime1985.png" class="r-stretch quarto-figure-center"><p class="caption">In-time placebo: actual versus synthetic California with a fake treatment in 1985. A modest gap opens during 1985–1988, and the lines split much further after the real 1989 policy.</p><aside class="notes">
+<p>If the design were spurious, a fake earlier date would produce an effect of similar size. Instead, the fake-period gaps (1985–1988) range from −3.33 to −8.65 packs, while the gaps from 1989 onward range from −13.97 to −25.59 packs. The fake model uses a reduced specification: covariates are averaged over 1980–1984, the 1988 lag is dropped, and the fit period is 1970–1984. The synth2 command does not print the fit of this fake-1985 model. The R² of 0.953 in the log belongs to the same reduced specification estimated with the real date 1989. The fake-period gaps are much smaller than the real ones, but they are not zero.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -551,11 +550,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-effect-snaps-on-at-the-real-date-not-the-fake-one" class="slide level2 center">
-<h2>The effect snaps on at the real date, not the fake one</h2>
+<section id="the-gap-stays-modest-at-the-fake-date-and-grows-after-the-real-one" class="slide level2 center">
+<h2>The gap stays modest at the fake date and grows after the real one</h2>
 
-<img data-src="../stata_sc_eff_pboTime1985.png" class="r-stretch quarto-figure-center"><p class="caption">In-time placebo effect: small gaps during the fake 1985–1988 window, large gaps after the real 1989 treatment.</p><aside class="notes">
-<p>Fake-period effects average about −6.0 packs; real-period effects roughly double at 1989 (−8.4 in 1988 to −14.1 in 1989) and keep deepening. The model does not detect a large effect where none should exist — strong internal-validity evidence.</p>
+<img data-src="../stata_sc_eff_pboTime1985.png" class="r-stretch quarto-figure-center"><p class="caption">In-time placebo effect: smaller gaps during the fake 1985–1988 window, larger gaps after the real 1989 treatment.</p><aside class="notes">
+<p>Fake-period gaps average −5.99 packs. At the real date, the gap steps down by 5.74 packs, from −8.39 in 1988 to −14.12 in 1989, and it widens further in later years. The model thus finds much smaller effects at the fake date than after the real one. This pattern supports the design only in part, because the gap already steps down by a similar amount in 1987. The fake-period gaps are also not zero.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -568,11 +567,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="no-single-donor-drives-the-result-leave-one-out-stays-negative" class="slide level2 center">
-<h2>No single donor drives the result — leave-one-out stays negative</h2>
+<section id="no-single-donor-drives-the-sign-of-the-effect-leave-one-out-gaps-stay-negative" class="slide level2 center">
+<h2>No single donor drives the sign of the effect: leave-one-out gaps stay negative</h2>
 
-<img data-src="../stata_sc_loo_combined.png" class="r-stretch quarto-figure-center"><p class="caption">Leave-one-out: synthetic California’s prediction stays similar whichever weighted donor state is dropped.</p><aside class="notes">
-<p>Drop each of the five weighted donors in turn. For 2000 the LOO range is [−28.4, −23.5] around a baseline of −25.6 — a 4.9-pack spread, ~19% of the estimate. No iteration approaches zero, even when Utah (a third of the weight) is removed. The leave-one-out estimates stay close to the baseline ATT of −19.0 packs.</p>
+<img data-src="../stata_sc_loo_combined.png" class="r-stretch quarto-figure-center"><p class="caption">Leave-one-out output in seven panels. In the last two, each gray line drops one weighted donor, and the paths stay close to the full-pool fit.</p><aside class="notes">
+<p>We drop each of the five weighted donors in turn and refit the model. For 2000, the leave-one-out gaps range from −28.35 to −23.49 around −25.61, the value from the refit inside the same command. The spread of 4.87 packs is about 19% of the estimate. Every leave-one-out gap stays negative in every post-treatment year, even when Utah, with a third of the weight, is removed. The note printed under the figure is inaccurate: each gray line, not each panel, drops one donor. The deployed figure comes from the original run and still carries this note; the corrected do-file now writes an accurate one.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -587,11 +586,11 @@
 </section>
 <section id="does-choosing-controls-by-fit-make-this-causal-not-by-itself" class="slide level2 center">
 <h2>Does choosing controls by fit make this causal? Not by itself</h2>
-<p><span class="objection">Objection.</span> A flexible, data-driven counterfactual still can’t manufacture identification.</p>
+<p><span class="objection">Objection.</span> A data-driven counterfactual is still a model. It cannot manufacture identification. Pre-1989 fit does not guarantee post-1989 validity.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. The ATT is credible only under <strong>no interference</strong>, <strong>no anticipation</strong>, and <strong>good pre-treatment fit</strong> — SCM makes the last one <em>visible</em> and disciplines the comparator, but it cannot rule out cross-border shopping or an idiosyncratic donor (e.g.&nbsp;Utah’s distinct smoking norms). It also gives no standard errors; inference rides entirely on the placebos.</p>
+<p><span class="rebuttal">Response.</span> Correct. The ATT is credible only under <strong>no interference</strong>, <strong>no anticipation</strong>, <strong>no donor contamination</strong>, and <strong>good pre-treatment fit</strong>. SCM makes the last condition <em>visible</em> and disciplines the comparator. It cannot rule out cross-border shopping or an idiosyncratic donor such as Utah. It also gives no standard errors, so inference rests on the placebos.</p>
 <aside class="notes">
-<p>Steelman the critique. SCM’s value is transparency, not a free identification lunch. The five-state synthetic is sensitive to the predictor set (ATT moves from −19.0 to −17.7 in the in-time spec), and the donor pool deliberately excludes states with their own tobacco programs. Recent conformal-inference methods offer more formal confidence intervals.</p>
+<p>We should take the critique seriously. The value of SCM lies in transparency; it does not deliver identification for free. The five-state synthetic control is sensitive to the predictor set: the ATT moves from −19.00 to −17.71 in the reduced specification of the in-time placebo, estimated with the real date. Utah, with its distinct smoking norms, shows how one idiosyncratic donor could matter. By design, the donor pool also excludes states with large tobacco control programs or large tax increases. Recent conformal-inference methods offer more formal confidence intervals.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -605,10 +604,10 @@
       }</style></aside>
 </div>
 </section></section>
-<section id="let-the-pre-treatment-fit-not-a-parallel-trends-assumption-earn-your-counterfactual." class="title-slide slide level1 divider center" data-background-color="#141413">
-<h1>Let the pre-treatment fit — not a parallel-trends assumption — earn your counterfactual.</h1>
+<section id="let-the-pre-treatment-fit-not-a-parallel-trends-assumption-earn-the-counterfactual." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>Let the pre-treatment fit, not a parallel-trends assumption, earn the counterfactual.</h1>
 <aside class="notes">
-<p>The single takeaway. With one treated unit, a transparent weighted counterfactual you can validate before treatment is more honest than an untestable parallel-trends story. For California, three independent checks — placebo in space, placebo in time, and leave-one-out — all point the same way: Prop 99 cut smoking, by about 19 packs per capita per year.</p>
+<p>This is the single takeaway of the talk. With one treated unit, a transparent weighted counterfactual that we can validate before treatment is more honest than an untestable parallel-trends story. For California, three checks support a negative effect: the placebo in space, the placebo in time, and leave-one-out. The in-time placebo, however, supports its timing only in part. Our estimate is that Proposition 99 cut sales by about 19 packs per capita per year over 1989–2000.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

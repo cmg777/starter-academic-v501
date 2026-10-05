@@ -1,192 +1,1525 @@
 {
+  "meta": {
+    "title": "Proposition 99 and cigarette sales in California: synthetic control results from Stata",
+    "post": "/post/stata_sc/",
+    "generator": "build_web_app_data.py",
+    "source_log": "analysis.log",
+    "data_url": "https://github.com/quarcs-lab/data-open/raw/master/isds/smoking_sc.dta",
+    "outcome": "cigsale",
+    "outcome_label": "Cigarette sales in packs per capita",
+    "treated_unit": "California",
+    "n_states": 39,
+    "n_donors": 38,
+    "n_years": 31,
+    "n_obs": 1209,
+    "years": [
+      1970,
+      2000
+    ],
+    "predictors": [
+      "lnincome",
+      "age15to24",
+      "retprice",
+      "beer",
+      "cigsale(1988)",
+      "cigsale(1980)",
+      "cigsale(1975)"
+    ],
+    "notes": [
+      "Every value except the 1970–1988 synthetic path comes from analysis.log, at the precision that Stata prints.",
+      "The log prints no synthetic values for 1970–1988. The generator recomputes them from the data with the rounded Stata weights and checks them against the log.",
+      "The headline MSPE values and the ratio of 123.549 come from the placebo re-fit of California. That run uses sigf(6) without allopt, so its fit differs slightly from the baseline.",
+      "The in-time run first prints a reduced specification estimated with the real year 1989. Its fit statistics describe that specification, not the model with the fake year 1985.",
+      "The leave-one-out run re-fits the baseline before it drops each donor with positive weight. The series labeled refit come from that re-fit, not from the baseline fit."
+    ],
+    "runs": {
+      "baseline": {
+        "label": "Baseline fit (nested allopt)",
+        "rmse_pre": 1.75567,
+        "r2_pre": 0.97434,
+        "att": -19.0018,
+        "n_covariates": 7,
+        "weights": [
+          {
+            "region": "Utah",
+            "weight": 0.334
+          },
+          {
+            "region": "Nevada",
+            "weight": 0.235
+          },
+          {
+            "region": "Montana",
+            "weight": 0.202
+          },
+          {
+            "region": "Colorado",
+            "weight": 0.161
+          },
+          {
+            "region": "Connecticut",
+            "weight": 0.068
+          }
+        ]
+      },
+      "placebo_refit": {
+        "label": "Re-fit of California inside the in-space placebo run (nested sigf(6) without allopt)",
+        "rmse_pre": 1.77955,
+        "r2_pre": 0.97411,
+        "att": -18.8261,
+        "n_covariates": 7,
+        "weights": [
+          {
+            "region": "Utah",
+            "weight": 0.345
+          },
+          {
+            "region": "Nevada",
+            "weight": 0.241
+          },
+          {
+            "region": "Montana",
+            "weight": 0.207
+          },
+          {
+            "region": "Colorado",
+            "weight": 0.148
+          },
+          {
+            "region": "Connecticut",
+            "weight": 0.059
+          }
+        ]
+      },
+      "reduced_spec": {
+        "label": "Reduced specification estimated with the real year 1989 (six predictors, covariate window 1980–1984), printed by the in-time placebo run",
+        "rmse_pre": 2.2053,
+        "r2_pre": 0.95253,
+        "att": -17.7131,
+        "n_covariates": 6,
+        "weights": [
+          {
+            "region": "Utah",
+            "weight": 0.36
+          },
+          {
+            "region": "Nevada",
+            "weight": 0.288
+          },
+          {
+            "region": "Connecticut",
+            "weight": 0.199
+          },
+          {
+            "region": "Colorado",
+            "weight": 0.102
+          },
+          {
+            "region": "New Mexico",
+            "weight": 0.05
+          }
+        ],
+        "post": [
+          {
+            "year": 1989,
+            "actual": 82.4,
+            "synthetic": 93.0322,
+            "gap": -10.6322
+          },
+          {
+            "year": 1990,
+            "actual": 77.8,
+            "synthetic": 89.4297,
+            "gap": -11.6297
+          },
+          {
+            "year": 1991,
+            "actual": 68.7,
+            "synthetic": 82.4727,
+            "gap": -13.7727
+          },
+          {
+            "year": 1992,
+            "actual": 67.5,
+            "synthetic": 80.6731,
+            "gap": -13.1731
+          },
+          {
+            "year": 1993,
+            "actual": 63.4,
+            "synthetic": 79.5929,
+            "gap": -16.1929
+          },
+          {
+            "year": 1994,
+            "actual": 58.6,
+            "synthetic": 78.1272,
+            "gap": -19.5272
+          },
+          {
+            "year": 1995,
+            "actual": 56.4,
+            "synthetic": 75.6207,
+            "gap": -19.2207
+          },
+          {
+            "year": 1996,
+            "actual": 54.5,
+            "synthetic": 74.8372,
+            "gap": -20.3372
+          },
+          {
+            "year": 1997,
+            "actual": 53.8,
+            "synthetic": 74.5395,
+            "gap": -20.7395
+          },
+          {
+            "year": 1998,
+            "actual": 52.3,
+            "synthetic": 71.1561,
+            "gap": -18.8561
+          },
+          {
+            "year": 1999,
+            "actual": 47.2,
+            "synthetic": 71.438,
+            "gap": -24.238
+          },
+          {
+            "year": 2000,
+            "actual": 41.6,
+            "synthetic": 65.8382,
+            "gap": -24.2382
+          }
+        ]
+      },
+      "intime_1985": {
+        "label": "In-time placebo with the fake treatment year 1985",
+        "fake_year": 1985,
+        "att_1985_2000": -15.5654,
+        "mean_gap_1985_1988": -5.9877,
+        "mean_gap_1989_2000": -18.758
+      },
+      "loo_refit": {
+        "label": "Re-fit of California inside the leave-one-out run (nested without allopt)",
+        "rmse_pre": 1.78329,
+        "r2_pre": 0.97365,
+        "att": -18.8659,
+        "n_covariates": 7,
+        "weights": [
+          {
+            "region": "Utah",
+            "weight": 0.342
+          },
+          {
+            "region": "Nevada",
+            "weight": 0.238
+          },
+          {
+            "region": "Montana",
+            "weight": 0.217
+          },
+          {
+            "region": "Colorado",
+            "weight": 0.145
+          },
+          {
+            "region": "Connecticut",
+            "weight": 0.058
+          }
+        ],
+        "dropped_units": [
+          "Utah",
+          "Nevada",
+          "Montana",
+          "Colorado",
+          "Connecticut"
+        ]
+      }
+    }
+  },
   "headline": {
-    "att_avg": -19.002,
-    "att_peak_year": 1999,
-    "att_peak_value": -26.371,
-    "pre_mspe": 3.1668,
-    "post_mspe": 391.2533,
-    "ratio": 123.5490,
-    "rank_full": 1,
-    "rank_full_n": 39,
-    "rank_trimmed": 1,
-    "rank_trimmed_n": 20,
-    "p_full": 0.0256,
-    "p_trimmed": 0.0500,
-    "rmse_pre": 1.756,
-    "r2_pre": 0.974,
     "treated_unit": "California",
     "treatment_year": 1989,
-    "pre_window": [1970, 1988],
-    "post_window": [1989, 2000]
+    "pre_window": [
+      1970,
+      1988
+    ],
+    "post_window": [
+      1989,
+      2000
+    ],
+    "n_donors": 38,
+    "n_donors_positive": 5,
+    "att_avg": -19.0018,
+    "att_peak_year": 1999,
+    "att_peak_value": -26.3711,
+    "gap_2000": -25.755,
+    "pct_gap_2000": -38.24,
+    "pct_gap_avg": -23.95,
+    "rmse_pre": 1.755672,
+    "r2_pre": 0.974336,
+    "r2_pre_definition": "synth2 divides by the variation of the synthetic series",
+    "r2_pre_conventional": 0.9762,
+    "max_pre_gap": {
+      "year": 1970,
+      "gap": 5.8753
+    },
+    "pre_mspe": 3.1668,
+    "post_mspe": 391.2533,
+    "ratio": 123.549,
+    "mspe_source": "Placebo re-fit of California (nested sigf(6) without allopt), not the baseline fit",
+    "placebo_refit": {
+      "rmse_pre": 1.77955,
+      "r2_pre": 0.97411,
+      "att": -18.8261
+    },
+    "rank_full": 1,
+    "rank_full_n": 39,
+    "p_full": 0.0256,
+    "rank_trimmed": 1,
+    "rank_trimmed_n": 20,
+    "p_trimmed": 0.05,
+    "cutoff": 2,
+    "n_excluded": 19,
+    "runner_up": {
+      "region": "Georgia",
+      "ratio": 80.0074
+    }
   },
   "donor_weights": [
-    { "region": "Utah",         "weight": 0.3340 },
-    { "region": "Nevada",       "weight": 0.2350 },
-    { "region": "Montana",      "weight": 0.2020 },
-    { "region": "Colorado",     "weight": 0.1610 },
-    { "region": "Connecticut",  "weight": 0.0680 },
-    { "region": "Alabama",      "weight": 0.0000 },
-    { "region": "Arkansas",     "weight": 0.0000 },
-    { "region": "Delaware",     "weight": 0.0000 },
-    { "region": "Georgia",      "weight": 0.0000 },
-    { "region": "Idaho",        "weight": 0.0000 },
-    { "region": "Illinois",     "weight": 0.0000 },
-    { "region": "Indiana",      "weight": 0.0000 },
-    { "region": "Iowa",         "weight": 0.0000 },
-    { "region": "Kansas",       "weight": 0.0000 },
-    { "region": "Kentucky",     "weight": 0.0000 },
-    { "region": "Louisiana",    "weight": 0.0000 },
-    { "region": "Maine",        "weight": 0.0000 },
-    { "region": "Minnesota",    "weight": 0.0000 },
-    { "region": "Mississippi",  "weight": 0.0000 },
-    { "region": "Missouri",     "weight": 0.0000 },
-    { "region": "Nebraska",     "weight": 0.0000 },
-    { "region": "New Hampshire","weight": 0.0000 },
-    { "region": "New Mexico",   "weight": 0.0000 },
-    { "region": "North Carolina","weight": 0.0000 },
-    { "region": "North Dakota", "weight": 0.0000 },
-    { "region": "Ohio",         "weight": 0.0000 },
-    { "region": "Oklahoma",     "weight": 0.0000 },
-    { "region": "Pennsylvania", "weight": 0.0000 },
-    { "region": "Rhode Island", "weight": 0.0000 },
-    { "region": "South Carolina","weight": 0.0000 },
-    { "region": "South Dakota", "weight": 0.0000 },
-    { "region": "Tennessee",    "weight": 0.0000 },
-    { "region": "Texas",        "weight": 0.0000 },
-    { "region": "Vermont",      "weight": 0.0000 },
-    { "region": "Virginia",     "weight": 0.0000 },
-    { "region": "West Virginia","weight": 0.0000 },
-    { "region": "Wisconsin",    "weight": 0.0000 },
-    { "region": "Wyoming",      "weight": 0.0000 }
+    {
+      "region": "Utah",
+      "weight": 0.334
+    },
+    {
+      "region": "Nevada",
+      "weight": 0.235
+    },
+    {
+      "region": "Montana",
+      "weight": 0.202
+    },
+    {
+      "region": "Colorado",
+      "weight": 0.161
+    },
+    {
+      "region": "Connecticut",
+      "weight": 0.068
+    },
+    {
+      "region": "Alabama",
+      "weight": 0.0
+    },
+    {
+      "region": "Arkansas",
+      "weight": 0.0
+    },
+    {
+      "region": "Delaware",
+      "weight": 0.0
+    },
+    {
+      "region": "Georgia",
+      "weight": 0.0
+    },
+    {
+      "region": "Idaho",
+      "weight": 0.0
+    },
+    {
+      "region": "Illinois",
+      "weight": 0.0
+    },
+    {
+      "region": "Indiana",
+      "weight": 0.0
+    },
+    {
+      "region": "Iowa",
+      "weight": 0.0
+    },
+    {
+      "region": "Kansas",
+      "weight": 0.0
+    },
+    {
+      "region": "Kentucky",
+      "weight": 0.0
+    },
+    {
+      "region": "Louisiana",
+      "weight": 0.0
+    },
+    {
+      "region": "Maine",
+      "weight": 0.0
+    },
+    {
+      "region": "Minnesota",
+      "weight": 0.0
+    },
+    {
+      "region": "Mississippi",
+      "weight": 0.0
+    },
+    {
+      "region": "Missouri",
+      "weight": 0.0
+    },
+    {
+      "region": "Nebraska",
+      "weight": 0.0
+    },
+    {
+      "region": "New Hampshire",
+      "weight": 0.0
+    },
+    {
+      "region": "New Mexico",
+      "weight": 0.0
+    },
+    {
+      "region": "North Carolina",
+      "weight": 0.0
+    },
+    {
+      "region": "North Dakota",
+      "weight": 0.0
+    },
+    {
+      "region": "Ohio",
+      "weight": 0.0
+    },
+    {
+      "region": "Oklahoma",
+      "weight": 0.0
+    },
+    {
+      "region": "Pennsylvania",
+      "weight": 0.0
+    },
+    {
+      "region": "Rhode Island",
+      "weight": 0.0
+    },
+    {
+      "region": "South Carolina",
+      "weight": 0.0
+    },
+    {
+      "region": "South Dakota",
+      "weight": 0.0
+    },
+    {
+      "region": "Tennessee",
+      "weight": 0.0
+    },
+    {
+      "region": "Texas",
+      "weight": 0.0
+    },
+    {
+      "region": "Vermont",
+      "weight": 0.0
+    },
+    {
+      "region": "Virginia",
+      "weight": 0.0
+    },
+    {
+      "region": "West Virginia",
+      "weight": 0.0
+    },
+    {
+      "region": "Wisconsin",
+      "weight": 0.0
+    },
+    {
+      "region": "Wyoming",
+      "weight": 0.0
+    }
   ],
   "predictor_balance": [
-    { "predictor": "lnincome",      "treated": 10.077, "synthetic":  9.859, "sample_mean":  9.829 },
-    { "predictor": "age15to24",     "treated":  0.174, "synthetic":  0.174, "sample_mean":  0.173 },
-    { "predictor": "retprice",      "treated": 89.422, "synthetic": 89.411, "sample_mean": 87.266 },
-    { "predictor": "beer",          "treated": 24.280, "synthetic": 24.228, "sample_mean": 23.655 },
-    { "predictor": "cigsale(1988)", "treated": 90.100, "synthetic": 91.668, "sample_mean": 113.824 },
-    { "predictor": "cigsale(1980)", "treated":120.200, "synthetic":120.502, "sample_mean": 138.090 },
-    { "predictor": "cigsale(1975)", "treated":127.100, "synthetic":127.111, "sample_mean": 136.932 }
+    {
+      "predictor": "lnincome",
+      "v_weight": 4.916e-05,
+      "treated": 10.076559,
+      "synthetic": 9.8587684,
+      "bias_synthetic_pct": -2.161355,
+      "sample_mean": 9.8291968,
+      "bias_sample_pct": -2.4548245
+    },
+    {
+      "predictor": "age15to24",
+      "v_weight": 0.54587094,
+      "treated": 0.17353238,
+      "synthetic": 0.17352193,
+      "bias_synthetic_pct": -0.00602001,
+      "sample_mean": 0.17251011,
+      "bias_sample_pct": -0.5890933
+    },
+    {
+      "predictor": "retprice",
+      "v_weight": 0.01741005,
+      "treated": 89.422223,
+      "synthetic": 89.4108,
+      "bias_synthetic_pct": -0.01277453,
+      "sample_mean": 87.266082,
+      "bias_sample_pct": -2.411192
+    },
+    {
+      "predictor": "beer",
+      "v_weight": 0.0031354,
+      "treated": 24.28,
+      "synthetic": 24.2278,
+      "bias_synthetic_pct": -0.21499293,
+      "sample_mean": 23.655263,
+      "bias_sample_pct": -2.5730524
+    },
+    {
+      "predictor": "cigsale(1988)",
+      "v_weight": 0.00490342,
+      "treated": 90.099998,
+      "synthetic": 91.667698,
+      "bias_synthetic_pct": 1.7399554,
+      "sample_mean": 113.82368,
+      "bias_sample_pct": 26.330395
+    },
+    {
+      "predictor": "cigsale(1980)",
+      "v_weight": 0.00655685,
+      "treated": 120.2,
+      "synthetic": 120.5017,
+      "bias_synthetic_pct": 0.25100113,
+      "sample_mean": 138.08947,
+      "bias_sample_pct": 14.883093
+    },
+    {
+      "predictor": "cigsale(1975)",
+      "v_weight": 0.42207419,
+      "treated": 127.1,
+      "synthetic": 127.1112,
+      "bias_synthetic_pct": 0.00881275,
+      "sample_mean": 136.93158,
+      "bias_sample_pct": 7.7353113
+    }
   ],
   "v_weights": [
-    { "predictor": "age15to24",     "weight": 0.5459 },
-    { "predictor": "cigsale(1975)", "weight": 0.4221 },
-    { "predictor": "retprice",      "weight": 0.0174 },
-    { "predictor": "cigsale(1980)", "weight": 0.0066 },
-    { "predictor": "cigsale(1988)", "weight": 0.0049 },
-    { "predictor": "beer",          "weight": 0.0031 },
-    { "predictor": "lnincome",      "weight": 0.0000 }
+    {
+      "predictor": "lnincome",
+      "weight": 4.916e-05,
+      "placebo_refit": 0.0001,
+      "loo_refit": 0.0002,
+      "reduced_spec": 0.0
+    },
+    {
+      "predictor": "age15to24",
+      "weight": 0.54587094,
+      "placebo_refit": 0.002,
+      "loo_refit": 0.0124,
+      "reduced_spec": 0.0
+    },
+    {
+      "predictor": "retprice",
+      "weight": 0.01741005,
+      "placebo_refit": 0.0147,
+      "loo_refit": 0.0113,
+      "reduced_spec": 0.0384
+    },
+    {
+      "predictor": "beer",
+      "weight": 0.0031354,
+      "placebo_refit": 0.0083,
+      "loo_refit": 0.0416,
+      "reduced_spec": 0.0
+    },
+    {
+      "predictor": "cigsale(1988)",
+      "weight": 0.00490342,
+      "placebo_refit": 0.0142,
+      "loo_refit": 0.0231,
+      "reduced_spec": null
+    },
+    {
+      "predictor": "cigsale(1980)",
+      "weight": 0.00655685,
+      "placebo_refit": 0.1923,
+      "loo_refit": 0.4378,
+      "reduced_spec": 0.9597
+    },
+    {
+      "predictor": "cigsale(1975)",
+      "weight": 0.42207419,
+      "placebo_refit": 0.7683,
+      "loo_refit": 0.4735,
+      "reduced_spec": 0.0019
+    }
   ],
   "gap_series": [
-    { "year": 1970, "actual": 123.000, "synthetic": 120.200, "gap":   2.800 },
-    { "year": 1971, "actual": 121.000, "synthetic": 119.300, "gap":   1.700 },
-    { "year": 1972, "actual": 123.500, "synthetic": 122.800, "gap":   0.700 },
-    { "year": 1973, "actual": 124.400, "synthetic": 124.000, "gap":   0.400 },
-    { "year": 1974, "actual": 126.700, "synthetic": 126.100, "gap":   0.600 },
-    { "year": 1975, "actual": 127.100, "synthetic": 127.111, "gap":  -0.011 },
-    { "year": 1976, "actual": 128.000, "synthetic": 128.500, "gap":  -0.500 },
-    { "year": 1977, "actual": 126.400, "synthetic": 126.900, "gap":  -0.500 },
-    { "year": 1978, "actual": 126.100, "synthetic": 126.300, "gap":  -0.200 },
-    { "year": 1979, "actual": 121.900, "synthetic": 121.500, "gap":   0.400 },
-    { "year": 1980, "actual": 120.200, "synthetic": 120.502, "gap":  -0.302 },
-    { "year": 1981, "actual": 118.600, "synthetic": 118.900, "gap":  -0.300 },
-    { "year": 1982, "actual": 115.400, "synthetic": 116.000, "gap":  -0.600 },
-    { "year": 1983, "actual": 110.800, "synthetic": 111.500, "gap":  -0.700 },
-    { "year": 1984, "actual": 104.800, "synthetic": 105.700, "gap":  -0.900 },
-    { "year": 1985, "actual": 102.800, "synthetic": 103.300, "gap":  -0.500 },
-    { "year": 1986, "actual":  99.700, "synthetic":  99.900, "gap":  -0.200 },
-    { "year": 1987, "actual":  97.500, "synthetic":  97.000, "gap":   0.500 },
-    { "year": 1988, "actual":  90.100, "synthetic":  91.668, "gap":  -1.568 },
-    { "year": 1989, "actual":  82.400, "synthetic":  89.995, "gap":  -7.595 },
-    { "year": 1990, "actual":  77.800, "synthetic":  87.504, "gap":  -9.704 },
-    { "year": 1991, "actual":  68.700, "synthetic":  82.175, "gap": -13.475 },
-    { "year": 1992, "actual":  67.500, "synthetic":  81.608, "gap": -14.108 },
-    { "year": 1993, "actual":  63.400, "synthetic":  81.190, "gap": -17.790 },
-    { "year": 1994, "actual":  58.600, "synthetic":  80.730, "gap": -22.130 },
-    { "year": 1995, "actual":  56.400, "synthetic":  78.502, "gap": -22.102 },
-    { "year": 1996, "actual":  54.500, "synthetic":  77.483, "gap": -22.983 },
-    { "year": 1997, "actual":  53.800, "synthetic":  77.712, "gap": -23.912 },
-    { "year": 1998, "actual":  52.300, "synthetic":  74.398, "gap": -22.098 },
-    { "year": 1999, "actual":  47.200, "synthetic":  73.571, "gap": -26.371 },
-    { "year": 2000, "actual":  41.600, "synthetic":  67.355, "gap": -25.755 }
+    {
+      "year": 1970,
+      "actual": 123.0,
+      "synthetic": 117.1247,
+      "gap": 5.8753,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1971,
+      "actual": 121.0,
+      "synthetic": 118.9328,
+      "gap": 2.0672,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1972,
+      "actual": 123.5,
+      "synthetic": 124.3263,
+      "gap": -0.8263,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1973,
+      "actual": 124.4,
+      "synthetic": 125.4884,
+      "gap": -1.0884,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1974,
+      "actual": 126.7,
+      "synthetic": 127.0027,
+      "gap": -0.3027,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1975,
+      "actual": 127.1,
+      "synthetic": 127.1112,
+      "gap": -0.0112,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1976,
+      "actual": 128.0,
+      "synthetic": 127.8948,
+      "gap": 0.1052,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1977,
+      "actual": 126.4,
+      "synthetic": 125.7724,
+      "gap": 0.6276,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1978,
+      "actual": 126.1,
+      "synthetic": 125.017,
+      "gap": 1.083,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1979,
+      "actual": 121.9,
+      "synthetic": 122.9502,
+      "gap": -1.0502,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1980,
+      "actual": 120.2,
+      "synthetic": 120.5017,
+      "gap": -0.3017,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1981,
+      "actual": 118.6,
+      "synthetic": 120.2341,
+      "gap": -1.6341,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1982,
+      "actual": 115.4,
+      "synthetic": 116.9158,
+      "gap": -1.5158,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1983,
+      "actual": 110.8,
+      "synthetic": 111.3575,
+      "gap": -0.5575,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1984,
+      "actual": 104.8,
+      "synthetic": 103.4071,
+      "gap": 1.3929,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1985,
+      "actual": 102.8,
+      "synthetic": 103.2571,
+      "gap": -0.4571,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1986,
+      "actual": 99.7,
+      "synthetic": 99.8481,
+      "gap": -0.1481,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1987,
+      "actual": 97.5,
+      "synthetic": 99.7431,
+      "gap": -2.2431,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1988,
+      "actual": 90.1,
+      "synthetic": 91.6677,
+      "gap": -1.5677,
+      "period": "pre",
+      "source": "recomputed"
+    },
+    {
+      "year": 1989,
+      "actual": 82.4,
+      "synthetic": 89.9945,
+      "gap": -7.5945,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1990,
+      "actual": 77.8,
+      "synthetic": 87.5039,
+      "gap": -9.7039,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1991,
+      "actual": 68.7,
+      "synthetic": 82.1751,
+      "gap": -13.4751,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1992,
+      "actual": 67.5,
+      "synthetic": 81.6075,
+      "gap": -14.1075,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1993,
+      "actual": 63.4,
+      "synthetic": 81.1897,
+      "gap": -17.7897,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1994,
+      "actual": 58.6,
+      "synthetic": 80.7295,
+      "gap": -22.1295,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1995,
+      "actual": 56.4,
+      "synthetic": 78.5023,
+      "gap": -22.1023,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1996,
+      "actual": 54.5,
+      "synthetic": 77.4827,
+      "gap": -22.9827,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1997,
+      "actual": 53.8,
+      "synthetic": 77.7123,
+      "gap": -23.9123,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1998,
+      "actual": 52.3,
+      "synthetic": 74.3976,
+      "gap": -22.0976,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 1999,
+      "actual": 47.2,
+      "synthetic": 73.5711,
+      "gap": -26.3711,
+      "period": "post",
+      "source": "log"
+    },
+    {
+      "year": 2000,
+      "actual": 41.6,
+      "synthetic": 67.355,
+      "gap": -25.755,
+      "period": "post",
+      "source": "log"
+    }
   ],
   "placebos": [
-    { "regionno":  3, "region": "California",   "pre_mspe": 3.1668,  "post_mspe": 391.2533, "ratio": 123.55, "rank":  1, "rank_trimmed":  1 },
-    { "regionno":  9, "region": "Georgia",      "pre_mspe": 1.4610,  "post_mspe": 116.8893, "ratio":  80.01, "rank":  2, "rank_trimmed":  2 },
-    { "regionno": 34, "region": "Virginia",     "pre_mspe": 2.7825,  "post_mspe": 219.8136, "ratio":  79.00, "rank":  3, "rank_trimmed":  3 },
-    { "regionno": 19, "region": "Missouri",     "pre_mspe": 1.2009,  "post_mspe":  85.1794, "ratio":  70.93, "rank":  4, "rank_trimmed":  4 },
-    { "regionno": 32, "region": "Texas",        "pre_mspe": 4.6691,  "post_mspe": 239.8559, "ratio":  51.37, "rank":  5, "rank_trimmed":  5 },
-    { "regionno": 26, "region": "Oklahoma",     "pre_mspe": 5.7128,  "post_mspe": 267.8078, "ratio":  46.88, "rank":  6, "rank_trimmed":  6 },
-    { "regionno": 15, "region": "Louisiana",    "pre_mspe": 3.85,    "post_mspe": 150.20,   "ratio":  39.01, "rank":  7, "rank_trimmed":  7 },
-    { "regionno": 21, "region": "Nebraska",     "pre_mspe": 2.10,    "post_mspe":  72.20,   "ratio":  34.38, "rank":  8, "rank_trimmed":  8 },
-    { "regionno": 27, "region": "Pennsylvania", "pre_mspe": 1.92,    "post_mspe":  61.30,   "ratio":  31.93, "rank":  9, "rank_trimmed":  9 },
-    { "regionno": 33, "region": "Vermont",      "pre_mspe": 2.40,    "post_mspe":  72.50,   "ratio":  30.21, "rank": 10, "rank_trimmed": 10 },
-    { "regionno":  6, "region": "Connecticut",  "pre_mspe": 4.10,    "post_mspe": 110.00,   "ratio":  26.83, "rank": 11, "rank_trimmed": 11 },
-    { "regionno": 14, "region": "Kentucky",     "pre_mspe": 6.10,    "post_mspe": 160.00,   "ratio":  26.23, "rank": 12, "rank_trimmed": null },
-    { "regionno": 30, "region": "South Dakota", "pre_mspe": 2.95,    "post_mspe":  70.20,   "ratio":  23.80, "rank": 13, "rank_trimmed": 12 },
-    { "regionno": 13, "region": "Kansas",       "pre_mspe": 3.55,    "post_mspe":  80.00,   "ratio":  22.54, "rank": 14, "rank_trimmed": 13 },
-    { "regionno": 36, "region": "Wisconsin",    "pre_mspe": 4.20,    "post_mspe":  86.00,   "ratio":  20.48, "rank": 15, "rank_trimmed": 14 },
-    { "regionno": 11, "region": "Illinois",     "pre_mspe": 3.25,    "post_mspe":  65.00,   "ratio":  20.00, "rank": 16, "rank_trimmed": 15 },
-    { "regionno": 17, "region": "Maine",        "pre_mspe": 7.00,    "post_mspe": 130.00,   "ratio":  18.57, "rank": 17, "rank_trimmed": null },
-    { "regionno": 22, "region": "New Hampshire","pre_mspe": 9.40,    "post_mspe": 160.00,   "ratio":  17.02, "rank": 18, "rank_trimmed": null },
-    { "regionno": 24, "region": "North Carolina","pre_mspe": 5.10,   "post_mspe":  85.00,   "ratio":  16.67, "rank": 19, "rank_trimmed": null },
-    { "regionno": 31, "region": "Tennessee",    "pre_mspe": 3.10,    "post_mspe":  50.00,   "ratio":  16.13, "rank": 20, "rank_trimmed": 16 },
-    { "regionno": 12, "region": "Indiana",      "pre_mspe": 3.95,    "post_mspe":  60.00,   "ratio":  15.19, "rank": 21, "rank_trimmed": 17 },
-    { "regionno": 25, "region": "North Dakota", "pre_mspe": 6.50,    "post_mspe":  90.00,   "ratio":  13.85, "rank": 22, "rank_trimmed": null },
-    { "regionno": 29, "region": "South Carolina","pre_mspe": 4.50,   "post_mspe":  60.00,   "ratio":  13.33, "rank": 23, "rank_trimmed": 18 },
-    { "regionno":  1, "region": "Alabama",      "pre_mspe": 3.95,    "post_mspe":  50.00,   "ratio":  12.66, "rank": 24, "rank_trimmed": 19 },
-    { "regionno":  2, "region": "Arkansas",     "pre_mspe": 8.80,    "post_mspe": 100.00,   "ratio":  11.36, "rank": 25, "rank_trimmed": null },
-    { "regionno":  4, "region": "Colorado",     "pre_mspe": 5.30,    "post_mspe":  60.00,   "ratio":  11.32, "rank": 26, "rank_trimmed": null },
-    { "regionno":  7, "region": "Delaware",     "pre_mspe": 8.20,    "post_mspe":  85.00,   "ratio":  10.37, "rank": 27, "rank_trimmed": null },
-    { "regionno":  8, "region": "Idaho",        "pre_mspe": 4.10,    "post_mspe":  40.00,   "ratio":   9.76, "rank": 28, "rank_trimmed": 20 },
-    { "regionno": 35, "region": "West Virginia","pre_mspe": 6.50,    "post_mspe":  60.00,   "ratio":   9.23, "rank": 29, "rank_trimmed": null },
-    { "regionno": 18, "region": "Minnesota",    "pre_mspe": 4.20,    "post_mspe":  38.00,   "ratio":   9.05, "rank": 30, "rank_trimmed": null },
-    { "regionno": 28, "region": "Rhode Island", "pre_mspe": 7.60,    "post_mspe":  68.00,   "ratio":   8.95, "rank": 31, "rank_trimmed": null },
-    { "regionno": 16, "region": "Iowa",         "pre_mspe": 4.80,    "post_mspe":  42.00,   "ratio":   8.75, "rank": 32, "rank_trimmed": null },
-    { "regionno": 20, "region": "Montana",      "pre_mspe": 6.40,    "post_mspe":  52.00,   "ratio":   8.13, "rank": 33, "rank_trimmed": null },
-    { "regionno": 23, "region": "New Mexico",   "pre_mspe": 7.10,    "post_mspe":  55.00,   "ratio":   7.75, "rank": 34, "rank_trimmed": null },
-    { "regionno": 10, "region": "Idaho-2",      "pre_mspe": 8.50,    "post_mspe":  60.00,   "ratio":   7.06, "rank": 35, "rank_trimmed": null },
-    { "regionno": 37, "region": "Wyoming",      "pre_mspe": 9.20,    "post_mspe":  60.00,   "ratio":   6.52, "rank": 36, "rank_trimmed": null },
-    { "regionno": 38, "region": "Utah",         "pre_mspe": 7.70,    "post_mspe":  48.00,   "ratio":   6.23, "rank": 37, "rank_trimmed": null },
-    { "regionno": 39, "region": "Nevada",       "pre_mspe": 9.00,    "post_mspe":  50.00,   "ratio":   5.56, "rank": 38, "rank_trimmed": null },
-    { "regionno":  5, "region": "Mississippi",  "pre_mspe": 8.10,    "post_mspe":  40.00,   "ratio":   4.94, "rank": 39, "rank_trimmed": null }
+    {
+      "region": "California",
+      "pre_mspe": 3.1668,
+      "post_mspe": 391.2533,
+      "ratio": 123.549,
+      "pre_mspe_rel": 1.0,
+      "retained": true,
+      "rank": 1,
+      "rank_trimmed": 1
+    },
+    {
+      "region": "Georgia",
+      "pre_mspe": 1.461,
+      "post_mspe": 116.8893,
+      "ratio": 80.0074,
+      "pre_mspe_rel": 0.4613,
+      "retained": true,
+      "rank": 2,
+      "rank_trimmed": 2
+    },
+    {
+      "region": "Virginia",
+      "pre_mspe": 2.7825,
+      "post_mspe": 219.8136,
+      "ratio": 78.9994,
+      "pre_mspe_rel": 0.8786,
+      "retained": true,
+      "rank": 3,
+      "rank_trimmed": 3
+    },
+    {
+      "region": "Missouri",
+      "pre_mspe": 1.2009,
+      "post_mspe": 85.1794,
+      "ratio": 70.9308,
+      "pre_mspe_rel": 0.3792,
+      "retained": true,
+      "rank": 4,
+      "rank_trimmed": 4
+    },
+    {
+      "region": "Texas",
+      "pre_mspe": 4.6691,
+      "post_mspe": 239.8559,
+      "ratio": 51.3707,
+      "pre_mspe_rel": 1.4744,
+      "retained": true,
+      "rank": 5,
+      "rank_trimmed": 5
+    },
+    {
+      "region": "Oklahoma",
+      "pre_mspe": 5.7128,
+      "post_mspe": 267.8078,
+      "ratio": 46.8786,
+      "pre_mspe_rel": 1.804,
+      "retained": true,
+      "rank": 6,
+      "rank_trimmed": 6
+    },
+    {
+      "region": "Louisiana",
+      "pre_mspe": 2.0183,
+      "post_mspe": 94.107,
+      "ratio": 46.6279,
+      "pre_mspe_rel": 0.6373,
+      "retained": true,
+      "rank": 7,
+      "rank_trimmed": 7
+    },
+    {
+      "region": "Indiana",
+      "pre_mspe": 14.4145,
+      "post_mspe": 469.415,
+      "ratio": 32.5654,
+      "pre_mspe_rel": 4.5518,
+      "retained": false,
+      "rank": 8,
+      "rank_trimmed": null
+    },
+    {
+      "region": "West Virginia",
+      "pre_mspe": 8.1492,
+      "post_mspe": 242.1734,
+      "ratio": 29.7175,
+      "pre_mspe_rel": 2.5733,
+      "retained": false,
+      "rank": 9,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Wisconsin",
+      "pre_mspe": 2.895,
+      "post_mspe": 75.2425,
+      "ratio": 25.9901,
+      "pre_mspe_rel": 0.9142,
+      "retained": true,
+      "rank": 10,
+      "rank_trimmed": 8
+    },
+    {
+      "region": "Tennessee",
+      "pre_mspe": 5.2043,
+      "post_mspe": 123.3097,
+      "ratio": 23.6938,
+      "pre_mspe_rel": 1.6434,
+      "retained": true,
+      "rank": 11,
+      "rank_trimmed": 9
+    },
+    {
+      "region": "Illinois",
+      "pre_mspe": 4.3146,
+      "post_mspe": 89.0552,
+      "ratio": 20.6406,
+      "pre_mspe_rel": 1.3624,
+      "retained": true,
+      "rank": 12,
+      "rank_trimmed": 10
+    },
+    {
+      "region": "South Carolina",
+      "pre_mspe": 2.1997,
+      "post_mspe": 41.2941,
+      "ratio": 18.7727,
+      "pre_mspe_rel": 0.6946,
+      "retained": true,
+      "rank": 13,
+      "rank_trimmed": 11
+    },
+    {
+      "region": "Delaware",
+      "pre_mspe": 30.3949,
+      "post_mspe": 499.0694,
+      "ratio": 16.4195,
+      "pre_mspe_rel": 9.598,
+      "retained": false,
+      "rank": 14,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Maine",
+      "pre_mspe": 8.6989,
+      "post_mspe": 115.5412,
+      "ratio": 13.2822,
+      "pre_mspe_rel": 2.7469,
+      "retained": false,
+      "rank": 15,
+      "rank_trimmed": null
+    },
+    {
+      "region": "New Mexico",
+      "pre_mspe": 5.0577,
+      "post_mspe": 63.7459,
+      "ratio": 12.6036,
+      "pre_mspe_rel": 1.5971,
+      "retained": true,
+      "rank": 16,
+      "rank_trimmed": 12
+    },
+    {
+      "region": "Montana",
+      "pre_mspe": 5.2861,
+      "post_mspe": 54.8978,
+      "ratio": 10.3853,
+      "pre_mspe_rel": 1.6692,
+      "retained": true,
+      "rank": 17,
+      "rank_trimmed": 13
+    },
+    {
+      "region": "Mississippi",
+      "pre_mspe": 4.0894,
+      "post_mspe": 37.2754,
+      "ratio": 9.1151,
+      "pre_mspe_rel": 1.2913,
+      "retained": true,
+      "rank": 18,
+      "rank_trimmed": 14
+    },
+    {
+      "region": "North Dakota",
+      "pre_mspe": 8.0725,
+      "post_mspe": 72.32,
+      "ratio": 8.9588,
+      "pre_mspe_rel": 2.5491,
+      "retained": false,
+      "rank": 19,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Vermont",
+      "pre_mspe": 15.386,
+      "post_mspe": 116.8473,
+      "ratio": 7.5944,
+      "pre_mspe_rel": 4.8585,
+      "retained": false,
+      "rank": 20,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Nebraska",
+      "pre_mspe": 4.8287,
+      "post_mspe": 36.5597,
+      "ratio": 7.5713,
+      "pre_mspe_rel": 1.5248,
+      "retained": true,
+      "rank": 21,
+      "rank_trimmed": 15
+    },
+    {
+      "region": "Idaho",
+      "pre_mspe": 5.8142,
+      "post_mspe": 39.183,
+      "ratio": 6.7392,
+      "pre_mspe_rel": 1.836,
+      "retained": true,
+      "rank": 22,
+      "rank_trimmed": 16
+    },
+    {
+      "region": "Arkansas",
+      "pre_mspe": 4.5587,
+      "post_mspe": 28.8239,
+      "ratio": 6.3228,
+      "pre_mspe_rel": 1.4395,
+      "retained": true,
+      "rank": 23,
+      "rank_trimmed": 17
+    },
+    {
+      "region": "Connecticut",
+      "pre_mspe": 20.6396,
+      "post_mspe": 118.9189,
+      "ratio": 5.7617,
+      "pre_mspe_rel": 6.5175,
+      "retained": false,
+      "rank": 24,
+      "rank_trimmed": null
+    },
+    {
+      "region": "South Dakota",
+      "pre_mspe": 7.5688,
+      "post_mspe": 32.2367,
+      "ratio": 4.2592,
+      "pre_mspe_rel": 2.3901,
+      "retained": false,
+      "rank": 25,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Ohio",
+      "pre_mspe": 2.9585,
+      "post_mspe": 12.3535,
+      "ratio": 4.1757,
+      "pre_mspe_rel": 0.9342,
+      "retained": true,
+      "rank": 26,
+      "rank_trimmed": 18
+    },
+    {
+      "region": "Colorado",
+      "pre_mspe": 17.6103,
+      "post_mspe": 68.6736,
+      "ratio": 3.8996,
+      "pre_mspe_rel": 5.5609,
+      "retained": false,
+      "rank": 27,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Minnesota",
+      "pre_mspe": 14.1736,
+      "post_mspe": 52.5217,
+      "ratio": 3.7056,
+      "pre_mspe_rel": 4.4757,
+      "retained": false,
+      "rank": 28,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Kentucky",
+      "pre_mspe": 431.7229,
+      "post_mspe": 1475.7975,
+      "ratio": 3.4184,
+      "pre_mspe_rel": 136.3284,
+      "retained": false,
+      "rank": 29,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Rhode Island",
+      "pre_mspe": 87.9904,
+      "post_mspe": 242.6697,
+      "ratio": 2.7579,
+      "pre_mspe_rel": 27.7854,
+      "retained": false,
+      "rank": 30,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Pennsylvania",
+      "pre_mspe": 2.7029,
+      "post_mspe": 6.7073,
+      "ratio": 2.4815,
+      "pre_mspe_rel": 0.8535,
+      "retained": true,
+      "rank": 31,
+      "rank_trimmed": 19
+    },
+    {
+      "region": "Iowa",
+      "pre_mspe": 14.6527,
+      "post_mspe": 31.5816,
+      "ratio": 2.1553,
+      "pre_mspe_rel": 4.627,
+      "retained": false,
+      "rank": 32,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Nevada",
+      "pre_mspe": 40.65,
+      "post_mspe": 83.4186,
+      "ratio": 2.0521,
+      "pre_mspe_rel": 12.8364,
+      "retained": false,
+      "rank": 33,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Alabama",
+      "pre_mspe": 5.417,
+      "post_mspe": 8.2108,
+      "ratio": 1.5157,
+      "pre_mspe_rel": 1.7106,
+      "retained": true,
+      "rank": 34,
+      "rank_trimmed": 20
+    },
+    {
+      "region": "North Carolina",
+      "pre_mspe": 90.2241,
+      "post_mspe": 67.3144,
+      "ratio": 0.7461,
+      "pre_mspe_rel": 28.4907,
+      "retained": false,
+      "rank": 35,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Kansas",
+      "pre_mspe": 14.1121,
+      "post_mspe": 9.0349,
+      "ratio": 0.6402,
+      "pre_mspe_rel": 4.4563,
+      "retained": false,
+      "rank": 36,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Wyoming",
+      "pre_mspe": 83.7717,
+      "post_mspe": 31.8266,
+      "ratio": 0.3799,
+      "pre_mspe_rel": 26.4532,
+      "retained": false,
+      "rank": 37,
+      "rank_trimmed": null
+    },
+    {
+      "region": "Utah",
+      "pre_mspe": 593.7643,
+      "post_mspe": 223.2758,
+      "ratio": 0.376,
+      "pre_mspe_rel": 187.4975,
+      "retained": false,
+      "rank": 38,
+      "rank_trimmed": null
+    },
+    {
+      "region": "New Hampshire",
+      "pre_mspe": 3436.598,
+      "post_mspe": 134.9018,
+      "ratio": 0.0393,
+      "pre_mspe_rel": 1085.2007,
+      "retained": false,
+      "rank": 39,
+      "rank_trimmed": null
+    }
   ],
-  "loo_series": [
-    { "year": 1989, "baseline": -7.3304,  "loo_min":  -9.9509, "loo_max":  -5.9892 },
-    { "year": 1990, "baseline": -9.5023,  "loo_min": -12.0500, "loo_max":  -7.4500 },
-    { "year": 1991, "baseline":-13.2070,  "loo_min": -16.1300, "loo_max": -11.4500 },
-    { "year": 1992, "baseline":-13.8929,  "loo_min": -16.5500, "loo_max": -12.0100 },
-    { "year": 1993, "baseline":-17.6028,  "loo_min": -20.3100, "loo_max": -15.6500 },
-    { "year": 1994, "baseline":-22.0229,  "loo_min": -24.7112, "loo_max": -20.0141 },
-    { "year": 1995, "baseline":-22.0185,  "loo_min": -26.0500, "loo_max": -18.4500 },
-    { "year": 1996, "baseline":-22.9302,  "loo_min": -28.5500, "loo_max": -17.9500 },
-    { "year": 1997, "baseline":-23.9288,  "loo_min": -30.6150, "loo_max": -17.9877 },
-    { "year": 1998, "baseline":-22.0255,  "loo_min": -27.9000, "loo_max": -18.8500 },
-    { "year": 1999, "baseline":-26.2650,  "loo_min": -28.7500, "loo_max": -24.0500 },
-    { "year": 2000, "baseline":-25.6107,  "loo_min": -28.3503, "loo_max": -23.4850 }
+  "pointwise_p": [
+    {
+      "year": 1989,
+      "effect": -7.4201,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1990,
+      "effect": -9.5789,
+      "p_two_sided": 0.1,
+      "p_right": 0.95,
+      "p_left": 0.1
+    },
+    {
+      "year": 1991,
+      "effect": -13.2182,
+      "p_two_sided": 0.15,
+      "p_right": 0.9,
+      "p_left": 0.15
+    },
+    {
+      "year": 1992,
+      "effect": -13.9061,
+      "p_two_sided": 0.1,
+      "p_right": 0.95,
+      "p_left": 0.1
+    },
+    {
+      "year": 1993,
+      "effect": -17.6228,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1994,
+      "effect": -21.9678,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1995,
+      "effect": -21.9083,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1996,
+      "effect": -22.8429,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1997,
+      "effect": -23.8174,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 1998,
+      "effect": -21.8877,
+      "p_two_sided": 0.1,
+      "p_right": 0.95,
+      "p_left": 0.1
+    },
+    {
+      "year": 1999,
+      "effect": -26.195,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    },
+    {
+      "year": 2000,
+      "effect": -25.5478,
+      "p_two_sided": 0.05,
+      "p_right": 1.0,
+      "p_left": 0.05
+    }
   ],
   "intime_placebo": [
-    { "year": 1985, "actual": 102.800, "synthetic": 106.126, "gap":  -3.326 },
-    { "year": 1986, "actual":  99.700, "synthetic": 103.285, "gap":  -3.585 },
-    { "year": 1987, "actual":  97.500, "synthetic": 106.152, "gap":  -8.652 },
-    { "year": 1988, "actual":  90.100, "synthetic":  98.487, "gap":  -8.387 },
-    { "year": 1989, "actual":  82.400, "synthetic":  96.524, "gap": -14.124 },
-    { "year": 1990, "actual":  77.800, "synthetic":  93.000, "gap": -15.200 },
-    { "year": 1991, "actual":  68.700, "synthetic":  84.500, "gap": -15.800 },
-    { "year": 1992, "actual":  67.500, "synthetic":  83.800, "gap": -16.300 },
-    { "year": 1993, "actual":  63.400, "synthetic":  82.300, "gap": -18.900 },
-    { "year": 1994, "actual":  58.600, "synthetic":  79.000, "gap": -20.400 },
-    { "year": 1995, "actual":  56.400, "synthetic":  77.200, "gap": -20.800 },
-    { "year": 1996, "actual":  54.500, "synthetic":  76.000, "gap": -21.500 },
-    { "year": 1997, "actual":  53.800, "synthetic":  75.300, "gap": -21.500 },
-    { "year": 1998, "actual":  52.300, "synthetic":  73.000, "gap": -20.700 },
-    { "year": 1999, "actual":  47.200, "synthetic":  71.000, "gap": -23.800 },
-    { "year": 2000, "actual":  41.600, "synthetic":  67.186, "gap": -25.586 }
+    {
+      "year": 1985,
+      "actual": 102.8,
+      "synthetic": 106.1262,
+      "gap": -3.3262,
+      "window": "fake"
+    },
+    {
+      "year": 1986,
+      "actual": 99.7,
+      "synthetic": 103.285,
+      "gap": -3.585,
+      "window": "fake"
+    },
+    {
+      "year": 1987,
+      "actual": 97.5,
+      "synthetic": 106.1524,
+      "gap": -8.6524,
+      "window": "fake"
+    },
+    {
+      "year": 1988,
+      "actual": 90.1,
+      "synthetic": 98.4873,
+      "gap": -8.3873,
+      "window": "fake"
+    },
+    {
+      "year": 1989,
+      "actual": 82.4,
+      "synthetic": 96.5237,
+      "gap": -14.1237,
+      "window": "real"
+    },
+    {
+      "year": 1990,
+      "actual": 77.8,
+      "synthetic": 91.9127,
+      "gap": -14.1127,
+      "window": "real"
+    },
+    {
+      "year": 1991,
+      "actual": 68.7,
+      "synthetic": 83.7156,
+      "gap": -15.0156,
+      "window": "real"
+    },
+    {
+      "year": 1992,
+      "actual": 67.5,
+      "synthetic": 81.473,
+      "gap": -13.973,
+      "window": "real"
+    },
+    {
+      "year": 1993,
+      "actual": 63.4,
+      "synthetic": 79.7911,
+      "gap": -16.3911,
+      "window": "real"
+    },
+    {
+      "year": 1994,
+      "actual": 58.6,
+      "synthetic": 77.9078,
+      "gap": -19.3078,
+      "window": "real"
+    },
+    {
+      "year": 1995,
+      "actual": 56.4,
+      "synthetic": 76.2193,
+      "gap": -19.8193,
+      "window": "real"
+    },
+    {
+      "year": 1996,
+      "actual": 54.5,
+      "synthetic": 75.201,
+      "gap": -20.701,
+      "window": "real"
+    },
+    {
+      "year": 1997,
+      "actual": 53.8,
+      "synthetic": 75.1958,
+      "gap": -21.3958,
+      "window": "real"
+    },
+    {
+      "year": 1998,
+      "actual": 52.3,
+      "synthetic": 71.9437,
+      "gap": -19.6437,
+      "window": "real"
+    },
+    {
+      "year": 1999,
+      "actual": 47.2,
+      "synthetic": 72.226,
+      "gap": -25.026,
+      "window": "real"
+    },
+    {
+      "year": 2000,
+      "actual": 41.6,
+      "synthetic": 67.1861,
+      "gap": -25.5861,
+      "window": "real"
+    }
   ],
-  "estimates": [
-    { "method": "Average ATT (1989-2000)", "outcome": "Cigarette sales (packs/capita)", "estimate": -19.002, "se": 0.0, "ci_lo": -19.002, "ci_hi": -19.002, "n_selected": 5 },
-    { "method": "Peak gap (1999)",         "outcome": "Cigarette sales (packs/capita)", "estimate": -26.371, "se": 0.0, "ci_lo": -26.371, "ci_hi": -26.371, "n_selected": 5 },
-    { "method": "End-of-window (2000)",    "outcome": "Cigarette sales (packs/capita)", "estimate": -25.755, "se": 0.0, "ci_lo": -25.755, "ci_hi": -25.755, "n_selected": 5 }
-  ],
-  "selection": []
+  "loo_series": [
+    {
+      "year": 1989,
+      "actual": 82.4,
+      "synthetic_refit": 89.7304,
+      "synthetic_min": 88.3892,
+      "synthetic_max": 92.3509,
+      "effect_refit": -7.3304,
+      "effect_min": -9.9509,
+      "effect_max": -5.9892
+    },
+    {
+      "year": 1990,
+      "actual": 77.8,
+      "synthetic_refit": 87.3001,
+      "synthetic_min": 83.5373,
+      "synthetic_max": 89.2205,
+      "effect_refit": -9.5001,
+      "effect_min": -11.4205,
+      "effect_max": -5.7373
+    },
+    {
+      "year": 1991,
+      "actual": 68.7,
+      "synthetic_refit": 81.8829,
+      "synthetic_min": 80.8905,
+      "synthetic_max": 82.4889,
+      "effect_refit": -13.1829,
+      "effect_min": -13.7889,
+      "effect_max": -12.1905
+    },
+    {
+      "year": 1992,
+      "actual": 67.5,
+      "synthetic_refit": 81.4287,
+      "synthetic_min": 80.6239,
+      "synthetic_max": 81.8815,
+      "effect_refit": -13.9287,
+      "effect_min": -14.3815,
+      "effect_max": -13.1239
+    },
+    {
+      "year": 1993,
+      "actual": 63.4,
+      "synthetic_refit": 81.045,
+      "synthetic_min": 79.7801,
+      "synthetic_max": 82.0592,
+      "effect_refit": -17.645,
+      "effect_min": -18.6592,
+      "effect_max": -16.3801
+    },
+    {
+      "year": 1994,
+      "actual": 58.6,
+      "synthetic_refit": 80.6229,
+      "synthetic_min": 78.6141,
+      "synthetic_max": 83.3112,
+      "effect_refit": -22.0229,
+      "effect_min": -24.7112,
+      "effect_max": -20.0141
+    },
+    {
+      "year": 1995,
+      "actual": 56.4,
+      "synthetic_refit": 78.4191,
+      "synthetic_min": 75.9901,
+      "synthetic_max": 81.3864,
+      "effect_refit": -22.0191,
+      "effect_min": -24.9864,
+      "effect_max": -19.5901
+    },
+    {
+      "year": 1996,
+      "actual": 54.5,
+      "synthetic_refit": 77.4316,
+      "synthetic_min": 75.0801,
+      "synthetic_max": 80.5833,
+      "effect_refit": -22.9316,
+      "effect_min": -26.0833,
+      "effect_max": -20.5801
+    },
+    {
+      "year": 1997,
+      "actual": 53.8,
+      "synthetic_refit": 77.7288,
+      "synthetic_min": 71.7877,
+      "synthetic_max": 84.415,
+      "effect_refit": -23.9288,
+      "effect_min": -30.615,
+      "effect_max": -17.9877
+    },
+    {
+      "year": 1998,
+      "actual": 52.3,
+      "synthetic_refit": 74.3255,
+      "synthetic_min": 71.1668,
+      "synthetic_max": 79.0314,
+      "effect_refit": -22.0255,
+      "effect_min": -26.7314,
+      "effect_max": -18.8668
+    },
+    {
+      "year": 1999,
+      "actual": 47.2,
+      "synthetic_refit": 73.4654,
+      "synthetic_min": 71.5421,
+      "synthetic_max": 77.5396,
+      "effect_refit": -26.2654,
+      "effect_min": -30.3396,
+      "effect_max": -24.3421
+    },
+    {
+      "year": 2000,
+      "actual": 41.6,
+      "synthetic_refit": 67.2107,
+      "synthetic_min": 65.085,
+      "synthetic_max": 69.9503,
+      "effect_refit": -25.6107,
+      "effect_min": -28.3503,
+      "effect_max": -23.485
+    }
+  ]
 }

@@ -189,6 +189,7 @@ p { margin: 0 0 12px; }
 }
 
 .chart-area {
+  position: relative; /* anchors the absolutely positioned tooltip */
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -201,6 +202,15 @@ p { margin: 0 0 12px; }
   color: var(--muted);
   padding-top: 6px;
   text-align: center;
+}
+.caption {
+  font-size: 12px;
+  color: var(--muted);
+  margin: -8px 0 18px;
+}
+.load-error {
+  padding: 20px;
+  color: var(--orange);
 }
 
 .stat-row {
@@ -271,20 +281,6 @@ button.action.secondary {
 }
 button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
 
-.tag {
-  display: inline-block;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.tag.rigorous { background: rgba(0, 212, 200, 0.18); color: var(--teal); }
-.tag.cv       { background: rgba(217, 119, 87, 0.20); color: var(--orange); }
-.tag.first    { background: rgba(106, 155, 204, 0.18); color: var(--steel); }
-.tag.ols      { background: rgba(232, 236, 242, 0.12); color: var(--muted); }
-.tag.psl      { background: rgba(0, 212, 200, 0.12); color: color-mix(in srgb, var(--teal) 60%, white); }
 
 details.gloss {
   margin: 8px 0;
@@ -475,8 +471,39 @@ table.balance td code {
   color: var(--text);
   font-size: 12px;
 }
-table.balance tr.outlier td:nth-child(4) {
+table.balance th.num, table.balance td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+table.balance .pct {
+  color: var(--muted);
+  font-size: 11px;
+}
+table.balance tr.outlier td:nth-child(5),
+table.balance tr.outlier td:nth-child(5) .pct {
   color: var(--orange) !important;
   font-weight: 600;
 }
 table.balance tr:hover { background: rgba(106, 155, 204, 0.08); }
+
+/* Keyboard focus, phone gutters, and reduced motion */
+nav.tab-strip button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+.cta-card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  header.app-header { padding: 16px; }
+  nav.tab-strip { padding: 0 8px; }
+  main { padding: 16px; }
+  footer.app-footer { padding: 16px; }
+  table.balance th, table.balance td { padding: 6px 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
