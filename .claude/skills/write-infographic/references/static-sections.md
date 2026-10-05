@@ -1,62 +1,65 @@
 # Static Sections: Negative Prompt and Condensed Prompt
 
 > This file is part of the `write-infographic` skill. Read during the core
-> workflow when generating the output file.
+> workflow when generating the output file. Keep both sections consistent with
+> Section A, including user overrides and source scientific color meanings.
 
 ## Section B: Negative Prompt
 
 Separated from Section A by a `---` horizontal rule and labeled `## Negative Prompt`.
 
-The negative prompt is mostly static with a few topic-specific additions:
+Use the following default, adapting topic-specific exclusions and explicit user
+style choices. Do not ban clean typography or precise strokes merely to imitate
+chalk. Mathematical signs and symbols needed for accurate labels are allowed.
 
 ```
-Do not include: photorealistic rendering, glossy or reflective surfaces,
-drop shadows, gradient color fills, emojis or Unicode symbols, computer-
-generated sans-serif typography, neon glow effects, 3D perspective or
-depth, watermarks, stock photo elements, smooth vector curves, pure white
-(#ffffff) -- all whites should be warm/creamy chalk white (#f0ece2).
-All lines should appear hand-drawn with varying weight and chalk texture.
-Do not use clean digital borders or perfectly straight lines. Do not
-render precise statistical charts, axis labels, or data tables. Do not
-attempt to render more than 3 text elements per panel.
+No blurry or broken lettering, chalk dust over text, smudge haze, glow,
+washed-out colors, low-contrast labels, global oversaturation, rainbow
+accents, or decorative gradients. No photorealistic classroom, glossy
+3D effects, watermarks, stock photos, or emojis. No cropped titles,
+labels, legends, borders, or arrowheads; keep all content inside the
+5% outer safe margin. No paragraphs, tiny filler text, or unrequested
+annotations. Per panel: title, callout, at most one short annotation
+(excluding panel numeral). No invented charts, data, units, or formulas.
+Preserve scientific color scales and category meanings, including
+meaningful map gradients. Keep minus signs, decimals, and labels exact.
 ```
 
-Add 1-2 topic-specific exclusions if relevant (e.g., "Do not include
-photographs of actual chalkboards or classrooms").
+Add 1-2 topic-specific exclusions when useful. If a precise figure is requested,
+reserve it for a verified source/data-driven overlay rather than asking the image
+model to invent its values. Adapt the style exclusions for an explicit override;
+accuracy and complete framing still apply.
 
 ## Section C: Condensed Prompt
 
 Separated by `---` and labeled `## Condensed Prompt (~200 words)`.
 
-A compressed version of Section A for token-limited tools (Midjourney ~6000
-chars, DALL-E ~4000 chars). Write in telegram-style -- dense, no filler:
+Compress Section A to **under 250 words** for tools with shorter prompt budgets.
+Retain the constraints that determine the result; cut decorative wording first:
 
-Structure:
-1. Style + format + dimensions (1 sentence)
-2. Layout (1 sentence)
-3. Colors with hex codes (1 sentence listing all 6)
-4. Title text (1 sentence)
-5. One sentence per panel: position, title, central sketch, callout
-6. Margin elements (1 sentence)
-7. Atmosphere (1 sentence)
-8. Negative prompt (1 sentence)
+1. Crisp style, format, and native dimensions
+2. Layout, safe margins, and dominant title/numeric anchors
+3. Selected current website colors with roles; any scientific color exceptions
+4. Exact short title and one compact scene/callout per panel, in reading order
+5. Essential legend only if needed; longer explanations stay in Section D
+6. Sharp-text and no-cropping exclusions, no invented values
 
-Target: under 250 words / 1800 characters.
-
-**Example structure:**
+**Example structure (adapt to the source post and any user override):**
 
 ```
-Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545).
-Academic chalk-drawn sketchnote, hand-lettered text, chalk dust, faint
-formula textures. Six panels in 3x2 grid with steel blue (#8bb8e0)
-chalk borders connected by chalk arrows. Title: "[TITLE]" in steel blue
-small-caps, subtitle: "[guiding question]" in italic chalk white
-(#f0ece2). Colors: chalk white (#f0ece2) body, warm orange (#e8956a) key
-numbers, teal (#00d4c8) highlights, muted gray (#b0a89a) annotations.
-Panel 1 (top-left): "[TITLE]" -- [central sketch in 5 words], callout
-"[phrase]" in orange. Panel 2 (top-center): ... [continue for all 6].
-Professor's note bottom-right: "[note]". Legend bottom-left: [concept]:
-teal, [concept]: orange. Faint formulas: [formula 1], [formula 2] at
-15% opacity. No photorealism, no gradients, no precise charts, no small
-text, no pure white.
+1920x1080 academic infographic, crisp chalk-inspired strokes, clean bold
+lettering. Near-black navy #050a12 background, deep navy #0a121d panels,
+off-white #edf2f6 lettering/outlines, blue #88b9de headings, selective gold
+#e9c184 callouts. Gray #9baaba only for secondary notes. Preserve source
+scientific colors with labels/line styles. Six panels, 3x2 grid, generous
+gutters, every element inside 5% margins on all edges. Sharp arrows link
+1→2→3, route through the row gutter to 4, then 4→5→6.
+Dominant title: "[SHORT TITLE]". Three numeric anchors large and bold.
+P1 top-left "[HEADING]": [sketch]; "[CALLOUT]".
+P2 top-center: ... P3 top-right: ... P4 bottom-left: ...
+P5 bottom-center: ... P6 bottom-right: ...
+[Essential semantic legend, if needed.] No paragraphs; at most one short
+annotation per panel. Title/anchors lead at card size; detail is full-size.
+No dusty text, haze, glow, washed-out colors, cropped labels, or invented
+values. Copy signs/units exactly; longer text stays in Section D.
 ```

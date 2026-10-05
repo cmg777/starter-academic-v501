@@ -5,26 +5,18 @@
 
 ## Content density: simple vs layered panels
 
-Before choosing a template, decide the **panel density mode** based on
-the message inventory from Step 0.6 of the skill:
+Choose simple panels by default: 40-60 words describing one primary metaphor,
+one callout, and a connector. A dense post may use layered panels (60-90 words,
+up to three supporting elements) only when ≥6 ON-IMAGE messages and the available
+space justify them. The main skill's text budget still applies: title, callout,
+and at most one short annotation, excluding the panel numeral. Sub-tags and
+in-panel equations count as annotations and must use full contrast. Move extra
+labels and equations to Section D before shrinking text or safe margins.
 
-- **Simple panels (40-60 words each, 3-4 elements)** — use when the
-  message inventory has ≤5 ON-IMAGE messages. Each panel carries one
-  primary metaphor, one callout, and the connector arrow. Calibration
-  example: `content/post/python_partial_identification/infographic_instructions.md`.
-- **Layered panels (60-90 words each, 3-4 baseline elements PLUS up to
-  3 sub-elements)** — use when the message inventory has ≥6 ON-IMAGE
-  messages. Each panel can carry a sub-sketch (e.g., a chalk-tally
-  next to the metaphor, or a split-scene composition), an in-panel
-  sub-equation at ~80% opacity, a steel-blue sub-tag above the panel
-  border (e.g., "STAGE 1" / "STAGE 2"), and 2-3 annotation labels.
-  Calibration example: `content/post/python_mgwrfer/infographic_instructions.md`.
-
-Whichever mode you choose, the templates below (Causal Inference, ML /
-Prediction, Exploratory / Descriptive) still apply: the dramatic
-function of each panel (Hook, Stakes, Attempt, Twist, Surprise,
-Resolution) is independent of how many sub-elements the panel carries.
-A layered panel just packs the function with more on-image content.
+`content/post/python_partial_identification/infographic_instructions.md` and
+`content/post/python_mgwrfer/infographic_instructions.md` are narrative examples
+for simple and layered scenes respectively, not current palette/texture defaults.
+The dramatic function of each panel is independent of its density.
 
 ---
 
@@ -111,7 +103,7 @@ descriptive reasoning]."
 
 Each panel gets ONE large central sketch -- a visual metaphor that
 communicates the story beat without precise statistical detail. See
-`references/visual-metaphor-vocabulary.md` for the full vocabulary.
+`visual-metaphor-vocabulary.md` (in this reference directory) for the full vocabulary.
 
 **Selection rules:**
 - Choose from the suggested metaphor categories for each panel position
@@ -128,20 +120,22 @@ communicates the story beat without precise statistical detail. See
 - No precise bar charts, scatter plots, or number lines with tick marks
 - No multi-row tables or axis labels
 - No more than one text label per sketch
-- No statistical notation inside the sketch
+- Put complex statistical notation in Section D; a short, source-verified
+  equation may use the single annotation slot in a justified layered panel
 
 ## Callout rules
 
-- Exactly one callout per panel in warm orange (#e8956a)
+- Exactly one callout per panel in website gold (#e9c184), unless the user overrides the palette
 - Under 8 words -- punchy, memorable, quotable
 - 3 of the 6 callouts must contain a BIG number from the post
 - The other 3 can be memorable phrases
-- Described with size/color instructions: "in large warm orange chalk"
+- Described with size/color instructions: "in large, sharp gold lettering"
 
 ## Connector rules
 
-- Chalk arrows connect panels in reading order (1->2->3, 3 down to 4, 4->5->6)
-- Arrows are visual only in Section A -- just "chalk arrow with dust particles"
+- Sharp arrows connect 1→2→3, route through the inter-row gutter from 3 back to
+  4 at bottom-left, then 4→5→6. Keep arrowheads within the safe area.
+- Arrows are visual only in Section A -- just "sharp chalk-inspired arrow"
 - Transition phrases (the narrative thread) go in Section D only
 - The transition phrases should use dramatic moves:
   - **Escalation** (Panels 1->2): "And the stakes are..."
@@ -151,7 +145,7 @@ communicates the story beat without precise statistical detail. See
 
 ## Panel title rules
 
-- 3-5 words in steel blue small-caps
+- 3-5 words in website blue, bold clean lettering
 - Specific to the post content -- never generic ("Results", "Analysis")
 - Include the method name or key concept
 - Examples: "MANSKI BOUNDS", "ENTROPY CUTS THE RANGE", "THE SELECTION PROBLEM"
