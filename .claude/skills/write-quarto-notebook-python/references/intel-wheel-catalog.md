@@ -24,6 +24,7 @@ lean.
 |---|---|---|---|
 | `numba` | `0.62.1` | `numba`, `pyfixest`, `statsmodels` (>=0.15), `sktime`, `umap` | Numba 0.63+ dropped macOS Intel wheels (cp310–cp313). 0.62.1 covers cp310–cp313 on Intel + Apple Silicon + Linux + Windows. |
 | `llvmlite` | `0.45.0` | (transitive via `numba`) | Llvmlite 0.46+ dropped Intel wheels. 0.45.0 is the pair for `numba==0.62.1`. Adds itself automatically when `numba` is in the trigger list. |
+| `scs` | `3.2.8` | `cvxpy`, `mlsynth` | SCS 3.2.9 through 3.3.1 ship no macOS Intel wheels, so newer versions compile from source. 3.2.8 has wheels for cp39 to cp314 on every platform. Added 2026-10-05 for `python_sc101` (mlsynth 1.0.0 requires cvxpy). |
 
 ---
 

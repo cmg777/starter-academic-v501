@@ -226,6 +226,25 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 - **Smoke test:** load the file in `vm` with `{ window: {} }` and call `window.PanelLab.*`. It checks FD with intercept = two-way within, FD without intercept = one-way within (1e-10), the default numbers, and that toy FE does not change when a stayer moves. Pattern: `node -e "const vm=require('vm'),fs=require('fs');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync('assets/js/panel-lab.js','utf8'),c);const L=c.window.PanelLab;console.log(L.estimate(L.buildPanel(L.simDraws(2199,L.SEED_BASE+1),L.DEFAULTS)))"`.
 - **Minifier gotcha (fixed 2026-10-02):** `hugo --minify` drops *valueless* attributes on SVG elements (`<g data-pts></g>` is published as `<g/>`), while HTML elements keep them. The lab then threw in its constructor, never set `data-ready`, and the CSS kept `.pl-body` hidden, so production showed only the lab header while the dev server worked. Give every hook attribute inside an SVG a value (`data-pts="toy"`), and test widgets on a **minified** build (`hugo --gc --minify -d <dir>` + `python -m http.server`), not only `hugo server`.
 
+### Reference implementation #3: `did-lab`
+
+`layouts/shortcodes/did-lab.html` + `assets/js/did-lab.js` + `assets/css/did-lab.css`, for `content/post/python_did101/`. The Scratch guard key is `didLabAssets`, the global is `window.DidLab`, and the classes carry the prefix `dl-`. It follows the same three-file pattern as `fwl-lab` and `panel-lab`.
+
+- **Params:** `id` (default `did-lab-<ordinal>`), `tab` (`twobytwo` default, or `event`).
+- **Data:** the GPA values of the post are embedded as JS array literals. The sliders shift the outcome exactly inside the span of the regressors, so the defaults reproduce every printed number of the post.
+
+### Reference implementation #4: `sc-lab`
+
+`layouts/shortcodes/sc-lab.html` + `assets/js/sc-lab.js` + `assets/css/sc-lab.css`, for `content/post/python_sc101/`. The Scratch guard key is `scLabAssets`, the global is `window.ScLab`, and the classes carry the prefix `sl-`. It follows the same three-file pattern and adds a generated data block, described below.
+
+- **Params:** `id` (default `sc-lab-<ordinal>`), `tab` (`mixer` default, `cutoff`, `intime`, or `loo`). Any other value stops the build through `errorf`.
+- **Tabs:** a weight mixer with presets and share sliders that rebuilds synthetic California live; a placebo cutoff with stops 1, 1.5, 2, 3, 5, 10, 20, and none; an in-time placebo for fake starts 1985 to 1988; and a leave-one-out view of the five refits.
+- **Data block:** `content/post/python_sc101/build_sc_lab_data.py` writes the block between `// BEGIN GENERATED DATA` and `// END GENERATED DATA` from `sc101_results.json`. Sales are stored as integers equal to ten times the value and decoded with `Math.fround`, which reproduces the float32 data exactly. Every synthetic path is rebuilt from full-precision weights, and `--check` exits 1 when the block is stale.
+- **Tests:** `node --test tests/sc-lab.test.cjs` checks every default and every `lab_scenarios` entry against the results JSON to 1e-9. Set `SC_LAB_JS` to the minified bundle of a build to run the same tests on the published file.
+- **Minifier gotcha (found 2026-10-05):** the minifier deletes `<rect>` elements whose width is zero in the markup, so shaded bands that JS sizes later silently disappear. Draw such bands as `<path>` elements instead.
+
+**Dark-only site (since 2026-10-03).** Every widget also needs a `body.page-wrapper.dark .<name>` token block in `assets/css/orbital-subpages.css`, next to the existing `.did-lab` and `.sc-lab` blocks. Without it, the orbital palette does not reach the widget, and its accents stay in the old colors.
+
 ## Reference implementation
 
 `content/post/python_fwl/` (Frisch–Waugh–Lovell theorem, 50 simulated stores): §7.2 predict card, §8.2 proof card, §16 the `fwl-lab` interactive widget, §18 Common misconceptions, §22 graded exercises with solution cards. Canonical numbers: `content/post/python_fwl/fwl_results.json` (written by `script.py`).
