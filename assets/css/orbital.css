@@ -981,7 +981,8 @@ html[lang^="en"] .hero h1 .h1-accent {
 .card-image img {
   width:100%;
   height:100%;
-  object-fit:cover
+  /* Tutorial and project artwork must retain edge labels and legends. */
+  object-fit:contain
 }
 
 .card-placeholder {
