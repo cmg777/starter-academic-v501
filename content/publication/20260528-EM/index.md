@@ -65,6 +65,7 @@ url_project: ''
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
   caption: ''
+  alt_text: 'Growth up, unemployment down? In Indonesia, the four regimes have long-run total associations of −0.189, +0.137, −0.028 and −0.014 percentage points per percentage point of GDP growth (Table 6). Whiskers show estimate ± 1.96 standard errors. Answer: Not everywhere.'
   focal_point: ""
   preview_only: false
 
@@ -160,6 +161,12 @@ Separating local responses from spillovers is what makes this visible. In Group 
 ---
 
 <style>
+/* Keep the image's bottom-line answer clear of the enlargement hint. */
+.featured-image-wrapper > div::after {
+  top: calc(100% + 6px);
+  bottom: auto;
+  right: 0;
+}
 .podcast-overlay {
   display: none;
   position: fixed;

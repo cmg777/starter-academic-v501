@@ -65,6 +65,7 @@ url_project: ''
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
   caption: ''
+  alt_text: '¿Más crecimiento, menos desempleo? En Indonesia, los cuatro regímenes tienen asociaciones totales de largo plazo de −0,189, +0,137, −0,028 y −0,014 puntos porcentuales por punto porcentual de crecimiento del PIB (Tabla 6). Las barras muestran la estimación ± 1,96 errores estándar. Respuesta: No en todas partes.'
   focal_point: ""
   preview_only: false
 
@@ -160,6 +161,12 @@ Separar las respuestas locales de los desbordamientos es lo que hace visible est
 ---
 
 <style>
+/* Keep the image's bottom-line answer clear of the enlargement hint. */
+.featured-image-wrapper > div::after {
+  top: calc(100% + 6px);
+  bottom: auto;
+  right: 0;
+}
 .podcast-overlay {
   display: none;
   position: fixed;

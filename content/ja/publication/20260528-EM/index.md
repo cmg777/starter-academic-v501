@@ -65,6 +65,7 @@ url_project: ''
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
   caption: ''
+  alt_text: '成長率が上がれば失業率は下がるのでしょうか。インドネシアの4つのレジームの長期総関連は、GDP成長率1ポイントあたり−0.189、+0.137、−0.028、−0.014ポイントです（表6）。横線は推定値±標準誤差の1.96倍を示します。答え：どの地域でもそうとは限りません。'
   focal_point: ""
   preview_only: false
 
@@ -160,6 +161,12 @@ graph LR
 ---
 
 <style>
+/* Keep the image's bottom-line answer clear of the enlargement hint. */
+.featured-image-wrapper > div::after {
+  top: calc(100% + 6px);
+  bottom: auto;
+  right: 0;
+}
 .podcast-overlay {
   display: none;
   position: fixed;
