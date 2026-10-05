@@ -198,6 +198,16 @@ body.page-wrapper.dark .did-lab {
   --dl-accent-ink: var(--orbital-bg);
   --dl-focus: var(--orbital-gold);
 }
+body.page-wrapper.dark .sc-lab {
+  --sl-text: var(--orbital-ink);
+  --sl-muted: var(--orbital-muted);
+  --sl-bg: var(--orbital-panel);
+  --sl-surface: var(--orbital-panel);
+  --sl-border: var(--orbital-line);
+  --sl-accent: var(--orbital-gold);
+  --sl-accent-ink: var(--orbital-bg);
+  --sl-focus: var(--orbital-gold);
+}
 
 /* Footer uses the same quiet surface, typography, and gold labels as home. */
 body.page-wrapper.dark .cz-footer { background: var(--orbital-bg); border-color: var(--orbital-line); }
