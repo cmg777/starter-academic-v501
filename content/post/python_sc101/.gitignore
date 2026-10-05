@@ -1,0 +1,14 @@
+# Build artifacts for python_sc101 (not source). The root .gitignore already
+# covers the local render of the bundle (references/.venv/, references/.quarto/,
+# references/_environment.local, references/tutorial.html, and
+# references/tutorial_files/) and the render cache slides/.quarto/.
+
+# AhaSlides upload payload, regenerated on demand.
+ahaslides/payload.json
+
+# Intermediate notebook that Quarto leaves behind when a render stops early.
+*.quarto_ipynb
+
+# Python bytecode.
+__pycache__/
+*.pyc

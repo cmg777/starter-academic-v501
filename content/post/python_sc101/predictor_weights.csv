@@ -1,0 +1,8 @@
+predictor,label,v_mlsynth,v_stata
+lnincome,Log GDP per capita,3.3434253e-09,4.916e-05
+age15to24,Share aged 15–24,0.33156003,0.54587094
+retprice,Retail price,0.33415693,0.01741005
+beer,Beer per capita,2.4043962e-07,0.0031354
+cigsale_1988,Sales in 1988,3.5715619e-07,0.00490342
+cigsale_1980,Sales in 1980,1.8892662e-07,0.00655685
+cigsale_1975,Sales in 1975,0.33428226,0.42207419

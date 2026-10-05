@@ -1,0 +1,5 @@
+fake_year,predictors,pre_rmspe,fake_gap_mean,post_gap_mean,weights
+1985,lnincome age15to24 retprice beer cigsale_1980 cigsale_1975,0.90703899,-5.9745606,-18.747474,"Utah 0.3510, Connecticut 0.3485, Nevada 0.3006"
+1986,lnincome age15to24 retprice beer cigsale_1980 cigsale_1975,1.154025,-6.1411492,-18.401349,"Utah 0.3714, Connecticut 0.3090, Nevada 0.3078, Colorado 0.0118"
+1987,lnincome age15to24 retprice beer cigsale_1980 cigsale_1975,1.2913774,-6.9579167,-18.132123,"Utah 0.3849, Nevada 0.3087, Connecticut 0.2696, Colorado 0.0367"
+1988,lnincome age15to24 retprice beer cigsale_1980 cigsale_1975,1.8640013,-3.4459434,-17.715807,"Utah 0.3832, Nevada 0.2686, Colorado 0.2093, Connecticut 0.1390"

@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Synthetic Control with mlsynth: Interactive Companion</title>
+<meta name="description" content="Interactive companion to the Python post on Proposition 99 and the synthetic control method with mlsynth. It shows the donor recipe of synthetic California, the gap in cigarette sales, the placebo and robustness checks, and four mlsynth estimators. Every number comes from the results file of the post.">
+<meta name="theme-color" content="#0f1729">
+<link rel="stylesheet" href="styles.css?v=20261005">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Synthetic Control with mlsynth: Interactive Companion</h1>
+  <div class="subtitle">
+    A companion to <em>Introduction to the Synthetic Control Method in Python with mlsynth</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist" aria-label="Sections of the app">
+  <button type="button" id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true"  aria-controls="pane-intro"  tabindex="0">1 · Intro and glossary</button>
+  <button type="button" id="tab-recipe" class="tab"        data-pane="pane-recipe" role="tab" aria-selected="false" aria-controls="pane-recipe" tabindex="-1">2 · Donor recipe and gap</button>
+  <button type="button" id="tab-robust" class="tab"        data-pane="pane-robust" role="tab" aria-selected="false" aria-controls="pane-robust" tabindex="-1">3 · Placebo and robustness checks</button>
+  <button type="button" id="tab-tour"   class="tab"        data-pane="pane-tour"   role="tab" aria-selected="false" aria-controls="pane-tour"   tabindex="-1">4 · mlsynth estimator tour</button>
+</nav>
+
+<noscript>
+  <div class="load-error">This app needs JavaScript to read its data and draw its charts. The post itself presents every result in static form.</div>
+</noscript>
+<div class="load-error" id="app-error" hidden></div>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO AND GLOSSARY ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro" tabindex="0">
+
+  <h2>Did Proposition 99 reduce cigarette sales in California?</h2>
+  <p class="lede">
+    In January 1989, Proposition 99 raised the cigarette tax in California and
+    funded anti-smoking education. Cigarette sales, however, were already
+    falling across the United States. The decline after 1989 therefore needs a
+    comparison before anyone can credit it to the program. The
+    <strong>synthetic control method</strong> builds that comparison from a
+    weighted average of other states, chosen to track California before 1989.
+  </p>
+  <p class="lede">
+    This app retells the post in four tabs, and it reads every number from the
+    results file of the post. The tiles below give the answer in brief, and the
+    chart under them shows where it comes from. The glossary at the end of this
+    tab defines each key term in a few sentences.
+  </p>
+
+  <div class="stat-row tiles" id="intro-tiles">
+    <div class="stat">
+      <div class="stat-label">ATT, 1989–2000</div>
+      <div class="stat-value orange" id="tile-att">…</div>
+      <div class="stat-sub">packs per capita per year (mlsynth)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Stata benchmark ATT</div>
+      <div class="stat-value gold" id="tile-stata">…</div>
+      <div class="stat-sub">synth2 in the Stata log</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pre-treatment RMSE</div>
+      <div class="stat-value teal" id="tile-rmse">…</div>
+      <div class="stat-sub">packs per capita, 1970–1988</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">In-space placebo rank</div>
+      <div class="stat-value teal" id="tile-rank">…</div>
+      <div class="stat-sub" id="tile-p">…</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Donors with weight</div>
+      <div class="stat-value steel" id="tile-donors">…</div>
+      <div class="stat-sub" id="tile-donors-sub">…</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Observed and synthetic California, 1970–2000</h3>
+    <div class="chart-area" id="intro-chart"></div>
+    <div class="caption">The shaded years follow Proposition 99. Hover over the chart, or tap it, to read the values of each year.</div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Before 1989, the two paths nearly overlap.</strong> After a miss of <span class="v" data-v="gap_1970">…</span> packs in 1970, the largest yearly miss is <span class="v" data-v="max_pre_miss">…</span> packs, in <span class="v" data-v="max_pre_miss_year">…</span>.</li>
+      <li><strong>From 1989, the paths separate.</strong> The gap is <span class="v" data-v="gap_first_post">…</span> packs in 1989 and <span class="v" data-v="gap_2000">…</span> packs in 2000, when sales sit <span class="v" data-v="gap_2000_pct">…</span> percent below the synthetic path.</li>
+      <li><strong>A few states build the counterfactual.</strong> Only <span class="v" data-v="n_pos">…</span> of the <span class="v" data-v="n_donors">…</span> donor states receive weight, and the next tab shows the recipe.</li>
+    </ul>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-recipe" role="button" tabindex="0">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Donor recipe and gap</h4>
+      <div class="cta-text">The donor weights, the predictor balance, and the gap, each next to the Stata benchmark.</div>
+    </div>
+    <div class="cta-card" data-goto="pane-robust" role="button" tabindex="0">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Placebo and robustness checks</h4>
+      <div class="cta-text">The placebo ranking with a cutoff filter, a fake start year, and the leave-one-out refits.</div>
+    </div>
+    <div class="cta-card" data-goto="pane-tour" role="button" tabindex="0">
+      <div class="cta-tag">Tab 4</div>
+      <h4>mlsynth estimator tour</h4>
+      <div class="cta-text">Four estimators answer the same question, each with its own configuration dictionary.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary: open a card when a term is unfamiliar</h3>
+    <div class="grid grid-2">
+      <div>
+        <details class="gloss"><summary>Synthetic control method (SCM)</summary>
+          <div class="gloss-body"><p>The synthetic control method builds a comparison unit from a weighted average of untreated units. The weights make this synthetic unit reproduce the treated unit before the policy. After the policy, the synthetic unit estimates the outcome that the treated unit would have recorded without it. Abadie, Diamond, and Hainmueller (2010) developed the method with the case of Proposition 99.</p></div>
+        </details>
+        <details class="gloss"><summary>Donor pool</summary>
+          <div class="gloss-body"><p>The donor pool is the set of untreated units that may enter the synthetic control. Here it contains the <span class="v" data-v="n_donors">…</span> states other than California in the data. Abadie, Diamond, and Hainmueller (2010) had already removed states with large tobacco programs or large tax increases. Each donor must stay free of the treatment and of similar policies, or the counterfactual becomes misleading.</p></div>
+        </details>
+        <details class="gloss"><summary>Donor weights (the vector W)</summary>
+          <div class="gloss-body"><p>Donor weights state how much each donor contributes to synthetic California. They cannot be negative, and they must sum to one, so synthetic California stays inside the range of the donors. The fit of mlsynth gives positive weight to <span class="v" data-v="n_pos">…</span> states, led by <span class="v" data-v="top_donor">…</span> with <span class="v" data-v="top_weight">…</span>. The other <span class="v" data-v="n_zero">…</span> donors receive a weight of zero.</p></div>
+        </details>
+        <details class="gloss"><summary>Predictors and predictor weights (the matrix V)</summary>
+          <div class="gloss-body"><p>Predictors are the characteristics on which synthetic California must resemble California. The post uses four covariates averaged over 1980–1988 and cigarette sales in 1975, 1980, and 1988. The predictor weights on the diagonal of V set how much a mismatch on each predictor counts. Very different V can select almost the same donor weights, so V is not identified and does not rank the predictors by importance.</p></div>
+        </details>
+      </div>
+      <div>
+        <details class="gloss"><summary>Pre-treatment fit (RMSE)</summary>
+          <div class="gloss-body"><p>Pre-treatment fit measures how closely synthetic California tracks California before the program. Its usual summary is the root mean squared error (RMSE) of the yearly gaps over 1970–1988. Here the RMSE is <span class="v" data-v="rmse">…</span> packs per capita, about <span class="v" data-v="rmse_pct">…</span> percent of mean sales in those years. A close fit is necessary for a credible counterfactual, but it is not sufficient.</p></div>
+        </details>
+        <details class="gloss"><summary>Gap and ATT</summary>
+          <div class="gloss-body"><p>The gap is the difference between actual and synthetic sales in a given year. The average treatment effect on the treated (ATT) is the mean gap over 1989–2000, the years after the program began. The ATT is <span class="v" data-v="att">…</span> packs per capita per year, a reduction of <span class="v" data-v="att_pct">…</span> percent relative to synthetic sales. It measures the effect on California only, not the effect that the program would have elsewhere.</p></div>
+        </details>
+        <details class="gloss"><summary>In-space placebo and MSPE ratio</summary>
+          <div class="gloss-body"><p>An in-space placebo test applies the method to every donor as if it had been treated. The mean squared prediction error (MSPE) averages the squared gaps, and the MSPE ratio divides its value after 1989 by its value before 1989. California has the largest ratio of all <span class="v" data-v="n_units">…</span> states, <span class="v" data-v="ratio_ca">…</span>. Its permutation p-value is therefore <span class="v" data-v="p_all">…</span>, the smallest value that <span class="v" data-v="n_units">…</span> states allow.</p></div>
+        </details>
+        <details class="gloss"><summary>In-time placebo and leave-one-out</summary>
+          <div class="gloss-body"><p>An in-time placebo moves the start of the program to a year when nothing happened. With a fake start in <span class="v" data-v="fake_year">…</span>, the fake gaps before 1989 average <span class="v" data-v="fake_mean">…</span> packs, about one third of the mean gap of <span class="v" data-v="fake_post_mean">…</span> over 1989–2000. A leave-one-out check refits the model once without each donor that receives weight. Across the <span class="v" data-v="n_loo">…</span> refits, the ATT stays between <span class="v" data-v="loo_att_lo">…</span> and <span class="v" data-v="loo_att_hi">…</span> packs.</p></div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DONOR RECIPE AND GAP ====================== -->
+<section id="pane-recipe" class="tab-pane" role="tabpanel" aria-labelledby="tab-recipe" tabindex="0" hidden>
+
+  <h2>The donor recipe: which states build synthetic California?</h2>
+  <p class="lede">
+    The nested search of mlsynth chooses donor weights that are nonnegative and
+    sum to one. The solution is sparse, because only
+    <span class="v" data-v="n_pos">…</span> of the
+    <span class="v" data-v="n_donors">…</span> donor states receive positive
+    weight. Gold ticks mark the weights that synth2 reports in the Stata log, so
+    the chart doubles as a replication check. Below the weights, a table
+    compares the predictors, and a final chart traces the gap that the recipe
+    implies.
+  </p>
+
+  <div class="card">
+    <h3>Donor weights: mlsynth bars and Stata ticks</h3>
+    <fieldset class="seg">
+      <legend>Donors shown</legend>
+      <div class="toggle">
+        <label><input type="radio" name="recipe-view" value="all" checked> All donors</label>
+        <label><input type="radio" name="recipe-view" value="pos"> Positive weights only</label>
+      </div>
+    </fieldset>
+    <div class="chart-area" id="recipe-bars"></div>
+    <div class="caption">Each bar shows the weight that mlsynth assigns, and each gold tick marks the weight in the Stata log. Hover over a row, or tap it, to read both weights.</div>
+  </div>
+
+  <div class="card">
+    <h3>Predictor balance</h3>
+    <div class="caption">The table compares California with synthetic California and with the simple average of the donors. Percent gaps from California appear in parentheses, and orange marks the large misses of the donor average.</div>
+    <div class="table-wrap" id="balance-table"></div>
+    <div class="caption scroll-hint">Swipe the table sideways to see every column.</div>
+  </div>
+
+  <div class="card">
+    <h3>Predictor weights V: mlsynth and Stata</h3>
+    <div class="grid grid-2 v-grid">
+      <div class="chart-area" id="v-chart"></div>
+      <p class="note">
+        The two programs put very different weights on the same seven
+        predictors. The fit of mlsynth spreads V almost equally over the age
+        share (<span class="v" data-v="v_ml_age">…</span>), the retail price
+        (<span class="v" data-v="v_ml_price">…</span>), and sales in 1975
+        (<span class="v" data-v="v_ml_1975">…</span>). Stata instead puts
+        <span class="v" data-v="v_st_age">…</span> on the age share and
+        <span class="v" data-v="v_st_1975">…</span> on sales in 1975. Both
+        vectors select almost the same donor weights, so V is not identified,
+        and its entries are not measures of importance.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Actual and synthetic California</h3>
+    <div class="controls-row">
+      <fieldset class="seg">
+        <legend>View</legend>
+        <div class="toggle">
+          <label><input type="radio" name="paths-view" value="paths" checked> Paths</label>
+          <label><input type="radio" name="paths-view" value="gap"> Gap (actual − synthetic)</label>
+        </div>
+      </fieldset>
+      <fieldset class="seg">
+        <legend>Add a comparison</legend>
+        <div class="toggle">
+          <label><input type="checkbox" id="show-stata"> <span class="swatch" style="background:#e8b04b"></span> Synthetic California with the Stata weights</label>
+          <label><input type="checkbox" id="show-average"> <span class="swatch" style="background:#54618a"></span> Simple average of the donors</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="chart-area" id="recipe-paths"></div>
+    <div class="stat-row" aria-live="polite">
+      <div class="stat">
+        <div class="stat-label">ATT (mlsynth)</div>
+        <div class="stat-value orange"><span class="v" data-v="att">…</span></div>
+        <div class="stat-sub">packs per capita per year</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ATT with the Stata weights</div>
+        <div class="stat-value gold"><span class="v" data-v="att_stata_w">…</span></div>
+        <div class="stat-sub">the rounded weights of synth2</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Gap in 2000</div>
+        <div class="stat-value teal"><span class="v" data-v="gap_2000">…</span></div>
+        <div class="stat-sub"><span class="v" data-v="gap_2000_pct">…</span> percent below the synthetic path</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pre-treatment RMSE</div>
+        <div class="stat-value teal"><span class="v" data-v="rmse">…</span></div>
+        <div class="stat-sub">R² <span class="v" data-v="r2">…</span>, or <span class="v" data-v="r2_stata">…</span> with the Stata definition</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Most donors receive zero weight.</strong> In total, <span class="v" data-v="n_zero">…</span> of the <span class="v" data-v="n_donors">…</span> donor states receive a weight of zero in both programs.</li>
+      <li><strong>The weights repair the balance.</strong> Across the seven predictors, the mean absolute percent gap falls from <span class="v" data-v="mapg_avg">…</span> percent for the donor average to <span class="v" data-v="mapg_syn">…</span> percent for synthetic California.</li>
+      <li><strong>Rounding barely matters.</strong> The rounded Stata weights move the ATT from <span class="v" data-v="att">…</span> to <span class="v" data-v="att_stata_w">…</span> packs, and the largest difference in a donor weight is <span class="v" data-v="max_w_diff">…</span>, for <span class="v" data-v="max_w_diff_state">…</span>.</li>
+      <li><strong>V differs, while W agrees.</strong> The two programs report very different predictor weights, yet they select almost the same recipe.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PLACEBO AND ROBUSTNESS CHECKS ====================== -->
+<section id="pane-robust" class="tab-pane" role="tabpanel" aria-labelledby="tab-robust" tabindex="0" hidden>
+
+  <h2>Can we break the result? Placebo tests and robustness checks</h2>
+  <p class="lede">
+    Every synthetic control misses by some amount, so a large gap alone does not
+    prove an effect. The in-space placebo test refits the model with each state
+    as if it had been treated and asks how unusual California is. Two further
+    checks move the start date and remove one donor at a time. Each section
+    below has its own controls, and every number updates with them.
+  </p>
+
+  <h3 class="section-head">In-space placebo test</h3>
+  <div class="card">
+    <p>
+      The test refits the model once for every state, each time as if that
+      state had adopted the program. California should stand out if the program
+      mattered. The cutoff of synth2 can drop placebo states whose fit before
+      1989 is poor, which changes the comparison set.
+    </p>
+    <fieldset class="seg">
+      <legend>Placebo filter (the cut option of synth2)</legend>
+      <div class="toggle" id="cutoff-group">
+        <label><input type="radio" name="cutoff" value="none"> All states</label>
+        <label><input type="radio" name="cutoff" value="5"> cut(5)</label>
+        <label><input type="radio" name="cutoff" value="2" checked> cut(2)</label>
+        <label><input type="radio" name="cutoff" value="1"> cut(1)</label>
+      </div>
+    </fieldset>
+    <div class="caption">The filter cut(k) keeps the states whose pre-treatment MSPE is at most k times that of California.</div>
+    <div class="stat-row" aria-live="polite">
+      <div class="stat">
+        <div class="stat-label">States kept</div>
+        <div class="stat-value teal" id="cut-kept">…</div>
+        <div class="stat-sub" id="cut-kept-sub">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Rank of California</div>
+        <div class="stat-value orange" id="cut-rank">…</div>
+        <div class="stat-sub">by the MSPE ratio</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Permutation p-value</div>
+        <div class="stat-value teal" id="cut-p">…</div>
+        <div class="stat-sub" id="cut-p-sub">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Years at the left-sided floor</div>
+        <div class="stat-value teal" id="cut-floor">…</div>
+        <div class="stat-sub" id="cut-floor-sub">…</div>
+      </div>
+    </div>
+    <div class="readout-line" id="cut-removed" aria-live="polite">…</div>
+
+    <div class="grid grid-2">
+      <div>
+        <h4>Gaps of California and the retained placebo states</h4>
+        <div class="chart-area" id="spaghetti"></div>
+        <div class="caption">Hover over the chart, or tap it, to find the nearest placebo line in each year. The vertical axis adapts to the retained states.</div>
+      </div>
+      <div>
+        <h4>Pointwise p-values after the program</h4>
+        <fieldset class="seg">
+          <legend>Test</legend>
+          <div class="toggle">
+            <label><input type="radio" name="pw-side" value="left" checked> Left-sided</label>
+            <label><input type="radio" name="pw-side" value="two"> Two-sided</label>
+            <label><input type="radio" name="pw-side" value="right"> Right-sided</label>
+          </div>
+        </fieldset>
+        <div class="chart-area" id="pointwise"></div>
+        <div class="caption">Hollow gold markers show the Stata values, which the log reports for cut(2) only. A program designed to lower sales calls for the left-sided test.</div>
+      </div>
+    </div>
+
+    <h4>MSPE ratios of all states</h4>
+    <div class="chart-area" id="ranking"></div>
+  </div>
+
+  <h3 class="section-head">In-time placebo test</h3>
+  <div class="card">
+    <p>
+      The in-time placebo pretends that the program started before 1989. Every
+      predictor is then measured before the fake start, and the gaps between
+      the fake start and 1989 are fake effects. A sound design shows fake gaps
+      that are small relative to the real effect.
+    </p>
+    <div class="controls-row">
+      <fieldset class="seg">
+        <legend>Fake start year</legend>
+        <div class="toggle" id="fake-group"></div>
+      </fieldset>
+      <fieldset class="seg">
+        <legend>View</legend>
+        <div class="toggle">
+          <label><input type="radio" name="intime-view" value="gap" checked> Gap</label>
+          <label><input type="radio" name="intime-view" value="paths"> Paths</label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="stat-row" aria-live="polite">
+      <div class="stat">
+        <div class="stat-label">RMSE of the fake-date fit</div>
+        <div class="stat-value teal" id="it-rmse">…</div>
+        <div class="stat-sub" id="it-rmse-sub">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mean fake gap</div>
+        <div class="stat-value gold" id="it-fake">…</div>
+        <div class="stat-sub" id="it-fake-sub">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mean gap after the program</div>
+        <div class="stat-value orange" id="it-post">…</div>
+        <div class="stat-sub" id="it-post-sub">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Fake gaps relative to the ATT</div>
+        <div class="stat-value teal" id="it-share">…</div>
+        <div class="stat-sub">mean fake gap divided by the baseline ATT</div>
+      </div>
+    </div>
+    <div class="readout-line" id="it-weights" aria-live="polite">…</div>
+    <div class="chart-area" id="intime-chart"></div>
+    <div class="caption">Hollow gold markers show the fake gaps in the Stata log, which covers the fake start of <span class="v" data-v="stata_fake_year">…</span> only.</div>
+  </div>
+
+  <h3 class="section-head">Leave-one-out refits</h3>
+  <div class="card">
+    <p>
+      Synthetic California rests on a few donors, so a single donor could drive
+      the result. The leave-one-out check refits the model without each donor
+      that receives weight, one at a time. A robust effect keeps its sign and
+      its rough size in every refit.
+    </p>
+    <fieldset class="seg">
+      <legend>Highlight a refit</legend>
+      <div class="toggle" id="loo-group"></div>
+    </fieldset>
+    <div class="stat-row" aria-live="polite">
+      <div class="stat wide">
+        <div class="stat-label">ATT range across refits</div>
+        <div class="stat-value teal" id="loo-att-range">…</div>
+        <div class="stat-sub">baseline <span class="v" data-v="att">…</span></div>
+      </div>
+      <div class="stat wide">
+        <div class="stat-label">Gap in 2000, range</div>
+        <div class="stat-value teal" id="loo-g-range">…</div>
+        <div class="stat-sub">baseline <span class="v" data-v="gap_2000">…</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ATT of the selected refit</div>
+        <div class="stat-value lavender" id="loo-sel-att">…</div>
+        <div class="stat-sub" id="loo-sel-rmse">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Largest weight in the refit</div>
+        <div class="stat-value lavender" id="loo-sel-top">…</div>
+        <div class="stat-sub" id="loo-sel-top-sub">…</div>
+      </div>
+    </div>
+    <div class="chart-area" id="loo-chart"></div>
+    <div class="caption">The teal band spans the gaps of the refits in each year. Gold dashed lines mark the range that the loo option of synth2 prints for the years after the program.</div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>California ranks first under every filter.</strong> Its MSPE ratio of <span class="v" data-v="ratio_ca">…</span> stays at rank <span class="v" data-v="rank_ca">…</span> with all states, cut(5), cut(2), and cut(1).</li>
+      <li><strong>The p-value equals one over the number of retained states.</strong> It rises from <span class="v" data-v="p_none">…</span> with all <span class="v" data-v="n_units">…</span> states to <span class="v" data-v="p_cut1">…</span> with cut(1), because a smaller comparison set has a higher floor.</li>
+      <li><strong>The cut removes badly fitted placebos.</strong> A large pre-treatment MSPE sits in the denominator of the ratio, so these states usually have small ratios, and removing them does not move California.</li>
+      <li><strong>The fake gaps are about one third of the real ones.</strong> With a fake start in <span class="v" data-v="fake_year">…</span>, the mean fake gap of <span class="v" data-v="fake_mean">…</span> packs is <span class="v" data-v="fake_share">…</span> times the baseline ATT.</li>
+      <li><strong>The leave-one-out band stays negative.</strong> After 1988, every refit gap lies below <span class="v" data-v="loo_band_max">…</span> packs, and the gap in 2000 stays between <span class="v" data-v="loo_g2000_lo">…</span> and <span class="v" data-v="loo_g2000_hi">…</span>.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: MLSYNTH ESTIMATOR TOUR ====================== -->
+<section id="pane-tour" class="tab-pane" role="tabpanel" aria-labelledby="tab-tour" tabindex="0" hidden>
+
+  <h2>One case, four mlsynth estimators</h2>
+  <p class="lede">
+    The mlsynth library runs many estimators behind the same configuration
+    dictionary. This tab compares the baseline with three of them, each with a
+    different idea of what a counterfactual should match. All four target the
+    same estimand, the ATT for California over 1989–2000. Tick the boxes to
+    compare their counterfactual paths, and then read the dot plot and the
+    table.
+  </p>
+
+  <div class="card">
+    <h3>Counterfactual paths</h3>
+    <fieldset class="seg">
+      <legend>Estimators shown</legend>
+      <div class="toggle" id="tour-checks"></div>
+    </fieldset>
+    <div class="chart-area" id="tour-paths"></div>
+    <div class="caption">Every dashed line is a counterfactual for California. Hover over the chart, or tap it, to compare the values of one year.</div>
+  </div>
+
+  <div class="card">
+    <h3>ATT of each estimator</h3>
+    <div class="chart-area" id="tour-dots"></div>
+    <div class="caption">The gold dashed line marks the Stata ATT. The hollow marker is the TWFE difference-in-differences reference, which weights every donor equally.</div>
+  </div>
+
+  <div class="card">
+    <h3>Comparison table</h3>
+    <div class="table-wrap" id="tour-table"></div>
+  </div>
+
+  <div class="card">
+    <h3>The configuration dictionaries</h3>
+    <p>
+      Every estimator in mlsynth reads one Python dictionary. The dictionary
+      <code>base</code> holds the data keys, and each estimator adds its own
+      settings to a copy of it. The baseline adds the predictors, their
+      windows, and the settings of the nested search.
+    </p>
+    <div class="code-grid" id="code-grid"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>All four estimates are negative.</strong> They range from <span class="v" data-v="tour_min">…</span> for <span class="v" data-v="tour_min_name">…</span> to <span class="v" data-v="tour_max">…</span> for <span class="v" data-v="tour_max_name">…</span>.</li>
+      <li><strong>SDID shifts the level.</strong> It matches the pre-treatment outcomes only up to a constant and adds time weights, and its ATT of <span class="v" data-v="sdid_att">…</span> is the least negative of the four.</li>
+      <li><strong>PCR uses signed weights.</strong> CLUSTERSC spreads its weight over <span class="v" data-v="pcr_n">…</span> donors and gives <span class="v" data-v="pcr_neg">…</span> of them negative weights, so its counterfactual can extrapolate beyond the donors.</li>
+      <li><strong>A lower RMSE is not more credible.</strong> CLUSTERSC has the lowest pre-treatment RMSE, <span class="v" data-v="pcr_rmse">…</span>. The outcome-only fit also beats the baseline (<span class="v" data-v="out_rmse">…</span> against <span class="v" data-v="base_rmse">…</span>), yet its placebo test places California at rank <span class="v" data-v="out_rank">…</span> <span class="nowrap">(p = <span class="v" data-v="out_p">…</span>).</span></li>
+      <li><strong>TWFE lies far from all four.</strong> The TWFE reference weights all <span class="v" data-v="n_donors">…</span> donors equally and gives <span class="v" data-v="twfe_att">…</span>.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to the Synthetic Control Method in Python with mlsynth</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="charts.js?v=20261005"></script>
+<script src="app.js?v=20261005"></script>
+</body>
+</html>

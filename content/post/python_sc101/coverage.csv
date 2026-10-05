@@ -1,0 +1,6 @@
+variable,n_obs,first_year,last_year,n_years
+cigsale,1209,1970,2000,31
+lnincome,1014,1972,1997,26
+beer,546,1984,1997,14
+age15to24,819,1970,1990,21
+retprice,1209,1970,2000,31

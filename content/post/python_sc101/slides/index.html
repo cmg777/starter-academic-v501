@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-10-05">
+  <title>Introduction to the Synthetic Control Method in Python with mlsynth</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-db6389aca580c90ada52aff7de3e23ec.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script>
+    // MathJax 2 (the reveal math plugin): use the TeX web fonts, never locally installed
+    // STIX fonts, whose accent metrics misplace hats and tildes (macOS ships STIX).
+    window.MathJax = { "HTML-CSS": { availableFonts: [], preferredFont: null, webFont: "TeX" } };
+  </script>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center" data-notes="This deck introduces the synthetic control method and the Python library mlsynth. Our case is Proposition 99, the tobacco control program that California began in 1989. The three numbers on this slide preview the results. The ATT is −18.98 packs per capita per year, and California ranks 1 of 39 in the placebo test. Five of the 38 donor states form the recipe. By the end of the talk, we will read each number correctly and know what it does not mean.">
+  <h1 class="title">Introduction to the Synthetic Control Method in Python with mlsynth</h1>
+  <p class="subtitle">Did Proposition 99 reduce cigarette sales in California?</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">−18.98</span><span class="kr-cap">ATT, packs per capita per year</span></div>
+    <div class="kr"><span class="kr-num">1 of 39</span><span class="kr-cap">placebo rank, p = 0.026</span></div>
+    <div class="kr"><span class="kr-num">5 of 38</span><span class="kr-cap">donor states in the recipe</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">October 5, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+<aside class="notes">
+<p>Act I sets up the puzzle that the method must solve. Cigarette sales were already falling across the country when California launched its program in 1989. We first show why the obvious comparisons fail, and then we lay out the plan of the talk.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="cigarette-sales-fell-everywhere-so-did-proposition-99-change-anything" class="slide level2 center">
+<h2>Cigarette sales fell everywhere, so did Proposition 99 change anything?</h2>
+<p>In November 1988, California voters approved <strong>Proposition 99</strong>: a tax increase of 25 cents per pack from January 1989, plus anti-smoking education.</p>
+<div class="fragment">
+<p>Average sales in California fell from <strong>116.21</strong> packs per capita in 1970–1988 to <strong>60.35</strong> in 1989–2000. <em>Yet the average donor state also fell, by 28.51 packs, without any program.</em></p>
+<p><span class="takeaway fragment">A before-and-after comparison mixes the program with a national decline.</span></p>
+<aside class="notes">
+<p>Proposition 99 raised the state cigarette tax by 25 cents per pack and funded anti-smoking education. Sales in California then fell steeply, from an average of 116.21 packs per capita over 1970–1988 to 60.35 over 1989–2000. Over the same two periods, however, the average of the 38 donor states fell by 28.51 packs. Part of the drop in California would therefore have happened anyway. Our question is counterfactual: how much lower were sales in California because of the program?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="before-you-look-did-california-move-with-the-average-state-before-1989" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: did California move with the average state before 1989?</h2>
+<p>In 1970, California sold 2.92 packs per capita more than the average of the 38 donor states. How large is the gap in 1988, the last year before the program?</p>
+<p><strong>A.</strong>&nbsp; Smaller: the two series converge</p>
+<p><strong>B.</strong>&nbsp; Similar: the average tracks California closely</p>
+<p><strong>C.</strong>&nbsp; Far larger: California falls well below the average</p>
+<aside class="notes">
+<p>Ask the room to commit before the figure appears. Give the room 20 seconds, and then take the vote. Answer on the next slide: C. California sat 23.72 packs below the donor average in 1988, after starting 2.92 packs above it in 1970. A comparison with the average would therefore credit Proposition 99 with a relative decline that began long before 1989. (AhaSlides interactive follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-average-state-is-a-poor-twin-california-was-already-falling-faster" class="slide level2 center">
+<h2>The average state is a poor twin: California was already falling faster</h2>
+
+<img data-src="../sc101_raw_trends.png" class="r-stretch quarto-figure-center"><p class="caption">California (orange), the 38 donor states (gray), and their average (dashed blue), 1970–2000.</p><p><span class="takeaway fragment">By 1988, California sat 23.72 packs below the donor average, so the simple average fails before the program starts.</span></p>
+<aside class="notes">
+<p>The answer to the vote: C. The two series were close in 1970, at 123.0 against 120.08 packs. By 1988, California sold 90.1 packs against 113.82 for the average, a gap of −23.72 packs. The simple average gives every donor the same voice, and 25 of the 38 donors sold more than California over 1970–1988. The naive difference-in-differences estimate of −27.35 packs therefore rests on parallel paths that these years contradict.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-plan-build-a-synthetic-california-in-mlsynth-then-try-to-break-it" class="slide level2 center">
+<h2>The plan: build a synthetic California in mlsynth, then try to break it</h2>
+<ul>
+<li><strong>Data:</strong> 39 states from 1970 to 2000, and one treated state</li>
+<li><strong>Method:</strong> a weighted recipe of donor states and the gap it leaves</li>
+<li><strong>Tool:</strong> one mlsynth dictionary and one call to <code>fit()</code></li>
+<li><strong>Tests:</strong> placebos in space and in time, and leave-one-out refits</li>
+<li><strong>Checks:</strong> the Stata benchmark, three other estimators, and five misreadings</li>
+</ul>
+<p><span class="takeaway fragment">Five times along the way, the room predicts the result before the reveal.</span></p>
+<aside class="notes">
+<p>This is a teaching deck, so we signpost the route. Act II builds synthetic California and reads its weights, its fit, and its gap. Act III tries to break the result with placebo tests, leave-one-out refits, and other estimators. Five cue slides on a blue background ask the room to predict before each reveal, and on AhaSlides each cue is followed by a live quiz.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+<aside class="notes">
+<p>Act II builds the synthetic control one step at a time. We start with the data and the estimand, state the weight problem, and write the configuration that mlsynth needs. The act ends with the main estimate and a gap that widens through the 1990s.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-lab-39-states-31-years-one-treated-state-and-one-estimand" class="slide level2 center">
+<h2>The lab: 39 states, 31 years, one treated state, and one estimand</h2>
+<ul>
+<li><strong>Panel:</strong> 39 US states from 1970 to 2000, or 1,209 state-year rows</li>
+<li><strong>Outcome:</strong> cigarette sales per capita, in packs</li>
+<li><strong>Treated:</strong> California from 1989; <strong>donors:</strong> the other 38 states</li>
+<li><strong>Predictors:</strong> four covariates averaged over 1980–1988, plus sales in 1975, 1980, and 1988</li>
+</ul>
+<p><span class="takeaway fragment">The estimand is the ATT: the effect of Proposition 99 on California alone, over 1989–2000.</span></p>
+<aside class="notes">
+<p>The data are the panel of Abadie, Diamond, and Hainmueller (2010), the same file as the Stata edition. The panel is balanced, with 31 rows for each state. The original authors had already removed states with large tobacco programs or large tax increases, such as Arizona, Massachusetts, and Oregon. The four covariates are log GDP per capita, the share aged 15–24, the retail price of cigarettes, and beer consumption. Beer data start only in 1984, so the beer average over 1980–1988 rests on 1984–1988 alone. The method estimates what Proposition 99 did in California, not what it would do in Nevada or Texas.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-synthetic-control-is-a-weighted-recipe-of-donor-states" class="slide level2 center">
+<h2>A synthetic control is a weighted recipe of donor states</h2>
+<p><span class="math display">\[\min_{w_2, \ldots, w_{J+1}} \; \sum_{m=1}^{k} v_m \Big( X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm} \Big)^2\]</span></p>
+<p><span class="math display">\[\text{subject to} \quad w_j \geq 0 \quad \text{and} \quad \sum_{j=2}^{J+1} w_j = 1\]</span></p>
+<p><span class="comment">Unit 1 is California, units 2 to 39 are the <span class="math inline">\(J = 38\)</span> donors, and <span class="math inline">\(v_m\)</span> sets the cost of a mismatch on predictor <span class="math inline">\(m\)</span> of <span class="math inline">\(k = 7\)</span>.</span></p>
+<p><span class="takeaway fragment">Weights that are nonnegative and sum to one interpolate between donors; they never extrapolate beyond them.</span></p>
+<aside class="notes">
+<p>Equation 1 chooses nonnegative donor weights that sum to one. These weights make synthetic California resemble California on each of the seven predictors before 1989. Because the weights form a convex combination, synthetic California can sell neither more than the highest donor nor less than the lowest donor. In 1988, California sold 90.1 packs, inside the donor range from 55.0 packs in Utah to 180.4 packs in New Hampshire. A convex combination can therefore reach it.</p>
+<p>The predictor weights are not fixed in advance. An outer search chooses them so that the synthetic path also reproduces sales in California from 1970 to 1988. Many different predictor weights can lead to the same donor weights, a point that returns on a later slide.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-effect-is-the-gap-between-california-and-its-synthetic-twin" class="slide level2 center">
+<h2>The effect is the gap between California and its synthetic twin</h2>
+<p><span class="math display">\[\hat{Y}_{1t}^{N} = \sum_{j=2}^{J+1} w_j^{\ast} Y_{jt} \qquad\qquad \hat{\tau}_t = Y_{1t} - \hat{Y}_{1t}^{N}\]</span></p>
+<p><span class="math display">\[\widehat{\mathrm{ATT}} = \frac{1}{T_1} \sum_{t=1989}^{2000} \hat{\tau}_t \qquad \text{with } T_1 = 12\]</span></p>
+<p><span class="comment">The superscript <span class="math inline">\(N\)</span> marks sales without the program, and a negative ATT means fewer packs than in synthetic California.</span></p>
+<p><span class="takeaway fragment">Once the weights are known, the counterfactual is simple arithmetic: a weighted average of donor sales.</span></p>
+<aside class="notes">
+<p>Equation 2 applies the optimal weights to the sales of the donors in each year. The gap then subtracts this synthetic path from actual sales in California. Equation 3 averages the 12 yearly gaps from 1989 to 2000 into one number, the ATT. In mlsynth, these objects are <code>res.counterfactual</code>, <code>res.gap</code>, and <code>res.att</code>. Exercise 2 of the post rebuilds the synthetic path by hand and matches <code>res.counterfactual</code> up to floating-point error.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="one-configuration-dictionary-drives-every-mlsynth-estimator" class="slide level2 center">
+<h2>One configuration dictionary drives every mlsynth estimator</h2>
+<div style="font-size: 1.2em;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" style="overflow: hidden;" data-code-line-numbers="2-3|4-5|6-8|1-10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>config <span class="op">=</span> {</span>
+<span id="cb1-2"><a href=""></a>    <span class="st">"df"</span>: panel, <span class="st">"outcome"</span>: <span class="st">"cigsale"</span>, <span class="st">"treat"</span>: <span class="st">"treated"</span>,</span>
+<span id="cb1-3"><a href=""></a>    <span class="st">"unitid"</span>: <span class="st">"state"</span>, <span class="st">"time"</span>: <span class="st">"year"</span>,</span>
+<span id="cb1-4"><a href=""></a>    <span class="st">"covariates"</span>: COVARIATES,       <span class="co"># four covariates, three lags</span></span>
+<span id="cb1-5"><a href=""></a>    <span class="st">"covariate_windows"</span>: WINDOWS,   <span class="co"># 1980–1988, or one year per lag</span></span>
+<span id="cb1-6"><a href=""></a>    <span class="st">"backend"</span>: <span class="st">"mscmt"</span>,             <span class="co"># nested search over V and W</span></span>
+<span id="cb1-7"><a href=""></a>    <span class="st">"canonical_v"</span>: <span class="st">"min.loss.w"</span>, <span class="st">"seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb1-8"><a href=""></a>    <span class="st">"inference"</span>: <span class="va">False</span>, <span class="st">"display_graphs"</span>: <span class="va">False</span>,</span>
+<span id="cb1-9"><a href=""></a>}</span>
+<span id="cb1-10"><a href=""></a>res <span class="op">=</span> VanillaSC(config).fit()       <span class="co"># res.att, res.donor_weights, res.gap</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><span class="takeaway fragment">One dictionary describes the data and the settings, and one call to <code>fit()</code> returns the result object.</span></p>
+<aside class="notes">
+<p>The mlsynth library organizes every estimator around one pattern: a dictionary of settings, an estimator class, and a call to <code>fit()</code>. Five keys describe the data, two keys describe the predictors, and the remaining keys choose the algorithm. The backend <code>mscmt</code> runs the nested search over the predictor weights V and the donor weights W, and the seed fixes its global search. The fit takes about one second, and the key <code>inference</code> stays off until the placebo test, because it would add 38 placebo fits.</p>
+<p>The library validates the dictionary with pydantic before it computes anything. A misspelled key such as <code>covariate_window</code> therefore raises an <code>MlsynthConfigError</code> instead of failing silently. One trap remains in version 1.0.0: if every predictor spans the same years, the library first drops every year in which any predictor is missing. The lagged sales therefore receive their own one-year windows.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-how-large-is-the-share-of-utah-in-the-recipe" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: how large is the share of Utah in the recipe?</h2>
+<p>Five of the 38 donor states receive positive weight, led by Utah, the state with by far the lowest sales. How much of synthetic California does Utah supply?</p>
+<p><strong>A.</strong>&nbsp; More than half: Utah alone is nearly the whole recipe</p>
+<p><strong>B.</strong>&nbsp; About one third: the other four shares differ widely</p>
+<p><strong>C.</strong>&nbsp; About one fifth: the five shares are nearly equal</p>
+<aside class="notes">
+<p>Ask the room to commit before the weights appear. Give the room 20 seconds, and then take the vote. Answer on the next slide: B. Utah receives 0.335, about one third of the recipe. The other four shares range from 0.236 for Nevada to 0.068 for Connecticut, and the other 33 states receive exactly zero. (AhaSlides interactive follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="five-states-build-synthetic-california-led-by-utah" class="slide level2 center">
+<h2>Five states build synthetic California, led by Utah</h2>
+
+<img data-src="../sc101_donor_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights of mlsynth (blue) and Stata (gold); the other 33 donor states receive zero weight in both fits.</p><p><span class="takeaway fragment">Utah supplies one third of the recipe, and 33 of the 38 donors receive exactly zero.</span></p>
+<aside class="notes">
+<p>The answer to the vote: B. The recipe is Utah (0.335), Nevada (0.236), Montana (0.202), Colorado (0.160), and Connecticut (0.068). Utah earns the largest share, because its low sales pull the weighted average down toward the level of California. The weights of mlsynth and Stata differ by less than 0.002 for every donor, so the two programs found the same recipe. Nevada is the only donor that borders California, so cross-border purchases could inflate its sales.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-will-mlsynth-and-stata-agree-on-the-predictor-weights" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: will mlsynth and Stata agree on the predictor weights?</h2>
+<p>The two programs agree on the donor weights within 0.002. Stata puts 0.546 of the predictor weights on the age share and 0.422 on sales in 1975. What will mlsynth report?</p>
+<p><strong>A.</strong>&nbsp; Very different predictor weights, yet the same donor weights</p>
+<p><strong>B.</strong>&nbsp; The same predictor weights, since equal donor weights require them</p>
+<p><strong>C.</strong>&nbsp; Different predictor weights, so one program must contain an error</p>
+<aside class="notes">
+<p>Ask the room whether equal donor weights imply equal predictor weights. Give the room 20 seconds, and then take the vote. Answer on the next slide: A. The mlsynth fit puts about one third of V on each of the age share, the retail price, and sales in 1975. Both V vectors lead to almost the same donor weights, so V is not identified. (AhaSlides interactive follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-same-donor-weights-w-arise-from-very-different-predictor-weights-v" class="slide level2 center">
+<h2>The same donor weights <span class="math inline">\(W\)</span> arise from very different predictor weights <span class="math inline">\(V\)</span></h2>
+
+<img data-src="../sc101_balance.png" class="r-stretch quarto-figure-center"><p class="caption">(a) Percent gaps from California on the seven predictors; (b) the predictor weights <span class="math inline">\(V\)</span> of mlsynth (blue) and Stata (gold).</p><p><span class="takeaway fragment">Report <span class="math inline">\(V\)</span> for transparency, but never rank predictors by it.</span></p>
+<aside class="notes">
+<p>The answer to the vote: A. In mlsynth, the age share (0.332), the retail price (0.334), and sales in 1975 (0.334) each receive about one third of the predictor weights. These are exactly the three predictors that synthetic California matches with a gap of zero. Stata instead puts 0.546 on the age share and 0.422 on sales in 1975, yet both programs reach almost the same donor weights. When a few predictors are matched exactly, many V select the same W, so the data cannot single out one set of predictor weights. Exercise 6 of the post feeds the Stata V into the inner problem and recovers the Stata donor weights.</p>
+<p>Panel (a) shows what the weights buy. On sales in 1988, the donor average misses California by 26.33 percent, while synthetic California misses by only 1.72 percent. Income is the exception, because its gap of −2.16 percent compares logarithms and implies a GDP per capita about 20 percent lower.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="synthetic-california-tracks-california-before-1989-with-an-rmse-of-1.754-packs" class="slide level2 center">
+<h2>Synthetic California tracks California before 1989, with an RMSE of 1.754 packs</h2>
+
+<img data-src="../sc101_synthetic_path.png" class="r-stretch quarto-figure-center"><p class="caption">Observed California (orange) and its synthetic twin (dashed blue), 1970–2000; shading marks 1989–2000.</p><p><span class="takeaway fragment">The typical miss before 1989 is 1.5 percent of mean sales, close enough for a credible counterfactual.</span></p>
+<aside class="notes">
+<p>Before we read any effect, we check the fit before 1989. The RMSE of 1.754 packs is about 1.5 percent of mean sales of 116.21 packs over 1970–1988. The R² of 0.976 says that the synthetic path reproduces almost all the variation of sales before the program. The largest miss, 5.90 packs, occurs in 1970 at the start of the series, and later misses are much smaller. Stata reports an RMSE of 1.756 and an R² of 0.974, and the gap in the R² comes from another definition.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="by-2000-california-sold-38-percent-fewer-packs-than-its-synthetic-twin" class="slide level2 center" data-background-color="#141413">
+<h2>By 2000, California sold 38 percent fewer packs than its synthetic twin</h2>
+<p><span class="bignum">−38.2%</span></p>
+<p><span class="bignum-label">In 2000: 41.6 packs per capita in California against 67.33 in synthetic California, a gap of −25.73 packs</span></p>
+<aside class="notes">
+<p>This is the headline number of Act II. In 2000, California sold 41.6 packs per capita, while synthetic California predicts 67.33 packs. The gap of −25.73 packs equals 38.2 percent of synthetic sales. The effect therefore grew over time instead of fading, although Act III qualifies the last two years.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-gap-widens-through-the-1990s-for-an-att-of-18.98-packs-per-capita" class="slide level2 center">
+<h2>The gap widens through the 1990s, for an ATT of −18.98 packs per capita</h2>
+
+<img data-src="../sc101_gap.png" class="r-stretch quarto-figure-center"><p class="caption">Yearly gap between observed and synthetic California, with the ATT over 1989–2000 as a dashed orange line.</p><p><span class="takeaway fragment">On average, California sold 18.98 fewer packs per capita per year than its twin, a reduction of 23.9 percent.</span></p>
+<aside class="notes">
+<p>From 1971 to 1988, the gap stays small, and its largest miss is −2.23 packs, in 1987. It then drops from −1.55 packs in 1988 to −7.59 in 1989 and widens to −25.73 in 2000. The ATT averages the 12 yearly gaps: −18.98 packs per capita per year, or 23.9 percent of mean synthetic sales. Stata reports −19.00, and its rounded weights reproduce that value exactly. A gap that opens when the program starts is the visual signature of a policy effect, so Act III asks how unusual this gap is.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+<aside class="notes">
+<p>Act III tries to break the result. An average gap of 19 packs needs a yardstick, because no synthetic control predicts perfectly. We therefore measure gaps in states without the program, at a date without the program, and without each key donor.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-which-states-rank-just-below-california" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: which states rank just below California?</h2>
+<p>Each state takes a turn as the treated state. California has the largest MSPE ratio: its misses after 1989 are large relative to its misses before 1989. Which states rank just below it?</p>
+<p><strong>A.</strong>&nbsp; Badly fitted states, whose large early misses inflate their ratios</p>
+<p><strong>B.</strong>&nbsp; The donors of synthetic California, led by Utah</p>
+<p><strong>C.</strong>&nbsp; Well-fitted states, such as Georgia and Virginia</p>
+<aside class="notes">
+<p>Ask the room what a large ratio requires before 1989. Give the room 20 seconds, and then take the vote. Answer on the next slide: C. Georgia, Virginia, and Missouri rank second to fourth, and all three fit better than California before 1989. A poor fit inflates the denominator of the ratio, so badly fitted states rarely rank near the top. (AhaSlides interactive follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="california-has-the-largest-mspe-ratio-of-all-39-states-so-p-139-0.026" class="slide level2 center">
+<h2>California has the largest MSPE ratio of all 39 states, so <span class="math inline">\(p = 1/39 = 0.026\)</span></h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[r_j = \frac{\mathrm{MSPE}_j^{\,\mathrm{post}}}{\mathrm{MSPE}_j^{\,\mathrm{pre}}}\]</span></p>
+<div style="font-size: 0.62em;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Rank</th>
+<th>State</th>
+<th style="text-align: right;">MSPE before 1989</th>
+<th style="text-align: right;">Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td>California</td>
+<td style="text-align: right;">3.08</td>
+<td style="text-align: right;"><span class="key">129.04</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td>Georgia</td>
+<td style="text-align: right;">1.41</td>
+<td style="text-align: right;">96.96</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td>Virginia</td>
+<td style="text-align: right;">2.74</td>
+<td style="text-align: right;">85.42</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td>Missouri</td>
+<td style="text-align: right;">1.09</td>
+<td style="text-align: right;">60.86</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../sc101_placebo_ratios.png" alt="Horizontal bars of the MSPE ratios of the 39 states, with California first at 129.0, Georgia second at 97.0, and Virginia third at 85.4; states removed by cut(2) are dimmed." height="420"></p>
+</div></div>
+<p><span class="takeaway fragment">California is the most extreme of the 39 states, and 0.026 is the smallest p-value that 39 states allow.</span></p>
+<aside class="notes">
+<p>The answer to the vote: C. Georgia, Virginia, and Missouri rank second to fourth, and each fits better than California before 1989. Their pre-treatment MSPEs are 1.41, 2.74, and 1.09, against 3.08 for California. The ratio rewards a close fit before 1989 and a large gap afterward, so a badly fitted state has a large denominator and a small ratio. The p-value is the share of the 39 states whose ratio is at least as large as that of California. California always counts itself, so rank 1 of 39 gives p = 1/39 = 0.026.</p>
+<p>The built-in test of mlsynth reaches the same verdict. It ranks the square root of the ratio, 11.36 for California, and reports rank 1 of 39 with p = 0.026. Its placebo fits leave California out of every donor pool, while our loop keeps California in, as synth2 does.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-cut2-filter-keeps-20-states-and-california-still-ranks-first-p-0.050" class="slide level2 center">
+<h2>The cut(2) filter keeps 20 states, and California still ranks first: <span class="math inline">\(p = 0.050\)</span></h2>
+
+<img data-src="../sc101_placebo_gaps.png" class="r-stretch quarto-figure-center"><p class="caption">Gaps of California (orange) and the 19 placebo states that cut(2) retains (gray), 1970–2000.</p><p><span class="takeaway fragment">The filter buys comparable gaps at a price: the floor of the p-value rises from 0.026 to 0.050.</span></p>
+<aside class="notes">
+<p>The option cut(2) of synth2 drops every placebo whose pre-treatment MSPE exceeds twice that of California, which is 3.08. It removes 19 states, including Utah and New Hampshire, whose extreme sales no weighted average can reach. It also removes Rhode Island, whose pre-treatment MSPE is about 20 times that of California. California still ranks first among the 20 states that remain, so p = 1/20 = 0.050. After 1989, its gap lies below every retained placebo in 9 of the 12 years and ends at −25.73 packs, against −18.77 for Georgia.</p>
+<p>The cutoff is a convention, and one state sits close to it. South Dakota is removed at 2.026 times the pre-treatment MSPE of California, while Illinois is kept at 1.867. Another seed or software stack could therefore keep 21 states and change the p-value to 1/21.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="year-by-year-the-left-sided-p-value-sits-at-its-floor-of-0.050-in-9-of-12-years" class="slide level2 center">
+<h2>Year by year, the left-sided p-value sits at its floor of 0.050 in 9 of 12 years</h2>
+
+<img data-src="../sc101_placebo_pvalues.png" class="r-stretch quarto-figure-center"><p class="caption">Pointwise placebo p-values with cut(2), 1989–2000; filled markers show mlsynth, and hollow gold markers show Stata.</p><p><span class="takeaway fragment">For a program designed to cut sales, the left-sided test is the relevant one, and it never exceeds 0.100.</span></p>
+<aside class="notes">
+<p>The pointwise test repeats the ranking in each year, using the gaps instead of the ratio. Proposition 99 was designed to lower sales, so the left-sided p-value is the relevant one. It sits at its floor of 1/20 = 0.050 in 9 of the 12 years and never exceeds 0.100. Only in 1999 does the two-sided p-value exceed the left-sided one. The reason is Oklahoma, whose positive gap of 26.37 packs is larger in absolute value than the gap of California. Stata differs only in 1991, 1992, and 1999, by one step of 0.050, and its left-sided value reaches the floor in 8 of the 12 years.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-fake-start-in-1985-yields-gaps-about-one-third-the-size-of-the-real-effect" class="slide level2 center">
+<h2>A fake start in 1985 yields gaps about one third the size of the real effect</h2>
+
+<img data-src="../sc101_intime_placebo.png" class="r-stretch quarto-figure-center"><p class="caption">In-time placebo with a fake start in 1985: (a) observed and synthetic paths; (b) the gap, with lines at 1985 and 1989.</p><p><span class="takeaway fragment">The in-time test supports the timing of the effect only in part.</span></p>
+<aside class="notes">
+<p>The in-time placebo pretends that the program began in 1985, so the model is fitted to 1970–1984. The fit is close, with an RMSE of 0.907, and the recipe uses Utah (0.351), Connecticut (0.348), and Nevada (0.301). The fake gaps for 1985–1988 range from −3.31 to −8.64 packs and average −5.97, or 0.31 times the baseline ATT. The gap then steps down by 5.74 packs, to −14.11 in 1989, and it averages −18.75 over 1989–2000. Steps of similar size already occur in 1985 and 1987, so prediction error or other changes in California may explain part of the gap.</p>
+<p>A fake start in 1984 is not feasible. The beer data begin in 1984, so the beer average over 1980–1983 is undefined, and mlsynth stops with an <code>MlsynthDataError</code>. The earliest feasible fake date is therefore 1985, the date of the Stata edition.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="before-you-look-drop-utah-and-refit-which-state-takes-over" class="slide level2 center" data-background-color="#1a3a8a">
+<h2>Before you look: drop Utah and refit; which state takes over?</h2>
+<p>Utah supplies one third of synthetic California. Remove it, refit the model with the remaining 37 donors, and compare the result with the baseline.</p>
+<p><strong>A.</strong>&nbsp; New Mexico takes over, the fit worsens, and the ATT stays near the baseline</p>
+<p><strong>B.</strong>&nbsp; Nevada takes over, the fit improves, and the ATT doubles</p>
+<p><strong>C.</strong>&nbsp; No state can replace Utah, and the ATT turns positive</p>
+<aside class="notes">
+<p>Ask the room which state can play the role of Utah. Give the room 20 seconds, and then take the vote. Answer on the next slide: A. New Mexico, which has zero weight in the baseline, becomes the leading donor with 0.614. The pre-treatment RMSE worsens from 1.754 to 2.584, yet the ATT stays close to the baseline, at −17.52 packs. (AhaSlides interactive follows.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="dropping-any-one-donor-keeps-the-att-between-19.29-and-17.52-packs" class="slide level2 center">
+<h2>Dropping any one donor keeps the ATT between −19.29 and −17.52 packs</h2>
+
+<img data-src="../sc101_leave_one_out.png" class="r-stretch quarto-figure-center"><p class="caption">Leave-one-out refits that drop each of the five donors in turn: (a) synthetic paths; (b) gaps.</p><p><span class="takeaway fragment">No single donor drives the result: every refit keeps a large, negative gap after 1988.</span></p>
+<aside class="notes">
+<p>The answer to the vote: A. Without Utah, New Mexico takes over with a weight of 0.614, and Montana drops out. The ATT is −17.52, the smallest reduction of the five refits. Across the five refits, the ATT stays between −19.29, without Nevada, and −17.52, without Utah. Every refit lies within 1.46 packs of the baseline of −18.98. The gap in 2000 stays between −27.15 and −23.48 packs in every refit.</p>
+<p>The refit without Nevada also speaks to spillovers. If residents of California bought cigarettes in Nevada, dropping Nevada should shrink the estimated reduction, yet it grows slightly, to −19.29. That refit, however, shifts 0.185 of the weight to New Hampshire, whose sales rose sharply after 1992, so the check cannot rule out spillovers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="python-reproduces-the-stata-benchmark-at-every-step-that-matters" class="slide level2 center">
+<h2>Python reproduces the Stata benchmark at every step that matters</h2>
+<div style="font-size: 0.62em;">
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;">Stata <code>synth2</code></th>
+<th style="text-align: right;">mlsynth <code>VanillaSC</code></th>
+<th>Agreement</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Donor weights, Utah to Connecticut</td>
+<td style="text-align: right;">0.334 to 0.068</td>
+<td style="text-align: right;">0.335 to 0.068</td>
+<td>Within 0.002</td>
+</tr>
+<tr class="even">
+<td>Pre-treatment RMSE</td>
+<td style="text-align: right;">1.756</td>
+<td style="text-align: right;">1.754</td>
+<td>Close</td>
+</tr>
+<tr class="odd">
+<td>ATT, packs per capita per year</td>
+<td style="text-align: right;">−19.00</td>
+<td style="text-align: right;"><span class="key">−18.98</span></td>
+<td>Exact with the Stata weights</td>
+</tr>
+<tr class="even">
+<td>Placebo rank and p-value</td>
+<td style="text-align: right;">1 of 39; 0.026</td>
+<td style="text-align: right;">1 of 39; 0.026</td>
+<td>Exact</td>
+</tr>
+<tr class="odd">
+<td>States kept by cut(2) and p-value</td>
+<td style="text-align: right;">20; 0.050</td>
+<td style="text-align: right;">20; 0.050</td>
+<td>Exact, the same 20 states</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(V\)</span> on age share, price, and sales in 1975</td>
+<td style="text-align: right;">0.546, 0.017, 0.422</td>
+<td style="text-align: right;">0.332, 0.334, 0.334</td>
+<td>Different: <span class="math inline">\(V\)</span> is not identified</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><span class="takeaway fragment">Every remaining difference has a documented source: the optimizer, rounding, a non-identified <span class="math inline">\(V\)</span>, or a definition.</span></p>
+<aside class="notes">
+<p>The scorecard compares each step with the Stata log. The donor weights differ by less than 0.002, because the two optimizers stop at slightly different points of a flat objective. Stata rounds its weights to three decimals before it predicts, and those rounded weights reproduce its ATT of −19.0018 by hand. The placebo rank, the p-value, and the 20 states kept by cut(2) agree exactly. The predictor weights differ sharply, but V is not identified, so this difference needs no reconciliation.</p>
+<p>Two further differences have simple sources. The R² differs because synth2 divides by the variation of synthetic California, and with that definition Python also gives 0.974. The MSPE ratio of California is 123.5 in Stata against 129.0 in Python, because the Stata placebo command refits California with a weaker search.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="four-mlsynth-estimators-one-sign-the-att-ranges-from-15.61-to-21.39" class="slide level2 center">
+<h2>Four mlsynth estimators, one sign: the ATT ranges from −15.61 to −21.39</h2>
+
+<img data-src="../sc101_estimator_tour.png" class="r-stretch quarto-figure-center"><p class="caption">(a) Observed California and four counterfactual paths; (b) the four ATTs and a TWFE reference at −27.35 (hollow marker).</p><p><span class="takeaway fragment">All four estimators find a large reduction, while TWFE inherits the poor fit of the simple average.</span></p>
+<aside class="notes">
+<p>The tour reuses the same dictionary with three other estimators. The outcome-only fit matches the 19 pre-treatment outcomes directly and gives −19.51 with six donors. Synthetic difference-in-differences adds time weights and a level shift and gives −15.61. CLUSTERSC with principal component regression gives −21.39 with 34 donors, 11 of them with negative weights, and −19.37 when its clustering step is switched off. The TWFE reference of −27.35 weights all 38 donors equally, so it inherits the poor match of the simple average before 1989.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-gap-was-already-large-before-proposition-10-raised-the-tax-again-in-1999" class="slide level2 center">
+<h2>The gap was already large before Proposition 10 raised the tax again in 1999</h2>
+<p><span class="objection">Objection.</span> The gap of 38.2 percent in 2000 measures Proposition 99 alone.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> In January 1999, <strong>Proposition 10</strong> added 50 cents per pack, so the gaps of 1999 and 2000 mix two programs. Yet the gap stayed below −22 packs in every year from 1994 to 1998.</p>
+<p><span class="takeaway fragment">The growth of the effect does not rest on the last two years.</span></p>
+<aside class="notes">
+<p>We steelman the objection first, because the largest gaps arrive in 1999 and 2000. Proposition 10 raised the state cigarette tax by a further 50 cents per pack in January 1999. The gaps of those two years therefore cannot be credited to Proposition 99 alone, and the same caveat applies to the headline of 38.2 percent in 2000. Even before that second increase, however, the gap stayed below −22 packs in every year from 1994 to 1998. The large and persistent effect thus does not depend on the last two years.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="five-tempting-misreadings" class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Five tempting misreadings</h1>
+<p><span class="act">Common misconceptions</span></p>
+<aside class="notes">
+<p>Synthetic control results are easy to state and easy to misread. Each of the next five slides states a tempting claim about this analysis. Each slide then answers the claim with the numbers of this tutorial.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="synthetic-california-is-built-from-its-neighbors-only-nevada-borders-it" class="slide level2 center">
+<h2>“Synthetic California is built from its neighbors”: only Nevada borders it</h2>
+<p><span class="objection">Myth.</span> Synthetic California blends the neighbors of California.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> Of the five donors, only Nevada borders California. Utah (0.335), Montana (0.202), Colorado (0.160), and Connecticut (0.068) enter because their weighted combination tracks sales before 1989.</p>
+<p><span class="takeaway fragment">The recipe is chosen for its fit, not for its geography.</span></p>
+<aside class="notes">
+<p>Arizona and Oregon, the other neighbors of California, are absent from the data, because they ran their own large tobacco programs. A donor need not resemble California on its own. Utah, the largest donor, sold 55.0 packs in 1988 against 90.1 in California. The weights are chosen so that the combination tracks California before 1989 and matches most of its predictors.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="p-0.026-is-the-probability-of-no-effect-it-is-a-rank-not-a-probability" class="slide level2 center">
+<h2>“<span class="math inline">\(p = 0.026\)</span> is the probability of no effect”: it is a rank, not a probability</h2>
+<p><span class="objection">Myth.</span> A p-value of 0.026 means a 2.6 percent chance that Proposition 99 had no effect.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> The p-value is the share of states whose MSPE ratio is at least as large as that of California. It cannot fall below <span class="math inline">\(1/39 = 0.026\)</span>, and it equals <span class="math inline">\(1/20 = 0.050\)</span> after cut(2).</p>
+<p><span class="takeaway fragment">The p-value describes a rank in a placebo distribution, not the probability of a hypothesis.</span></p>
+<aside class="notes">
+<p>This misreading is common in applied work. Suppose that the program had no effect in any state and that every state were equally likely to be the treated one. Each state would then be equally likely to have the largest ratio. California would then hold the top rank with probability 1/39, which is exactly the p-value. The p-value is thus a statement about the data under the null, not about the truth of the null.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="a-sound-in-time-placebo-shows-zero-gaps-the-standard-is-small-gaps-and-no-break" class="slide level2 center">
+<h2>“A sound in-time placebo shows zero gaps”: the standard is small gaps and no break</h2>
+<p><span class="objection">Myth.</span> A valid in-time placebo must show fake gaps of exactly zero.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> Prediction errors grow beyond the fitting period, so fake gaps are rarely zero. The standard is small fake gaps and no break at the fake date. Here the fake gaps average −5.97 packs, about one third of the −18.75 after 1989, and the gap already steps down in 1985.</p>
+<p><span class="takeaway fragment">By this standard, the in-time test of this tutorial passes only in part.</span></p>
+<aside class="notes">
+<p>The in-time placebo is the weak spot of the analysis. Its fake gaps need not be zero, so their size alone is not the problem. The problem is the step at the fake date, which shows that California was already pulling away from its synthetic twin before 1989.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-smallest-pre-treatment-error-wins-a-close-fit-is-necessary-not-sufficient" class="slide level2 center">
+<h2>“The smallest pre-treatment error wins”: a close fit is necessary, not sufficient</h2>
+<p><span class="objection">Myth.</span> The estimator with the lowest pre-treatment RMSE is the most credible.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> CLUSTERSC has the lowest RMSE, 1.503, but 11 of its 34 donors carry negative weights, which extrapolate beyond the donors. The outcome-only fit beats the baseline by construction (1.656 against 1.754), yet its placebo test ranks California only third, with <span class="math inline">\(p = 0.077\)</span>.</p>
+<p><span class="takeaway fragment">A close fit is necessary for credibility, but it does not certify the counterfactual.</span></p>
+<aside class="notes">
+<p>Fit before 1989 is a necessary condition, not a ranking device. Negative weights let a counterfactual leave the range of the donors, which the simplex constraint of the baseline forbids. The weaker placebo test of the outcome-only fit shows that a closer fit need not yield stronger evidence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="cut2-can-only-strengthen-the-evidence-it-trades-resolution-for-comparability" class="slide level2 center">
+<h2>“cut(2) can only strengthen the evidence”: it trades resolution for comparability</h2>
+<p><span class="objection">Myth.</span> Dropping badly fitted placebos with cut(2) can only strengthen the evidence.</p>
+<div class="fragment">
+<p><span class="rebuttal">Truth.</span> The filter shrinks the comparison set from 39 to 20 states, so the smallest attainable p-value rises from 0.026 to 0.050. With a cutoff of 1, only 9 states remain, and the p-value cannot fall below 0.111, although California still ranks first.</p>
+<p><span class="takeaway fragment">The filter buys comparability of the gaps at the cost of resolution.</span></p>
+<aside class="notes">
+<p>A badly fitted state has a large pre-treatment MSPE, so its ratio tends to be small already, and the filter seldom helps California climb the ranking. What the filter buys is comparability of the gaps themselves, which matters for the gap figure and the pointwise test. What it costs is resolution, because every p-value then moves on a coarser grid.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section id="a-synthetic-twin-earns-trust-by-fitting-the-past-and-keeps-it-only-by-surviving-attempts-to-break-it." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>A synthetic twin earns trust by fitting the past and keeps it only by surviving attempts to break it.</h1>
+<aside class="notes">
+<p>This sentence is the single takeaway of the talk. Synthetic California earned trust with a close fit from 1970 to 1988, and it kept that trust through the placebo test, the leave-one-out refits, and the estimator tour. The fake start in 1985 passed only in part, so the timing of the onset remains less certain than the size of the effect. Our answer to the question is a reduction of 18.98 packs per capita per year over 1989–2000, or 23.9 percent.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

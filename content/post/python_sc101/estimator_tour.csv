@@ -1,0 +1,6 @@
+key,estimator,call,matches,weight_rule,donors,pre_rmse,att,gap_2000,inference
+vanillasc_adh,"VanillaSC, ADH predictors","VanillaSC({**base, ""covariates"": COVARIATES, ""backend"": ""mscmt"", ...})",seven predictors: four covariates and three lagged sales,"simplex (nonnegative, sum to one)",5 of 38 positive,1.7540421,-18.981598,-25.732569,"built-in placebo rank 1, p 0.0256"
+vanillasc_outcome,"VanillaSC, outcome only","VanillaSC({**base, ""inference"": True})",all 19 pre-treatment outcomes,"simplex (nonnegative, sum to one)",6 of 38 positive,1.6564002,-19.51363,-26.596643,"built-in placebo rank 3, p 0.0769"
+sdid,Synthetic DiD (SDID),"SDID({**base, ""B"": 500, ""seed"": 42})","pre-treatment outcomes up to a constant, with time weights",simplex unit and time weights plus an intercept,not exposed in mlsynth 1.0.0,1.7991405,-15.605398,-24.499197,"placebo SE 7.5996, p 0.0379"
+clustersc_pcr,"CLUSTERSC, PCR","CLUSTERSC({**base, ""method"": ""pcr""})",denoised outcomes of the donors in the California cluster,unconstrained regression weights (negative allowed),"34 in the cluster, 11 negative",1.5034772,-21.394069,-32.883309,"Shen 95% CI (−23.89, −18.90)"
+twfe_did,TWFE DiD (reference),two-way fixed effects regression of cigsale on treated,average levels of all 38 donors,equal weights,38 equal,,-27.349111,,none (one treated cluster)

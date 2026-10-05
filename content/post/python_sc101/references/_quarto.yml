@@ -1,0 +1,4 @@
+project:
+  type: default
+  pre-render:
+    - python3 setup_env.py

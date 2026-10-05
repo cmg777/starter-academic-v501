@@ -1,0 +1,38 @@
+quantity,stata,mlsynth,abs_diff,tolerance,pass
+Max |diff| of the seven California predictor means,0,3.0517578e-06,3.0517578e-06,0.0001,PASS
+Max |diff| of the seven donor-average predictor means,0,3.7243652e-06,3.7243652e-06,0.0001,PASS
+Weight of Utah,0.334,0.33507127,0.0010712713,0.005,PASS
+Weight of Nevada,0.235,0.23560825,0.00060825209,0.005,PASS
+Weight of Montana,0.202,0.20189148,0.00010851731,0.005,PASS
+Weight of Colorado,0.161,0.15952549,0.0014745139,0.005,PASS
+Weight of Connecticut,0.068,0.067903508,9.6492165e-05,0.005,PASS
+Largest weight among the other 33 donors,0,0,0,1e-06,PASS
+Max |diff| of synthetic predictors (mlsynth W vs Stata),0,0.029568718,0.029568718,0.05,PASS
+ATT,-19.001767,-18.981598,0.020168927,0.05,PASS
+Pre-period RMSE,1.7556724,1.7540421,0.0016302853,0.01,PASS
+R-squared (Stata definition),0.97433642,0.97434555,9.134004e-06,0.001,PASS
+Gap in 1989,-7.5945,-7.5894391,0.0050609099,0.05,PASS
+Gap in 2000,-25.755,-25.732569,0.022431111,0.05,PASS
+Max |diff| of the 12 post-period gaps,0,0.02908472,0.02908472,0.05,PASS
+R-squared (conventional definition),0.97433642,0.97620695,0.001870533,n/a,info
+"ATT with the Stata W, rebuilt by hand",-19.001767,-19.001766,7.4831645e-07,5e-05,PASS
+Max |diff| of the 12 gaps with the Stata W,0,3.1890869e-06,3.1890869e-06,5e-05,PASS
+Max |diff| of synthetic predictors with the Stata W,0,5.2185058e-07,5.2185058e-07,5e-05,PASS
+R-squared (Stata definition) with the Stata W,0.97433642,0.97433641,9.975698e-09,5e-06,PASS
+Pre-period RMSE with the Stata W,1.7556724,1.7541281,0.0015442495,n/a,info
+ATT with oracle_weights,-19.001767,-19.001766,7.4831645e-07,5e-05,PASS
+Placebo loop: rank of California among 39,1,1,0,0,PASS
+Placebo loop: p-value over 39 units,0.0256,0.025641026,4.1025641e-05,0.0005,PASS
+MSPE ratio of California,123.549,129.04333,5.4943324,n/a,info
+Pre-period MSPE of California,3.1668,3.0766636,0.090136367,n/a,info
+cut(2): number of units kept,20,20,0,"[19, 22]",PASS
+cut(2): p-value,0.05,0.05,0,0.01,PASS
+Years with left-sided p at its minimum,8,9,1,n/a,info
+Years with two-sided p at its minimum,8,8,0,n/a,info
+In-time 1985: gap in 1985,-3.3262,-3.3133055,0.012894497,0.05,PASS
+In-time 1985: gap in 1986,-3.585,-3.572768,0.012231959,0.05,PASS
+In-time 1985: gap in 1987,-8.6524,-8.638096,0.014304015,0.05,PASS
+In-time 1985: gap in 1988,-8.3873,-8.3740729,0.013227125,0.05,PASS
+Reduced specification at 1989: pre-period RMSE,2.2053,2.2052512,4.8793994e-05,0.01,PASS
+Leave-one-out: largest gap in 2000,-23.485,-23.478654,0.0063462245,0.05,PASS
+Leave-one-out: smallest gap in 2000,-28.3503,-27.150368,1.1999319,1.5,PASS

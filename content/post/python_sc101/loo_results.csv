@@ -1,0 +1,6 @@
+dropped,att,gap_1997,gap_2000,pre_rmse,weights
+Utah,-17.520721,-17.982118,-23.478654,2.5835964,"New Mexico 0.6142, Nevada 0.1969, Colorado 0.1229, Connecticut 0.0660"
+Nevada,-19.287079,-30.618762,-27.150368,2.2850439,"Utah 0.5513, New Hampshire 0.1855, Connecticut 0.1391, Colorado 0.1242"
+Montana,-17.5629,-21.345461,-24.012419,1.9239837,"Utah 0.3840, Colorado 0.2731, Nevada 0.2553, Connecticut 0.0876"
+Colorado,-19.259181,-24.053522,-26.123309,1.7804638,"Utah 0.3419, Nevada 0.2673, Montana 0.2424, Connecticut 0.1485"
+Connecticut,-18.891528,-24.071906,-25.638948,1.9398928,"Utah 0.3387, Nevada 0.2275, Colorado 0.2076, Montana 0.1907, Minnesota 0.0355"

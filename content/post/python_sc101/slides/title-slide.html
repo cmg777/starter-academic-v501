@@ -1,0 +1,22 @@
+<section id="$idprefix$title-slide" class="quarto-title-block"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$>
+  <h1 class="title">$title$</h1>
+$if(subtitle)$
+  <p class="subtitle">$subtitle$</p>
+$endif$
+$if(key-results)$
+  <div class="title-result-strip">
+$for(key-results)$
+    <div class="kr"><span class="kr-num">$key-results.num$</span><span class="kr-cap">$key-results.cap$</span></div>
+$endfor$
+  </div>
+$endif$
+$if(deck-author)$
+  <p class="author">$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$</p>
+$endif$
+$for(institute)$
+  <p class="institute">$institute$</p>
+$endfor$
+$if(date)$
+  <p class="date">$date$</p>
+$endif$
+</section>
