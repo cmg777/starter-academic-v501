@@ -39,7 +39,7 @@ the page's own design, not the server:
   `assets/media/orbital/`. Hugo serves same-size WebP at q88 (3600×1800 desktop,
   1800×900 mobile, about half the bytes, PSNR ≈ 42.7 dB against the JPEG,
   visually identical at 2× zoom). Hashed filenames make the `immutable` header
-  safe. Each breakpoint gets a `<link rel=preload media=…>`. `orbital.js` calls
+  safe. `orbital.js` calls
   `image.decode()` before `texImage2D`. The research-card background uses the
   same mobile WebP through `--research-art`.
 - **Google Analytics**: restored on the homepage for production builds only.

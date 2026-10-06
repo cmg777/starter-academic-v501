@@ -129,7 +129,8 @@ The home template deliberately omits the legacy theme's browser dependencies.
 - **Imagery and attribution:** `static/media/orbital/CREDITS.txt`. The real NASA
   Black Marble 2016 map has desktop (3600×1800) and mobile (1800×900) variants in
   `assets/media/orbital/`. Hugo serves them as same-size WebP (q88, about half the
-  JPEG bytes), preloaded per breakpoint and decoded before the WebGL upload. Hugo generates a 53 KiB
+  JPEG bytes), requested after the hero is in place (never preloaded: a preload
+  competed with the hero image), and decoded before the WebGL upload. Hugo generates a 53 KiB
   WebP static fallback from `assets/media/orbital/earth-at-night-asia.png`. The
   Sentinel-2 spacecraft and footer horizon are generated decorative imagery under
   `assets/media/orbital/`; Hugo serves optimized responsive WebP derivatives.

@@ -37,11 +37,10 @@
   <meta property="og:image" content="{{ $fallback.Permalink }}">
   <meta name="twitter:card" content="summary_large_image">
   <style>:root{--research-art:url('{{ $mobileTexture.RelPermalink }}')}{{ $style.Content | safeCSS }}</style>
-  <link rel="preload" as="image" href="{{ $fallback.RelPermalink }}">
-  {{/* Start the globe texture during HTML parsing instead of after the script runs.
-       The breakpoint matches the texture choice in orbital.js. */}}
-  <link rel="preload" as="image" href="{{ $texture.RelPermalink }}" media="(min-width: 680px)" fetchpriority="low">
-  <link rel="preload" as="image" href="{{ $mobileTexture.RelPermalink }}" media="(max-width: 679px)" fetchpriority="low">
+  <link rel="preload" as="image" href="{{ $fallback.RelPermalink }}" fetchpriority="high">
+  {{/* Do not preload the globe textures: measured on 2026-10-06, a texture preload
+       split bandwidth with this hero image and the script and delayed both. The
+       texture is an enhancement; orbital.js requests it after the hero is in place. */}}
   <script defer src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>
   {{ if and hugo.IsProduction $ga }}
   {{/* Google Analytics, as configured for the rest of the site. Calls queue at once,
