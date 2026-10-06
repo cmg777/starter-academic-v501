@@ -103,7 +103,7 @@ the initial gallery measurements run on the next animation frame, and the textur
 is decoded with `image.decode()` first.
 
 PageSpeed Insights: the keyless API returned HTTP 429 (shared daily quota), so PSI
-numbers were not collected; local Lighthouse covers the same lab metrics.
+numbers could not be collected (see the end of this log).
 
 ### Live, after 4476e64a (simulated throttling)
 
@@ -132,3 +132,25 @@ Mobile TBT breakdown (new): Google Analytics ≈ 128 ms (restored on purpose),
 homepage script ≈ 110 ms (old: 134 ms over three files), and ≈ 100 ms of
 style/layout that used to happen before first paint and now falls inside the
 TBT window because first paint is ~0.8 s earlier.
+
+### Live, final (39495c8e, simulated throttling, medians of 3)
+
+| Page | Score | FCP | LCP | TBT | Transfer |
+|---|---|---|---|---|---|
+| `/` mobile | 76 → 96 | 1359 → 1616 ms | 1418 → 1935 ms | 999 → 111 ms | 305 → 447 KB |
+| `/` desktop | 99 → 95 | 535 → 968 ms | 586 → 1167 ms | 4 → 6 ms | 1783 → 1521 KB |
+| `/es/` mobile | 98 → 95 | 1376 → 1746 ms | 1578 → 2089 ms | 75 → 113 ms | 304 → 446 KB |
+| `/es/` desktop | 99 → 95 | 582 → 1041 ms | 648 → 1217 ms | 4 → 6 ms | 1782 → 1520 KB |
+| `/ja/` mobile | 98 → 96 | 1123 → 1585 ms | 1318 → 1923 ms | 67 → 104 ms | 305 → 447 KB |
+| `/ja/` desktop | 100 → 97 | 457 → 823 ms | 513 → 1006 ms | 6 → 6 ms | 1783 → 1521 KB |
+
+Simulated (Lantern) FCP/LCP disagree with the real-throttling A/B above. They are
+model estimates; LCP also changed element (header text → globe image). Mobile
+transfer grew by Google Analytics (~160 KB, loaded after the page is idle). The
+desktop drop comes from the 780 KB → 366 KB texture.
+Observed (unsimulated) live FCP was faster on 4 of 6 pages, but live network
+variance is large (the baseline alone ranged 798–3460 ms on `/` mobile).
+
+PageSpeed Insights: the keyless API (HTTP 429) and the pagespeed.web.dev UI both
+failed to return results on 2026-10-06; run https://pagespeed.web.dev/ manually
+for Google's field (CrUX) data once 28 days of post-change visits accumulate.
