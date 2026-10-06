@@ -27,7 +27,9 @@ originals are listed in `pages.py`.
   info* off). Before the first scored quiz AhaSlides itself asks for a nickname ("Join
   the game") for the leaderboard; that prompt belongs to the quiz and cannot be turned
   off. The audience language is set per deck (Settings → *Presentation language*:
-  English, Español, 日本語); `create_presentation` ignores its `lang` argument.
+  English, Español, 日本語); `create_presentation` ignores its `lang` argument. *Filter
+  profanity* (same panel) is on in all three decks, because the word cloud and the idea
+  board are open to anyone on the web.
 - **Videos play on the visitor device:** every YouTube slide has *Also show on
   audience's smartphones* ticked (editor, YouTube panel). Without it a self-paced visitor
   sees "Please watch the video on the presenter's screen".
