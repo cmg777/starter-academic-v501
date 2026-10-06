@@ -36,6 +36,7 @@ I currently teach the following graduate-level courses:
   <h3>Regional Development</h3>
   <p>Website: <a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p>Posts about <a href="https://carlos-mendez.org/#posts">exploratory spatial data analysis, spatial econometrics, spatial machine learning</a></p>
+  <p>Slides: <a href="https://canva.link/zjtenpul5tzhqp2">Introductory slides</a></p>
 </div>
 
 <div class="course-card">

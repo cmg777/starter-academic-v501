@@ -36,6 +36,7 @@ Actualmente imparto los siguientes cursos de posgrado:
   <h3>Desarrollo regional</h3>
   <p>Sitio web: <a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p>Publicaciones sobre <a href="https://carlos-mendez.org/es/#posts">análisis exploratorio de datos espaciales, econometría espacial y aprendizaje automático espacial</a></p>
+  <p>Diapositivas: <a href="https://canva.link/zjtenpul5tzhqp2">Diapositivas introductorias</a></p>
 </div>
 
 <div class="course-card">

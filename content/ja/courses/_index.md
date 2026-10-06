@@ -36,6 +36,7 @@ image:
   <h3>地域開発</h3>
   <p>ウェブサイト：<a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p><a href="https://carlos-mendez.org/ja/#posts">探索的空間データ分析・空間計量経済学・空間機械学習</a>に関する投稿</p>
+  <p>スライド：<a href="https://canva.link/zjtenpul5tzhqp2">導入スライド</a></p>
 </div>
 
 <div class="course-card">
