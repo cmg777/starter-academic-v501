@@ -23,8 +23,9 @@ this file is the procedure:
   decks.**
 - `content/post/python_panel_intro/ahaslides/` (deck `10245137`) — the fourth. Its
   "Before you look" cues were added to `slides.qmd` for the deck (mirroring the post's
-  predict cards), and `make_deck_md.py` generates `deck.md` from `slides.qmd` plus the quiz
-  definitions instead of hand-writing it.
+  predict cards). Rebuilt for the paid plan on 2026-10-06 with the FWL generators (37
+  interactive slides): the second example of the `activities.py` pattern, with the cue
+  quizzes kept in a `CUE_QUIZZES` list and merged by page.
 
 ---
 
