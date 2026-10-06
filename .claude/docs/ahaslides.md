@@ -353,8 +353,8 @@ Every presentation lives in one of four top-level folders (no subfolders):
 
 | Folder | ID | Holds |
 |---|---|---|
-| Regional Development | `141828` | the Regional Development class decks (Parts 1 to 3) |
-| Applied Econometrics | `141829` | the econometrics tutorial decks (FWL, panel data, DiD, synthetic control, Bayesian spatial SC, bridge impact) |
+| Regional Development | `141828` | the Regional Development class decks (Parts 1 to 3) and the spatial causal inference decks (Bayesian spatial SC, bridge impact) |
+| Applied Econometrics | `141829` | the econometrics tutorial decks (FWL, panel data, DiD, synthetic control) |
 | Website | `141830` | decks made only for the website (the hero keynote in EN, ES and JA) |
 | Spanish Class | `141831` | decks for the Spanish language class (only those) |
 
