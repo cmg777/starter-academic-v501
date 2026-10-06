@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One learning path? In 28 EU countries over 1990–2016, four learning convergence clubs have log-t statistics of 2.94, 2.05, 2.65 and 7.68. Bulgaria and Romania form a diverging group with statistic −7.53. The vertical line marks −1.65, below which convergence is rejected. These are dimensionless test statistics, not effect estimates or confidence intervals. Four clubs, with two countries diverging."
   caption: ''
   focal_point: ""
   preview_only: false

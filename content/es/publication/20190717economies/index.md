@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se reducen las brechas de bienestar? Entre los miembros centrales de tres clubes de países, la dispersión, medida como desviación estándar del logaritmo del bienestar relativo, cambia entre 1980 y 2007 así: núcleo de bienestar bajo, 30 países, de 0,31 a 0,39; núcleo medio, 17 países, de 0,25 a 0,27; núcleo alto, 28 países, de 0,32 a 0,21. Solo el núcleo más rico reduce las brechas. Son valores de la tabla 1; no se reportan intervalos. Los miembros centrales son un subconjunto de la muestra de 128 países."
   caption: ''
   focal_point: ""
   preview_only: false

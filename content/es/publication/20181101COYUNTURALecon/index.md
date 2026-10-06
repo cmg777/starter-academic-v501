@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Todo el capital es igual? Un gráfico de puntos pareados compara el producto marginal del capital con medidas de capital total y capital reproducible. Bolivia pasa de 0,31 a 0,19; Chile de 0,26 a 0,24; Perú de 0,20 a 0,18; Botsuana de 0,36 a 0,24; Singapur de 0,15 a 0,18; Japón de 0,09 a 0,10; y Estados Unidos de 0,12 a 0,14. La medición importa. Son estimaciones contables alternativas expresadas como razones, con fuentes de distintos años entre 2000 y 2005; no representan una tendencia temporal ni un efecto causal de la inversión. No se reporta incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "生産性格差は何で説明されるのでしょうか。共分散項を分離し、物的資本の弾力性を0.33とする2010年の国際比較の分解では、労働生産性の分散に対する物的資本の寄与は14%、総合効率性の寄与は44%です。この会計的比較では効率性の寄与が大きくなります。両者の合計は100%ではなく、不確実性区間は報告されていません。因果効果を示すものではありません。出典は第4.1節、14ページです。"
   caption: ''
   focal_point: ""
   preview_only: false

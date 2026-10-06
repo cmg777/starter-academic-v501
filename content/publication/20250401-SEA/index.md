@@ -92,6 +92,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Violence: one spatial scale? Brazil, 5,562 municipalities; outcome is the change in homicide rates between 2007–2008 and 2011–2012 averages. Selected MGWR bandwidths in municipalities: population density 510 [510–540], single-mother households 584 [540–584], voter abstention 2,133 [2,132–2,150], and margin of victory 5,560 [4,259–5,560]. Many scales. Brackets and whiskers reproduce manuscript Table 3 confidence intervals, whose level is unspecified. These are bandwidths of model associations, not causal effect sizes or distances in kilometers."
   caption: ''
   focal_point: ""
   preview_only: false

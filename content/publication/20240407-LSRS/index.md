@@ -70,6 +70,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Can night lights track the economy? For urban nighttime lights in 81 provinces of Türkiye, 2004–2020, reported between-province R² values are 0.807 for non-agriculture, 0.732 for industry, 0.809 for services and 0.511 for agriculture. Corresponding within-province models with region and year fixed effects have R² of 0.012, 0.038, 0.004 and 0.038. Connected dots compare these reported fit statistics on a zero-to-one scale. Night lights describe differences across places better than annual changes within places. These are in-sample statistics for different variation, not causal effects or holdout forecast accuracy; no R² intervals are reported."
   caption: ''
   focal_point: ""
   preview_only: false

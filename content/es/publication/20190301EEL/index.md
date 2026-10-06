@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Las mismas empresas muestran la misma dinámica de productividad total de los factores? Para empresas de muebles de Brasil, 2003–2009, el estimador LP identifica dos agrupaciones transitorias de densidad y ACF identifica una. El estimador importa. Los círculos representan el número de agrupaciones, no empresas, ubicaciones ni tamaños. No se reportan intervalos de incertidumbre. Fuente: manuscrito de julio de 2018, figura 2."
   caption: ''
   focal_point: ""
   preview_only: false

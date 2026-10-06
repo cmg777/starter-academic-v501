@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Are HDI gaps shrinking? Among 20 municipalities in Bolivia’s main metropolitan regions, the paper reports an approximate HDI range from 17% below the annual sample mean in Palca to 20% above it in Santa Cruz in 1992. In 2013, it ranges from 12% below in Laja to 7% above in Santa Cruz. Two horizontal ranges show municipalities getting closer while remaining unequal. These are rounded log-based approximations from the source, not exact raw percentage deviations or confidence intervals; no uncertainty is reported."
   caption: ''
   focal_point: ""
   preview_only: false

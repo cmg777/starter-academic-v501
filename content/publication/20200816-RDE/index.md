@@ -50,6 +50,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One productivity path? The March 2020 author manuscript identifies two labor-productivity convergence clubs across 26 Indonesian provinces, 1990–2010. The higher-productivity club contains Jakarta and East Kalimantan, two provinces; the lower-productivity club contains the other 24. Each dot represents one province and its position is not geographic. Two distinct clubs. No membership uncertainty intervals are reported. Source: MPRA 99322, Table 2; the journal abstract also reports two labor-productivity clubs."
   caption: ''
   focal_point: ""
   preview_only: false

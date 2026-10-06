@@ -82,6 +82,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "高所得になると地域格差は再び拡大するのでしょうか。ベイズモデル平均による実質1人当たりGDPの対数の事後包含確率は、一次項88%、二次項73%、三次項48%です。破線の50%は中央値確率モデルの変数選択基準であり、統計的有意性の閾値ではありません。再拡大は明確ではありません。三次項はこの基準を下回り、高所得域での再拡大が不確かであるという論文の結果と整合します。これらは変数の包含確率であり、特定の曲線形状が真である確率ではありません。出典は表5の二方向固定効果モデルです。"
   caption: ''
   focal_point: ""
   preview_only: false

@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "効率性格差は縮小しているのでしょうか。インドネシア26州では1990年から2010年に、効率性の対数の標準偏差が、総合効率性で0.63から0.25、純技術効率性で0.54から0.18、規模効率性で0.46から0.20に低下します。ただし、総合効率性と純技術効率性には2つの収束クラスターが残り、規模効率性には1つあります。刊行論文の表3と第3.2節に基づきます。分散指標の区間は報告されていません。因果推定ではなく記述的な収束結果です。"
   caption: ''
   focal_point: ""
   preview_only: false

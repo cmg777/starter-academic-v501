@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "学習成果は一つの経路に収束するのでしょうか。1990～2016年のEU28か国では、四つの学習成果の収束クラブのlog-t検定統計量は2.94、2.05、2.65、7.68です。ブルガリアとルーマニアは−7.53の発散グループを構成します。縦線の−1.65を下回ると収束が棄却されます。これらは無次元の検定統計量であり、効果の推定値や信頼区間ではありません。四つのクラブに分かれ、2か国が発散しています。"
   caption: ''
   focal_point: ""
   preview_only: false

@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Las industrias convergen juntas? La figura original 5c–d muestra la desviación estándar del logaritmo de la productividad laboral en Japón, 1973–2012, para comunidades de insumo-producto estacionarias y transitorias. La dispersión de la comunidad estacionaria empieza a disminuir alrededor de 2007, mientras la de la transitoria sigue aumentando. Las redes difieren. Se conservan observaciones, curvas suavizadas y bandas originales; la fuente no especifica el nivel de confianza de las bandas. Son patrones descriptivos, no causales."
   caption: ''
   focal_point: ""
   preview_only: false

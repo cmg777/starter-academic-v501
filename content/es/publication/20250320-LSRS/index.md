@@ -68,6 +68,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Pueden los satélites completar las series de PIB? Vietnam, 63 provincias, 2010–2020. R² con validación cruzada para DMSP armonizado/VIIRS-like: Ridge 0,992/0,992; XGBoost 0,951/0,963; vecinos más cercanos 0,920/0,944; random forest 0,910/0,913; red neuronal 0,889/0,931; y máquina de vectores de soporte 0,783/0,839. Ridge logra el mejor ajuste. Los modelos combinan luces nocturnas, suelo, clima y PIB nacional; usan 25 % de prueba y validación cruzada de cinco particiones. No se informan intervalos del R². Estos resultados no validan directamente las estimaciones retrospectivas de 1992–2009."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "人間開発指数（HDI）の格差は縮小しているのでしょうか。ボリビアの主要大都市圏の20自治体について、論文は1992年のHDIの範囲を、その年の標本平均より約17%低いパルカから約20%高いサンタクルスまでと報告しています。2013年には約12%低いラハから約7%高いサンタクルスまでに縮まりました。2本の水平線は、差が縮小しても格差が残ることを示します。数値は原論文の対数に基づく丸められた近似値であり、厳密な百分率の差や信頼区間ではありません。不確実性は報告されていません。"
   caption: ''
   focal_point: ""
   preview_only: false

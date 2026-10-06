@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "所得は一つの経路に収束するのでしょうか。1995～2017年のタイ77県は、1人当たりGDPの三つの収束クラブに分かれます。クラブ1は12県、クラブ2は48県、クラブ3は17県です。点は所属する県の数を示し、所得水準や信頼区間ではありません。論文の検定ではクラブの統合が棄却されています。"
   caption: ''
   focal_point: ""
   preview_only: false

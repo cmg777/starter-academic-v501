@@ -67,6 +67,7 @@ url_source: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Does unemployment persist? In 30 Indonesian provinces during 2001–2021, the time-lag unemployment coefficient is 0.60 with time effects, 0.31 with the contemporaneous national average, 0.49 with its lag, and 0.31 with both averages. Whiskers show estimate ±1 reported standard error: 0.03, 0.04, 0.04 and 0.04, respectively. Units are percentage points per percentage point. All models include regional effects and spatial dynamics. Persistence is positive, but its size depends on the model; these are conditional coefficients, not total causal effects."
   caption: ''
   focal_point: ""
   preview_only: false

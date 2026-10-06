@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Where does regional inequality come from? This methods diagram summarizes the nested Theil decomposition described in Carlos Mendez’s 2023 book review: overall income inequality separates into between-region, between-province within-region, and within-province components. Look within and between. The three equal boxes are conceptual categories, not measured shares or original empirical estimates. The review discusses Akita and Kataoka’s Regional Inequality and Development (2022) in the Indonesian context."
   caption: ''
   focal_point: ""
   preview_only: false

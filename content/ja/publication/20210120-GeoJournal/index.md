@@ -56,6 +56,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "追いつく速さはどのくらいでしょうか。県・市ではより緩やかです。2010～2017年のインドネシアの514県・市と34州について、推定された年間の収束速度は、県・市で0.93%、空間フィルタリング後の県・市で1.14%、州で1.44%です。点は共通の尺度で示しています。元の回帰係数はいずれもp < 0.01ですが、収束速度の区間推定は報告されていません。この図はモデル間の有意差や因果効果を示すものではありません。出典はGeoJournalの表1です。"
   caption: ''
   focal_point: ""
   preview_only: false

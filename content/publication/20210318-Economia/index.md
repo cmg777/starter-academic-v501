@@ -53,6 +53,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Do constraints cluster? Neighbours are alike. Across 339 Bolivian municipalities, global Moran’s I is 0.57 for PC1, summarizing nutrition, educational inequality and language measures, and 0.39 for PC2, summarizing secondary-school dropout. Both components are reported to show significant spatial similarity; no confidence intervals or numerical global p-values are reported. Positive similarity is an association, not a causal effect. Source: Economía (2021), section 5.2; indicators come from 2012, 2016 and 2017."
   caption: ''
   focal_point: ""
   preview_only: false

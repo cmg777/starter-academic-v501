@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Did faster growth reach every region? Average annual growth of potential real GDP per person in Bolivia, 2000–2014, ranges from 6.67% in Tarija to −1.52% in Pando. The other departments are Potosí 4.04%, Chuquisaca 3.08%, La Paz 2.74%, Beni 1.53%, Cochabamba 1.49%, Oruro 1.44% and Santa Cruz 1.16%. A dashed reference marks national growth of 2.44%. Growth stayed uneven. Rates are descriptive geometric averages from an HP-filtered, 2014-price real GDP series; no uncertainty is reported."
   caption: ''
   focal_point: ""
   preview_only: false

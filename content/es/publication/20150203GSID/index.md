@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿El PIB cuenta toda la historia? Para las economías seleccionadas de Asia Oriental y América Latina en 2000, el PIB per cápita de Asia Oriental es 3,10 veces el de América Latina, mientras que su desarrollo ajustado por bienestar es 4,22 veces mayor. Dos barras usan la misma escala de razones. El bienestar incorpora esperanza de vida, consumo, ocio y desigualdad, y amplía la brecha medida. Son estimaciones descriptivas redondeadas basadas en un modelo, para seis economías latinoamericanas y cuatro de Asia Oriental; no se reporta incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

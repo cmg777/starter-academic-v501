@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se reducen las brechas delictivas? La escala importa. Colombia, 2010–2018: con 2010 = 100, los índices de desviación estándar bajan a 68,4 para homicidios y 88,2 para lesiones personales entre departamentos, pero suben a 106,5 y 157,9 entre municipios. Los puntos vacíos corresponden a 2010 y los llenos a 2018; las líneas muestran cambios, no intervalos de incertidumbre. Son índices de dispersión, no niveles medios de delincuencia. No se reportan intervalos. Cálculos a partir de desviaciones estándar redondeadas de la tabla 1 del documento de trabajo de los autores de 2019."
   caption: ''
   focal_point: ""
   preview_only: false

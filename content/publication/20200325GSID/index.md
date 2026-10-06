@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "What explains productivity gaps? In the paper’s 2010 cross-country decomposition separating the covariance term and setting physical-capital elasticity to 0.33, physical capital accounts for 14% of labor-productivity variance and aggregate efficiency for 44%. Efficiency matters more in this accounting comparison. These shares do not sum to 100%, no uncertainty intervals are reported, and they are not causal effects. Source: section 4.1, page 14."
   caption: ''
   focal_point: ""
   preview_only: false

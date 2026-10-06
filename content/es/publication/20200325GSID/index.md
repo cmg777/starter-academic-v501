@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Qué explica las brechas de productividad? En la descomposición entre países de 2010, que separa el término de covarianza y fija la elasticidad del capital físico en 0,33, el capital físico explica el 14 % de la varianza de la productividad laboral y la eficiencia agregada el 44 %. La eficiencia tiene mayor peso en esta comparación contable. Estas proporciones no suman el 100 %, no se reportan intervalos y no son efectos causales. Fuente: sección 4.1, página 14."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -68,6 +68,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Can satellites fill GDP gaps? Vietnam, 63 provinces, 2010–2020. Cross-validated R² for Harmonized DMSP/VIIRS-like models: Ridge 0.992/0.992, XGBoost 0.951/0.963, K-nearest neighbors 0.920/0.944, Random forest 0.910/0.913, neural network 0.889/0.931, and support vector machine 0.783/0.839. Ridge fits best. Models combine nighttime lights, land, climate and national GDP; 25% test set and fivefold cross-validation. No R² intervals are reported. These scores do not directly validate the 1992–2009 backcasts."
   caption: ''
   focal_point: ""
   preview_only: false

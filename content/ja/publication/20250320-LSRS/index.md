@@ -68,6 +68,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "衛星データでGDPの欠落を補えるのでしょうか。ベトナムの63省、2010～2020年が対象です。調整済みDMSP／VIIRS-likeモデルの交差検証R²は、リッジ回帰0.992／0.992、XGBoost0.951／0.963、k近傍法0.920／0.944、ランダムフォレスト0.910／0.913、ニューラルネットワーク0.889／0.931、サポートベクターマシン0.783／0.839です。リッジ回帰が最もよく適合します。夜間光、土地、気候、全国GDPを組み合わせ、25%のテストデータと5分割交差検証を用いています。R²の区間は報告されておらず、この評価は1992～2009年の遡及推計を直接検証するものではありません。"
   caption: ''
   focal_point: ""
   preview_only: false

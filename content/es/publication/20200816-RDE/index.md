@@ -50,6 +50,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria de productividad? El manuscrito de marzo de 2020 identifica dos clubes de convergencia de productividad laboral en 26 provincias de Indonesia, 1990–2010. El club de mayor productividad incluye Yakarta y Kalimantan Oriental, dos provincias; el de menor productividad incluye las otras 24. Cada punto representa una provincia y su posición no es geográfica. Son dos clubes distintos. No se reportan intervalos de incertidumbre de pertenencia. Fuente: MPRA 99322, tabla 2; el resumen publicado también identifica dos clubes de productividad laboral."
   caption: ''
   focal_point: ""
   preview_only: false

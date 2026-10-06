@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Do the same firms tell the same TFP story? For Brazilian furniture firms, 2003–2009, the LP estimator produces two transitional productivity density clusters and ACF produces one. The estimator matters. Circles show cluster counts, not firm counts, locations or cluster sizes. No uncertainty interval is reported. Source: July 2018 manuscript, Figure 2."
   caption: ''
   focal_point: ""
   preview_only: false

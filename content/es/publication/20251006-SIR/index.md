@@ -86,6 +86,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Pueden los macrodatos cartografiar la pobreza? No con la misma exactitud. Para los diez indicadores de privación de los hogares de Camboya, la exactitud reportada en validación es del 76% para combustible de cocina y agua limpia, 74% para consumo de alimentos, 73% para electricidad, 72% para saneamiento, 69% para atención médica y asistencia escolar, 68% para materiales de vivienda, 67% para nivel educativo y 55% para bienes. Se muestran los diez resultados. El estudio utiliza muestreo equilibrado, una separación 90/10 y un umbral de clasificación del 50%. No se reportan intervalos de incertidumbre. Son resultados de predicción, no tasas oficiales de pobreza. Khoun et al. (2025), tabla 3."
   caption: ''
   focal_point: ""
   preview_only: false

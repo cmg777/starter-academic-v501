@@ -45,6 +45,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "追いつく速度は上がっているのでしょうか。ボリビアの大都市圏20自治体の人間開発について、推定された年間ベータ収束速度は1992〜2001年の2.23%から2001〜2013年の7.21%へ上昇しています。2本の棒は点推定値を示します。対応する回帰の傾きのt統計量は−2.54と−7.22で、収束速度の区間推定は報告されていません。2001年以降の収束が速いことを示唆しますが、期間間の差の検定は報告されていません。これはHDIの年間成長率ではなく、収束率です。"
   caption: ''
   focal_point: ""
   preview_only: false

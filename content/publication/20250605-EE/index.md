@@ -82,6 +82,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Does regional inequality rise again at high incomes? Bayesian model averaging reports posterior inclusion probabilities of 88% for the linear, 73% for the quadratic and 48% for the cubic term in log real GDP per capita. The dashed 50% line is the median-probability-model inclusion rule, not a significance threshold. Not clearly: the cubic term is below that rule, consistent with the paper’s uncertain high-income rebound. These are model inclusion probabilities, not probabilities that a curve shape is true. Source: Table 5, two-way fixed effects."
   caption: ''
   focal_point: ""
   preview_only: false

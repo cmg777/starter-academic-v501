@@ -54,6 +54,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One catch-up path? Across 151 South American regions in 2010–2018, local GNI convergence coefficients range from −0.914 to −0.006, with median −0.273; HDI coefficients range from −0.537 to 0.057, with median −0.169. Lines are regional minimum–maximum ranges, not confidence intervals. Local paths differ; the signs alone do not establish local statistical significance."
   caption: ''
   focal_point: ""
   preview_only: false

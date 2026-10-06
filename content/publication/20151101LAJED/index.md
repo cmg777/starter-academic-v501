@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is productivity converging? Grouped bars compare country shares across seven GDP-per-worker bins relative to the United States, set to 100, in a balanced sample of 92 countries. From 1960 to 2010, the lowest bin, below 2.5, rises from 8% to 14%, and the highest bin, 80 to below 120, rises from 7% to 16%. All seven bins are shown. More countries are at both extremes. Values are descriptive, rounded country shares, not population shares; the 2010 shares total 99% because of rounding. No uncertainty is reported."
   caption: ''
   focal_point: ""
   preview_only: false

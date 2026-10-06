@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is all capital alike? A paired-dot chart compares marginal product of capital under total-capital and reproducible-capital measures. Bolivia changes from 0.31 to 0.19; Chile 0.26 to 0.24; Peru 0.20 to 0.18; Botswana 0.36 to 0.24; Singapore 0.15 to 0.18; Japan 0.09 to 0.10; and the USA 0.12 to 0.14. Measurement matters. These are alternative accounting estimates in ratio units using sources from different years in 2000–2005, not a time trend or a causal investment effect. No uncertainty is reported."
   caption: ''
   focal_point: ""
   preview_only: false

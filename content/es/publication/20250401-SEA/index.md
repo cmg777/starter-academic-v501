@@ -92,6 +92,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Violencia: ¿una sola escala espacial? Brasil, 5562 municipios; se analiza el cambio de las tasas de homicidio entre los promedios de 2007–2008 y 2011–2012. Anchos de banda seleccionados de MGWR, en municipios: densidad poblacional 510 [510–540], hogares encabezados por madres solas 584 [540–584], abstención electoral 2133 [2132–2150] y margen de victoria 5560 [4259–5560]. Hay múltiples escalas. Los corchetes y las líneas reproducen los intervalos de confianza del Cuadro 3 del manuscrito, cuyo nivel no se especifica. Son anchos de banda de asociaciones del modelo, no magnitudes causales ni distancias en kilómetros."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Are efficiency gaps closing? Across 26 Indonesian provinces from 1990 to 2010, the standard deviation of log efficiency falls from 0.63 to 0.25 for overall efficiency, 0.54 to 0.18 for pure efficiency, and 0.46 to 0.20 for scale efficiency. Yes, but two convergence clusters remain for overall and pure efficiency; scale efficiency has one. Journal Table 3 and section 3.2. No dispersion intervals are reported. These are descriptive convergence results, not causal estimates."
   caption: ''
   focal_point: ""
   preview_only: false

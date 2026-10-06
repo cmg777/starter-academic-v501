@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Growth and jobs: does method matter? Across 514 Indonesian districts, 2011–2020, the reported unemployment-change coefficient per percentage point of GDP growth is −0.000 under OLS, −0.629 using lagged temperature as an instrument, −0.583 using temperature change, and −0.624 using both. Whiskers show ±1 district-clustered standard error: 0.007, 0.253, 0.296 and 0.250. All models include district and year fixed effects. The estimate changes with method. Instrumental-variable interpretation requires validity and relevance assumptions; −0.000 is a rounded estimate, not proof of no relationship."
   caption: ''
   focal_point: ""
   preview_only: false

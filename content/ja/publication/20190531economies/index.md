@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "産業は一緒に収束するのでしょうか。原著の図5c–dは、日本の定常的・移行的な産業連関コミュニティについて、1973～2012年の労働生産性の対数の標準偏差を示します。定常的コミュニティの分散は2007年頃から低下し始めますが、移行的コミュニティでは上昇が続きます。ネットワークによって傾向が異なります。原著の観測値、平滑化曲線、帯を保持していますが、帯の信頼水準は明記されていません。因果効果ではなく記述的な傾向です。"
   caption: ''
   focal_point: ""
   preview_only: false

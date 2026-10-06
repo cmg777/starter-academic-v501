@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria del ingreso? Las 77 provincias de Tailandia se separan en tres clubes de convergencia del PIB per cápita durante 1995–2017: el club 1 tiene 12 provincias, el club 2 tiene 48 y el club 3 tiene 17. Los puntos muestran cantidades de provincias, no niveles de ingreso ni intervalos de confianza. Las pruebas del estudio rechazan la fusión de los clubes."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se cierran las brechas de eficiencia? En 26 provincias de Indonesia, entre 1990 y 2010, la desviación estándar del logaritmo de la eficiencia disminuye de 0,63 a 0,25 para la eficiencia global, de 0,54 a 0,18 para la eficiencia pura y de 0,46 a 0,20 para la eficiencia de escala. Sí, pero persisten dos agrupaciones de convergencia en la eficiencia global y pura; la de escala tiene una. Tabla 3 y sección 3.2 del artículo publicado. No se reportan intervalos de dispersión. Son resultados descriptivos, no estimaciones causales."
   caption: ''
   focal_point: ""
   preview_only: false

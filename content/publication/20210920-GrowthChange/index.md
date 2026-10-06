@@ -50,6 +50,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One provincial income path? Four separate paths. Lines show the four convergence clubs’ mean relative trends in log GDP per capita for 34 Indonesian provinces, 2001–2017; the cross-province mean is normalized to 1. Clubs 1–4 contain 2, 10, 17 and 5 provinces. The lines remain separated, with club 1 declining toward the mean, clubs 2 and 3 edging upward and club 4 moving downward. These are normalized log-income trends, not raw income ratios; no intervals are reported. Source: Growth and Change (2021), Figure 7(a) and Tables 6–7, with exact paths from original author analysis data and plotting code."
   caption: ''
   focal_point: ""
   preview_only: false

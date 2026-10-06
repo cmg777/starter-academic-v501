@@ -50,6 +50,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria provincial de ingresos? Cuatro trayectorias separadas. Las líneas muestran las tendencias relativas medias del logaritmo del PIB per cápita de cuatro clubes de convergencia en 34 provincias de Indonesia, 2001–2017; la media entre provincias se normaliza a 1. Los clubes 1 a 4 contienen 2, 10, 17 y 5 provincias. Las líneas permanecen separadas: el club 1 desciende hacia la media, los clubes 2 y 3 aumentan ligeramente y el club 4 desciende. Son tendencias normalizadas del logaritmo del ingreso, no razones del ingreso original; no se reportan intervalos. Fuente: Growth and Change (2021), figura 7(a) y tablas 6 y 7, con trayectorias exactas calculadas a partir de los datos y el código originales de los autores."
   caption: ''
   focal_point: ""
   preview_only: false

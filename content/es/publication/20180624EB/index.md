@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se reducen las brechas del IDH? En 20 municipios de las principales regiones metropolitanas de Bolivia, el artículo reporta para 1992 un intervalo aproximado del IDH desde 17% por debajo del promedio anual de la muestra en Palca hasta 20% por encima en Santa Cruz. En 2013, va desde 12% por debajo en Laja hasta 7% por encima en Santa Cruz. Dos segmentos horizontales muestran acercamiento, pero persiste la desigualdad. Son aproximaciones logarítmicas redondeadas de la fuente, no diferencias porcentuales exactas ni intervalos de confianza; no se reporta incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

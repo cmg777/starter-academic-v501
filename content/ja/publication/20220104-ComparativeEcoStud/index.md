@@ -54,6 +54,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "収束は一つの経路をたどるのでしょうか。2010～2018年の南米151地域では、1人当たり国民総所得の地域別収束係数は−0.914～−0.006（中央値−0.273）、人間開発指数では−0.537～0.057（中央値−0.169）です。線は地域間の最小値と最大値の範囲で、信頼区間ではありません。地域によって経路は異なります。符号だけで個別地域の統計的有意性は判断できません。"
   caption: ''
   focal_point: ""
   preview_only: false

@@ -51,6 +51,7 @@ url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Converge la ASEAN? De manera desigual. Para 274 regiones subnacionales entre 1998 y 2012, los puntos muestran la razón entre la dispersión inicial y final del logaritmo del PIB per cápita estimado mediante luces nocturnas. Los valores superiores a 1 indican brechas menores: ASEAN total 1,22; Brunéi 1,14; Tailandia 1,09; Indonesia 1,07; Filipinas 1,04; Vietnam 1,03; Malasia y Laos 1,02; Camboya 0,99; Myanmar 0,95. Solo la razón total de la ASEAN está marcada como significativa con p < 0,01; no se reportan intervalos. Fuente: documento de trabajo de los autores, tabla 2."
   caption: ''
   focal_point: ""
   preview_only: false

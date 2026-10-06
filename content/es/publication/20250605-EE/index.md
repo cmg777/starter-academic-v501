@@ -82,6 +82,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Vuelve a aumentar la desigualdad regional con ingresos altos? El promedio bayesiano de modelos informa probabilidades posteriores de inclusión del 88 % para el término lineal, 73 % para el cuadrático y 48 % para el cúbico del logaritmo del PIB real per cápita. La línea discontinua del 50 % representa la regla de inclusión del modelo de probabilidad mediana, no un umbral de significación. No está claro: el término cúbico queda por debajo de esa regla, en consonancia con la incertidumbre del artículo sobre un repunte con ingresos altos. Son probabilidades de inclusión, no de que una forma de curva sea verdadera. Fuente: Cuadro 5, efectos fijos de dos vías."
   caption: ''
   focal_point: ""
   preview_only: false

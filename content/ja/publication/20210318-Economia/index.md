@@ -53,6 +53,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "制約は空間的に集まっているのでしょうか。近隣の自治体には類似性が見られます。ボリビアの339自治体において、グローバル・モランのIは、栄養、教育格差、言語の指標を要約する第1主成分で0.57、中等教育の中退を要約する第2主成分で0.39です。両主成分の空間的類似性は有意と報告されていますが、信頼区間やグローバル検定の数値的なp値は報告されていません。正の類似性は関連を表し、因果効果ではありません。出典はEconomía（2021年）の5.2節で、指標の年次は2012年、2016年、2017年です。"
   caption: ''
   focal_point: ""
   preview_only: false

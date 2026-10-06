@@ -86,6 +86,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Can big data map poverty? Not equally well. For Cambodia’s ten household deprivation indicators, the reported validation accuracy is 76% for cooking fuel and clean water, 74% for food consumption, 73% for electricity, 72% for sanitation, 69% for health care and school attendance, 68% for housing materials, 67% for educational attainment, and 55% for assets. The plot shows all ten reported scores. The study uses balanced sampling, a 90/10 holdout and a 50% classification threshold. No uncertainty intervals are reported. These are predictive performance scores, not official poverty rates. Khoun et al. (2025), Table 3."
   caption: ''
   focal_point: ""
   preview_only: false

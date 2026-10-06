@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿El mayor crecimiento llegó a todas las regiones? El crecimiento anual promedio del PIB real potencial por persona en Bolivia, entre 2000 y 2014, va del 6,67% en Tarija al −1,52% en Pando. Los otros departamentos son Potosí 4,04%, Chuquisaca 3,08%, La Paz 2,74%, Beni 1,53%, Cochabamba 1,49%, Oruro 1,44% y Santa Cruz 1,16%. Una línea discontinua marca el crecimiento nacional de 2,44%. El crecimiento siguió siendo desigual. Son promedios geométricos descriptivos de una serie de PIB real a precios de 2014 con filtro HP; no se reporta incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

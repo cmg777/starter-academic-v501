@@ -45,6 +45,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is catch-up getting faster? For human development in 20 metropolitan municipalities in Bolivia, estimated annual beta-convergence speed rises from 2.23% in 1992–2001 to 7.21% in 2001–2013. Two bars show these point estimates. The associated regression-slope t statistics are −2.54 and −7.22; no interval for convergence speed is reported. The estimates suggest faster catch-up after 2001, but the paper does not report a test of the difference between periods. These are convergence rates, not annual HDI growth rates."
   caption: ''
   focal_point: ""
   preview_only: false

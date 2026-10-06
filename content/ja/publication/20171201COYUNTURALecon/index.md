@@ -43,6 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "成長の加速はすべての地域に及んだのでしょうか。2000〜2014年のボリビアの1人当たり潜在実質GDPの年平均成長率は、タリハの6.67%からパンドの−1.52%まで異なります。他の県はポトシ4.04%、チュキサカ3.08%、ラパス2.74%、ベニ1.53%、コチャバンバ1.49%、オルロ1.44%、サンタクルス1.16%です。破線は全国の成長率2.44%を示します。成長には地域差が残りました。2014年価格の実質GDP系列にHPフィルターを適用した記述的な幾何平均で、不確実性は報告されていません。"
   caption: ''
   focal_point: ""
   preview_only: false

@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "所得は一つの経路に収束するのでしょうか。異なる五つのクラブが見られます。2000～2017年のインドネシアの514県・市について、収束クラブ1～5に属する地域数は順に6、126、178、181、23です。クラブは高所得から低所得の順に並び、棒の高さは所得水準ではなく地域数を示しています。所属はモデルの仕様によって変わり、地域数の区間推定は報告されていません。出典は著者のワーキングペーパーの表4・5です。"
   caption: ''
   focal_point: ""
   preview_only: false

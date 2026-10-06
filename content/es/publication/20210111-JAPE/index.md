@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria de ingresos? Cinco clubes distintos. Para 514 distritos de Indonesia entre 2000 y 2017, las barras muestran 6, 126, 178, 181 y 23 distritos en los clubes de convergencia 1 a 5. Los clubes se ordenan de mayor a menor ingreso; la altura de las barras representa cantidades de distritos, no niveles de ingreso. La composición depende de la especificación del modelo y no se reportan intervalos para estas cantidades. Fuente: documento de trabajo de los autores, tablas 4 y 5."
   caption: ''
   focal_point: ""
   preview_only: false

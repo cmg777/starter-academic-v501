@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "同じ企業でも全要素生産性の動きは同じでしょうか。ブラジルの家具企業（2003～2009年）では、LP推定法が過渡的な生産性密度のクラスターを2つ、ACF推定法が1つ示します。推定法によって結果が異なります。円はクラスター数を表し、企業数、位置、規模ではありません。不確実性区間は報告されていません。出典は2018年7月の原稿、図2です。"
   caption: ''
   focal_point: ""
   preview_only: false

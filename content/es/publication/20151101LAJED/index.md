@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Converge la productividad? Barras agrupadas comparan la proporción de países en siete intervalos de PIB por trabajador respecto de Estados Unidos, fijado en 100, en una muestra equilibrada de 92 países. De 1960 a 2010, el intervalo inferior, menor que 2,5, pasa del 8% al 14%, y el superior, de 80 a menos de 120, pasa del 7% al 16%. Se muestran los siete intervalos. Hay más países en ambos extremos. Son proporciones descriptivas redondeadas de países, no de población; las de 2010 suman 99% por redondeo. No se reporta incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

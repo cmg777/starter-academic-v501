@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "GDPだけで全体像がわかるでしょうか。2000年の選定された東アジアとラテンアメリカの経済を比較すると、東アジアの1人当たりGDPはラテンアメリカの3.10倍ですが、厚生で調整した開発水準は4.22倍です。2本の棒は同じ比率尺度で示しています。厚生には平均寿命、消費、余暇、格差が含まれ、測定された地域間の差は広がります。対象はラテンアメリカ6経済と東アジア4経済です。記述的なモデルに基づく丸められた推計で、不確実性は報告されていません。"
   caption: ''
   focal_point: ""
   preview_only: false

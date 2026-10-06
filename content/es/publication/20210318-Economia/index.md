@@ -53,6 +53,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se agrupan las restricciones? Los municipios vecinos se parecen. En 339 municipios de Bolivia, la I de Moran global es 0,57 para el primer componente principal, que resume medidas de nutrición, desigualdad educativa e idioma, y 0,39 para el segundo, que resume el abandono de la secundaria. El estudio reporta similitud espacial significativa en ambos componentes, sin intervalos de confianza ni valores p globales numéricos. La similitud positiva es una asociación, no un efecto causal. Fuente: Economía (2021), sección 5.2; los indicadores provienen de 2012, 2016 y 2017."
   caption: ''
   focal_point: ""
   preview_only: false

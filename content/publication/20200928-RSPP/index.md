@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Are crime gaps shrinking? Scale matters. Colombia, 2010–2018: standard-deviation indices with 2010 = 100 fall to 68.4 for homicides and 88.2 for personal injuries across departments, but rise to 106.5 and 157.9 across municipalities. Open dots mark 2010 and filled dots 2018; connecting lines show changes, not uncertainty intervals. These are dispersion indices, not average crime levels. No intervals are reported. Calculated from rounded standard deviations in the authors’ 2019 working paper, Table 1."
   caption: ''
   focal_point: ""
   preview_only: false

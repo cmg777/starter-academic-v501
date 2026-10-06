@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "夜間光は所得水準と成長のどちらを捉えるのでしょうか。インドの36地域（2014～2019年）について、表7のモデルの決定係数R²は地域間で0.9036、地域・年固定効果を考慮した地域内で0.0002です。主に所得水準の違いを捉えます。1人当たりGDPの代理変数として1人当たりGNIを用いています。標本内の関連性であり、因果効果や検証用データの予測精度ではありません。R²の不確実性区間は報告されていません。"
   caption: ''
   focal_point: ""
   preview_only: false

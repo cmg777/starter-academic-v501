@@ -51,6 +51,7 @@ url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is ASEAN converging? Unevenly. For 274 subnational regions in 1998–2012, dots show the ratio of initial to final dispersion in log GDP per capita estimated from nighttime lights. Ratios above 1 indicate narrower gaps: ASEAN total 1.22, Brunei 1.14, Thailand 1.09, Indonesia 1.07, Philippines 1.04, Vietnam 1.03, Malaysia and Laos 1.02, Cambodia 0.99, Myanmar 0.95. Only the ASEAN total ratio is marked significant at p < 0.01; no intervals are reported. Source: author working paper, Table 2."
   caption: ''
   focal_point: ""
   preview_only: false

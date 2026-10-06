@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Nightlights: levels or growth? For 36 Indian regions in 2014–2019, Table 7 reports model R² of 0.9036 between regions and 0.0002 within regions with region and year fixed effects. Levels, mostly. The income measure is a GNI-per-capita proxy for GDP per capita. These are in-sample associations, not causal effects or held-out prediction scores. No R² uncertainty intervals are reported."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is GDP the whole story? For selected East Asian and Latin American economies in 2000, East Asia’s GDP per capita is 3.10 times Latin America’s, while its welfare-adjusted development is 4.22 times as high. Two bars use a common ratio scale. Welfare incorporates life expectancy, consumption, leisure and inequality; it widens the measured gap. These are rounded descriptive, model-based estimates for six Latin American and four East Asian economies, with no uncertainty reported."
   caption: ''
   focal_point: ""
   preview_only: false

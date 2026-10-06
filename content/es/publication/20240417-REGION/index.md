@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Luces nocturnas: ¿niveles o crecimiento? Para 36 regiones de la India en 2014–2019, el Cuadro 7 informa un R² de 0,9036 entre regiones y 0,0002 dentro de las regiones con efectos fijos regionales y anuales. Principalmente, niveles. El ingreso nacional bruto per cápita se utiliza como aproximación al PIB per cápita. Son asociaciones dentro de la muestra, no efectos causales ni resultados de validación externa. No se informan intervalos para el R²."
   caption: ''
   focal_point: ""
   preview_only: false

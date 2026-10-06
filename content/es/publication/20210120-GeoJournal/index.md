@@ -56,6 +56,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Qué tan rápido se cierran las brechas? Más lentamente en los distritos. Para 514 distritos y 34 provincias de Indonesia entre 2010 y 2017, las velocidades anuales estimadas de convergencia son 0,93% en distritos, 1,14% en distritos con filtrado espacial y 1,44% en provincias. Los puntos comparten una misma escala. Todos los coeficientes de regresión subyacentes tienen p < 0,01, pero no se reportan intervalos para las velocidades; el gráfico no demuestra diferencias significativas entre modelos ni efectos causales. Fuente: GeoJournal, tabla 1."
   caption: ''
   focal_point: ""
   preview_only: false

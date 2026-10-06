@@ -45,6 +45,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Se acelera la convergencia? Para el desarrollo humano de 20 municipios metropolitanos de Bolivia, la velocidad anual estimada de convergencia beta pasa de 2,23% en 1992–2001 a 7,21% en 2001–2013. Dos barras muestran estas estimaciones puntuales. Los estadísticos t de las pendientes de regresión asociadas son −2,54 y −7,22; no se reporta un intervalo para la velocidad de convergencia. Las estimaciones sugieren una convergencia más rápida después de 2001, pero el artículo no reporta una prueba de la diferencia entre periodos. Son tasas de convergencia, no tasas anuales de crecimiento del IDH."
   caption: ''
   focal_point: ""
   preview_only: false

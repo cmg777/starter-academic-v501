@@ -48,6 +48,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Do industries converge together? Original Figure 5c–d shows the standard deviation of log labor productivity in Japan, 1973–2012, for stationary and transitional input–output communities. Dispersion in the stationary community begins declining around 2007, while dispersion in the transitional community continues rising. Networks differ. Original observations, smoothed curves and shaded bands are retained; the source does not specify a band confidence level. These patterns are descriptive, not causal."
   caption: ''
   focal_point: ""
   preview_only: false

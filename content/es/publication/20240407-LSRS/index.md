@@ -70,6 +70,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Pueden las luces nocturnas seguir la actividad económica? Para las luces nocturnas urbanas de 81 provincias de Türkiye, 2004–2020, los R² reportados entre provincias son 0,807 para actividades no agrícolas, 0,732 para industria, 0,809 para servicios y 0,511 para agricultura. Los modelos correspondientes dentro de las provincias, con efectos fijos de región y año, presentan R² de 0,012, 0,038, 0,004 y 0,038. Los puntos conectados comparan estos estadísticos en una escala de cero a uno. Las luces describen mejor las diferencias entre lugares que los cambios anuales dentro de cada lugar. Son ajustes dentro de la muestra para variaciones distintas, no efectos causales ni precisión predictiva fuera de la muestra; no se reportan intervalos para R²."
   caption: ''
   focal_point: ""
   preview_only: false

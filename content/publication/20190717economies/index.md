@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Are welfare gaps shrinking? Among the core members of three country welfare clubs, dispersion measured as the standard deviation of log relative welfare changes from 1980 to 2007 as follows: low-welfare core, 30 countries, 0.31 to 0.39; middle-welfare core, 17 countries, 0.25 to 0.27; high-welfare core, 28 countries, 0.32 to 0.21. Only the richest core shows narrowing gaps. Table 1 values; no intervals are reported. Core members are a subset of the 128-country sample."
   caption: ''
   focal_point: ""
   preview_only: false

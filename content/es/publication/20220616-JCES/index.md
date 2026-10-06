@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria del aprendizaje? En 28 países de la UE durante 1990–2016, cuatro clubes de convergencia del aprendizaje presentan estadísticos log-t de 2,94; 2,05; 2,65 y 7,68. Bulgaria y Rumania forman un grupo divergente, con −7,53. La línea vertical marca −1,65; por debajo se rechaza la convergencia. Son estadísticos adimensionales, no estimaciones de efectos ni intervalos de confianza. Cuatro clubes y dos países divergentes."
   caption: ''
   focal_point: ""
   preview_only: false

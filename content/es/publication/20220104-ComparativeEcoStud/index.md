@@ -54,6 +54,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola trayectoria de convergencia? En 151 regiones de América del Sur, entre 2010 y 2018, los coeficientes locales del ingreso nacional bruto per cápita van de −0,914 a −0,006, con mediana de −0,273; los del índice de desarrollo humano van de −0,537 a 0,057, con mediana de −0,169. Las líneas muestran mínimos y máximos regionales, no intervalos de confianza. Las trayectorias locales difieren; los signos por sí solos no establecen significancia estadística local."
   caption: ''
   focal_point: ""
   preview_only: false

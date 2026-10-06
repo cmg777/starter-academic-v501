@@ -52,6 +52,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One income path? Thailand’s 77 provinces separate into three GDP-per-capita convergence clubs for 1995–2017: Club 1 has 12 provinces, Club 2 has 48, and Club 3 has 17. Dots show membership counts, not income levels or confidence intervals. The clubs cannot be merged under the paper’s convergence tests."
   caption: ''
   focal_point: ""
   preview_only: false

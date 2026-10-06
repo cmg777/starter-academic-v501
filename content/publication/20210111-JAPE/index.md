@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One income path? Five distinct clubs. For 514 Indonesian districts in 2000–2017, bars show 6, 126, 178, 181 and 23 districts in convergence clubs 1 through 5. Clubs are ordered from the highest to the lowest income group; bar heights represent district counts, not income levels. Membership depends on model specification, and no count intervals are reported. Source: author working paper, Tables 4–5."
   caption: ''
   focal_point: ""
   preview_only: false

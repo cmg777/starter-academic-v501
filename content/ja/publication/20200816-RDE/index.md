@@ -50,6 +50,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "生産性は一つの経路に収束するのでしょうか。2020年3月の著者原稿は、インドネシア26州（1990～2010年）に2つの労働生産性の収束クラブを識別しています。高生産性クラブはジャカルタと東カリマンタンの2州、低生産性クラブは残る24州です。各点は1州を表し、配置は地理的位置を示しません。2つの異なるクラブがあります。所属の不確実性区間は報告されていません。出典はMPRA 99322の表2で、刊行論文の要旨も2つの労働生産性クラブを報告しています。"
   caption: ''
   focal_point: ""
   preview_only: false

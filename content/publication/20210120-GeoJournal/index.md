@@ -56,6 +56,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "How fast is catch-up? Slower in districts. For Indonesia’s 514 districts and 34 provinces in 2010–2017, estimated annual convergence speeds are 0.93% for districts, 1.14% for spatially filtered districts and 1.44% for provinces. Dots use a common scale. All underlying regression coefficients have p < 0.01, but no intervals for convergence speeds are reported; the chart does not establish significant differences between models or causal effects. Source: GeoJournal, Table 1."
   caption: ''
   focal_point: ""
   preview_only: false

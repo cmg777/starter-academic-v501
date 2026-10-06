@@ -51,6 +51,7 @@ url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "ASEANは収束しているのでしょうか。進み方は一様ではありません。1998～2012年の274の国内地域について、夜間光から推計した1人当たりGDPの対数のばらつきを、期首と期末の比で示しています。1を上回ると格差の縮小を表します。ASEAN全体は1.22、ブルネイ1.14、タイ1.09、インドネシア1.07、フィリピン1.04、ベトナム1.03、マレーシアとラオス1.02、カンボジア0.99、ミャンマー0.95です。p < 0.01で有意と記されている比はASEAN全体のみで、区間推定は報告されていません。出典は著者のワーキングペーパーの表2です。"
   caption: ''
   focal_point: ""
   preview_only: false

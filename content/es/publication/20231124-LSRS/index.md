@@ -67,6 +67,7 @@ url_source: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Persiste el desempleo? En 30 provincias de Indonesia durante 2001–2021, el coeficiente del desempleo rezagado es 0,60 con efectos temporales, 0,31 con el promedio nacional contemporáneo, 0,49 con su rezago y 0,31 con ambos promedios. Los intervalos muestran la estimación ±1 error estándar reportado: 0,03, 0,04, 0,04 y 0,04, respectivamente. Las unidades son puntos porcentuales por punto porcentual. Todos los modelos incluyen efectos regionales y dinámica espacial. La persistencia es positiva, pero su magnitud depende del modelo; son coeficientes condicionales, no efectos causales totales."
   caption: ''
   focal_point: ""
   preview_only: false

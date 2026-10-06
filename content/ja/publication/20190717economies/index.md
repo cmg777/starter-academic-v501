@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "厚生格差は縮小しているのでしょうか。3つの国別厚生クラブの中核メンバーについて、相対厚生の対数の標準偏差は1980年から2007年に、低厚生クラブの30か国で0.31から0.39、中位クラブの17か国で0.25から0.27、高厚生クラブの28か国で0.32から0.21へ変化します。格差が縮小したのは最も豊かな中核グループだけです。表1の値を使用し、区間は報告されていません。中核メンバーは128か国の標本の一部です。"
   caption: ''
   focal_point: ""
   preview_only: false

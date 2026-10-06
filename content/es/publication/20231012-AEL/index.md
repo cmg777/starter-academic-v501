@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Crecimiento y empleo: ¿importa el método? En 514 distritos de Indonesia, 2011–2020, el coeficiente reportado del cambio del desempleo por punto porcentual de crecimiento del PIB es −0,000 con MCO, −0,629 usando la temperatura rezagada como instrumento, −0,583 con el cambio de temperatura y −0,624 con ambos. Los intervalos muestran ±1 error estándar agrupado por distrito: 0,007, 0,253, 0,296 y 0,250. Todos los modelos incluyen efectos fijos de distrito y año. La estimación cambia según el método. La interpretación mediante variables instrumentales requiere supuestos de validez y relevancia; −0,000 es una estimación redondeada, no una prueba de ausencia de relación."
   caption: ''
   focal_point: ""
   preview_only: false

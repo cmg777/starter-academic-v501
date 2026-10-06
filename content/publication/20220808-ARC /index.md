@@ -53,6 +53,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One income destination? Among Turkey’s 81 provinces in 2007–2019, final GDP-per-capita convergence clubs contain 2, 17, 31, 18, 9 and 2 provinces. Istanbul and Kocaeli are the 2 nonconvergent provinces. Dots show exact membership counts, not income levels or confidence intervals. Six clubs, with two provinces diverging; clubs 2, 3 and 5 exhibit weak convergence."
   caption: ''
   focal_point: ""
   preview_only: false

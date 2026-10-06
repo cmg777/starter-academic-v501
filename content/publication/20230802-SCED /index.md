@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Is structural change spatially uniform? In European regions over 2003–2015, manufacturing’s employment share decreases while its spatial dependence increases. Knowledge-intensive services show the reverse: employment share increases while spatial dependence decreases. This directional diagram summarizes Figure 5 of the authors’ December 9, 2022 manuscript for Convergence clubs and spatial structural change in the European Union. Arrows encode direction only, not magnitudes or statistical significance. Opposite spatial paths; descriptive trends, not causal effects."
   caption: ''
   focal_point: ""
   preview_only: false
