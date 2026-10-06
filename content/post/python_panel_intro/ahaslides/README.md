@@ -12,7 +12,7 @@
 | **Public view link** | https://presenter.ahaslides.com/share/1790911128481-t7x8a80cw2 |
 | **Join code** | `V62EU` |
 | **Plan** | Education Large (paid, from 2026-10-06): editor reports **0 / 200** participants |
-| **Backup** | `10274743`, *"BACKUP 2026-10-06 (free-plan 7-quiz version)"* |
+| **Backup** | `10274743`, *"BACKUP 2026-10-06 (free-plan 7-quiz version)"*, deleted 2026-10-07 after the rebuild was verified |
 | **Theme** | Meeting (`#000000`, theme id 18468) |
 | **Source deck** | `../slides/slides.qmd` → 33 printed pages |
 | **Composition** | 33 image slides + 37 interactive = **70** |

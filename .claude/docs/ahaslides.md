@@ -206,7 +206,8 @@ are card-only stubs.
 The post links to the presentation's share URL, so never create a replacement deck —
 rebuild the same ID.
 
-1. `duplicate_presentation` → `rename_presentation` the copy as a dated backup.
+1. `duplicate_presentation` → `rename_presentation` the copy as a dated backup (delete
+   it once the rebuild is verified; see *Folders in the account*).
 2. `get_presentation_detail_tool`, split slides into interactive vs content **by type**.
    **Slide IDs change when a slide's type is converted**, so never trust recorded IDs.
 3. Soft-delete the content slides:
@@ -345,6 +346,27 @@ When the source is a PDF export (Canva, PowerPoint) rather than `slides.qmd`:
    (a Japanese page image became a video). Re-count the image slides by API afterwards,
    and place new or imported slides with `move_slide` (they land at the end when nothing
    is selected).
+
+## Folders in the account (2026-10-07)
+
+Every presentation lives in one of four top-level folders (no subfolders):
+
+| Folder | ID | Holds |
+|---|---|---|
+| Regional Development | `141828` | the Regional Development class decks (Parts 1 to 3) |
+| Applied Econometrics | `141829` | the econometrics tutorial decks (FWL, panel data, DiD, synthetic control, Bayesian spatial SC, bridge impact) |
+| Website | `141830` | decks made only for the website (the hero keynote in EN, ES and JA) |
+| Spanish Class | `141831` | decks for the Spanish language class (only those) |
+
+- **File every new deck:** right after `create_presentation`, call
+  `move_presentations_to_folder` with the folder of its use. A class deck goes to its
+  class folder; a deck for a tutorial on an econometrics topic goes to Applied
+  Econometrics. If a new deck fits none of them, ask before creating a folder.
+- **Backups are temporary:** the dated backup made before a rebuild (see *Rebuild an
+  existing deck in place*) is deleted with `delete_presentations` once the rebuild is
+  verified (soft delete; `recover_presentations` restores it). The three backups from
+  2026-09-30 and 2026-10-06 were deleted on 2026-10-07.
+- Moving a deck does not change its join code, audience link or share link.
 
 ## Plan behaviour
 
