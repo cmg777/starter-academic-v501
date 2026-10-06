@@ -1,0 +1,25 @@
+{{/* A real image link works without JavaScript; the native dialog enhances it. */}}
+{{ $copy := dict "hint" "Click to enlarge" "open" "Enlarge featured image" "viewer" "Enlarged image viewer" "close" "Close image viewer" }}
+{{ if eq .page.Language.Lang "es" }}
+  {{ $copy = dict "hint" "Haga clic para ampliar" "open" "Ampliar imagen destacada" "viewer" "Visor de imagen ampliada" "close" "Cerrar visor de imagen" }}
+{{ else if eq .page.Language.Lang "ja" }}
+  {{ $copy = dict "hint" "クリックして拡大" "open" "アイキャッチ画像を拡大" "viewer" "拡大画像ビューアー" "close" "画像ビューアーを閉じる" }}
+{{ end }}
+{{ $alt := .page.Params.image.alt_text | default .page.Title | plainify }}
+<a class="publication-image-link" href="{{ .original.RelPermalink }}" aria-label="{{ $copy.open }}">
+  <span class="publication-image-artwork">
+    <img src="{{ .image.RelPermalink }}" alt="{{ $alt }}" class="featured-image" width="{{ .image.Width }}" height="{{ .image.Height }}">
+  </span>
+  <span class="publication-image-hint" aria-hidden="true">{{ $copy.hint }}</span>
+</a>
+{{ with .page.Params.image.caption }}<div class="publication-image-caption">{{ . | markdownify | emojify }}</div>{{ end }}
+<dialog class="publication-image-viewer" id="publication-image-viewer" aria-label="{{ $copy.viewer }}">
+  <div class="publication-image-viewer-toolbar">
+    <button class="image-lightbox-close publication-image-viewer-close" type="button" aria-label="{{ $copy.close }}" autofocus></button>
+  </div>
+  <img class="publication-image-viewer-image" alt="{{ $alt }}">
+</dialog>
+{{ $style := resources.Get "css/publication-image-viewer.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+{{ $script := resources.Get "js/publication-image-viewer.js" | minify | fingerprint }}
+<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}" defer></script>

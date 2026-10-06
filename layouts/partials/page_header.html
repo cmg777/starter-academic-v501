@@ -62,14 +62,19 @@
 {{end}}
 
 {{/* Featured image FIRST */}}
+{{ $publicationImage := eq $page.Type "publication" }}
 {{ if eq $placement 3 }}
-<div class="article-header container featured-image-wrapper mt-5 mb-4">
+<div class="article-header container featured-image-wrapper{{ if $publicationImage }} publication-featured-image{{ end }} mt-5 mb-4">
 {{ else }}
-<div class="article-header {{$image_container}} featured-image-wrapper mb-4" style="max-width: {{$image.Width}}px; max-height: {{$image.Height}}px;">
+<div class="article-header {{$image_container}} featured-image-wrapper{{ if $publicationImage }} publication-featured-image{{ end }} mb-4" style="max-width: {{$image.Width}}px;{{ if not $publicationImage }} max-height: {{$image.Height}}px;{{ end }}">
 {{ end }}
   <div style="position: relative">
+    {{ if $publicationImage }}
+      {{ partial "publication-featured-image.html" (dict "page" $page "image" $image "original" $featured) }}
+    {{ else }}
     <img src="{{ $image.RelPermalink }}" alt="{{ with $.Params.image.alt_text }}{{.}}{{ end }}" class="featured-image">
     {{ with $.Params.image.caption }}<span class="article-header-caption">{{ . | markdownify | emojify }}</span>{{ end }}
+    {{ end }}
   </div>
 </div>
 

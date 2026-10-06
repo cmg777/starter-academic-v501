@@ -1,0 +1,90 @@
+/* Replace the decorative shared hint with a localized, clickable image link. */
+.publication-featured-image > div::after {
+  content: none;
+}
+
+.publication-image-link,
+.publication-image-artwork {
+  display: block;
+  position: relative;
+}
+
+.publication-image-link,
+.publication-image-link:hover {
+  color: var(--orbital-muted, #9baaba);
+  text-decoration: none;
+}
+
+.publication-image-hint {
+  display: block;
+  margin-top: 6px;
+  text-align: right;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.publication-image-caption {
+  color: var(--orbital-muted, #9baaba);
+  font-size: 0.75rem;
+}
+
+.publication-image-link:focus-visible,
+.publication-image-viewer-close:focus-visible {
+  outline: 3px solid #e9c184;
+  outline-offset: 4px;
+}
+
+.publication-image-viewer:not([open]) {
+  display: none;
+}
+
+.publication-image-viewer {
+  box-sizing: border-box;
+  width: calc(100vw - 24px);
+  max-width: none;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 12px;
+  border: 1px solid #22303e;
+  border-radius: 6px;
+  color: #edf2f6;
+  background: #050a12;
+}
+
+.publication-image-viewer::backdrop {
+  background: rgba(5, 10, 18, 0.88);
+}
+
+.publication-image-viewer-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 44px;
+  margin-bottom: 8px;
+}
+
+.publication-image-viewer .publication-image-viewer-close {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.publication-image-viewer .publication-image-viewer-image {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 108px);
+  height: calc(100dvh - 108px);
+  margin: 0;
+  object-fit: contain;
+  cursor: default;
+}
+
+@media print {
+  .publication-image-hint,
+  .publication-image-viewer[open] {
+    display: none;
+  }
+}
