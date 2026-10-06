@@ -17,7 +17,8 @@
     return best;
   };
   let index = Math.max(0, Math.min(slides.length - 1, Number(gallery.dataset.galleryStart) || 0));
-  track.scrollTo({ left: target(index), behavior: 'auto' });
+  // Position on the next frame, so measuring never forces a layout during startup.
+  requestAnimationFrame(() => track.scrollTo({ left: target(index), behavior: 'auto' }));
   counter.textContent = index + 1;
   const go = next => {
     next = (next + slides.length) % slides.length;

@@ -56,6 +56,10 @@ Spanish, and Japanese copy is in `data/orbital.json`; its dedicated design and
 interactive NASA Earth-at-night globe are in `assets/css/orbital.css` and
 `assets/js/orbital.js`. See README's **Cinematic landing page** section and
 `logs/2026-10-03-orbital-landing.md`. The browser has no 3D-library dependency.
+The homepage CSS is inlined in `<head>` and its four scripts ship as one deferred
+bundle; the globe textures live in `assets/media/orbital/` and are served as
+same-size WebP. Keep the hero opening sequence under about 0.6 s and do not hide
+content that is already on screen; see `logs/2026-10-06-homepage-performance.md`.
 
 Both page systems share `assets/css/orbital-palette.css`. Content pages load the
 palette plus `assets/css/orbital-subpages.css` after Wowchemy, via `custom_head.html`.

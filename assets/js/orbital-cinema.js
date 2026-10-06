@@ -172,22 +172,31 @@
     ['.section-intro, .section-heading, .about-copy, .contact-intro, .contact-details', 0],
     ['.research-card, .content-card, .publication-row, .talk-list > a, .member-card, .portrait-wrap, .gallery-track, .courses-link', 1]
   ];
-  const revealables = [];
+  const candidates = [];
   for (const [selector, stagger] of revealGroups) {
     document.querySelectorAll(selector).forEach(el => {
       if (el.closest('.hero')) return;
       const siblings = stagger ? [...el.parentElement.children].filter(c => c.matches(selector)) : [el];
-      el.style.setProperty('--d', `${Math.min(siblings.indexOf(el), 9) * 70}ms`);
-      el.setAttribute('data-reveal', '');
-      revealables.push(el);
+      candidates.push([el, Math.min(siblings.indexOf(el), 6) * 50, el.getBoundingClientRect()]);
     });
   }
+  // Read every position before writing, so tagging costs a single layout.
+  // Content already on screen (e.g. a restored scroll position) stays put
+  // instead of vanishing and animating back in.
+  const revealables = [];
+  for (const [el, delay, box] of candidates) {
+    if (box.top < innerHeight && box.bottom > 0) continue;
+    el.style.setProperty('--d', `${delay}ms`);
+    el.setAttribute('data-reveal', '');
+    revealables.push(el);
+  }
   if ('IntersectionObserver' in window) {
+    // A positive bottom margin starts each reveal just before it scrolls into view.
     const io = new IntersectionObserver(entries => entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       const el = entry.target; el.classList.add('is-in'); io.unobserve(el);
-      setTimeout(() => el.classList.add('settled'), 1400);
-    }), { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+      setTimeout(() => el.classList.add('settled'), 1000);
+    }), { rootMargin: '0px 0px 12% 0px', threshold: 0 });
     revealables.forEach(el => io.observe(el));
   } else revealables.forEach(el => el.classList.add('is-in', 'settled'));
 
@@ -307,19 +316,22 @@
     let queued = false;
     const paint = () => {
       queued = false;
+      // Measure every slide before styling any: interleaving the two forced
+      // a full-page layout per slide.
       const mid = track.scrollLeft + track.clientWidth / 2;
-      for (const s of slides) {
-        const o = (s.offsetLeft + s.offsetWidth / 2 - mid) / s.offsetWidth;
+      const offsets = slides.map(s => (s.offsetLeft + s.offsetWidth / 2 - mid) / s.offsetWidth);
+      slides.forEach((s, i) => {
+        const o = offsets[i];
         const a = clamp(o, -1.6, 1.6), m = Math.min(Math.abs(o), 1.6);
         s.style.setProperty('--o', a.toFixed(3));
         s.style.setProperty('--m', m.toFixed(3));
         s.classList.toggle('is-center', m < .5);
         s.style.zIndex = String(20 - Math.round(m * 6));
-      }
+      });
     };
     const queue = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
     track.addEventListener('scroll', queue, { passive: true });
     addEventListener('resize', queue, { passive: true });
-    paint(); setTimeout(paint, 300);
+    queue(); setTimeout(queue, 300);
   }
 })();

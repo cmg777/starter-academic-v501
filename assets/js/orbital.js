@@ -167,7 +167,9 @@
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.uniform1i(gl.getUniformLocation(program, 'earthMap'), 0);
     const image = new Image();
-    image.onload = () => {
+    // Decode off the main thread first, so the texture upload cannot freeze the page.
+    image.onload = () => typeof image.decode === 'function' ? image.decode().then(upload, upload) : upload();
+    const upload = () => {
       if (failed) return;
       try {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

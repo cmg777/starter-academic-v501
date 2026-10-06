@@ -94,6 +94,13 @@ The home template deliberately omits the legacy theme's browser dependencies.
 - **Navigation:** `config/_default/menus.yaml` and the localized menus in
   `config/_default/languages.yaml` supply both desktop and mobile navigation.
 - **Design:** `assets/css/orbital.css`; only loaded by the landing page.
+- **Loading:** the palette, design, and cinema CSS are concatenated, minified, and
+  **inlined** in `<head>` (no render-blocking stylesheet request). The four scripts
+  (`orbital.js`, `lang-pref.js`, `orbital-gallery.js`, `orbital-cinema.js`) ship as one
+  deferred, fingerprinted bundle. The opening sequence completes in about 0.6 s, and
+  scroll reveals start just before a section enters the viewport. Content already on
+  screen is never hidden. Google Analytics is queued at once but loads only after
+  the page is idle (production builds only).
 - **Shared site theme:** `assets/css/orbital-palette.css` supplies the dark background,
   reading panels, text, blue links, gold accents, and system fonts for both the
   landing page and all Wowchemy content pages. `orbital-subpages.css` applies these
@@ -120,7 +127,9 @@ The home template deliberately omits the legacy theme's browser dependencies.
   *Local Development* and *outer space*). Page titles use the plain text.
 - **Cards, student directory, presentations:** `layouts/partials/orbital-*.html`.
 - **Imagery and attribution:** `static/media/orbital/CREDITS.txt`. The real NASA
-  Black Marble 2016 map has desktop and mobile variants. Hugo generates a 53 KiB
+  Black Marble 2016 map has desktop (3600×1800) and mobile (1800×900) variants in
+  `assets/media/orbital/`. Hugo serves them as same-size WebP (q88, about half the
+  JPEG bytes), preloaded per breakpoint and decoded before the WebGL upload. Hugo generates a 53 KiB
   WebP static fallback from `assets/media/orbital/earth-at-night-asia.png`. The
   Sentinel-2 spacecraft and footer horizon are generated decorative imagery under
   `assets/media/orbital/`; Hugo serves optimized responsive WebP derivatives.

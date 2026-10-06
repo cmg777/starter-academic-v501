@@ -805,7 +805,7 @@ html[lang^="en"] .hero h1 .h1-accent {
   flex-shrink:0;
   position:relative;
   overflow:hidden;
-  background:#080e17 url('/media/orbital/black-marble-2016-mobile.jpg') 75% 36% / 290% auto
+  background:#080e17 var(--research-art) 75% 36% / 290% auto
 }
 
 .research-card-1 .research-art {
