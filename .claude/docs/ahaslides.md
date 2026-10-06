@@ -298,7 +298,18 @@ When the source is a PDF export (Canva, PowerPoint) rather than `slides.qmd`:
 4. **Moving a video into place:** anchor it to the slide of the page *before* it, by
    page, not by position in the image list (a skipped video page shifts the image index;
    that slip put two Part 1 videos one image late until `move_slide` fixed it).
-5. **A non-post folder needs a Hugo exclusion.** Under a branch bundle such as
+5. **Animated GIFs freeze in the PDF.** Canva keeps GIF uploads as MP4 clips listed in
+   the view page data (a `"J"` array: id, title such as `lasVegas.gif`, files with sizes);
+   element boxes (top, left, width, height on a 1920x1080 page) sit next to the asset id.
+   Rebuild each page as a full-slide GIF (`content/courses/slides/ahaslides/animate_pages.py`)
+   and swap it in with the editor's **Change image** (GIF up to 15 MB; it animates in the
+   editor and the share view). Restore page pixels only inside explicit boxes of elements
+   drawn over the GIF: an automatic difference mask also freezes the clip's own changing
+   labels. Hold nearly unchanged pixels between frames, or satellite clips exceed 10 MB.
+   Chrome blocks a second scripted download from a site until the user allows "automatic
+   downloads". After the swap, `get_presentation_detail` kept returning the old image URL;
+   trust a reloaded editor or the share view, not that field.
+6. **A non-post folder needs a Hugo exclusion.** Under a branch bundle such as
    `content/courses/`, `.md` files in a subfolder become pages; the courses deck folder is
    in `excludeFiles` in `config/_default/config.yaml`.
 

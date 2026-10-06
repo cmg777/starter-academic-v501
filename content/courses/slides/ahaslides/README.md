@@ -30,6 +30,29 @@ Development card on `/courses/` (EN, ES, JA).
   the map, with start times for p13 (3:40), p36 (0:21) and p74 (1:52). `deck_part*.md`
   says for each video whether it is core or optional and how much to play.
 
+## Animated pages (GIFs)
+
+The Canva deck has five animated GIFs that the PDF export froze. All are in Part 1, and
+their four pages are now **animated full-slide GIFs** in place of the static images
+(same slide IDs, so the anchors and order are unchanged):
+
+| Page | Part 1 slide | Animation | GIF |
+|---|---|---|---|
+| 8 | 18 | Las Vegas urban growth, 1984 to 2020 | 3.7 s loop, 3.1 MB |
+| 9 | 19 | Dubai and Playa del Carmen | 3.8 s loop, 3.0 MB |
+| 14 | 32 | McKinsey: one world bubble splitting into micro regions | 50 s, 2.4 MB |
+| 25 | 47 | Awesome GEE catalog: Africa layers switching | 9 s loop, 0.7 MB |
+
+`animate_pages.py` builds them. It renders the page, plays the original clip in its box
+(positions read from the Canva design data), and keeps the page pixels only inside the
+listed boxes of elements drawn on top (banners, the McKinsey title and source line).
+Pixels that barely change between frames are held, which cuts the satellite GIFs from
+about 17 MB to 3 MB. Canva stores the author's GIF uploads as MP4 clips in the design
+data (`"J"` array of the view page, titles such as `lasVegas.gif`); they were downloaded
+from the shared view into `build/clips/` (gitignored). The GIFs were uploaded with the
+editor's **Change image** on the page image (GIF accepted, up to 15 MB) and play in the
+editor and the share view.
+
 ## Teaching design (2026-10-06)
 
 GSID master's students, under 30, in person, 90 minutes per part, English, laptops.
@@ -58,6 +81,7 @@ GSID master's students, under 30, in person, 90 minutes per part, English, lapto
 | `pages.py` | Page labels, part membership, YouTube map, tool links. |
 | `activities.py` | **Source of truth** for the 97 interactive slides (A*, B*, C*). |
 | `images.json` | AhaSlides CDN URLs of four page images reused as activity backgrounds. |
+| `animate_pages.py` | Builds `build/animated/page{8,9,14,25}.gif` from the page renders and the Canva clips. |
 | `make_part_pdfs.py` | Writes `build/part{1,2,3}.pdf` (Part 3 split in two: the upload tool takes 10 MB). |
 | `build_deck_json.py` | Validates and writes `deck_part{1,2,3}.json` and the presenter copies `deck_part{1,2,3}.md`. |
 | `build_payload.py` | Writes `payload_part{1,2,3}.json`: `create_slides` calls with resolved anchors, then property updates. |

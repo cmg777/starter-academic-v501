@@ -55,6 +55,16 @@ new slide types allowed; course-card links in EN/ES/JA.
 - Editor: 0 / 200 participants; pin on image, ranking, photo share, interactive image and
   YouTube slides render. Share links return 200.
 
+## Animated pages (follow-up, same day)
+
+The author asked to use the GIFs of the Canva deck. Five animations (Las Vegas, Dubai,
+Playa del Carmen, the McKinsey micro regions, the Awesome GEE Africa layers) on pages 8,
+9, 14 and 25 were downloaded from the shared Canva view as the MP4 clips Canva keeps, and
+`animate_pages.py` rebuilt those pages as full-slide GIFs (0.7 to 3.1 MB). They replaced
+the static images on Part 1 slides 18, 19, 32 and 47 through the editor (Change image);
+slide IDs and order are unchanged (re-verified), and the GIFs play in the editor and the
+public share view. Parts 2 and 3 have no animated pages.
+
 ## Still to do before class
 
 Two-device dry run per part (join, answer, pin, upload, spin, play a video, duck race),
