@@ -1,81 +1,104 @@
 #!/usr/bin/env python3
-"""Parse deck.md into deck.json.
+"""Build deck.json and deck.md from slides.qmd plus activities.py, with validation.
 
-deck.md is the source of truth for the AhaSlides deck; deck.json is the
-machine-readable form fed to the AhaSlides MCP server. Regenerate after any
-edit to deck.md:
+    python3 build_deck_json.py && python3 build_payload.py
 
-    python3 build_deck_json.py
+The deck has two layers (see .claude/docs/ahaslides.md):
 
-Under the image architecture the content slides are pages of an imported PDF,
-not text built through the API, so a content slide here carries only a title,
-its source page number and its speaker notes. Only the interactive slides are
-actually created through the MCP; see .claude/docs/ahaslides.md.
+- 34 content slides: pages of ../slides/slides.qmd, rendered to PDF and imported
+  as images. Their titles and speaker notes are read from slides.qmd verbatim, so
+  deck.md can never drift from the images.
+- 35 interactive slides: defined in activities.py, each placed after a page.
+
+deck.md is the presenter copy: the full running order, every speaker note (the
+imported images cannot carry notes in AhaSlides), every activity with its answer,
+and the run-of-show timing. Nothing is written if any check fails.
 """
 import json
 import re
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SRC = HERE / "deck.md"
-OUT = HERE / "deck.json"
-QMD = HERE.parent / "slides" / "slides.qmd"   # the deck the images come from
+QMD = HERE.parent / "slides" / "slides.qmd"
+sys.path.insert(0, str(HERE))
+from activities import ACTIVITIES, LEGACY_NOTES  # noqa: E402
 
-# The deck's shape, asserted by validate(). IMAGE_PAGES must equal the page
-# count of the rendered PDF (pdfinfo deck.pdf); INTERACTIVE_POSITIONS is the
-# final running order the interleave reproduces. Interactive k sits right after
-# source page p_k, so its final position is p_k + k: cue pages 4, 12, 17, 20,
-# 24, 26 and the DML slide on page 33 give 5, 14, 20, 24, 29, 32, 40.
 IMAGE_PAGES = 34
-INTERACTIVE_POSITIONS = [5, 14, 20, 24, 29, 32, 40]
+N_INTERACTIVE = 35
 
-SLIDE_RE = re.compile(r"^## (\d+) — (.*)$")
-FIELD_RE = re.compile(r"^\*\*([A-Za-z][^:*]*):\*\*\s*(.*)$")
-OPTION_RE = re.compile(r"^- ([A-Z])\.\s+(.*)$")
-BULLET_RE = re.compile(r"^(?:- |\d+\. )(.*)$")
-BACKTICK_RE = re.compile(r"`([^`]+)`")
-# A "Before you look" cue option in slides.qmd:  **A.**&nbsp; Positive, ...
+PRESENTATION = {
+    "title": "The FWL Theorem: Making Multivariate Regressions Intuitive",
+    "subtitle": "Partialling-out a confounder to estimate a known +0.2 causal effect",
+    "author": "Carlos Mendez — Nagoya University (GSID)",
+    "language": "en",
+    "source": "content/post/python_fwl/slides/slides.qmd",
+    "post": "https://carlos-mendez.org/post/python_fwl/",
+    "presentationId": 10198190,
+    "backupPresentationId": 10274590,
+    "publicViewLink": "https://presenter.ahaslides.com/share/1790567562708-72xqh62ban",
+    "editorUrl": "https://presenter.ahaslides.com/presentation/10198190",
+    "joinCode": "VSXHY",
+    "plan": "AhaSlides Education Large (paid, from 2026-10-06)",
+    "architecture": "content slides are imported PDF pages; only the "
+                    "interactive slides are created through the MCP",
+    "imagePages": IMAGE_PAGES,
+}
+
 QMD_OPTION_RE = re.compile(r"^\*\*([A-Z])\.\*\*(?:&nbsp;|\s)+(.*?)\s*$")
+BG_RE = re.compile(r'background-color="([^"]+)"')
+
+TYPE_LABEL = {
+    "qr_code": "QR code (join)",
+    "word_cloud": "Word cloud",
+    "scale": "Rating scale",
+    "q&a": "Live Q&A",
+    "poll": "Poll",
+    "pick_answer_quiz": "Quiz: pick answer",
+    "short_answer_quiz": "Quiz: short answer",
+    "correct_order_quiz": "Quiz: correct order",
+    "match_pairs_quiz": "Quiz: match pairs",
+    "categorise_quiz": "Quiz: categorise",
+    "spinner_wheel": "Spinner wheel",
+    "leaderboard": "Leaderboard",
+    "open_ended_survey": "Open ended",
+    "ideaBoard": "Idea board",
+    "marketplace/draw-answer-v2": "Draw answer",
+    "marketplace/true-or-false": "Quiz: true or false",
+    "marketplace/fill-in-the-blanks": "Quiz: fill in the blanks",
+    "marketplace/two-by-two-grid-v2": "2x2 matrix",
+    "marketplace/escape-room-v2": "Escape room",
+    "marketplace/duck-race": "Duck race",
+}
+SCORED = {"pick_answer_quiz", "short_answer_quiz", "correct_order_quiz",
+          "match_pairs_quiz", "categorise_quiz", "marketplace/true-or-false",
+          "marketplace/fill-in-the-blanks"}
+
+# Author writing rules for NEW text: no em dashes, no contractions, no
+# possessive apostrophes. Proper names are exempt.
+EM_DASH = "—"
+APOSTROPHE_RE = re.compile(r"\b\w+['’](?:s|t|re|ve|ll|d|m)\b", re.I)
+EXEMPT = {"Simpson's", "variable's", "model's"}   # proper name; verbatim cue text
 
 
-def clean(text, keep_bold=False):
-    """Strip markdown emphasis and the CORRECT marker.
-
-    Bullets keep their `**bold**` runs — the source deck uses them to mark the
-    key term on each line, and the slide renderer understands markdown.
-    """
-    text = text.replace("← CORRECT", "")
-    if keep_bold:
-        # shield ** pairs so the italic pass below cannot eat one of their stars
-        text = text.replace("**", "\x00")
-    else:
-        text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+def clean(text):
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
     text = re.sub(r"(?<!\w)\*(.+?)\*(?!\w)", r"\1", text)
-    return text.replace("\x00", "**").strip()
-
-
-def squash(text):
-    """Collapse all whitespace runs, so hard-wrapped and one-line text compare."""
-    return " ".join((text or "").split())
+    return text.strip()
 
 
 def qmd_pages():
-    """The Quarto deck the images were rendered from, one dict per printed page.
+    """One dict per printed page of slides.qmd: title, notes, options, background.
 
-    Each dict holds the page's `title`, its speaker `notes` (verbatim, joined)
-    and, for a "Before you look" cue slide, its A/B/C `options`.
-
-    Page 1 is the title slide (built from YAML by a template partial, so it has
-    no heading); every `#` and `##` after the front matter is one printed page,
-    because the PDF is rendered with pdfSeparateFragments=false. Headings inside
-    fenced code blocks are Python comments, not slides, and are skipped — this
-    deck's statsmodels slide has two lines that start with "# ".
+    Page 1 is the title slide (built from YAML, no heading). Every `#` and `##`
+    after the front matter is one printed page; headings inside fenced code are
+    Python comments and are skipped.
     """
-    if not QMD.is_file():
-        return None
-    _, front, body = QMD.read_text(encoding="utf-8").split("---" + chr(10), 2)
+    _, front, body = QMD.read_text(encoding="utf-8").split("---\n", 2)
     title = re.search(r'^title:\s*"(.*)"\s*$', front, re.M)
-    pages = [{"title": clean(title.group(1)) if title else "",
+    subtitle = re.search(r'^subtitle:\s*"(.*)"\s*$', front, re.M)
+    pages = [{"kind": "title", "title": clean(title.group(1)) if title else "",
+              "subtitle": clean(subtitle.group(1)) if subtitle else "",
               "notes": [], "options": []}]
     in_notes = in_code = False
     for line in body.splitlines():
@@ -93,10 +116,15 @@ def qmd_pages():
             if s:
                 pages[-1]["notes"].append(s)
         else:
-            m = re.match(r"^#{1,2} (.*?)\s*(\{.*\})?\s*$", line)
+            m = re.match(r"^(#{1,2}) (.*?)\s*(\{.*\})?\s*$", line)
             if m:
-                pages.append({"title": clean(m.group(1)),
-                              "notes": [], "options": []})
+                ttl = clean(m.group(2))
+                kind = ("divider" if m.group(1) == "#" else
+                        "cue" if ttl.startswith("Before you look") else "content")
+                bg = BG_RE.search(m.group(3) or "")
+                pages.append({"kind": kind, "title": ttl, "notes": [],
+                              "options": [],
+                              "background": bg.group(1) if bg else None})
                 continue
             om = QMD_OPTION_RE.match(s)
             if om:
@@ -106,270 +134,353 @@ def qmd_pages():
     return pages
 
 
-def kind_of(heading, type_line):
-    if heading.strip() == "Title":
-        return "title"
-    if "divider" in heading:
-        return "heading"
-    t = type_line.lower()
-    if "word cloud" in t:
-        return "word_cloud"
-    if "open ended" in t:
-        return "open_ended"
-    if "rating" in t or "scale" in t:
-        return "scale"
-    if "quiz" in t:
-        return "quiz"
-    if "poll" in t:
-        return "poll"
-    return "content"
+def notes_of(a):
+    if a.get("notes"):
+        return a["notes"]
+    return LEGACY_NOTES.get(a["id"])
 
 
-def parse_blocks(lines):
-    """Split the Slides section into (number, heading, body-lines) blocks."""
-    start = lines.index("# Slides")
-    blocks, cur = [], None
-    for line in lines[start + 1:]:
-        m = SLIDE_RE.match(line)
-        if m:
-            if cur:
-                blocks.append(cur)
-            cur = (int(m.group(1)), m.group(2), [])
-        elif cur:
-            cur[2].append(line)
-    if cur:
-        blocks.append(cur)
-    return blocks
+def prompt_of(a):
+    s = a["slide"]
+    return s.get("heading") or s.get("title") or ""
 
 
-def parse_slide(number, heading, body):
-    fields, lists, notes = {}, {}, []
-    current = None
-    for line in body:
-        if line.strip() == "---":
-            current = None
-            continue
-        m = FIELD_RE.match(line)
-        if m:
-            name, value = m.group(1).strip(), m.group(2).strip()
-            key = name.split(" (")[0].strip().lower()
-            current = key
-            if key == "notes":
-                if value:
-                    notes.append(value)
-            elif key == "body":
-                pass  # the headline follows on the next line, in backticks
-            elif key in ("bullets", "options"):
-                # may carry an inline caption, e.g. "*(original table: ...)*";
-                # the items themselves always follow on subsequent lines
-                lists[key] = []
-                if value:
-                    fields[key + "_caption"] = clean(value)
-            elif value:
-                fields[key] = value
-            else:
-                lists[key] = []
-            continue
-        if current == "notes":
-            notes.append(line.strip())
-        elif current == "body" and line.strip().startswith("`"):
-            fields["body"] = BACKTICK_RE.search(line.strip()).group(1)
-        elif current in fields and line.strip():
-            # a wrapped scalar field (Title, Question, Subtitle) continues on
-            # the next line — without this the value is silently truncated at
-            # the first line break, which is exactly how it shipped once.
-            fields[current] += " " + line.strip()
-        elif current in lists:
-            om = OPTION_RE.match(line.strip())
-            bm = BULLET_RE.match(line.strip())
-            if om:
-                lists[current].append(
-                    {"text": clean(om.group(2)), "correct": "← CORRECT" in line}
-                )
-            elif bm:
-                lists[current].append(clean(bm.group(1),
-                                            keep_bold=(current == "bullets")))
-            elif line.strip().startswith("`"):
-                lists[current].append(line.strip())
-
-    type_line = fields.get("type", "")
-    slide = {"n": number, "kind": kind_of(heading, type_line)}
-
-    for key in ("title", "subtitle", "byline", "question"):
-        if key in fields:
-            slide[key] = clean(fields[key])
-    if "background" in fields:
-        slide["background"] = BACKTICK_RE.search(fields["background"]).group(1)
-    if "image" in fields:
-        slide["image"] = BACKTICK_RE.search(fields["image"]).group(1)
-    if "image page" in fields:
-        # "12 of 34" -> 12, the page of the imported PDF this slide is
-        slide["imagePage"] = int(fields["image page"].split()[0])
-    if "body" in fields:
-        slide["headline"] = fields["body"]
-    if lists.get("bullets"):
-        slide["bullets"] = lists["bullets"]
-    if "bullets_caption" in fields:
-        slide["sourceNote"] = fields["bullets_caption"]
-    if lists.get("options"):
-        slide["options"] = lists["options"]
-
-    if slide["kind"] == "quiz":
-        pts = re.search(r"(\d+)\s*points", type_line)
-        secs = re.search(r"(\d+)\s*second", type_line)
-        slide["points"] = int(pts.group(1)) if pts else 1000
-        slide["timeLimitSeconds"] = int(secs.group(1)) if secs else 30
-    if slide["kind"] == "word_cloud":
-        n = re.search(r"(\d+)\s*entries", type_line)
-        slide["entriesPerParticipant"] = int(n.group(1)) if n else 1
-    if slide["kind"] == "scale":
-        rng = re.search(r"(\d+)\s*to\s*(\d+)", type_line)
-        slide["min"], slide["max"] = (
-            (int(rng.group(1)), int(rng.group(2))) if rng else (1, 5)
-        )
-        if "scale labels" in fields:
-            parts = [clean(p) for p in fields["scale labels"].split("·")]
-            if len(parts) == 2:
-                slide["minLabel"], slide["maxLabel"] = parts
-    if slide["kind"] in ("poll", "quiz", "word_cloud", "scale", "open_ended"):
-        slide["interactive"] = True
-
-    note = " ".join(n for n in notes if n).strip()
-    if note:
-        slide["notes"] = note
-    return slide
+def answer_of(a):
+    """One-line answer key for the run-of-show table."""
+    s, t = a["slide"], a["slide"]["slide_type"]
+    if t == "pick_answer_quiz":
+        i = ord(s["correct"]) - 65
+        return f'{s["correct"]}. {s["options"][i]}'
+    if t == "short_answer_quiz":
+        return s["correct_answer"]
+    if t == "correct_order_quiz":
+        return " → ".join(o["text"] for o in sorted(s["options"],
+                                                    key=lambda o: o["position"]))
+    if t == "match_pairs_quiz":
+        return "; ".join(f'{p["left_item"]} = {p["right_item"]}' for p in s["pairs"])
+    if t == "categorise_quiz":
+        return "; ".join(f'{c["name"]}: {", ".join(c["items"])}' for c in s["options"])
+    if t == "marketplace/true-or-false":
+        return s["slide_attributes"]["config"]["correctAnswer"].capitalize()
+    if t == "marketplace/fill-in-the-blanks":
+        return ", ".join(b["acceptedAnswers"][0]
+                         for b in s["slide_attributes"]["config"]["blanks"])
+    if t == "marketplace/escape-room-v2":
+        rooms = s["slide_attributes"]["config"]["rooms"]
+        return f"{len(rooms)} rooms, {sum(len(r['clues']) for r in rooms)} clues"
+    if t == "poll":
+        return "none (prediction)"
+    return "none (unscored)"
 
 
-def validate(slides):
-    """Structural checks. These exist because each one caught a real bug."""
+def validate(pages, acts):
     bad = []
-    numbers = [s["n"] for s in slides]
-    if numbers != list(range(1, len(slides) + 1)):
-        bad.append((0, f"slide numbers are not 1..{len(slides)} contiguous: "
-                       f"{numbers[:8]}..."))
-    for s in slides:
-        n, k = s["n"], s["kind"]
-        if k == "quiz":
-            correct = sum(o["correct"] for o in s.get("options", []))
-            if correct != 1:
-                bad.append((n, f"quiz has {correct} correct answers, expected 1"))
-            if len(s.get("options", [])) < 2:
-                bad.append((n, "quiz needs at least 2 options"))
-        if k == "poll":
-            if any(o["correct"] for o in s.get("options", [])):
-                bad.append((n, "poll must not mark an option correct"))
-            if len(s.get("options", [])) < 2:
-                bad.append((n, "poll needs at least 2 options"))
-        if k in ("quiz", "poll", "word_cloud", "scale", "open_ended") \
-                and not s.get("question"):
-            bad.append((n, f"{k} slide has no question"))
-        if "image" in s and not (HERE.parent / s["image"]).is_file():
-            bad.append((n, f"figure not found on disk: {s['image']}"))
-        if k in ("title", "heading", "content") and not s.get("title"):
-            bad.append((n, f"{k} slide has no title"))
-        if k in ("title", "heading", "content") and not s.get("imagePage"):
-            bad.append((n, f"{k} slide declares no source image page"))
-        if s.get("interactive") and s.get("imagePage"):
-            bad.append((n, "interactive slide must not claim an image page"))
+    if len(pages) != IMAGE_PAGES:
+        bad.append(f"{QMD.name} has {len(pages)} pages, not {IMAGE_PAGES}: "
+                   "re-render the PDF and re-import")
+    ids = [a["id"] for a in acts]
+    if len(set(ids)) != len(ids):
+        bad.append(f"duplicate activity ids: {ids}")
+    if len(acts) != N_INTERACTIVE:
+        bad.append(f"{len(acts)} activities, expected {N_INTERACTIVE}")
+    if sorted(a["after"] for a in acts) != [a["after"] for a in acts]:
+        bad.append("activities are not listed in page order")
+    cue_pages = [i + 1 for i, p in enumerate(pages) if p["kind"] == "cue"]
+    cue_acts = [a["after"] for a in acts if a.get("cue") and a["id"] != "I7"]
+    if cue_acts != cue_pages:
+        bad.append(f"cue quizzes follow pages {cue_acts}, cue slides are {cue_pages}")
 
-    # The imported PDF supplies the content slides in page order, so the image
-    # pages must run 1..N with nothing missing, duplicated or out of sequence —
-    # every interleave offset downstream depends on it.
-    seen = [s["imagePage"] for s in slides if s.get("imagePage")]
-    if seen != list(range(1, len(seen) + 1)):
-        dupes = {p for p in seen if seen.count(p) > 1}
-        bad.append((0, f"image pages are not 1..{len(seen)} in order "
-                       f"(duplicated: {sorted(dupes) or 'none'})"))
-    if len(seen) != IMAGE_PAGES:
-        bad.append((0, f"expected {IMAGE_PAGES} imported pages, found {len(seen)}"))
+    for a in acts:
+        aid, s = a["id"], a["slide"]
+        t = s.get("slide_type")
+        err = lambda m: bad.append(f"{aid}: {m}")  # noqa: E731
+        if t not in TYPE_LABEL:
+            err(f"unknown slide_type {t!r}")
+            continue
+        if not 1 <= a["after"] <= IMAGE_PAGES:
+            err(f"after={a['after']} is outside 1..{IMAGE_PAGES}")
+        if a["tier"] not in ("core", "opt"):
+            err(f"tier {a['tier']!r}")
+        if not notes_of(a):
+            err("no presenter notes")
+        if t in SCORED and t.startswith(("pick", "short", "correct", "match",
+                                         "categ")):
+            if a.get("props", {}).get("timeToAnswer") is None:
+                err("scored quiz without a timer in props")
+        cfg = s.get("slide_attributes", {}).get("config", {})
 
-    # deck.md records the Quarto deck's titles and speaker notes; if slides.qmd
-    # is edited and the deck re-rendered, the images change but deck.md does
-    # not. Catch that — for the titles, for the notes (which exist only in
-    # deck.md once the slides are images), and for the cue slides' options,
-    # which each interactive slide must repeat verbatim.
-    pages = qmd_pages()
-    if pages is None:
-        bad.append((0, f"source deck not found at {QMD}"))
-    else:
-        if len(pages) != IMAGE_PAGES:
-            bad.append((0, f"{QMD.name} now has {len(pages)} pages, not "
-                           f"{IMAGE_PAGES} - re-render the PDF and re-import"))
-        last_page = 0
-        for sl in slides:
-            page = sl.get("imagePage")
-            if page:
-                last_page = page
-            if page and page <= len(pages):
-                src = pages[page - 1]
-                if sl.get("title") != src["title"]:
-                    bad.append((sl["n"], f"title drifted from {QMD.name} page "
-                                         f"{page}: deck.md has "
-                                         f"{sl.get('title')!r}, slides.qmd has "
-                                         f"{src['title']!r}"))
-                if squash(sl.get("notes")) != squash(src["notes"]):
-                    bad.append((sl["n"], f"speaker notes differ from "
-                                         f"{QMD.name} page {page} - copy them "
-                                         f"over verbatim"))
-            if sl.get("interactive") and 0 < last_page <= len(pages):
-                cue = pages[last_page - 1]["options"]
-                mine = [o["text"] for o in sl.get("options", [])]
-                if cue and mine != cue:
-                    bad.append((sl["n"], f"options do not repeat the cue on "
-                                         f"{QMD.name} page {last_page} "
-                                         f"verbatim: {mine} vs {cue}"))
+        if t in ("poll", "pick_answer_quiz"):
+            opts = s["options"]
+            if not 2 <= len(opts) <= 6 or not all(isinstance(o, str) for o in opts):
+                err("needs 2-6 plain-string options (letters are added later)")
+            if t == "pick_answer_quiz" and not (
+                    "A" <= s.get("correct", "") <= chr(64 + len(opts))):
+                err(f"correct letter {s.get('correct')!r} not among the options")
+            if t == "poll" and "correct" in s:
+                err("a poll must not mark a correct option")
+            if a.get("cue"):
+                page = pages[a["after"] - 1]
+                if page["options"] and opts != page["options"]:
+                    err(f"options do not repeat the cue on page {a['after']} "
+                        f"verbatim: {opts} vs {page['options']}")
+        elif t == "categorise_quiz":
+            items = [i for c in s["options"] for i in c["items"]]
+            if len(s["options"]) < 2 or len(items) != len(set(items)) or not all(
+                    c["items"] for c in s["options"]):
+                err("categorise needs 2+ non-empty categories with unique items")
+        elif t == "match_pairs_quiz":
+            L = [p["left_item"] for p in s["pairs"]]
+            R = [p["right_item"] for p in s["pairs"]]
+            if not 2 <= len(L) <= 4 or len(set(L)) != len(L) or len(set(R)) != len(R):
+                err("match pairs needs 2-4 pairs with unique sides")
+        elif t == "correct_order_quiz":
+            pos = sorted(o["position"] for o in s["options"])
+            if not 2 <= len(pos) <= 7 or pos != list(range(1, len(pos) + 1)):
+                err(f"correct order positions must be 1..n, n <= 7: {pos}")
+        elif t == "short_answer_quiz":
+            if not s.get("correct_answer"):
+                err("short answer needs correct_answer")
+        elif t == "scale":
+            sc = s["scale_config"]
+            if not s["options"] or sc["low_value"] >= sc["high_value"]:
+                err("scale needs statements and low < high")
+        elif t == "marketplace/true-or-false":
+            if cfg.get("correctAnswer") not in ("true", "false"):
+                err("true/false needs correctAnswer 'true' or 'false'")
+            if cfg.get("question") != s.get("title"):
+                err("true/false: title and config.question must match")
+        elif t == "marketplace/fill-in-the-blanks":
+            q, blanks = cfg["question"], cfg["blanks"]
+            if q.count("[blank]") != len(blanks) or not 1 <= len(blanks) <= 4:
+                err("fill-in: [blank] markers and blanks differ, or not 1-4")
+            for b in blanks:
+                if not b["acceptedAnswers"]:
+                    err(f"fill-in {b['id']}: no accepted answer")
+                if cfg["answerType"] == "dropdown" and (
+                        not 2 <= len(b["dropdownOptions"]) <= 4 or
+                        not set(b["acceptedAnswers"]) <= set(b["dropdownOptions"])):
+                    err(f"fill-in {b['id']}: drop-down needs 2-4 options incl. "
+                        "every accepted answer")
+        elif t in ("marketplace/draw-answer-v2", "marketplace/two-by-two-grid-v2"):
+            if cfg.get("question") != s.get("title"):
+                err("title and config.question must match")
+            if t.endswith("two-by-two-grid-v2"):
+                iid = [i["id"] for i in cfg["items"]]
+                if not 1 <= len(iid) <= 8 or len(set(iid)) != len(iid):
+                    err("2x2 needs 1-8 items with unique ids")
+                if max(len(cfg["xAxisLabel"]), len(cfg["yAxisLabel"])) > 30:
+                    err("2x2 axis labels must be <= 30 characters")
+        elif t == "ideaBoard":
+            g = [x["id"] for x in s["slide_attributes"]["groups"]]
+            if len(g) != len(set(g)) or len(g) > 10:
+                err("idea board groups need unique ids, at most 10")
+        elif t == "marketplace/escape-room-v2":
+            rooms = cfg["rooms"]
+            clues = [c for r in rooms for c in r["clues"]]
+            if not 2 <= len(rooms) <= 6 or len(clues) > 15 or not all(
+                    r["clues"] for r in rooms):
+                err("escape room needs 2-6 rooms, each with clues, <= 15 clues")
+            all_ids = [r["id"] for r in rooms] + [c["id"] for c in clues] + [
+                ch["id"] for c in clues for ch in c["choices"]]
+            if len(all_ids) != len(set(all_ids)):
+                err("escape room ids are not unique")
+            for c in clues:
+                if sum(ch["correct"] for ch in c["choices"]) != 1:
+                    err(f"escape clue {c['id']} needs exactly one correct choice")
+                if len(c["prompt"]) > 140 or any(len(ch["text"]) > 40
+                                                 for ch in c["choices"]):
+                    err(f"escape clue {c['id']}: prompt > 140 or choice > 40 chars")
+            pieces = [p["clueId"] for p in cfg["codePuzzle"]["pieces"]]
+            if len(set(pieces)) != len(pieces) or not set(pieces) <= {
+                    c["id"] for c in clues}:
+                err("escape room code pieces must be distinct existing clues")
+        elif t == "marketplace/duck-race":
+            if "title" in s:
+                err("duck race must not set a slide title")
 
-    positions = [s["n"] for s in slides if s.get("interactive")]
-    if positions != INTERACTIVE_POSITIONS:
-        bad.append((0, f"interactive slides sit at {positions}, "
-                       f"expected {INTERACTIVE_POSITIONS}"))
+        # Writing rules apply to text written for this rebuild (not the six
+        # legacy cue notes, and not cue options that repeat slides.qmd).
+        if a["id"] not in LEGACY_NOTES:
+            text = json.dumps(s, ensure_ascii=False) + " " + (a.get("notes") or "")
+            if EM_DASH in text:
+                err("em dash in new text")
+            hits = [h for h in APOSTROPHE_RE.findall(text) if h not in EXEMPT]
+            words = [w for w in re.findall(r"\b\w+['’]\w+\b", text)
+                     if w not in EXEMPT]
+            if hits or words:
+                err(f"contraction or possessive in new text: {words or hits}")
     return bad
 
 
-def main():
-    lines = SRC.read_text(encoding="utf-8").splitlines()
-    slides = [parse_slide(n, h, b) for n, h, b in parse_blocks(lines)]
-
-    deck = {
-        "presentation": {
-            "title": "The FWL Theorem: Making Multivariate Regressions Intuitive",
-            "subtitle": "Partialling-out a confounder to estimate a known +0.2 "
-                        "causal effect",
-            "author": "Carlos Mendez — Nagoya University (GSID)",
-            "language": "en",
-            "source": "content/post/python_fwl/slides/slides.qmd",
-            "post": "https://carlos-mendez.org/post/python_fwl/",
-            "presentationId": 10198190,
-            "publicViewLink": "https://presenter.ahaslides.com/share/1790567562708-72xqh62ban",
-            "editorUrl": "https://presenter.ahaslides.com/presentation/10198190",
-            "joinCode": "VSXHY",
-            "architecture": "content slides are imported PDF pages; only the "
-                            "interactive slides are created through the MCP",
-            "imagePages": IMAGE_PAGES,
-            "interactivePositions": INTERACTIVE_POSITIONS,
-            "freePlanTypesOnly": True,
-            # poll/quiz are free types, but ANY interactive slide counts toward
-            # the free allowance; 7 of them cap this deck at 3 live participants
-            "freePlanParticipantCap": 3,
-        },
-        "slides": slides,
-    }
-    problems = validate(slides)
+def build():
+    pages = qmd_pages()
+    problems = validate(pages, ACTIVITIES)
     if problems:
-        print(f"{SRC.name}: {len(problems)} problem(s) — nothing written\n")
-        for n, msg in problems:
-            print(f"  slide {n}: {msg}")
+        print(f"{len(problems)} problem(s), nothing written:\n")
+        for p in problems:
+            print("  " + p)
         raise SystemExit(1)
 
-    OUT.write_text(json.dumps(deck, indent=2, ensure_ascii=False) + "\n",
-                   encoding="utf-8")
-    kinds = {}
+    by_page = {}
+    for a in ACTIVITIES:
+        by_page.setdefault(a["after"], []).append(a)
+
+    slides, n = [], 0
+    for page_no, page in enumerate(pages, start=1):
+        n += 1
+        sl = {"n": n, "kind": page["kind"], "imagePage": page_no,
+              "title": page["title"]}
+        if page.get("subtitle"):
+            sl["subtitle"] = page["subtitle"]
+        if page.get("background"):
+            sl["background"] = page["background"]
+        if page["notes"]:
+            sl["notes"] = page["notes"]
+        slides.append(sl)
+        for a in by_page.get(page_no, []):
+            n += 1
+            slides.append({
+                "n": n, "kind": "interactive", "id": a["id"],
+                "tier": a["tier"], "minutes": a["minutes"],
+                "afterImage": page_no, "slideType": a["slide"]["slide_type"],
+                "prompt": prompt_of(a), "answer": answer_of(a),
+                "slide": a["slide"], "props": a.get("props", {}),
+                "notes": notes_of(a), "legacy": a["id"].startswith("I"),
+            })
+    deck = {"presentation": {**PRESENTATION,
+                             "interactivePositions": [s["n"] for s in slides
+                                                      if s["kind"] == "interactive"]},
+            "slides": slides}
+    (HERE / "deck.json").write_text(json.dumps(deck, indent=1, ensure_ascii=False)
+                                    + "\n", encoding="utf-8")
+    (HERE / "deck.md").write_text(render_md(deck), encoding="utf-8")
+
+    inter = [s for s in slides if s["kind"] == "interactive"]
+    core = sum(s["minutes"] for s in inter if s["tier"] == "core")
+    opt = sum(s["minutes"] for s in inter if s["tier"] == "opt")
+    print(f"wrote deck.json and deck.md: {len(slides)} slides = "
+          f"{IMAGE_PAGES} images + {len(inter)} interactive")
+    print(f"  activity time: core {core:g} min, optional {opt:g} min")
+
+
+def bullet_body(s):
+    """Markdown lines showing what the audience sees for one activity."""
+    sl, t = s["slide"], s["slideType"]
+    cfg = sl.get("slide_attributes", {}).get("config", {})
+    out = []
+    if t in ("poll", "pick_answer_quiz"):
+        for i, o in enumerate(sl["options"]):
+            mark = "  ← CORRECT" if t != "poll" and chr(65 + i) == sl.get("correct") else ""
+            out.append(f"- {chr(65 + i)}. {o}{mark}")
+    elif t == "scale":
+        c = sl["scale_config"]
+        out.append(f"Scale {c['low_value']} ({c['low_label']}) to "
+                   f"{c['high_value']} ({c['high_label']}):")
+        out += [f"- {o['text']}" for o in sl["options"]]
+    elif t == "categorise_quiz":
+        out += [f"- **{c['name']}:** {', '.join(c['items'])}" for c in sl["options"]]
+    elif t == "match_pairs_quiz":
+        out += [f"- {p['left_item']} ↔ {p['right_item']}" for p in sl["pairs"]]
+    elif t == "correct_order_quiz":
+        out += [f"{o['position']}. {o['text']}" for o in
+                sorted(sl["options"], key=lambda o: o["position"])]
+    elif t == "marketplace/fill-in-the-blanks":
+        out.append(f"> {cfg['question']}")
+        out += [f"- blank {i + 1}: options {', '.join(b['dropdownOptions'])} → "
+                f"**{b['acceptedAnswers'][0]}**" for i, b in enumerate(cfg["blanks"])]
+    elif t == "marketplace/two-by-two-grid-v2":
+        out.append(f"X axis: {cfg['xAxisLabel']} · Y axis: {cfg['yAxisLabel']}")
+        out += [f"- {i['label']}" for i in cfg["items"]]
+    elif t == "ideaBoard":
+        out.append("Groups: " + ", ".join(g["name"] for g in
+                                          sl["slide_attributes"]["groups"]))
+    elif t == "marketplace/escape-room-v2":
+        out.append(f"Theme: {cfg['theme']} · door code from clues "
+                   + ", ".join(p["clueId"] for p in cfg["codePuzzle"]["pieces"]))
+        for r in cfg["rooms"]:
+            out.append(f"- **{r['name']}**")
+            for c in r["clues"]:
+                right = next(ch["text"] for ch in c["choices"] if ch["correct"])
+                out.append(f"  - {c['prompt']} → **{right}** "
+                           f"(choices: {' / '.join(ch['text'] for ch in c['choices'])})")
+    return out
+
+
+def render_md(deck):
+    P = deck["presentation"]
+    slides = deck["slides"]
+    inter = [s for s in slides if s["kind"] == "interactive"]
+    core = sum(s["minutes"] for s in inter if s["tier"] == "core")
+    opt = sum(s["minutes"] for s in inter if s["tier"] == "opt")
+    L = [
+        "# AhaSlides deck: presenter copy",
+        "",
+        "> **Generated** by `build_deck_json.py` from `../slides/slides.qmd` (content "
+        "slides, speaker notes) and `activities.py` (interactive slides). Do not "
+        "edit by hand: edit those two files and regenerate.",
+        "",
+        f"**Presentation:** {P['title']}  ",
+        f"**Editor:** {P['editorUrl']} (ID {P['presentationId']}, join code "
+        f"**{P['joinCode']}**)  ",
+        f"**Public view link:** {P['publicViewLink']}  ",
+        f"**Plan:** {P['plan']}  ",
+        f"**Backup of the free-plan version:** presentation {P['backupPresentationId']}",
+        "",
+        "## Composition",
+        "",
+        "| Kind | Count |",
+        "|---|---|",
+        f"| Content slides (images of the Quarto deck) | {P['imagePages']} |",
+        f"| Interactive slides, core | {sum(s['tier'] == 'core' for s in inter)} |",
+        f"| Interactive slides, optional (skip live if behind) | "
+        f"{sum(s['tier'] == 'opt' for s in inter)} |",
+        f"| **Total** | **{len(slides)}** |",
+        "",
+        f"Activity time: about **{core:g} min** for the core slides, plus "
+        f"**{opt:g} min** if every optional slide runs. Quizzes use 30-second "
+        "timers with faster answers earning more points (the Colab stop has "
+        "five minutes).",
+        "",
+        "## Run of show",
+        "",
+        "| Pos | ID | After page | Type | Tier | Min | Answer |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for s in inter:
+        tier = "core" if s["tier"] == "core" else "*optional*"
+        ans = s["answer"].replace("|", "/")
+        L.append(f"| {s['n']} | {s['id']} | {s['afterImage']} | "
+                 f"{TYPE_LABEL[s['slideType']]} | {tier} | {s['minutes']:g} | {ans} |")
+    L += ["", "# Slides", ""]
     for s in slides:
-        kinds[s["kind"]] = kinds.get(s["kind"], 0) + 1
-    print(f"wrote {OUT.name}: {len(slides)} slides")
-    for k in sorted(kinds):
-        print(f"  {k:12} {kinds[k]}")
+        if s["kind"] == "interactive":
+            tier = "CORE" if s["tier"] == "core" else "OPTIONAL, skip if behind"
+            L.append(f"## {s['n']} — ★ {s['id']} — {TYPE_LABEL[s['slideType']]} "
+                     f"({tier}, ~{s['minutes']:g} min)")
+            L.append("")
+            if s["prompt"]:
+                L += [f"**Prompt:** {s['prompt']}", ""]
+            body = bullet_body(s)
+            if body:
+                L += body + [""]
+            L += [f"**Answer:** {s['answer']}", ""]
+            if s["props"]:
+                L += [f"**Settings:** `{json.dumps(s['props'], ensure_ascii=False)}`", ""]
+        else:
+            label = {"title": "Title", "divider": "Act divider",
+                     "cue": "Cue slide (Before you look)",
+                     "content": "Content"}[s["kind"]]
+            L += [f"## {s['n']} — {label}", "", f"**Title:** {s['title']}", ""]
+            if s.get("subtitle"):
+                L += [f"**Subtitle:** {s['subtitle']}", ""]
+            L += [f"**Image page:** {s['imagePage']} of {P['imagePages']}", ""]
+            if s.get("background"):
+                L += [f"**Background:** `{s['background']}`", ""]
+        if s.get("notes"):
+            L += [f"**Notes:** {s['notes']}", ""]
+        L += ["---", ""]
+    return "\n".join(L)
 
 
 if __name__ == "__main__":
-    main()
+    build()

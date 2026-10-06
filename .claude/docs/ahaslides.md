@@ -15,9 +15,12 @@ this file is the procedure:
 - `content/post/python_sc_bayes_spatial/ahaslides/` (deck `10042312`) — the second, built
   from this doc. Its generators add real validation, including a check that `deck.md`'s
   titles still match `slides.qmd`. Read its free-plan section before promising a cap.
-- `content/post/python_fwl/ahaslides/` (deck `10198190`) — the third. Its generators also
-  check speaker notes and each quiz's options against the cue slides, and they letter and
-  reverse the options (see *Hard constraints*). Copy these generators for new decks.
+- `content/post/python_fwl/ahaslides/` (deck `10198190`) — the third, and since 2026-10-06
+  the **reference for paid-plan decks**: 35 interactive slides of 18 types, defined in
+  `activities.py` (exact MCP bodies + settings + notes) and built by generators that read
+  titles and notes straight from `slides.qmd`, validate every type, and letter and reverse
+  the options (see *Hard constraints*). **Copy `activities.py` + its generators for new
+  decks.**
 - `content/post/python_panel_intro/ahaslides/` (deck `10245137`) — the fourth. Its
   "Before you look" cues were added to `slides.qmd` for the deck (mirroring the post's
   predict cards), and `make_deck_md.py` generates `deck.md` from `slides.qmd` plus the quiz
@@ -38,7 +41,7 @@ it is good at.
 | Layer | How |
 |---|---|
 | Content slides | render `slides.qmd` → PDF → **import through the editor UI** |
-| Interactive slides | native types via MCP (`poll`, `pick_answer_quiz`, `word_cloud`, `scale`, `open_ended_survey`) |
+| Interactive slides | native types via MCP: quizzes (`pick_answer_quiz`, `short_answer_quiz`, `correct_order_quiz`, `match_pairs_quiz`, `categorise_quiz`, `marketplace/true-or-false`, `marketplace/fill-in-the-blanks`), opinion (`poll`, `word_cloud`, `scale`, `open_ended_survey`, `ideaBoard`, `q&a`, `marketplace/two-by-two-grid-v2`, `marketplace/draw-answer-v2`), and game/utility (`spinner_wheel`, `leaderboard`, `qr_code`, `marketplace/duck-race`) |
 
 ---
 
@@ -114,10 +117,21 @@ holding one Image block at exactly **1280×720** — genuinely edge to edge.
 
 ### 4. Author the interactive slides
 
-Keep them in a `deck.md` in `content/post/<slug>/ahaslides/`, generated to `deck.json`
-and MCP payloads by the two scripts in the reference implementation (copy them). Create
-with `create_slides`. Place interactive slides where the Quarto **speaker notes already
-ask for audience work** — do not invent engagement points.
+Define them in `content/post/<slug>/ahaslides/activities.py` (copy the `python_fwl`
+one): each activity holds its anchor page, a `core`/`opt` tier, a time estimate, the
+exact `create_slides` body, its `update_slide_properties` settings and its notes.
+`build_deck_json.py` reads titles and notes straight from `slides.qmd`, validates
+everything and writes `deck.json` + `deck.md`; `build_payload.py` writes the MCP calls.
+
+**Ask the author before designing the interaction**: class size and format, minutes
+available for activities, competitive or low-stakes, names or anonymous, whether students
+have laptops, and whether activities may go anywhere or only where the Quarto **speaker
+notes already ask for audience work**. On the free plan, stay at the cue slides (see
+*Plan behaviour*); on a paid plan, the author may want activities throughout (FWL).
+
+Timers, points, poll single choice, word-cloud entries and spinner name fill are **not**
+part of the create body: set them afterwards with `update_slide_properties` (see *Hard
+constraints* for the type names).
 
 ### 5. Interleave
 
@@ -135,6 +149,11 @@ plan. Two ways to apply it:
 Either way the anchors are image slides, whose relative order never changes, so the
 operations are independent and ascending order is not actually required.
 
+When several slides share one anchor, create them in **one** call in display order —
+they land in order. But a new slide inserted after an image goes *before* any slide
+already sitting after that image: on FWL the review round landed ahead of the kept I7
+quiz and needed one `move_slide`. Re-check the full order after every batch.
+
 ### 6. Verify
 
 1. `get_presentation_detail_tool` → slide count; interactive positions match `deck.md`;
@@ -143,9 +162,10 @@ operations are independent and ascending order is not actually required.
 2. Open the editor **and** the share link; spot-check one image slide, one divider, one
    quiz. The editor renders lazily — reload before believing a blank slide.
 3. **Reload the editor, then read the participant badge and the line under the canvas.**
-   *"up to 50 live participants"* vs **0 / 3** + *"reached the free slide limit"* is the
-   free-plan answer for this deck; note which slides carry a 👑. Do this only after a
-   fresh reload (see *Free-plan behaviour* — crowns are computed lazily).
+   On the free plan, *"up to 50 live participants"* vs **0 / 3** + *"reached the free
+   slide limit"* is the answer for this deck; note which slides carry a 👑. On a paid
+   plan, expect the plan limit (FWL: **0 / 200**) and no crowns. Do this only after a
+   fresh reload (see *Plan behaviour* — crowns are computed lazily).
 4. `curl -o /dev/null -w "%{http_code}"` the share link.
 
 ### 7. Publish + clean up
@@ -209,8 +229,45 @@ rebuild the same ID.
   positions by rank in `slides_with_id_and_order`, not by the raw `order` value.
 - Native text types, if ever needed: `content` takes `heading` + `paragraphs` (an array —
   **never** `body`); `listing` takes `heading` + `items`.
+- **`update_slide_properties` type names:** `multipleChoiceQuizQuestion` (pick answer),
+  `shortAnswerQuizQuestion`, `correctOrderQuizQuestion`, `matchPairsQuizQuestion`,
+  `categoriseQuizQuestion`, `pollQuestion`, `wordCloudQuestion`, `scaleQuestion`,
+  `openEndedQuestion`, `spinnerWheelQuestion`. Its response reports every quiz as
+  `type: pickAnswer` with the real kind in `slideType` (`categorise`, `matchPairs`,
+  `correctOrder`, `typeAnswer`) — that is normal, the slide was not converted.
+  Soft-delete any slide, marketplace ones included, with `{id, type: <its type>,
+  deleted: true}`.
+- **Spinner wheels can fill themselves with the joined participants:**
+  `{type: "spinnerWheelQuestion", metadata: {autoFillParticipantName: true}}`.
+  `create_slides` accepts `options: []` for such a wheel.
+- **Marketplace true/false keeps its scoring in `config`** (`maxPointsPerCorrect`,
+  `minPoint`, `timeLimitSeconds`, `speedBonus`) as an off-host fallback; match the
+  deck's quiz points (FWL: 100 max, 0 min).
+- **`marketplace/escape-room-v2` is accepted by the API but may not exist in the
+  account's editor.** On FWL (Education Large, 2026-10-06) the editor's slide-type search
+  had no Escape Room, and the slide was blank in the editor, Preview and share view. Check
+  the editor's *New slide* list for a marketplace type before building on it.
+- **Marketplace slides render lazily** in the share view (fill-in-the-blanks showed only
+  its title for a few seconds). Wait before calling one blank.
+- **Do not click the editor's *New slide* button to look at the type list** — it opens
+  a blank placeholder slide in the thumbnail rail. Closing the menu and reloading
+  discards it (verify the slide count by API afterwards).
 
-## Free-plan behaviour
+## Plan behaviour
+
+### Paid plan (Education Large, measured on FWL 2026-10-06)
+
+With 34 images and 35 interactive slides of 18 types, the editor reports **0 / 200**
+and *"You can host up to 200 live participants"*, with no free-slide-limit notice and no
+crowns. Interactivity is then a teaching decision, not a quota: FWL aims at about a third
+of class time (about 28 core minutes in 90) with optional slides flagged in the notes.
+
+Presentation settings that matter for a class are editor-only (Settings dialog), not
+MCP: *Collect audience info* (ask for info before joining, Name → *Mark as required*),
+*Q&A* (*On all slides*), and *Who takes the lead* (*Presenter* live, *Audience
+(self-paced)* for review afterwards).
+
+### Free plan
 
 Import allows 50 MB / 100 slides.
 
@@ -250,5 +307,6 @@ upgrade, and to test a live session before teaching from it.
 - `post-resource-buttons.md` — the `links:` button rules.
 - `content/post/python_bridge_impact/ahaslides/README.md` — worked example, incl. the
   interaction-design patterns worth reusing (prediction poll → callback quiz).
-- `content/post/python_sc_bayes_spatial/ahaslides/` — second example; copy its
-  `build_deck_json.py` / `build_payload.py`, which are written for this architecture.
+- `content/post/python_sc_bayes_spatial/ahaslides/` — second example.
+- `content/post/python_fwl/ahaslides/` — the paid-plan reference; copy its
+  `activities.py`, `build_deck_json.py` and `build_payload.py`.

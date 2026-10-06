@@ -1,107 +1,112 @@
 #!/usr/bin/env python3
-"""deck.json -> AhaSlides `create_slides` payloads + the interleave plan.
+"""deck.json -> payload.json: the AhaSlides MCP calls that build the audience layer.
 
-    python3 build_payload.py        # writes payload.json next to this script
+    python3 build_deck_json.py && python3 build_payload.py
 
-Under the image architecture the 34 content slides are pages of an imported PDF,
-so this script emits payloads for the **interactive slides only** — they are the
-only thing created through the MCP. Strip the bookkeeping keys (`_n`,
-`_after_image`) before sending a payload.
+payload.json (gitignored) holds three lists:
 
-`_after_image` is the 1-based page of the imported PDF each interactive slide
-belongs after: for an interactive slide at final position P it is
-count(non-interactive positions < P). Two ways to apply it (see
-.claude/docs/ahaslides.md, step 5):
+- `create`: one `create_slides` call per anchor page. Send `slides` with
+  `insert_after_slide_id` = the ID of the image slide at `after_image` (map page
+  to ID by rank among the image slides in `slides_with_id_and_order`). Several
+  slides after one page go in ONE call, in display order, so they land in order.
+- `update_content`: `update_slide_content` bodies for kept slides whose text
+  changed (I1: new notes). Each carries the slide's AhaSlides `id`.
+- `update_props`: `update_slide_properties` bodies (timers, speed points, poll
+  single choice, spinner name auto-fill). New slides get `id` only after they
+  exist, so each entry names its `activity`; map it to the created slide ID.
 
-- preferred: one `create_slides` call per slide with
-  `insert_after_slide_id=<id of image at that page>` — born in place, no moves;
-- or create them all in one batch (they append after the 34 images) and then one
-  `move_slide` each, mapping the returned IDs back **by heading**, never by array
-  position — the response is not in input order.
+Option order. AhaSlides gives successive options `order` 1, 0.5, 0.25, ... and
+every view sorts ascending, so options DISPLAY IN REVERSE payload order. Poll
+and pick-answer options are lettered ("A. ...") and sent reversed, so they show
+A, B, C and match the cue slides and the notes. Verified on this deck 2026-09-28.
 
-The anchors are image slides, whose relative order never changes, so the calls
-are independent and ascending order is not actually required.
-
-Only `poll` and `pick_answer_quiz` are used. Word Cloud, Rating Scale and Open
-Ended are separately premium. Even these two types count toward the free plan's
-small allowance of interactive slides, so seven of them cap this deck at 3 live
-participants — accepted in advance; see README.md.
-
-`load_slide_type_specs` documents only `heading` and `options` for both types —
-per-question points and timers are NOT part of the create payload, so they keep
-the presentation-level defaults and are changed in the editor if wanted. Do not
-invent field names for them.
+Notes. New slides get their tier and time as a prefix ("CORE, about 1 min." or
+"OPTIONAL: skip if behind, about 2 min."), so the presenter view shows which
+slides can be dropped on the day.
 """
 import json
-import pathlib
 from collections import Counter
+from pathlib import Path
 
-HERE = pathlib.Path(__file__).parent
+HERE = Path(__file__).parent
 deck = json.loads((HERE / "deck.json").read_text(encoding="utf-8"))
 
-# Only these two types. Adding a premium type here is a plan change, not a
-# code change — read the free-plan note in README.md first.
-# AhaSlides does not keep option order. The API gives successive options
-# order values 1, 0.5, 0.25, ... and every view sorts them ascending, so the
-# options DISPLAY IN REVERSE payload order (verified on presentation 10198190,
-# 2026-09-28; get_presentation_detail_tool lists yet another order). So each
-# option carries its letter -- the audience can always match it to the A/B/C
-# cue slide and the notes ("Answer: B") -- and the lettered list is sent
-# reversed, which makes it display A, B, C.
-def lettered(opts):
-    return [f"{chr(65 + i)}. {o['text']}" for i, o in enumerate(opts)]
+# AhaSlides IDs of the seven slides kept from the first build (stable: their
+# type never changes, and a type conversion is what changes a slide ID).
+KEPT_IDS = {"I1": 160499240, "I2": 160499243, "I3": 160499267, "I4": 160499268,
+            "I5": 160499287, "I6": 160499289, "I7": 160499310}
 
-
-def reversed_pairs(opts):
-    return list(reversed(list(zip(lettered(opts), opts))))
-
-
-BUILDERS = {
-    "poll": lambda s: {
-        "slide_type": "poll",
-        "heading": s["question"],
-        "options": [{"text": t} for t, _ in reversed_pairs(s["options"])],
-    },
-    "quiz": lambda s: {
-        "slide_type": "pick_answer_quiz",
-        "heading": s["question"],
-        "options": [{"text": t, "correct": o["correct"]}
-                    for t, o in reversed_pairs(s["options"])],
-    },
+# slide_type -> the API type name update_slide_properties expects.
+PROPS_TYPE = {
+    "poll": "pollQuestion",
+    "pick_answer_quiz": "multipleChoiceQuizQuestion",
+    "short_answer_quiz": "shortAnswerQuizQuestion",
+    "correct_order_quiz": "correctOrderQuizQuestion",
+    "match_pairs_quiz": "matchPairsQuizQuestion",
+    "categorise_quiz": "categoriseQuizQuestion",
+    "word_cloud": "wordCloudQuestion",
+    "scale": "scaleQuestion",
+    "open_ended_survey": "openEndedQuestion",
+    "spinner_wheel": "spinnerWheelQuestion",
 }
 
-out = []
-images_seen = 0
-for s in deck["slides"]:
-    if not s.get("interactive"):
-        images_seen += 1          # a content/title/divider slide = one PDF page
-        continue
-    kind = s["kind"]
-    if kind not in BUILDERS:
-        raise SystemExit(f"slide {s['n']}: {kind!r} is not a free-plan type; "
-                         "see the free-plan note in README.md")
-    p = BUILDERS[kind](s)
-    if s.get("notes"):
-        p["notes"] = s["notes"]
-    p["_n"] = s["n"]
-    p["_after_image"] = images_seen
-    out.append(p)
 
-expected = deck["presentation"]["imagePages"]
-if images_seen != expected:
-    raise SystemExit(f"deck.json has {images_seen} content slides but the PDF "
-                     f"has {expected} pages — rerun build_deck_json.py")
+def lettered_reversed(options, correct=None):
+    rows = [(f"{chr(65 + i)}. {t}", chr(65 + i) == correct)
+            for i, t in enumerate(options)]
+    return list(reversed(rows))
 
-(HERE / "payload.json").write_text(
-    json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
-print(f"wrote payload.json: {len(out)} interactive slides",
-      dict(Counter(p["slide_type"] for p in out)))
-print(f"content slides supplied by the PDF import: {images_seen}")
-print("\nInterleave plan — one call per row:")
-print(f"  {'final':>5}  {'after image':>11}  type")
-for p in out:
-    print(f"  {p['_n']:>5}  {p['_after_image']:>11}  {p['slide_type']}")
-print("\n  create_slides(..., insert_after_slide_id=<id of image at that page>)")
-print("  or: move_slide(slide_id=<new slide>, presentation_id=<id>,")
-print("                 insert_after_slide_id=<id of image at that page>)")
+def body(s):
+    """The create/update body of one interactive slide, notes included."""
+    sl = dict(s["slide"])
+    t = sl["slide_type"]
+    if t == "poll":
+        sl["options"] = [{"text": txt} for txt, _ in lettered_reversed(sl["options"])]
+    elif t == "pick_answer_quiz":
+        sl["options"] = [{"text": txt, "correct": ok} for txt, ok in
+                         lettered_reversed(sl["options"], sl.pop("correct"))]
+    notes = s["notes"]
+    if not s["legacy"] or s["id"] == "I1":
+        prefix = ("CORE" if s["tier"] == "core" else "OPTIONAL: skip if behind")
+        notes = f"{prefix}, about {s['minutes']:g} min. {notes}"
+    sl["notes"] = notes
+    return sl
+
+
+inter = [s for s in deck["slides"] if s["kind"] == "interactive"]
+create, update_content, update_props = [], [], []
+for s in inter:
+    if s["legacy"]:
+        if s["id"] == "I1":
+            update_content.append({"id": KEPT_IDS["I1"], **body(s)})
+    else:
+        if not create or create[-1]["after_image"] != s["afterImage"]:
+            create.append({"after_image": s["afterImage"], "activities": [],
+                           "slides": []})
+        create[-1]["activities"].append(s["id"])
+        create[-1]["slides"].append(body(s))
+    if s["props"]:
+        if s["slideType"] not in PROPS_TYPE:
+            raise SystemExit(f"{s['id']}: no update_slide_properties type for "
+                             f"{s['slideType']}")
+        entry = {"activity": s["id"], "type": PROPS_TYPE[s["slideType"]],
+                 **s["props"]}
+        if s["legacy"]:
+            entry["id"] = KEPT_IDS[s["id"]]
+        update_props.append(entry)
+
+payload = {"create": create, "update_content": update_content,
+           "update_props": update_props}
+(HERE / "payload.json").write_text(json.dumps(payload, indent=1, ensure_ascii=False)
+                                   + "\n", encoding="utf-8")
+
+n_new = sum(len(c["slides"]) for c in create)
+print(f"wrote payload.json: {n_new} new slides in {len(create)} create calls, "
+      f"{len(update_content)} content update(s), {len(update_props)} property "
+      "updates")
+print("  new types:", dict(Counter(sl["slide_type"] for c in create
+                                    for sl in c["slides"])))
+print("\nCreate plan (insert after the image slide at this page):")
+for c in create:
+    print(f"  page {c['after_image']:>2}: {', '.join(c['activities'])}")
