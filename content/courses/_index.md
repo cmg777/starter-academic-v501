@@ -37,6 +37,7 @@ I currently teach the following graduate-level courses:
   <p>Website: <a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p>Posts about <a href="https://carlos-mendez.org/#posts">exploratory spatial data analysis, spatial econometrics, spatial machine learning</a></p>
   <p>Slides: <a href="https://canva.link/zjtenpul5tzhqp2">Introductory slides</a></p>
+  <p>Interactive slides: <a href="https://presenter.ahaslides.com/share/1791258453174-40as7c668g">Part 1</a> · <a href="https://presenter.ahaslides.com/share/1791258454027-jgdiqqybab">Part 2</a> · <a href="https://presenter.ahaslides.com/share/1791258454264-rgy13rxpeh">Part 3</a></p>
 </div>
 
 <div class="course-card">

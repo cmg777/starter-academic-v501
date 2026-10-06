@@ -37,6 +37,7 @@ image:
   <p>ウェブサイト：<a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p><a href="https://carlos-mendez.org/ja/#posts">探索的空間データ分析・空間計量経済学・空間機械学習</a>に関する投稿</p>
   <p>スライド：<a href="https://canva.link/zjtenpul5tzhqp2">導入スライド</a></p>
+  <p>インタラクティブスライド：<a href="https://presenter.ahaslides.com/share/1791258453174-40as7c668g">パート 1</a> · <a href="https://presenter.ahaslides.com/share/1791258454027-jgdiqqybab">パート 2</a> · <a href="https://presenter.ahaslides.com/share/1791258454264-rgy13rxpeh">パート 3</a></p>
 </div>
 
 <div class="course-card">

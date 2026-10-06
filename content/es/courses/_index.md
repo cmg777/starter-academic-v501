@@ -37,6 +37,7 @@ Actualmente imparto los siguientes cursos de posgrado:
   <p>Sitio web: <a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p>Publicaciones sobre <a href="https://carlos-mendez.org/es/#posts">análisis exploratorio de datos espaciales, econometría espacial y aprendizaje automático espacial</a></p>
   <p>Diapositivas: <a href="https://canva.link/zjtenpul5tzhqp2">Diapositivas introductorias</a></p>
+  <p>Diapositivas interactivas: <a href="https://presenter.ahaslides.com/share/1791258453174-40as7c668g">Parte 1</a> · <a href="https://presenter.ahaslides.com/share/1791258454027-jgdiqqybab">Parte 2</a> · <a href="https://presenter.ahaslides.com/share/1791258454264-rgy13rxpeh">Parte 3</a></p>
 </div>
 
 <div class="course-card">

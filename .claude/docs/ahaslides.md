@@ -26,6 +26,12 @@ this file is the procedure:
   predict cards). Rebuilt for the paid plan on 2026-10-06 with the FWL generators (37
   interactive slides): the second example of the `activities.py` pattern, with the cue
   quizzes kept in a `CUE_QUIZZES` list and merged by page.
+- `content/courses/slides/ahaslides/` (decks `10276514`, `10276515`, `10276516`) — the
+  fifth, and the reference for **a deck that is not a Quarto deck**: a 75-page Canva PDF
+  for a course, split into **three presentations** (one per lecture), with the Canva
+  YouTube embeds rebuilt as **playable YouTube slides** and five more types (pin on image,
+  photo share, interactive image, ranking, split the points). Its `pages.py` replaces
+  `slides.qmd` as the page source. See *PDF-only decks, several parts, videos* below.
 
 ---
 
@@ -42,7 +48,8 @@ it is good at.
 | Layer | How |
 |---|---|
 | Content slides | render `slides.qmd` → PDF → **import through the editor UI** |
-| Interactive slides | native types via MCP: quizzes (`pick_answer_quiz`, `short_answer_quiz`, `correct_order_quiz`, `match_pairs_quiz`, `categorise_quiz`, `marketplace/true-or-false`, `marketplace/fill-in-the-blanks`), opinion (`poll`, `word_cloud`, `scale`, `open_ended_survey`, `ideaBoard`, `q&a`, `marketplace/two-by-two-grid-v2`, `marketplace/draw-answer-v2`), and game/utility (`spinner_wheel`, `leaderboard`, `qr_code`, `marketplace/duck-race`) |
+| Interactive slides | native types via MCP: quizzes (`pick_answer_quiz`, `short_answer_quiz`, `correct_order_quiz`, `match_pairs_quiz`, `categorise_quiz`, `marketplace/true-or-false`, `marketplace/fill-in-the-blanks`), opinion (`poll`, `word_cloud`, `scale`, `open_ended_survey`, `ideaBoard`, `q&a`, `marketplace/two-by-two-grid-v2`, `marketplace/draw-answer-v2`), and game/utility (`spinner_wheel`, `leaderboard`, `qr_code`, `marketplace/duck-race`); place- and image-based (`pinOnImage`, `marketplace/image-show`, `marketplace/interactive-images`) and priority (`ranking`, `marketplace/budget-allocation-v2`) |
+| Videos | editor-only **YouTube** slide at the video page position (no MCP type) |
 
 ---
 
@@ -253,6 +260,47 @@ rebuild the same ID.
 - **Do not click the editor's *New slide* button to look at the type list** — it opens
   a blank placeholder slide in the thumbnail rail. Closing the menu and reloading
   discards it (verify the slide count by API afterwards).
+- **`pinOnImage` and `marketplace/interactive-images` need an image URL** the API can
+  store. The imported page images already live on the AhaSlides CDN: read their `src`
+  from `curated_slides[].canvasBlocks` in `get_presentation_detail` and reuse it (signed
+  links valid about ten years). `upload_image` with base64 also works but is costly.
+- **`marketplace/image-show`, `interactive-images` and `budget-allocation-v2` mirror the
+  title into `config`** (`config.title`, `config.title`, `config.prompt`), like true/false
+  and 2x2 mirror it into `config.question`. Hotspots: at most 8, x/y in percent, title at
+  most 40 and description at most 150 characters.
+- **A YouTube slide is editor-only.** New slide → Content → **YouTube**, paste the link
+  (`&t=220s` start times are kept). The API then lists it as type `youtube` with
+  `youtubeLink`, and `move_slide` moves it like any other slide; notes and the caption
+  field cannot be set through the MCP, and captions typed in the editor did not persist.
+- **The browser upload tool takes at most 10 MB per file.** Split a larger part PDF in two
+  and import the halves one after the other, with the last slide of the first half
+  selected; check the order by alt text afterwards.
+- **Editor text input can trigger browser-extension shortcuts** (a Glasp sidebar opened
+  on capitals typed into the YouTube fields, and one link was lost). Re-read each field
+  by API after typing.
+
+## PDF-only decks, several parts, videos (Regional Development, 2026-10-06)
+
+When the source is a PDF export (Canva, PowerPoint) rather than `slides.qmd`:
+
+1. **`pages.py` replaces `slides.qmd`.** Short labels per page, the part membership, and
+   the video map (page → YouTube ID and start). Read embed IDs from the public view of the
+   source (Canva: the `youtube.com/embed/<id>` strings in the page HTML), then confirm each
+   title through `https://www.youtube.com/oembed?url=...`. The PDF itself only carries
+   the few videos the author also linked.
+2. **One presentation per lecture** when a deck is longer than a class. Each part gets
+   its own join code, leaderboard and results; repeat the title and closing pages in
+   every part.
+3. **Video pages are left out of the part PDFs** (`make_part_pdfs.py`) and become YouTube
+   slides at the same position. Create the YouTube slides first, record every page's slide
+   ID (image or video) in `slide_ids.json`, then anchor the interactive slides to those
+   IDs; `build_payload.py` resolves the anchors itself, so no position arithmetic is left.
+4. **Moving a video into place:** anchor it to the slide of the page *before* it, by
+   page, not by position in the image list (a skipped video page shifts the image index;
+   that slip put two Part 1 videos one image late until `move_slide` fixed it).
+5. **A non-post folder needs a Hugo exclusion.** Under a branch bundle such as
+   `content/courses/`, `.md` files in a subfolder become pages; the courses deck folder is
+   in `excludeFiles` in `config/_default/config.yaml`.
 
 ## Plan behaviour
 
@@ -311,3 +359,4 @@ upgrade, and to test a live session before teaching from it.
 - `content/post/python_sc_bayes_spatial/ahaslides/` — second example.
 - `content/post/python_fwl/ahaslides/` — the paid-plan reference; copy its
   `activities.py`, `build_deck_json.py` and `build_payload.py`.
+- `content/courses/slides/ahaslides/` — PDF-only source, three parts, YouTube slides.

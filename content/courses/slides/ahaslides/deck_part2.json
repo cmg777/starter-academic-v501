@@ -1,0 +1,985 @@
+{
+ "part": 2,
+ "title": "Introduction to regional development, Part 2: Studying regional development from outer space",
+ "slides": [
+  {
+   "kind": "image",
+   "page": 1,
+   "title": "Title: Introduction to Geospatial Development"
+  },
+  {
+   "kind": "interactive",
+   "id": "B1",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "qr_code",
+   "slide": {
+    "slide_type": "qr_code"
+   },
+   "props": null,
+   "notes": "Students join at ahaslides.com with code PWCXU or by scanning the QR code. Names are required on join, so the leaderboard and the spinner wheels show real names. Keep this slide up while the room settles and watch the count rise.",
+   "title": "QR code: join",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B2",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: what can a satellite see about development?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Do not correct anyone yet. The same prompt returns at the end of class, so take a screenshot of this cloud for the comparison.",
+   "title": "In one word: what can a satellite see about development?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B3",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "Before we start: how confident are you?",
+    "options": [
+     {
+      "text": "I can explain why satellite data help where official data are poor"
+     },
+     {
+      "text": "I can explain how night lights proxy economic activity"
+     },
+     {
+      "text": "I can name one limitation of night lights data"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "Baseline confidence on a 1 to 5 scale. The same three statements return before the exit ticket, so the class can see its own change. Read the averages aloud without comment.",
+   "title": "Before we start: how confident are you?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B4",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "q&a",
+   "slide": {
+    "slide_type": "q&a",
+    "heading": "Questions? Ask them here at any time during class"
+   },
+   "props": null,
+   "notes": "Q&A stays open on every slide (presentation setting: Q&A on all slides). Questions can be anonymous. Upvotes push a question to the top. Check the Q&A at the leaderboard break and at the end.",
+   "title": "Questions? Ask them here at any time during class",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 29,
+   "title": "Outline (section 2 highlighted)"
+  },
+  {
+   "kind": "image",
+   "page": 30,
+   "title": "Studying development from outer space"
+  },
+  {
+   "kind": "interactive",
+   "id": "B5",
+   "afterPage": 30,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Have you ever worked with satellite data?",
+    "options": [
+     "Never",
+     "I have seen it in papers or reports",
+     "I have used it myself"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "A quick baseline. If most answer A, slow down at the night lights apps; if many answer C, ask one of them to help a neighbor during the hands-on stops.",
+   "title": "Have you ever worked with satellite data?",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 31,
+   "tier": "opt",
+   "title": "The View from Above (QuaRCS)",
+   "url": "https://www.youtube.com/watch?v=Hy-b7kjLFds",
+   "notes": "Play 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "B6",
+   "afterPage": 31,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: why are official statistics weak in many poor countries?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Collect words for a minute. The next slide gives the answer in three words: data are unavailable, unreliable and uncomparable. Check how many of the three words the cloud already holds.",
+   "title": "In one word: why are official statistics weak in many poor countries?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 32,
+   "title": "In many poor countries, data are poor"
+  },
+  {
+   "kind": "interactive",
+   "id": "B7",
+   "afterPage": 32,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "spinner_wheel",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: give an example of missing or unreliable data from your country",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Spin; the wheel holds the joined names. Typical examples: an old census, GDP rebased by a large amount, no data below the state level, or a conflict area with no surveys. Poor Numbers (Jerven, 2013) on the slide tells this story for Africa.",
+   "title": "Cold call: give an example of missing or unreliable data from your country",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 33,
+   "title": "New technologies, new data, new research opportunities"
+  },
+  {
+   "kind": "interactive",
+   "id": "B8",
+   "afterPage": 33,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/fill-in-the-blanks",
+   "slide": {
+    "slide_type": "marketplace/fill-in-the-blanks",
+    "title": "Complete the case for satellite data",
+    "slide_attributes": {
+     "config": {
+      "question": "In many poor countries, satellite data are [blank], [blank] and [blank].",
+      "blanks": [
+       {
+        "id": "b1",
+        "acceptedAnswers": [
+         "reliable"
+        ],
+        "dropdownOptions": [
+         "expensive",
+         "reliable",
+         "secret"
+        ]
+       },
+       {
+        "id": "b2",
+        "acceptedAnswers": [
+         "available"
+        ],
+        "dropdownOptions": [
+         "available",
+         "rare",
+         "private"
+        ]
+       },
+       {
+        "id": "b3",
+        "acceptedAnswers": [
+         "comparable"
+        ],
+        "dropdownOptions": [
+         "local",
+         "unique",
+         "comparable"
+        ]
+       }
+      ],
+      "answerType": "dropdown",
+      "partialScoring": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: reliable, available and comparable, the mirror image of the previous slide. The papers on the slide, many of them highly cited, use these data to measure growth, convergence and inequality across regions.",
+   "title": "Complete the case for satellite data",
+   "answer": "reliable, available, comparable"
+  },
+  {
+   "kind": "video",
+   "page": 34,
+   "tier": "opt",
+   "title": "Illuminating Progress: Satellite Nighttime Images for Economic Monitoring (QuaRCS)",
+   "url": "https://www.youtube.com/watch?v=srNtOUf_e_w",
+   "notes": "Play 2 minutes."
+  },
+  {
+   "kind": "image",
+   "page": 35,
+   "title": "Satellite images are big data (world at night)"
+  },
+  {
+   "kind": "interactive",
+   "id": "B9",
+   "afterPage": 35,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "pinOnImage",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "Drop a pin on your home region",
+    "slide_attributes": {
+     "imageUrl": "https://assets-cdn.ahaslides.com/static/4835109/image/bf1cbcb58a1bb4e08a538deb9cdc78ab6f22bb67f4fec5665bfc9851fe0e7044.webp?Expires=2106618884&Signature=CDEQmZwfCpY1NbI2e5TrSh-Y5Qh1bEXhkZ3f8hrrnNRk7pjQDcndbm1pzGXuj~KhAADwkzGLLab8yDv53S6P4IOn~cg8caA1gZsxNSRsqxRyjjLgN2CpBv~oabvyV35NwJ~lwsVZ2iie8-3yenRLVSI6ahkWOuJq2nKV3WJ2paadiCMkU2v-EI2i5nD3euku7CKGy6xeaQA2rf8yYOaIZf-EbnlkABqdagqZiOnrsZzRsVwC~8hY01QsPELMT1UmMrpjfNowkrDmePWJ-qk62wOqJdVbPXf1iuLqVlezkTVKv~4unpAXFu7Pid57HXceWqr1qbsyqEfk4hlvLAQH4A__&Key-Pair-Id=APKAIQI7IMS5DMTTAKOA",
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "The world at night as a pin board. The heatmap shows where the class comes from. Ask two students whether their home region is brighter or darker than they expected, and why.",
+   "title": "Drop a pin on your home region",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B10",
+   "afterPage": 35,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "spinner_wheel",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: name a bright place and a dark place on this map. Why the difference?",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Expected answers: income, population density, electrification, and also deserts, forests and ice with nobody living there. The next video makes the same point: dark is not always poor.",
+   "title": "Cold call: name a bright place and a dark place on this map. Why the difference?",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 36,
+   "tier": "core",
+   "title": "How 1 Photo From Space Explains ALL of History (RealLifeLore)",
+   "url": "https://www.youtube.com/watch?v=ki-hoy-3ea8&t=21s",
+   "notes": "Starts at 0:21; play 2 minutes."
+  },
+  {
+   "kind": "video",
+   "page": 37,
+   "tier": "core",
+   "title": "Measuring the South Asia Economy from Outer Space (World Bank)",
+   "url": "https://www.youtube.com/watch?v=rm1gCLfaZnE",
+   "notes": "Play the first 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "B11",
+   "afterPage": 37,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/true-or-false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Night lights measure income directly.",
+    "slide_attributes": {
+     "config": {
+      "question": "Night lights measure income directly.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: False. Night lights are a proxy: they track economic activity, population and electricity use together. They work well where official data are weak, but they need calibration against data on income or output, as the World Bank video shows for South Asia.",
+   "title": "Night lights measure income directly.",
+   "answer": "False"
+  },
+  {
+   "kind": "video",
+   "page": 38,
+   "tier": "opt",
+   "title": "How one NASA image tells dozens of stories (neo)",
+   "url": "https://www.youtube.com/watch?v=ZYGd-llxHJE",
+   "notes": "Play 2 minutes. Japanese documentaries in the notes."
+  },
+  {
+   "kind": "image",
+   "page": 39,
+   "title": "Explore the data yourself (night lights app)"
+  },
+  {
+   "kind": "interactive",
+   "id": "B12",
+   "afterPage": 39,
+   "tier": "core",
+   "minutes": 8,
+   "slideType": "marketplace/image-show",
+   "slide": {
+    "slide_type": "marketplace/image-show",
+    "title": "Lights app stop: share a screenshot of the most striking change, with the place in the caption",
+    "slide_attributes": {
+     "config": {
+      "title": "Lights app stop: share a screenshot of the most striking change, with the place in the caption",
+      "displayMode": "tiledWall",
+      "wallMotion": "drift",
+      "wallLayout": "masonry",
+      "allowCaptions": true,
+      "showParticipantNames": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "The first hands-on stop, about eight minutes. Students open https://carlosmendez777.users.earthengine.app/view/worldviirs-like on their laptops, move the slider between the two years, and upload a screenshot with the place and their explanation in the caption. Show the wall at the end and ask two students to explain theirs.",
+   "title": "Lights app stop: share a screenshot of the most striking change, with the place in the caption",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 40,
+   "title": "Why are the lights different? (East Asia)"
+  },
+  {
+   "kind": "interactive",
+   "id": "B13",
+   "afterPage": 40,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "pinOnImage",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "Drop a pin on North Korea",
+    "slide_attributes": {
+     "imageUrl": "https://assets-cdn.ahaslides.com/static/4835109/image/aa83c14c46fa5d65d841d264c3bc2b56c96e002cf3bd068ddfca4f777dd31e78.webp?Expires=2106618885&Signature=Tixl4CYn6aKgAHu5bPMb445YEA9p45SO~VgFKwgVd0uhTDSkZ5br-slshmEJIXk7hkYb~0GFTwzhFTpbkEWpisNvWdq8btpzCosqd-cQLRoDEYScg2D9JLYeCldxesEuoue2Ia1mMYpjkzgSsCe6RTi-hORUGQGoDT9qScKrpbCDPE9vbjpXm9rvs4MrTXdgfb0Om185ZWeRvZceCi8GumVMloqz7qNf~w418k5~GMyiWNJaOAbJLve54uecSG1BD4KXkr8yGjC9-JZaNz9VSOFXxK7pI7RjmV0QHmxW3A3p3VBBOFCjGNEZ4YP38CJwSbisa58h2fYrLYmZuHE1LQ__&Key-Pair-Id=APKAIQI7IMS5DMTTAKOA",
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "No labels on the map. Most pins should land in the dark area north of the bright South Korea. The border is a light border: same geography, very different economies. Ask what else, besides income, could make a country this dark.",
+   "title": "Drop a pin on North Korea",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B14",
+   "afterPage": 40,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "The next map mixes three years as colors: red = 2013, green = 2003, blue = 1993. A place lit in all three years looks...",
+    "options": [
+     "Red",
+     "White",
+     "Blue"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, white. Red, green and blue at full brightness add up to white, so stable old lights are white. The next quiz asks about new lights.",
+   "title": "The next map mixes three years as colors: red = 2013, green = 2003, blue = 1993. A place lit in all three years looks...",
+   "answer": "B. White"
+  },
+  {
+   "kind": "interactive",
+   "id": "B15",
+   "afterPage": 40,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Same map. A place dark in 1993 and 2003 but lit in 2013 looks...",
+    "options": [
+     "White",
+     "Blue",
+     "Red"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C, red, because red is 2013 only. Yellow (red plus green) means lit since 2003. On the next slide, much of China is red and yellow, Japan is white, and North Korea stays dark.",
+   "title": "Same map. A place dark in 1993 and 2003 but lit in 2013 looks...",
+   "answer": "C. Red"
+  },
+  {
+   "kind": "image",
+   "page": 41,
+   "title": "Why are the lights different? (RGB composite, 1993 to 2013)"
+  },
+  {
+   "kind": "interactive",
+   "id": "B16",
+   "afterPage": 41,
+   "tier": "core",
+   "minutes": 6,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "RGB app stop: name a city or region that lit up recently (red or yellow) and its country."
+   },
+   "props": null,
+   "notes": "The second hands-on stop, about six minutes. Students open https://jhowarth.users.earthengine.app/view/rgb-nighttime-lights and look for red or yellow places. Good finds: inland China, parts of India, the Gulf, West Africa. Ask what changed there between 1993 and 2013.",
+   "title": "RGB app stop: name a city or region that lit up recently (red or yellow) and its country.",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 42,
+   "tier": "core",
+   "title": "Better Night Lights Data, For Longer (John Gibson)",
+   "url": "https://www.youtube.com/watch?v=9P7BYy5mSa8",
+   "notes": "Play 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "B17",
+   "afterPage": 42,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Which sensor gives sharper night lights, with less blurring and no top-coding in city centers?",
+    "options": [
+     "DMSP (1992 to 2013)",
+     "VIIRS (since 2012)",
+     "Landsat"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, VIIRS. DMSP blurs light into nearby areas and caps bright city centers, so it understates inequality and growth in dense places. Gibson argues for VIIRS, and for VIIRS-like series that extend it back in time. Landsat is a daytime sensor.",
+   "title": "Which sensor gives sharper night lights, with less blurring and no top-coding in city centers?",
+   "answer": "B. VIIRS (since 2012)"
+  },
+  {
+   "kind": "interactive",
+   "id": "B18",
+   "afterPage": 42,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Halfway leaderboard.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 43,
+   "tier": "opt",
+   "title": "Shining a light on economic inequality (University of Waikato)",
+   "url": "https://www.youtube.com/watch?v=8GLqofy7K-8",
+   "notes": "Play 1 to 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "B19",
+   "afterPage": 43,
+   "tier": "opt",
+   "minutes": 1,
+   "slideType": "marketplace/true-or-false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Night lights work equally well in dense cities and in sparsely populated rural areas.",
+    "slide_attributes": {
+     "config": {
+      "question": "Night lights work equally well in dense cities and in sparsely populated rural areas.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: False. In sparse rural areas, much economic activity (farming) emits little light, so lights understate rural output. The Waikato video makes this point with the United States.",
+   "title": "Night lights work equally well in dense cities and in sparsely populated rural areas.",
+   "answer": "False"
+  },
+  {
+   "kind": "image",
+   "page": 44,
+   "title": "Recommended books"
+  },
+  {
+   "kind": "interactive",
+   "id": "B20",
+   "afterPage": 44,
+   "tier": "opt",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Which recommended book will you open first?",
+    "options": [
+     "Power and the Vote (Min)",
+     "Earth at Night (NASA)",
+     "Nighttime Lights as a Proxy for Regions",
+     "Pixels of Progress (McKinsey)",
+     "Growth out of the Blue (World Bank)",
+     "Mapping poverty with AI (ADB)"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "All six are free. The links are on the slide in the Canva version of the deck.",
+   "title": "Which recommended book will you open first?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 45,
+   "title": "We can also use daytime images: why and how?"
+  },
+  {
+   "kind": "interactive",
+   "id": "B21",
+   "afterPage": 45,
+   "tier": "core",
+   "minutes": 2.5,
+   "slideType": "ideaBoard",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "What can daytime images show that night lights cannot?",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "3f6c2a8e-1b4d-4c7a-9e2f-5a1b3c4d6e70",
+       "name": "Housing and roofs"
+      },
+      {
+       "id": "7a1d4e9b-2c5f-4b8a-8d3e-6b2c4d5e7f81",
+       "name": "Roads and infrastructure"
+      },
+      {
+       "id": "9c3e5f1a-4d6b-4e9c-af4b-7c3d5e6f8a92",
+       "name": "Farms and land use"
+      },
+      {
+       "id": "b5d7a2c4-6e8f-4fad-b05c-8d4e6f7a9ba3",
+       "name": "Other"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 2
+    }
+   },
+   "props": null,
+   "notes": "Two minutes of ideas, then voting. Expected: roof materials, building size, roads, crops, water and green space, all visible in rural areas where night lights are dark. Machine learning turns these features into poverty estimates (next slides).",
+   "title": "What can daytime images show that night lights cannot?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 46,
+   "title": "Monitoring regional development from outer space"
+  },
+  {
+   "kind": "interactive",
+   "id": "B22",
+   "afterPage": 46,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "categorise_quiz",
+   "slide": {
+    "slide_type": "categorise_quiz",
+    "heading": "Which images fit each task best?",
+    "options": [
+     {
+      "name": "Nighttime images",
+      "items": [
+       "Brightness of a growing city",
+       "Electrification of towns"
+      ]
+     },
+     {
+      "name": "Daytime images",
+      "items": [
+       "Roof materials in a village",
+       "Crop fields and farmland"
+      ]
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: nighttime images for city brightness and electrification; daytime images for roofs and crops. The slide summary pairs nighttime images with urban development and daytime images with rural development.",
+   "title": "Which images fit each task best?",
+   "answer": "Nighttime images: Brightness of a growing city, Electrification of towns; Daytime images: Roof materials in a village, Crop fields and farmland"
+  },
+  {
+   "kind": "interactive",
+   "id": "B23",
+   "afterPage": 46,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Should a government use satellite images to decide who receives cash transfers?",
+    "options": [
+     "Yes",
+     "Yes, but only with other data",
+     "No",
+     "Not sure"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "Opinion poll before the BBC video on Togo, where satellite images and phone data targeted cash during the pandemic. Do not discuss yet; the 2x2 after the video does.",
+   "title": "Should a government use satellite images to decide who receives cash transfers?",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 47,
+   "tier": "core",
+   "title": "How satellite images are helping one country hand out cash (BBC)",
+   "url": "https://www.youtube.com/watch?v=e60QXzkFhc0",
+   "notes": "Play in full, about 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "B24",
+   "afterPage": 47,
+   "tier": "opt",
+   "minutes": 2,
+   "slideType": "marketplace/two-by-two-grid-v2",
+   "slide": {
+    "slide_type": "marketplace/two-by-two-grid-v2",
+    "title": "Targeting cash with satellite data: where does each risk land?",
+    "slide_attributes": {
+     "config": {
+      "question": "Targeting cash with satellite data: where does each risk land?",
+      "xAxisLabel": "How likely",
+      "yAxisLabel": "How much harm",
+      "items": [
+       {
+        "id": "i1",
+        "label": "Poor families in rich-looking areas are missed",
+        "color": ""
+       },
+       {
+        "id": "i2",
+        "label": "People without a phone cannot receive cash",
+        "color": ""
+       },
+       {
+        "id": "i3",
+        "label": "The images are out of date",
+        "color": ""
+       },
+       {
+        "id": "i4",
+        "label": "Household privacy is exposed",
+        "color": ""
+       }
+      ],
+      "canSkip": false
+     }
+    }
+   },
+   "props": null,
+   "notes": "Unscored. Compare with the poll before the video: did the video change minds? Missed poor households in rich-looking areas is the classic error of area-based targeting.",
+   "title": "Targeting cash with satellite data: where does each risk land?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 75,
+   "title": "Closing: join our research network"
+  },
+  {
+   "kind": "interactive",
+   "id": "BR1",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Satellite data help in data-poor countries because they are...",
+    "options": [
+     "Reliable, available and comparable",
+     "Cheaper than any survey",
+     "Collected by national governments"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Rapid-fire review: four questions, 20 seconds each, speed bonus on. Answer: A.",
+   "title": "Satellite data help in data-poor countries because they are...",
+   "answer": "A. Reliable, available and comparable"
+  },
+  {
+   "kind": "interactive",
+   "id": "BR2",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "In the RGB night lights map, a place lit in all three years looks...",
+    "options": [
+     "Red",
+     "Blue",
+     "White"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C, white.",
+   "title": "In the RGB night lights map, a place lit in all three years looks...",
+   "answer": "C. White"
+  },
+  {
+   "kind": "interactive",
+   "id": "BR3",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Which country is almost dark at night next to bright neighbors?",
+    "options": [
+     "Japan",
+     "North Korea",
+     "South Korea"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, North Korea.",
+   "title": "Which country is almost dark at night next to bright neighbors?",
+   "answer": "B. North Korea"
+  },
+  {
+   "kind": "interactive",
+   "id": "BR4",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Night lights are best described as...",
+    "options": [
+     "A proxy for economic activity",
+     "A direct measure of income",
+     "A census of the population"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A, a proxy.",
+   "title": "Night lights are best described as...",
+   "answer": "A. A proxy for economic activity"
+  },
+  {
+   "kind": "interactive",
+   "id": "B90",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Final podium. Congratulate the top three by name and invite everyone to the raffle at the end, where luck decides.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B91",
+   "afterPage": 75,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "Again, in one word: what can a satellite see about development?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "The opening prompt again. Show the screenshot of the first cloud next to this one and ask what changed.",
+   "title": "Again, in one word: what can a satellite see about development?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B92",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "After class: how confident are you now?",
+    "options": [
+     {
+      "text": "I can explain why satellite data help where official data are poor"
+     },
+     {
+      "text": "I can explain how night lights proxy economic activity"
+     },
+     {
+      "text": "I can name one limitation of night lights data"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "The same three statements as the opening scale. Compare the averages with the baseline aloud. The statement with the smallest gain is the one to revisit next class.",
+   "title": "After class: how confident are you now?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B93",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 2,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Exit ticket: what is still unclear after today? One sentence."
+   },
+   "props": null,
+   "notes": "The exit ticket. Responses carry names, so they can be followed up. Skim them after class and open the next session with the two most common points.",
+   "title": "Exit ticket: what is still unclear after today? One sentence.",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "B94",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/duck-race",
+   "slide": {
+    "slide_type": "marketplace/duck-race",
+    "slide_attributes": {
+     "config": {
+      "durationSeconds": 20,
+      "resultMode": "winner"
+     }
+    }
+   },
+   "props": null,
+   "notes": "Prize raffle. Every joined student becomes a duck and the winner is pure luck, so students who scored low on the quizzes still have a chance.",
+   "title": "Duck race raffle",
+   "answer": ""
+  }
+ ],
+ "counts": {
+  "total": 54,
+  "image": 13,
+  "video": 8,
+  "interactive": 33
+ },
+ "minutes": {
+  "core": 42.0,
+  "optional": 8.5
+ }
+}

@@ -1,0 +1,976 @@
+{
+ "part": 3,
+ "title": "Introduction to regional development, Part 3: Standing on the shoulders of geospatial data science",
+ "slides": [
+  {
+   "kind": "image",
+   "page": 1,
+   "title": "Title: Introduction to Geospatial Development"
+  },
+  {
+   "kind": "interactive",
+   "id": "C1",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "qr_code",
+   "slide": {
+    "slide_type": "qr_code"
+   },
+   "props": null,
+   "notes": "Students join at ahaslides.com with code ZTR2I or by scanning the QR code. Names are required on join, so the leaderboard and the spinner wheels show real names. Keep this slide up while the room settles and watch the count rise.",
+   "title": "QR code: join",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C2",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: which tool do you use for data analysis today?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Do not correct anyone yet. The same prompt returns at the end of class, so take a screenshot of this cloud for the comparison.",
+   "title": "In one word: which tool do you use for data analysis today?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C3",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "Before we start: how confident are you?",
+    "options": [
+     {
+      "text": "I can explain what spatial data science adds to data science"
+     },
+     {
+      "text": "I can state the first law of geography"
+     },
+     {
+      "text": "I can name a free tool to start a geospatial analysis"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "Baseline confidence on a 1 to 5 scale. The same three statements return before the exit ticket, so the class can see its own change. Read the averages aloud without comment.",
+   "title": "Before we start: how confident are you?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C4",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "q&a",
+   "slide": {
+    "slide_type": "q&a",
+    "heading": "Questions? Ask them here at any time during class"
+   },
+   "props": null,
+   "notes": "Q&A stays open on every slide (presentation setting: Q&A on all slides). Questions can be anonymous. Upvotes push a question to the top. Check the Q&A at the leaderboard break and at the end.",
+   "title": "Questions? Ask them here at any time during class",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 48,
+   "title": "Outline (section 3 highlighted)"
+  },
+  {
+   "kind": "image",
+   "page": 49,
+   "title": "If I have seen further... (Newton)"
+  },
+  {
+   "kind": "image",
+   "page": 50,
+   "title": "Discovering truth by building on previous discoveries"
+  },
+  {
+   "kind": "interactive",
+   "id": "C5",
+   "afterPage": 50,
+   "tier": "opt",
+   "minutes": 2,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Whose shoulders do you stand on? Name a researcher, book or course that shaped your work."
+   },
+   "props": null,
+   "notes": "A warm, personal opener after the two quotes. Read three answers aloud. Science is cumulative, and so is this course: the tools in this lecture were built by others for us to reuse.",
+   "title": "Whose shoulders do you stand on? Name a researcher, book or course that shaped your work.",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C6",
+   "afterPage": 50,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Data science needs domain knowledge, coding and statistics. Which is your strongest?",
+    "options": [
+     "Domain knowledge",
+     "Coding",
+     "Statistics"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "Most master students in development pick domain knowledge. The Venn diagram on the next slide puts data science where all three meet; the tools at the end of the lecture lower the coding bar.",
+   "title": "Data science needs domain knowledge, coding and statistics. Which is your strongest?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 51,
+   "title": "What is data science?"
+  },
+  {
+   "kind": "image",
+   "page": 52,
+   "title": "What is spatial data science?"
+  },
+  {
+   "kind": "interactive",
+   "id": "C7",
+   "afterPage": 52,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "match_pairs_quiz",
+   "slide": {
+    "slide_type": "match_pairs_quiz",
+    "heading": "Match each field to its focus",
+    "pairs": [
+     {
+      "left_item": "GIS",
+      "right_item": "Storing, mapping and managing geographic data"
+     },
+     {
+      "left_item": "Data science",
+      "right_item": "Learning from data with coding and statistics"
+     },
+     {
+      "left_item": "Spatial data science",
+      "right_item": "Data science where location and space matter"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer as listed. Spatial data science sits in the overlap on the slide: it treats location as information, not only as a label.",
+   "title": "Match each field to its focus",
+   "answer": "GIS = Storing, mapping and managing geographic data; Data science = Learning from data with coding and statistics; Spatial data science = Data science where location and space matter"
+  },
+  {
+   "kind": "interactive",
+   "id": "C8",
+   "afterPage": 52,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/fill-in-the-blanks",
+   "slide": {
+    "slide_type": "marketplace/fill-in-the-blanks",
+    "title": "Guess the first law of geography",
+    "slide_attributes": {
+     "config": {
+      "question": "Everything is related to everything else, but [blank] things are more related than [blank] things.",
+      "blanks": [
+       {
+        "id": "b1",
+        "acceptedAnswers": [
+         "near"
+        ],
+        "dropdownOptions": [
+         "near",
+         "large",
+         "old"
+        ]
+       },
+       {
+        "id": "b2",
+        "acceptedAnswers": [
+         "distant"
+        ],
+        "dropdownOptions": [
+         "small",
+         "distant",
+         "new"
+        ]
+       }
+      ],
+      "answerType": "dropdown",
+      "partialScoring": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: near, distant. Waldo Tobler, 1970. The next slide shows the quote. It is the reason for spatial dependence: neighboring regions share markets, climate and policy, so their outcomes move together.",
+   "title": "Guess the first law of geography",
+   "answer": "near, distant"
+  },
+  {
+   "kind": "image",
+   "page": 53,
+   "title": "The first law of geography (Tobler)"
+  },
+  {
+   "kind": "interactive",
+   "id": "C9",
+   "afterPage": 53,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "spinner_wheel",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: give an example of the first law of geography from your country",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Good examples: poverty clusters in neighboring districts, house prices, crime, disease spread, growth spilling over from a big city to its neighbors.",
+   "title": "Cold call: give an example of the first law of geography from your country",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 54,
+   "title": "We need easy-to-use open software"
+  },
+  {
+   "kind": "image",
+   "page": 55,
+   "title": "A point-and-click approach"
+  },
+  {
+   "kind": "interactive",
+   "id": "C10",
+   "afterPage": 55,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "GeoDa is free point-and-click software. How many users did it have by 2020?",
+    "options": [
+     "About 3,600",
+     "About 36,000",
+     "About 360,000"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C, about 360,000 users as of September 2020, shown at the start of the next video. GeoDa comes from the Center for Spatial Data Science (Luc Anselin).",
+   "title": "GeoDa is free point-and-click software. How many users did it have by 2020?",
+   "answer": "C. About 360,000"
+  },
+  {
+   "kind": "video",
+   "page": 56,
+   "tier": "core",
+   "title": "GeoDa Intro (GeoDa Software)",
+   "url": "https://www.youtube.com/watch?v=--8vhhmpgdM",
+   "notes": "Play 1 minute."
+  },
+  {
+   "kind": "image",
+   "page": 57,
+   "title": "Video lectures of Prof. Anselin"
+  },
+  {
+   "kind": "image",
+   "page": 58,
+   "title": "The GeoDa workbook"
+  },
+  {
+   "kind": "interactive",
+   "id": "C11",
+   "afterPage": 58,
+   "tier": "opt",
+   "minutes": 1,
+   "slideType": "marketplace/true-or-false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "GeoDa requires programming skills.",
+    "slide_attributes": {
+     "config": {
+      "question": "GeoDa requires programming skills.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: False. GeoDa is point-and-click, which makes it the easiest first step. The free video lectures of Prof. Anselin and the two-volume GeoDa workbook teach it from scratch.",
+   "title": "GeoDa requires programming skills.",
+   "answer": "False"
+  },
+  {
+   "kind": "image",
+   "page": 59,
+   "title": "We need free software for satellite images"
+  },
+  {
+   "kind": "image",
+   "page": 60,
+   "title": "An AI-based programming approach with Google Earth Engine"
+  },
+  {
+   "kind": "interactive",
+   "id": "C12",
+   "afterPage": 60,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Why is Google Earth Engine called a supercomputer for you?",
+    "options": [
+     "It runs the analysis on Google servers, so you do not download the images",
+     "It makes your own laptop faster",
+     "It works offline, without internet"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A. Earth Engine stores petabytes of satellite images and runs your code in the cloud; your laptop only sends the script and receives the result. The video that follows shows it.",
+   "title": "Why is Google Earth Engine called a supercomputer for you?",
+   "answer": "A. It runs the analysis on Google servers, so you do not download the images"
+  },
+  {
+   "kind": "video",
+   "page": 61,
+   "tier": "core",
+   "title": "Google Earth Engine Overview (Google)",
+   "url": "https://www.youtube.com/watch?v=MnCf9Gjz720",
+   "notes": "Play 2 minutes."
+  },
+  {
+   "kind": "image",
+   "page": 62,
+   "title": "Learn Earth Engine (EEFA book)"
+  },
+  {
+   "kind": "interactive",
+   "id": "C13",
+   "afterPage": 62,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Halfway leaderboard.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 63,
+   "title": "I like R programming: what can I use?"
+  },
+  {
+   "kind": "image",
+   "page": 64,
+   "title": "An AI-based programming approach with R"
+  },
+  {
+   "kind": "interactive",
+   "id": "C19",
+   "afterPage": 64,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Have you used an AI assistant to write code for your research?",
+    "options": [
+     "Yes, often",
+     "A few times",
+     "Never"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "Sets up the AI-based programming slides. If most answer C, show one example prompt live: ask an assistant for R or Python code that maps a variable by district, then read the code together before running it. The point is to read and check the code, not only to run it.",
+   "title": "Have you used an AI assistant to write code for your research?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 65,
+   "title": "R books"
+  },
+  {
+   "kind": "image",
+   "page": 66,
+   "title": "I like Python programming: what can I use?"
+  },
+  {
+   "kind": "image",
+   "page": 67,
+   "title": "An AI-based programming approach with Python"
+  },
+  {
+   "kind": "image",
+   "page": 68,
+   "title": "Geographic Data Science with Python"
+  },
+  {
+   "kind": "interactive",
+   "id": "C20",
+   "afterPage": 68,
+   "tier": "opt",
+   "minutes": 2,
+   "slideType": "marketplace/two-by-two-grid-v2",
+   "slide": {
+    "slide_type": "marketplace/two-by-two-grid-v2",
+    "title": "Place each tool: how easy to start, and how strong with satellite images?",
+    "slide_attributes": {
+     "config": {
+      "question": "Place each tool: how easy to start, and how strong with satellite images?",
+      "xAxisLabel": "Easy to start",
+      "yAxisLabel": "Strong with satellite images",
+      "items": [
+       {
+        "id": "i1",
+        "label": "GeoDa",
+        "color": ""
+       },
+       {
+        "id": "i2",
+        "label": "Google Earth Engine",
+        "color": ""
+       },
+       {
+        "id": "i3",
+        "label": "R",
+        "color": ""
+       },
+       {
+        "id": "i4",
+        "label": "Python",
+        "color": ""
+       },
+       {
+        "id": "i5",
+        "label": "Excel",
+        "color": ""
+       }
+      ],
+      "canSkip": false
+     }
+    }
+   },
+   "props": null,
+   "notes": "Unscored. A reasonable picture: GeoDa and Excel easy but weak with images; Earth Engine strongest with images and moderate to start; R and Python flexible, harder to start, strong once learned. There is no single best tool; it depends on the question.",
+   "title": "Place each tool: how easy to start, and how strong with satellite images?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C14",
+   "afterPage": 68,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "match_pairs_quiz",
+   "slide": {
+    "slide_type": "match_pairs_quiz",
+    "heading": "Match each tool to a free resource to learn it",
+    "pairs": [
+     {
+      "left_item": "GeoDa",
+      "right_item": "An Introduction to Spatial Data Science with GeoDa"
+     },
+     {
+      "left_item": "Google Earth Engine",
+      "right_item": "Cloud-Based Remote Sensing with Google Earth Engine"
+     },
+     {
+      "left_item": "R",
+      "right_item": "Spatial Data Science with Applications in R"
+     },
+     {
+      "left_item": "Python",
+      "right_item": "Geographic Data Science with Python"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer as listed; all four books are on the previous slides and free to read online.",
+   "title": "Match each tool to a free resource to learn it",
+   "answer": "GeoDa = An Introduction to Spatial Data Science with GeoDa; Google Earth Engine = Cloud-Based Remote Sensing with Google Earth Engine; R = Spatial Data Science with Applications in R; Python = Geographic Data Science with Python"
+  },
+  {
+   "kind": "interactive",
+   "id": "C15",
+   "afterPage": 68,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Which tool will you try first after this class?",
+    "options": [
+     "GeoDa",
+     "Google Earth Engine",
+     "R",
+     "Python"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "No right answer. Point out that the AI-based approach on the previous slides (asking an assistant to draft code) makes R and Python much easier to start than a few years ago.",
+   "title": "Which tool will you try first after this class?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C16",
+   "afterPage": 68,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "ranking",
+   "slide": {
+    "slide_type": "ranking",
+    "title": "Rank these tools from easiest to hardest to start with",
+    "slide_attributes": {
+     "rankingItems": [
+      {
+       "index": 0,
+       "text": "GeoDa"
+      },
+      {
+       "index": 1,
+       "text": "Google Earth Engine"
+      },
+      {
+       "index": 2,
+       "text": "R"
+      },
+      {
+       "index": 3,
+       "text": "Python"
+      }
+     ],
+     "rankingPicksPerParticipant": 4
+    }
+   },
+   "props": null,
+   "notes": "Borda count result. GeoDa usually ranks easiest. Ask a student who ranked Python or R first why.",
+   "title": "Rank these tools from easiest to hardest to start with",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 69,
+   "title": "Tutorial: start your spatial data science journey"
+  },
+  {
+   "kind": "interactive",
+   "id": "C21",
+   "afterPage": 69,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "correct_order_quiz",
+   "slide": {
+    "slide_type": "correct_order_quiz",
+    "heading": "Put the steps of a geospatial notebook in order",
+    "options": [
+     {
+      "position": 1,
+      "text": "Install and import the libraries"
+     },
+     {
+      "position": 2,
+      "text": "Load the map and the data"
+     },
+     {
+      "position": 3,
+      "text": "Explore the indicator with tables and charts"
+     },
+     {
+      "position": 4,
+      "text": "Map it and test for spatial dependence"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: install, load, explore, then map and test. These are the sections of the Bolivia notebook that students open in the Colab stop: setup, import data, exploratory data analysis, then exploratory spatial data analysis.",
+   "title": "Put the steps of a geospatial notebook in order",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 70,
+   "title": "Tutorial: monitoring subnational human development"
+  },
+  {
+   "kind": "image",
+   "page": 71,
+   "title": "Tutorial: monitoring regional development in Bolivia"
+  },
+  {
+   "kind": "interactive",
+   "id": "C17",
+   "afterPage": 71,
+   "tier": "core",
+   "minutes": 8,
+   "slideType": "short_answer_quiz",
+   "slide": {
+    "slide_type": "short_answer_quiz",
+    "heading": "Colab stop: run the Bolivia notebook through Section 4. Which municipality has the LOWEST development index (imds)?",
+    "correct_answer": "Poroma"
+   },
+   "props": {
+    "timeToAnswer": 480,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "The coding stop, about eight minutes. Students open https://colab.research.google.com/github/quarcs-lab/project2021o-notebook/blob/main/notebookColab.ipynb (the Link to the tutorial on the slide), run the setup cells, load the data and run the table sorted by imds in Section 4. The last row is Poroma (35.7), the least developed of the 339 municipalities; La Paz is first (80.2). Students who finish early can open the maps in Section 5 and look for clusters of low imds: the first law of geography again.",
+   "title": "Colab stop: run the Bolivia notebook through Section 4. Which municipality has the LOWEST development index (imds)?",
+   "answer": "Poroma"
+  },
+  {
+   "kind": "image",
+   "page": 72,
+   "title": "Some final remarks"
+  },
+  {
+   "kind": "interactive",
+   "id": "C18",
+   "afterPage": 72,
+   "tier": "core",
+   "minutes": 3,
+   "slideType": "ideaBoard",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "A regional development question you want to study with geospatial data",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "3f6c2a8e-1b4d-4c7a-9e2f-5a1b3c4d6e70",
+       "name": "Poverty and inequality"
+      },
+      {
+       "id": "7a1d4e9b-2c5f-4b8a-8d3e-6b2c4d5e7f81",
+       "name": "Cities and infrastructure"
+      },
+      {
+       "id": "9c3e5f1a-4d6b-4e9c-af4b-7c3d5e6f8a92",
+       "name": "Environment and climate"
+      },
+      {
+       "id": "b5d7a2c4-6e8f-4fad-b05c-8d4e6f7a9ba3",
+       "name": "Other"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 3
+    }
+   },
+   "props": null,
+   "notes": "The final remarks, made concrete. Two minutes to post, then three votes each. Discuss the top two: which data and which tool from this course would answer them? These can become term paper topics.",
+   "title": "A regional development question you want to study with geospatial data",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 73,
+   "tier": "opt",
+   "title": "Geo for Good 2022 Highlights (Google Earth)",
+   "url": "https://www.youtube.com/watch?v=eHEKQHhl4T0",
+   "notes": "Play 1 minute as a closing montage."
+  },
+  {
+   "kind": "video",
+   "page": 74,
+   "tier": "opt",
+   "title": "Geo for Good 2022: Welcoming Remarks and Keynote (Google Earth)",
+   "url": "https://www.youtube.com/watch?v=SpOjPLMOmEk&t=112s",
+   "notes": "Starts at 1:52; play 1 to 2 minutes."
+  },
+  {
+   "kind": "image",
+   "page": 75,
+   "title": "Closing: join our research network"
+  },
+  {
+   "kind": "interactive",
+   "id": "CR1",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "The first law of geography says that near things are...",
+    "options": [
+     "Less related than distant things",
+     "More related than distant things",
+     "Unrelated to distant things"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Rapid-fire review: four questions, 20 seconds each, speed bonus on. Answer: B (Tobler, 1970).",
+   "title": "The first law of geography says that near things are...",
+   "answer": "B. More related than distant things"
+  },
+  {
+   "kind": "interactive",
+   "id": "CR2",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Which free tool is point-and-click?",
+    "options": [
+     "Google Earth Engine",
+     "Python",
+     "GeoDa"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C, GeoDa.",
+   "title": "Which free tool is point-and-click?",
+   "answer": "C. GeoDa"
+  },
+  {
+   "kind": "interactive",
+   "id": "CR3",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Spatial data science is best described as...",
+    "options": [
+     "Data science where location matters",
+     "GIS without any data",
+     "Statistics without coding"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A.",
+   "title": "Spatial data science is best described as...",
+   "answer": "A. Data science where location matters"
+  },
+  {
+   "kind": "interactive",
+   "id": "CR4",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "In the Bolivia notebook, which municipality has the lowest development index?",
+    "options": [
+     "La Paz",
+     "Poroma",
+     "Cochabamba"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, Poroma. La Paz has the highest.",
+   "title": "In the Bolivia notebook, which municipality has the lowest development index?",
+   "answer": "B. Poroma"
+  },
+  {
+   "kind": "interactive",
+   "id": "C90",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Final podium. Congratulate the top three by name and invite everyone to the raffle at the end, where luck decides.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C91",
+   "afterPage": 75,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "Again, in one word: which tool do you use for data analysis today?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "The opening prompt again. Show the screenshot of the first cloud next to this one and ask what changed.",
+   "title": "Again, in one word: which tool do you use for data analysis today?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C92",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "After class: how confident are you now?",
+    "options": [
+     {
+      "text": "I can explain what spatial data science adds to data science"
+     },
+     {
+      "text": "I can state the first law of geography"
+     },
+     {
+      "text": "I can name a free tool to start a geospatial analysis"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "The same three statements as the opening scale. Compare the averages with the baseline aloud. The statement with the smallest gain is the one to revisit next class.",
+   "title": "After class: how confident are you now?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C93",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 2,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Exit ticket: what is still unclear after today? One sentence."
+   },
+   "props": null,
+   "notes": "The exit ticket. Responses carry names, so they can be followed up. Skim them after class and open the next session with the two most common points.",
+   "title": "Exit ticket: what is still unclear after today? One sentence.",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "C94",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/duck-race",
+   "slide": {
+    "slide_type": "marketplace/duck-race",
+    "slide_attributes": {
+     "config": {
+      "durationSeconds": 20,
+      "resultMode": "winner"
+     }
+    }
+   },
+   "props": null,
+   "notes": "Prize raffle. Every joined student becomes a duck and the winner is pure luck, so students who scored low on the quizzes still have a chance.",
+   "title": "Duck race raffle",
+   "answer": ""
+  }
+ ],
+ "counts": {
+  "total": 59,
+  "image": 25,
+  "video": 4,
+  "interactive": 30
+ },
+ "minutes": {
+  "core": 33.0,
+  "optional": 9.5
+ }
+}

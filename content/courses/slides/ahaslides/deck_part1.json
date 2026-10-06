@@ -1,0 +1,1116 @@
+{
+ "part": 1,
+ "title": "Introduction to regional development, Part 1: Why study regional development",
+ "slides": [
+  {
+   "kind": "image",
+   "page": 1,
+   "title": "Title: Introduction to Geospatial Development"
+  },
+  {
+   "kind": "interactive",
+   "id": "A1",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "qr_code",
+   "slide": {
+    "slide_type": "qr_code"
+   },
+   "props": null,
+   "notes": "Students join at ahaslides.com with code X0CIY or by scanning the QR code. Names are required on join, so the leaderboard and the spinner wheels show real names. Keep this slide up while the room settles and watch the count rise.",
+   "title": "QR code: join",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A2",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: what makes a region developed?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Do not correct anyone yet. The same prompt returns at the end of class, so take a screenshot of this cloud for the comparison.",
+   "title": "In one word: what makes a region developed?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A3",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "Before we start: how confident are you?",
+    "options": [
+     {
+      "text": "I can explain why development gaps within countries matter"
+     },
+     {
+      "text": "I can name three sources of subnational development data"
+     },
+     {
+      "text": "I can explain what a raster image is"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "Baseline confidence on a 1 to 5 scale. The same three statements return before the exit ticket, so the class can see its own change. Read the averages aloud without comment.",
+   "title": "Before we start: how confident are you?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A4",
+   "afterPage": 1,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "q&a",
+   "slide": {
+    "slide_type": "q&a",
+    "heading": "Questions? Ask them here at any time during class"
+   },
+   "props": null,
+   "notes": "Q&A stays open on every slide (presentation setting: Q&A on all slides). Questions can be anonymous. Upvotes push a question to the top. Check the Q&A at the leaderboard break and at the end.",
+   "title": "Questions? Ask them here at any time during class",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 2,
+   "tier": "opt",
+   "title": "The Power of Smart Maps in Times of Crises (Esri)",
+   "url": "https://www.youtube.com/watch?v=42eFnLZ6bXM",
+   "notes": "Play the first 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "A5",
+   "afterPage": 2,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "After the video: in your country, which problem would better maps help most?",
+    "options": [
+     "Health crises and pandemics",
+     "Natural disasters",
+     "Poverty and food security",
+     "Climate change"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "No right answer. The Esri video shows maps answering questions in a crisis: where, how many, who is affected. Ask one or two students why they chose their answer, then move to the outline.",
+   "title": "After the video: in your country, which problem would better maps help most?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 3,
+   "title": "Technological progress in the study of regional development"
+  },
+  {
+   "kind": "image",
+   "page": 4,
+   "title": "Outline (section 1 highlighted)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A6",
+   "afterPage": 4,
+   "tier": "core",
+   "minutes": 2,
+   "slideType": "ranking",
+   "slide": {
+    "slide_type": "ranking",
+    "title": "Why study regional development? Rank your top three reasons",
+    "slide_attributes": {
+     "rankingItems": [
+      {
+       "index": 0,
+       "text": "Target poverty programs to the right places"
+      },
+      {
+       "index": 1,
+       "text": "Reduce inequality between regions"
+      },
+      {
+       "index": 2,
+       "text": "Plan cities and infrastructure"
+      },
+      {
+       "index": 3,
+       "text": "Monitor the SDGs locally"
+      },
+      {
+       "index": 4,
+       "text": "Evaluate place-based policies"
+      }
+     ],
+     "rankingPicksPerParticipant": 3
+    }
+   },
+   "props": null,
+   "notes": "Each student ranks three of five reasons; the result uses a Borda count. Use the top reason as the thread of the lecture: every section that follows returns to it. Section 1 answers why regions matter, section 2 how to measure them from space, and section 3 which tools to use.",
+   "title": "Why study regional development? Rank your top three reasons",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 5,
+   "title": "Large development gaps within countries (Rio de Janeiro)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A7",
+   "afterPage": 5,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "pinOnImage",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "Drop a pin on the poorest part of this photo",
+    "slide_attributes": {
+     "imageUrl": "https://assets-cdn.ahaslides.com/static/4835109/image/80a50c5cee3f130a86c48768aff510f931f251122065b676e620869686cab7d1.webp?Expires=2106618576&Signature=JR1NTyYsrAPX-xxIEIa6-qvFY4QIQqUhRui2Q40-JuMRrsUmDpRbGbVwOsUofW2N4BXU0TD3meI3VUcQTL6kzTcVbzCFC2iTxncaTrUMSq8AlNUuJSUFqWm-LLoCCxnuP6fl9MvTOUSznvDzuBSFGQoYzbRP96mS3NOCDCxkZYqfVJMPFE-485zRUplKLzH29ygIK-N9dZxPUtDPKTp70sp7-VkdJqXyImOag4DLrCP3TJgDVyOpoiP9yYeliZAfRoqNevz-9sXsdRcbSwCq3PMX-CybYhlpRgRmlKyPQiD7140MlToSmaZlH~RsPdhxNgc4n~djvRyY8l9pHcEhNw__&Key-Pair-Id=APKAIQI7IMS5DMTTAKOA",
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "The Rio de Janeiro photo, now as a pin board. Most pins should land on the informal settlement in the foreground, a few on the high-rise blocks. Ask the room what visual cues they used: roofs, density, roads, green space. Those cues are exactly what daytime satellite images measure in section 2.",
+   "title": "Drop a pin on the poorest part of this photo",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A8",
+   "afterPage": 5,
+   "tier": "core",
+   "minutes": 2,
+   "slideType": "ideaBoard",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "How would you measure the development gap in this photo? Name one indicator",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "3f6c2a8e-1b4d-4c7a-9e2f-5a1b3c4d6e70",
+       "name": "Income and consumption"
+      },
+      {
+       "id": "7a1d4e9b-2c5f-4b8a-8d3e-6b2c4d5e7f81",
+       "name": "Housing and infrastructure"
+      },
+      {
+       "id": "9c3e5f1a-4d6b-4e9c-af4b-7c3d5e6f8a92",
+       "name": "Health and education"
+      },
+      {
+       "id": "b5d7a2c4-6e8f-4fad-b05c-8d4e6f7a9ba3",
+       "name": "Other"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 2
+    }
+   },
+   "props": null,
+   "notes": "The slide asked how we can measure, predict and explain these gaps. Collect indicators for 90 seconds, then open voting (two votes each) and read the top three. Point out which ones need a survey and which ones can be seen from above.",
+   "title": "How would you measure the development gap in this photo? Name one indicator",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 6,
+   "title": "Gaps show clear geospatial patterns (Sao Paulo)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A9",
+   "afterPage": 6,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "This Sao Paulo photo was taken in 2004. By 2021, the gap between the two neighborhoods was...",
+    "options": [
+     "Much narrower",
+     "About the same",
+     "Wider"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "A prediction poll; do not reveal the answer. The next slide shows the same spot in 2004 and 2021: the favela of Paraisopolis and the luxury towers next to it look almost unchanged, and El Pais (2022) reported that little has changed in nearly 20 years. The answer is B, about the same: gaps can persist for decades.",
+   "title": "This Sao Paulo photo was taken in 2004. By 2021, the gap between the two neighborhoods was...",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 7,
+   "title": "Gaps can persist over time (Sao Paulo, 2004 and 2021)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A10",
+   "afterPage": 7,
+   "tier": "core",
+   "minutes": 3,
+   "slideType": "marketplace/image-show",
+   "slide": {
+    "slide_type": "marketplace/image-show",
+    "title": "Share a photo of a development gap you have seen in your home region",
+    "slide_attributes": {
+     "config": {
+      "title": "Share a photo of a development gap you have seen in your home region",
+      "displayMode": "tiledWall",
+      "wallMotion": "drift",
+      "wallLayout": "polaroid",
+      "allowCaptions": true,
+      "showParticipantNames": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Students upload one photo from their phone, with a caption that names the place. Photos from the internet are fine if they have none of their own. Pick two photos and ask their owners what the gap is and whether it shows a geographic pattern.",
+   "title": "Share a photo of a development gap you have seen in your home region",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 8,
+   "title": "Dynamics observable from above (Las Vegas)"
+  },
+  {
+   "kind": "image",
+   "page": 9,
+   "title": "Dynamics observable from above (Dubai, Playa del Carmen)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A11",
+   "afterPage": 9,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "spinner_wheel",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: what can the view from above show that a GDP table cannot?",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Spin the wheel; it fills itself with joined names. Good answers: where growth happens inside a city or country, how fast cities expand, change over time without waiting for a census, and places with no official statistics at all.",
+   "title": "Cold call: what can the view from above show that a GDP table cannot?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 10,
+   "title": "Local development matters for several SDGs"
+  },
+  {
+   "kind": "interactive",
+   "id": "A12",
+   "afterPage": 10,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "marketplace/interactive-images",
+   "slide": {
+    "slide_type": "marketplace/interactive-images",
+    "title": "Tap each goal: why does it need local data?",
+    "slide_attributes": {
+     "config": {
+      "title": "Tap each goal: why does it need local data?",
+      "backgroundImageUrl": "https://assets-cdn.ahaslides.com/static/4835109/image/8baa01098ca516642c5afd10e8b1f285f081b98b2dac9192a6ceb4e4a2d7f3c8.webp?Expires=2106618578&Signature=W-7DTx3Qoguw~t5Y-GnN~3V1XXdqnprxBJF08STXrjNjyq3-VG3g8pv9doG~7eAfWzWPa8Zg5OZFuegsCLx7h11USIq3H~xjugb8a7zVoA1ltbUxxhQj44ZnQxTZQpKCUXE6L6sZY5wJDU4O-9FpoRnE~udPKfeJyIgB7R61vueg~mnUk12nKEZJjmNp44pp6iTIQTQedLa41xhWZB1WiXwNkrvuM-8yyss8Zt1ZhMWxuPS~fCbw0VK~bwqx5Nv4gCUas2Gh8aAPGT1FGenrZtWpBMe1fnBT4qPDDWTd3xJ1vmSGIpeU1YGXYPDSyqdmRC-4k2cxEOWGdPi3MzYd5A__&Key-Pair-Id=APKAIQI7IMS5DMTTAKOA",
+      "hotspots": [
+       {
+        "id": "hs_1",
+        "x": 26,
+        "y": 50,
+        "title": "SDG 11: Cities and communities",
+        "description": "Slums, transport and housing differ block by block, so a national average hides the neighborhoods in need."
+       },
+       {
+        "id": "hs_2",
+        "x": 52,
+        "y": 52,
+        "title": "Leave no one behind",
+        "description": "The 2030 Agenda asks for data disaggregated by location, not only by country."
+       },
+       {
+        "id": "hs_3",
+        "x": 70,
+        "y": 41,
+        "title": "SDG 10: Reduced inequalities",
+        "description": "Inequality between regions is part of total inequality and only shows up in subnational data."
+       },
+       {
+        "id": "hs_4",
+        "x": 81,
+        "y": 41,
+        "title": "SDG 13: Climate action",
+        "description": "Floods, droughts and heat hit specific places, so adaptation needs local exposure maps."
+       },
+       {
+        "id": "hs_5",
+        "x": 76,
+        "y": 60,
+        "title": "SDG 8: Decent work and growth",
+        "description": "Growth is uneven across regions; local data show where jobs and income are rising or falling."
+       }
+      ]
+     }
+    }
+   },
+   "props": null,
+   "notes": "Students tap the numbered pins on their phones and read at their own pace while you talk through the slide. No scoring. Ask which goal matters most in their own country, which leads into the next ranking.",
+   "title": "Tap each goal: why does it need local data?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A13",
+   "afterPage": 10,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "ranking",
+   "slide": {
+    "slide_type": "ranking",
+    "title": "Which goal most needs data for small regions? Rank your top three",
+    "slide_attributes": {
+     "rankingItems": [
+      {
+       "index": 0,
+       "text": "SDG 1: No poverty"
+      },
+      {
+       "index": 1,
+       "text": "SDG 8: Decent work and growth"
+      },
+      {
+       "index": 2,
+       "text": "SDG 10: Reduced inequalities"
+      },
+      {
+       "index": 3,
+       "text": "SDG 11: Sustainable cities"
+      },
+      {
+       "index": 4,
+       "text": "SDG 13: Climate action"
+      }
+     ],
+     "rankingPicksPerParticipant": 3
+    }
+   },
+   "props": null,
+   "notes": "No right answer. Many students put SDG 1 first: poverty maps are the classic use of subnational data. Note the goal that ranks last and ask one student to argue for it.",
+   "title": "Which goal most needs data for small regions? Rank your top three",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 11,
+   "title": "But... do we have enough data?"
+  },
+  {
+   "kind": "interactive",
+   "id": "A14",
+   "afterPage": 11,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Do we have enough data to study regional development in your country?",
+    "options": [
+     "Yes, for most regions",
+     "Only for large regions such as states",
+     "No, data are scarce or outdated",
+     "I do not know"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "An honest answer from the room before the data tour. Students from countries with recent censuses tend to answer A or B. Keep the result in mind: section 2 argues that satellites fill exactly the gap behind answers B and C.",
+   "title": "Do we have enough data to study regional development in your country?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A15",
+   "afterPage": 11,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Next video: Rosling starts in 1810. In that year, life expectancy in every country was below...",
+    "options": [
+     "40 years",
+     "60 years",
+     "25 years"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A, 40 years. In 1810 all countries were poor and sick, with life expectancy below 40. The four-minute video that follows shows 200 years of divergence and then convergence. Play it in full (core).",
+   "title": "Next video: Rosling starts in 1810. In that year, life expectancy in every country was below...",
+   "answer": "A. 40 years"
+  },
+  {
+   "kind": "video",
+   "page": 12,
+   "tier": "core",
+   "title": "200 Countries, 200 Years, 4 Minutes (Hans Rosling, BBC)",
+   "url": "https://www.youtube.com/watch?v=jbkSRLYSojo",
+   "notes": "Play in full, about 4 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "A16",
+   "afterPage": 12,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Now Rosling splits China into provinces. Rich Shanghai matches which country in health and wealth?",
+    "options": [
+     "Pakistan",
+     "Italy",
+     "Ghana"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, Italy. The next video starts at 3:40, where Rosling splits China: Shanghai has the health and wealth of Italy, the inland province Guizhou is like Pakistan, and the poorest rural west is like Ghana. One country holds the whole world inside it.",
+   "title": "Now Rosling splits China into provinces. Rich Shanghai matches which country in health and wealth?",
+   "answer": "B. Italy"
+  },
+  {
+   "kind": "video",
+   "page": 13,
+   "tier": "core",
+   "title": "200 Countries, 200 Years: China provinces segment (Hans Rosling, BBC)",
+   "url": "https://www.youtube.com/watch?v=jbkSRLYSojo&t=220s",
+   "notes": "Starts at 3:40; stop after the China provinces, about 1 minute."
+  },
+  {
+   "kind": "interactive",
+   "id": "A17",
+   "afterPage": 13,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "match_pairs_quiz",
+   "slide": {
+    "slide_type": "match_pairs_quiz",
+    "heading": "Match each part of China to the country it resembles (Rosling, 2009)",
+    "pairs": [
+     {
+      "left_item": "Shanghai",
+      "right_item": "Italy"
+     },
+     {
+      "left_item": "Guizhou province",
+      "right_item": "Pakistan"
+     },
+     {
+      "left_item": "The poorest rural west",
+      "right_item": "Ghana"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: Shanghai is Italy, Guizhou is Pakistan, the rural west is Ghana. The point for the course: a national average for China describes none of these places. That is the case for subnational data.",
+   "title": "Match each part of China to the country it resembles (Rosling, 2009)",
+   "answer": "Shanghai = Italy; Guizhou province = Pakistan; The poorest rural west = Ghana"
+  },
+  {
+   "kind": "interactive",
+   "id": "A18",
+   "afterPage": 13,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "The McKinsey study Pixels of Progress splits the world into how many micro regions?",
+    "options": [
+     "About 200",
+     "About 4,000",
+     "More than 40,000"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C. Pixels of Progress (McKinsey Global Institute) uses more than 40,000 micro regions, about 230 times more granular than a country view; each averages about 180,000 people. Night lights helped build it. The next two slides show one bubble for the world and then the world through a regional microscope.",
+   "title": "The McKinsey study Pixels of Progress splits the world into how many micro regions?",
+   "answer": "C. More than 40,000"
+  },
+  {
+   "kind": "image",
+   "page": 14,
+   "title": "The disaggregation of development (one bubble)"
+  },
+  {
+   "kind": "interactive",
+   "id": "A19",
+   "afterPage": 14,
+   "tier": "opt",
+   "minutes": 1,
+   "slideType": "marketplace/true-or-false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "A world average of 73 years of life and USD 16,800 of income per person describes most places well.",
+    "slide_attributes": {
+     "config": {
+      "question": "A world average of 73 years of life and USD 16,800 of income per person describes most places well.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: False. The single bubble on the previous slide hides a wide cloud of micro regions, far above and below the average in both life expectancy and income, as the next slide shows. Averages are a summary, not a description.",
+   "title": "A world average of 73 years of life and USD 16,800 of income per person describes most places well.",
+   "answer": "False"
+  },
+  {
+   "kind": "image",
+   "page": 15,
+   "title": "The world through a regional microscope"
+  },
+  {
+   "kind": "image",
+   "page": 16,
+   "title": "A new world of micro regions"
+  },
+  {
+   "kind": "image",
+   "page": 17,
+   "title": "Micro regions as pixels: a raster is an array of values"
+  },
+  {
+   "kind": "interactive",
+   "id": "A20",
+   "afterPage": 17,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/fill-in-the-blanks",
+   "slide": {
+    "slide_type": "marketplace/fill-in-the-blanks",
+    "title": "Complete the definition of a raster image",
+    "slide_attributes": {
+     "config": {
+      "question": "A raster image is a grid of [blank], and each one stores a [blank].",
+      "blanks": [
+       {
+        "id": "b1",
+        "acceptedAnswers": [
+         "pixels"
+        ],
+        "dropdownOptions": [
+         "polygons",
+         "pixels",
+         "points"
+        ]
+       },
+       {
+        "id": "b2",
+        "acceptedAnswers": [
+         "value"
+        ],
+        "dropdownOptions": [
+         "border",
+         "name",
+         "value"
+        ]
+       }
+      ],
+      "answerType": "dropdown",
+      "partialScoring": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: pixels, value. A raster is a set of pixels and also an array of numbers, which is why satellite images can enter a regression like any other data. Polygons and points are vector data, the other main type of spatial data.",
+   "title": "Complete the definition of a raster image",
+   "answer": "pixels, value"
+  },
+  {
+   "kind": "interactive",
+   "id": "A21",
+   "afterPage": 17,
+   "tier": "core",
+   "minutes": 0.5,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Halfway leaderboard. Then the GeoQuery video and the data tour.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 18,
+   "tier": "core",
+   "title": "An Introduction to Geospatial Data and GeoQuery (AidData)",
+   "url": "https://www.youtube.com/watch?v=7o5Faom5uRU",
+   "notes": "Play the first 2 minutes."
+  },
+  {
+   "kind": "interactive",
+   "id": "A22",
+   "afterPage": 18,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/true-or-false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "GeoQuery requires coding or mapping software.",
+    "slide_attributes": {
+     "config": {
+      "question": "GeoQuery requires coding or mapping software.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "Answer: False. GeoQuery (AidData) filters and aggregates geospatial data to provinces or districts and returns a spreadsheet, without code or mapping software. That makes it the easiest entry point for the portal stop that follows the tour.",
+   "title": "GeoQuery requires coding or mapping software.",
+   "answer": "False"
+  },
+  {
+   "kind": "image",
+   "page": 19,
+   "title": "Where can we find data?"
+  },
+  {
+   "kind": "image",
+   "page": 20,
+   "title": "AidData GeoQuery"
+  },
+  {
+   "kind": "image",
+   "page": 21,
+   "title": "Global Data Lab"
+  },
+  {
+   "kind": "image",
+   "page": 22,
+   "title": "NASA SEDAC"
+  },
+  {
+   "kind": "image",
+   "page": 23,
+   "title": "World Bank geospatial poverty portal"
+  },
+  {
+   "kind": "image",
+   "page": 24,
+   "title": "Earth Engine data catalog"
+  },
+  {
+   "kind": "image",
+   "page": 25,
+   "title": "Awesome GEE community catalog"
+  },
+  {
+   "kind": "image",
+   "page": 26,
+   "title": "SHRUG (India) in the community catalog"
+  },
+  {
+   "kind": "interactive",
+   "id": "A23",
+   "afterPage": 26,
+   "tier": "core",
+   "minutes": 8,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Portal stop: find one subnational indicator for your country. Write the indicator, the portal and the level (state, district or pixel)."
+   },
+   "props": null,
+   "notes": "The hands-on stop, about eight minutes on laptops. Portals: http://geo.aiddata.org, https://globaldatalab.org, https://sedac.ciesin.columbia.edu, https://pipmaps.worldbank.org/en/data/datatopics/poverty-portal/home, https://developers.google.com/earth-engine/datasets, https://gee-community-catalog.org. Suggest GeoQuery or Global Data Lab for beginners. Walk around and help. Close by reading three answers that use different levels, and ask which level would be best for their own research question.",
+   "title": "Portal stop: find one subnational indicator for your country. Write the indicator, the portal and the level (state, district or pixel).",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A24",
+   "afterPage": 26,
+   "tier": "core",
+   "minutes": 1.5,
+   "slideType": "match_pairs_quiz",
+   "slide": {
+    "slide_type": "match_pairs_quiz",
+    "heading": "Match each portal to what it offers",
+    "pairs": [
+     {
+      "left_item": "AidData GeoQuery",
+      "right_item": "Data aggregated to provinces and districts, no code"
+     },
+     {
+      "left_item": "Global Data Lab",
+      "right_item": "A subnational Human Development Index"
+     },
+     {
+      "left_item": "NASA SEDAC",
+      "right_item": "Population and socioeconomic grids"
+     },
+     {
+      "left_item": "World Bank poverty portal",
+      "right_item": "Subnational poverty maps from surveys"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer as listed. Earth Engine and the community catalog are the raster archives behind many of these products; they return in Part 3 with Earth Engine itself.",
+   "title": "Match each portal to what it offers",
+   "answer": "AidData GeoQuery = Data aggregated to provinces and districts, no code; Global Data Lab = A subnational Human Development Index; NASA SEDAC = Population and socioeconomic grids; World Bank poverty portal = Subnational poverty maps from surveys"
+  },
+  {
+   "kind": "image",
+   "page": 27,
+   "title": "... and many other new data projects"
+  },
+  {
+   "kind": "interactive",
+   "id": "A25",
+   "afterPage": 27,
+   "tier": "opt",
+   "minutes": 2,
+   "slideType": "marketplace/budget-allocation-v2",
+   "slide": {
+    "slide_type": "marketplace/budget-allocation-v2",
+    "title": "Split 100 points of research time across these data sources",
+    "slide_attributes": {
+     "config": {
+      "prompt": "Split 100 points of research time across these data sources",
+      "unit": "points",
+      "total": 100,
+      "resultsChartType": "bars",
+      "options": [
+       {
+        "id": "surveys",
+        "label": "Household surveys"
+       },
+       {
+        "id": "admin",
+        "label": "Census and admin records"
+       },
+       {
+        "id": "satellite",
+        "label": "Satellite images"
+       },
+       {
+        "id": "mobile",
+        "label": "Mobile phone and web data"
+       }
+      ]
+     }
+    }
+   },
+   "props": null,
+   "notes": "No right answer. Compare the average split with the room answers to the data poll earlier: rooms that said data are scarce often give satellites more points. The next video argues for geospatial big data.",
+   "title": "Split 100 points of research time across these data sources",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 28,
+   "tier": "opt",
+   "title": "Can a billion maps help save the planet? (Esri)",
+   "url": "https://www.youtube.com/watch?v=zQfy1K_vMU0",
+   "notes": "Play 1 to 2 minutes."
+  },
+  {
+   "kind": "image",
+   "page": 75,
+   "title": "Closing: join our research network"
+  },
+  {
+   "kind": "interactive",
+   "id": "AR1",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "In the Rosling video, which Chinese province looks like Pakistan?",
+    "options": [
+     "Shanghai",
+     "Guizhou",
+     "Beijing"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Rapid-fire review: four questions, 20 seconds each, speed bonus on. Answer: B, Guizhou, the poor inland province.",
+   "title": "In the Rosling video, which Chinese province looks like Pakistan?",
+   "answer": "B. Guizhou"
+  },
+  {
+   "kind": "interactive",
+   "id": "AR2",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "A raster image is best described as...",
+    "options": [
+     "A grid of pixels, each with a value",
+     "A set of country borders",
+     "A table of survey answers"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A. Borders are vector data; survey tables are not spatial at all.",
+   "title": "A raster image is best described as...",
+   "answer": "A. A grid of pixels, each with a value"
+  },
+  {
+   "kind": "interactive",
+   "id": "AR3",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "The Sao Paulo photos from 2004 and 2021 show that the gap...",
+    "options": [
+     "Closed completely",
+     "Moved to another city",
+     "Has hardly changed"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C. Regional gaps can persist for decades.",
+   "title": "The Sao Paulo photos from 2004 and 2021 show that the gap...",
+   "answer": "C. Has hardly changed"
+  },
+  {
+   "kind": "interactive",
+   "id": "AR4",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 0.75,
+   "slideType": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Which portal offers a subnational Human Development Index?",
+    "options": [
+     "NASA SEDAC",
+     "Global Data Lab",
+     "Earth Engine catalog"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B, Global Data Lab.",
+   "title": "Which portal offers a subnational Human Development Index?",
+   "answer": "B. Global Data Lab"
+  },
+  {
+   "kind": "interactive",
+   "id": "A90",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Final podium. Congratulate the top three by name and invite everyone to the raffle at the end, where luck decides.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A91",
+   "afterPage": 75,
+   "tier": "opt",
+   "minutes": 1.5,
+   "slideType": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "Again, in one word: what makes a region developed?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "The opening prompt again. Show the screenshot of the first cloud next to this one and ask what changed.",
+   "title": "Again, in one word: what makes a region developed?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A92",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "After class: how confident are you now?",
+    "options": [
+     {
+      "text": "I can explain why development gaps within countries matter"
+     },
+     {
+      "text": "I can name three sources of subnational development data"
+     },
+     {
+      "text": "I can explain what a raster image is"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "The same three statements as the opening scale. Compare the averages with the baseline aloud. The statement with the smallest gain is the one to revisit next class.",
+   "title": "After class: how confident are you now?",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A93",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 2,
+   "slideType": "open_ended_survey",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Exit ticket: what is still unclear after today? One sentence."
+   },
+   "props": null,
+   "notes": "The exit ticket. Responses carry names, so they can be followed up. Skim them after class and open the next session with the two most common points.",
+   "title": "Exit ticket: what is still unclear after today? One sentence.",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "A94",
+   "afterPage": 75,
+   "tier": "core",
+   "minutes": 1,
+   "slideType": "marketplace/duck-race",
+   "slide": {
+    "slide_type": "marketplace/duck-race",
+    "slide_attributes": {
+     "config": {
+      "durationSeconds": 20,
+      "resultMode": "winner"
+     }
+    }
+   },
+   "props": null,
+   "notes": "Prize raffle. Every joined student becomes a duck and the winner is pure luck, so students who scored low on the quizzes still have a chance.",
+   "title": "Duck race raffle",
+   "answer": ""
+  }
+ ],
+ "counts": {
+  "total": 63,
+  "image": 24,
+  "video": 5,
+  "interactive": 34
+ },
+ "minutes": {
+  "core": 38.5,
+  "optional": 10.5
+ }
+}
