@@ -1,0 +1,503 @@
+{
+ "lang": "en",
+ "title": "On the geography of development (interactive keynote)",
+ "canva": "https://canva.link/n0fk7iia8hvmy61",
+ "slides": [
+  {
+   "kind": "image",
+   "page": 1,
+   "topic": "title",
+   "title": "Title"
+  },
+  {
+   "kind": "interactive",
+   "id": "K1",
+   "afterPage": 1,
+   "activityKind": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: what does development mean to you?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Read the three biggest words aloud. Most answers will be about income; the talk adds where and when development happens.",
+   "title": "In one word: what does development mean to you?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 2,
+   "topic": "gap_photo",
+   "title": "Sao Paulo: poor and rich neighborhoods"
+  },
+  {
+   "kind": "interactive",
+   "id": "K2",
+   "afterPage": 2,
+   "activityKind": "pin",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "Drop a pin on the poorest part of this photo",
+    "slide_attributes": {
+     "imageUrl": null,
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "The Sao Paulo photo as a pin board. Most pins land on the favela on the left, a few on the towers. Ask what cues people used: roofs, density, green space, swimming pools. The same cues are what daytime satellite images measure.",
+   "title": "Drop a pin on the poorest part of this photo",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "K3",
+   "afterPage": 2,
+   "activityKind": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "This photo is from 2004. By 2021, the gap between the two neighborhoods was...",
+    "options": [
+     "Much narrower",
+     "About the same",
+     "Wider"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": false,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "A prediction poll; do not reveal the answer. The next page shows the same spot in 2004 and 2021: the favela of Paraisopolis and the towers next to it look almost unchanged. The answer is B, about the same: gaps can persist for decades.",
+   "title": "This photo is from 2004. By 2021, the gap between the two neighborhoods was...",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 3,
+   "topic": "gap_2004_2021",
+   "title": "Sao Paulo, 2004 and 2021"
+  },
+  {
+   "kind": "image",
+   "page": 4,
+   "topic": "las_vegas",
+   "title": "Las Vegas (GIF)"
+  },
+  {
+   "kind": "image",
+   "page": 5,
+   "topic": "dubai_carmen",
+   "title": "Dubai and Playa del Carmen (GIFs)"
+  },
+  {
+   "kind": "image",
+   "page": 6,
+   "topic": "outer_space",
+   "title": "Development from outer space"
+  },
+  {
+   "kind": "interactive",
+   "id": "K4",
+   "afterPage": 6,
+   "activityKind": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "How much have you used satellite data?",
+    "options": [
+     {
+      "text": "I have looked at satellite images of my own region"
+     },
+     {
+      "text": "I have used satellite data in a study or a project"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Never",
+     "high_label": "Often",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "A quick read of the room. The gap between the two averages is the point: many people have looked at satellite images, few have used them as data. The rest of the talk shows how.",
+   "title": "How much have you used satellite data?",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 7,
+   "topic": "view_above",
+   "title": "The View from Above",
+   "url": "https://youtu.be/Hy-b7kjLFds"
+  },
+  {
+   "kind": "video",
+   "page": 8,
+   "topic": "south_asia",
+   "title": "Measuring South Asia's Economy from Outer Space",
+   "url": "https://youtu.be/rm1gCLfaZnE"
+  },
+  {
+   "kind": "interactive",
+   "id": "K5",
+   "afterPage": 8,
+   "activityKind": "true_false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Night lights measure income directly.",
+    "slide_attributes": {
+     "config": {
+      "question": "Night lights measure income directly.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 50,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": null,
+   "notes": "False. Night lights are a proxy for economic activity, as the World Bank video says: they track electricity use, which moves with income but also with population, prices and access to the grid.",
+   "title": "Night lights measure income directly.",
+   "answer": "False"
+  },
+  {
+   "kind": "video",
+   "page": 9,
+   "topic": "nasa_image",
+   "title": "How one NASA image tells dozens of stories",
+   "url": "https://youtu.be/ZYGd-llxHJE"
+  },
+  {
+   "kind": "image",
+   "page": 10,
+   "topic": "lights_quiz",
+   "title": "Quiz page: why are the lights different?"
+  },
+  {
+   "kind": "interactive",
+   "id": "K6",
+   "afterPage": 10,
+   "activityKind": "pin",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "Drop a pin on North Korea",
+    "slide_attributes": {
+     "imageUrl": null,
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "North Korea is the dark area between China and the bright South Korea. The border between the two Koreas is one of the sharpest development gaps visible from space.",
+   "title": "Drop a pin on North Korea",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 11,
+   "topic": "rgb_app",
+   "title": "Howarth RGB app"
+  },
+  {
+   "kind": "interactive",
+   "id": "K7",
+   "afterPage": 11,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "In this map, lights from 2013 are red, 2003 green and 1993 blue. Why are some lights red?",
+    "options": [
+     "They are the brightest cities",
+     "They are gas flares",
+     "They were lit only in 1993",
+     "They were lit only in 2013, the latest year"
+    ],
+    "correct": "D"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "D. Each year is one color channel (Howarth: red 2013, green 2003, blue 1993). A place lit in all three years mixes to white; a place lit only in 2013 shows pure red, so red marks new electrification, for example in China.",
+   "title": "In this map, lights from 2013 are red, 2003 green and 1993 blue. Why are some lights red?",
+   "answer": "D. They were lit only in 2013, the latest year"
+  },
+  {
+   "kind": "image",
+   "page": 12,
+   "topic": "daytime",
+   "title": "Daytime images: why and how?"
+  },
+  {
+   "kind": "image",
+   "page": 13,
+   "topic": "worldcover",
+   "title": "ESA WorldCover"
+  },
+  {
+   "kind": "interactive",
+   "id": "K8",
+   "afterPage": 13,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "What can daytime images show that night lights cannot?",
+    "options": [
+     "Land cover, such as crops and forests",
+     "The brightness of cities at night",
+     "Gas flares at night",
+     "Lit fishing boats at sea"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "A. The other three are all visible in night lights. Daytime images classify land cover (the ESA WorldCover map has 11 classes at 10 m), which matters most in rural areas where there are few lights.",
+   "title": "What can daytime images show that night lights cannot?",
+   "answer": "A. Land cover, such as crops and forests"
+  },
+  {
+   "kind": "image",
+   "page": 14,
+   "topic": "overview",
+   "title": "Monitoring regional development from outer space"
+  },
+  {
+   "kind": "image",
+   "page": 15,
+   "topic": "sdgs",
+   "title": "Multiple SDGs"
+  },
+  {
+   "kind": "interactive",
+   "id": "K9",
+   "afterPage": 15,
+   "activityKind": "ranking",
+   "slide": {
+    "slide_type": "ranking",
+    "title": "Which goals most need data for small regions? Rank your top two",
+    "slide_attributes": {
+     "rankingItems": [
+      {
+       "index": 0,
+       "text": "SDG 1: No poverty"
+      },
+      {
+       "index": 1,
+       "text": "SDG 8: Decent work and economic growth"
+      },
+      {
+       "index": 2,
+       "text": "SDG 10: Reduced inequalities"
+      },
+      {
+       "index": 3,
+       "text": "SDG 11: Sustainable cities and communities"
+      },
+      {
+       "index": 4,
+       "text": "SDG 13: Climate action"
+      }
+     ],
+     "rankingPicksPerParticipant": 2
+    }
+   },
+   "props": null,
+   "notes": "No right answer. The page highlights SDG 11, with goals 8, 10 and 13 beside it. Ask why the top choice needs data below the national level.",
+   "title": "Which goals most need data for small regions? Rank your top two",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 16,
+   "topic": "combine",
+   "title": "Combining satellite and other data"
+  },
+  {
+   "kind": "interactive",
+   "id": "K10",
+   "afterPage": 16,
+   "activityKind": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Which data would you combine with satellite images first?",
+    "options": [
+     "Drone images",
+     "Cell phone data",
+     "Social media data",
+     "Household surveys"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": false,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "No right answer. Household surveys are what most studies use to train and validate satellite predictions. In Togo, the government combined satellite images with cell phone data to target emergency cash (BBC, 2021).",
+   "title": "Which data would you combine with satellite images first?",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 17,
+   "topic": "bbc_cash",
+   "title": "How satellite images are helping one country hand out cash (BBC)",
+   "url": "https://youtu.be/e60QXzkFhc0"
+  },
+  {
+   "kind": "interactive",
+   "id": "K11",
+   "afterPage": 17,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "In the BBC video, which country used satellite images to send emergency cash?",
+    "options": [
+     "Kenya",
+     "Togo",
+     "Nigeria",
+     "Ghana"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "B, Togo. During the pandemic the government searched satellite images for signs of poverty and sent cash through mobile phones (BBC, May 2021).",
+   "title": "In the BBC video, which country used satellite images to send emergency cash?",
+   "answer": "B. Togo"
+  },
+  {
+   "kind": "image",
+   "page": 18,
+   "topic": "poverty_map",
+   "title": "Poverty map"
+  },
+  {
+   "kind": "image",
+   "page": 19,
+   "topic": "mckinsey",
+   "title": "McKinsey: the disaggregation of development (GIF)"
+  },
+  {
+   "kind": "interactive",
+   "id": "K12",
+   "afterPage": 19,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "The animation zooms in from one bubble for the whole world. How many micro regions does it end with?",
+    "options": [
+     "About 200",
+     "About 4,000",
+     "More than 40,000",
+     "More than 4 million"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "C. The McKinsey Global Institute view (Pixels of Progress) splits the world into more than 40,000 micro regions, a 230 times increase in resolution over countries. Averages hide most of the variation.",
+   "title": "The animation zooms in from one bubble for the whole world. How many micro regions does it end with?",
+   "answer": "C. More than 40,000"
+  },
+  {
+   "kind": "image",
+   "page": 20,
+   "topic": "microscope",
+   "title": "The world through a regional microscope"
+  },
+  {
+   "kind": "image",
+   "page": 21,
+   "topic": "big_data",
+   "title": "Big Data and AI"
+  },
+  {
+   "kind": "interactive",
+   "id": "K90",
+   "afterPage": 21,
+   "activityKind": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Final leaderboard. Without names, players show as generated names; congratulate the top three.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "K91",
+   "afterPage": 21,
+   "activityKind": "idea_board",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "What would you study with satellite data in your region?",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "3f6c2a8e-1b4d-4c7a-9e2f-5a1b3c4d6e70",
+       "name": "Cities and housing"
+      },
+      {
+       "id": "7a1d4e9b-2c5f-4b8a-8d3e-6b2c4d5e7f81",
+       "name": "Rural areas and agriculture"
+      },
+      {
+       "id": "9c3e5f1a-4d6b-4e9c-af4b-7c3d5e6f8a92",
+       "name": "Environment and climate"
+      },
+      {
+       "id": "b5d7a2c4-6e8f-4fad-b05c-8d4e6f7a9ba3",
+       "name": "Other"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 3
+    }
+   },
+   "props": null,
+   "notes": "The open question that closes the talk. Ideas stay on the board for later visitors, who can add their own and vote (three votes each). Read the top ideas before the thank-you page.",
+   "title": "What would you study with satellite data in your region?",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 22,
+   "topic": "thanks",
+   "title": "Thank you"
+  },
+  {
+   "kind": "image",
+   "page": 23,
+   "topic": "appendix",
+   "title": "Additional slides"
+  },
+  {
+   "kind": "image",
+   "page": 24,
+   "topic": "tasks",
+   "title": "Research tasks"
+  }
+ ],
+ "counts": {
+  "total": 38,
+  "image": 20,
+  "video": 4,
+  "interactive": 14
+ }
+}

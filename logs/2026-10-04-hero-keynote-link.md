@@ -88,3 +88,10 @@ The pinned `0.111.3` binary documented in `CLAUDE.md` was missing from
 `<version>/hugo` layout. The Homebrew `hugo` on `PATH` is 0.155.3, which is above
 the repo's tested 0.96–0.119 window and fails the build on the removed
 `site.GoogleAnalytics` and `paginate` keys — do not use it.
+
+## Follow-up (2026-10-06): interactive keynote
+
+`keynoteUrl` in all three locales now points to the interactive AhaSlides versions of
+these Canva decks (audience links, self-paced), not to Canva. See
+`logs/2026-10-06-keynote-ahaslides.md` and `content/keynote/ahaslides/README.md`; the
+Canva links are kept in `content/keynote/ahaslides/pages.py`.

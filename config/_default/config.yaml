@@ -60,12 +60,16 @@ module:
       # Regional Development deck. Under a branch bundle its deck_part*.md
       # presenter copies would become pages, so the folder stays out of the site;
       # the deck PDF one level up is still published.
+      # `keynote/**` holds the AhaSlides build sources of the hero keynote
+      # (content/keynote/ahaslides/); its deck_*.md presenter copies would
+      # otherwise become a /keynote/ section.
       excludeFiles:
         - '{es,ja,cv}/**'
         - '**/.venv/**'
         - '**/.quarto/**'
         - '**/_freeze/**'
         - 'courses/slides/ahaslides/**'
+        - 'keynote/**'
     - source: content/es
       target: content
       lang: es

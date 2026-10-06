@@ -1,0 +1,456 @@
+{
+ "lang": "ja",
+ "title": "開発の地理学に関する考察（インタラクティブ版）",
+ "canva": "https://canva.link/9l4tum0urflm6mu",
+ "slides": [
+  {
+   "kind": "image",
+   "page": 1,
+   "topic": "title",
+   "title": "Title"
+  },
+  {
+   "kind": "interactive",
+   "id": "K1",
+   "afterPage": 1,
+   "activityKind": "word_cloud",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "一言で：あなたにとって「開発」とは何ですか？"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Read the three biggest words aloud. Most answers will be about income; the talk adds where and when development happens.",
+   "title": "一言で：あなたにとって「開発」とは何ですか？",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 2,
+   "topic": "gap_photo",
+   "title": "Sao Paulo: poor and rich neighborhoods"
+  },
+  {
+   "kind": "interactive",
+   "id": "K2",
+   "afterPage": 2,
+   "activityKind": "pin",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "この写真の中で最も貧しい場所にピンを置いてください",
+    "slide_attributes": {
+     "imageUrl": null,
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "The Sao Paulo photo as a pin board. Most pins land on the favela on the left, a few on the towers. Ask what cues people used: roofs, density, green space, swimming pools. The same cues are what daytime satellite images measure.",
+   "title": "この写真の中で最も貧しい場所にピンを置いてください",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "K3",
+   "afterPage": 2,
+   "activityKind": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "この写真は2004年のものです。2021年には、2つの地区の格差は…",
+    "options": [
+     "大きく縮小した",
+     "ほぼ同じだった",
+     "拡大した"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": false,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "A prediction poll; do not reveal the answer. The next page shows the same spot in 2004 and 2021: the favela of Paraisopolis and the towers next to it look almost unchanged. The answer is B, about the same: gaps can persist for decades.",
+   "title": "この写真は2004年のものです。2021年には、2つの地区の格差は…",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 3,
+   "topic": "gap_2004_2021",
+   "title": "Sao Paulo, 2004 and 2021"
+  },
+  {
+   "kind": "image",
+   "page": 4,
+   "topic": "las_vegas",
+   "title": "Las Vegas (GIF)"
+  },
+  {
+   "kind": "image",
+   "page": 5,
+   "topic": "dubai_carmen",
+   "title": "Dubai and Playa del Carmen (GIFs)"
+  },
+  {
+   "kind": "image",
+   "page": 6,
+   "topic": "outer_space",
+   "title": "Development from outer space"
+  },
+  {
+   "kind": "interactive",
+   "id": "K4",
+   "afterPage": 6,
+   "activityKind": "scale",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "衛星データをどのくらい使ったことがありますか？",
+    "options": [
+     {
+      "text": "自分の地域の衛星画像を見たことがある"
+     },
+     {
+      "text": "研究やプロジェクトで衛星データを使ったことがある"
+     }
+    ],
+    "scale_config": {
+     "low_label": "まったくない",
+     "high_label": "よくある",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": null,
+   "notes": "A quick read of the room. The gap between the two averages is the point: many people have looked at satellite images, few have used them as data. The rest of the talk shows how.",
+   "title": "衛星データをどのくらい使ったことがありますか？",
+   "answer": ""
+  },
+  {
+   "kind": "video",
+   "page": 7,
+   "topic": "view_above",
+   "title": "The View from Above (JPN)",
+   "url": "https://youtu.be/SJF_pLOMNVE"
+  },
+  {
+   "kind": "video",
+   "page": 8,
+   "topic": "south_asia",
+   "title": "Measuring South Asia's Economy from Outer Space (JPN)",
+   "url": "https://youtu.be/MCBxUQGKgiU"
+  },
+  {
+   "kind": "interactive",
+   "id": "K5",
+   "afterPage": 8,
+   "activityKind": "true_false",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "夜間光は所得を直接測定している。",
+    "slide_attributes": {
+     "config": {
+      "question": "夜間光は所得を直接測定している。",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 50,
+      "speedBonus": true,
+      "trueLabel": "正しい",
+      "falseLabel": "間違い"
+     }
+    }
+   },
+   "props": null,
+   "notes": "False. Night lights are a proxy for economic activity, as the World Bank video says: they track electricity use, which moves with income but also with population, prices and access to the grid.",
+   "title": "夜間光は所得を直接測定している。",
+   "answer": "False"
+  },
+  {
+   "kind": "video",
+   "page": 9,
+   "topic": "nasa_image",
+   "title": "How one NTL image can tell dozens of stories (Japanese)",
+   "url": "https://youtu.be/I3QKlEiXOOU"
+  },
+  {
+   "kind": "image",
+   "page": 10,
+   "topic": "lights_quiz",
+   "title": "Quiz page: why are the lights different?"
+  },
+  {
+   "kind": "interactive",
+   "id": "K6",
+   "afterPage": 10,
+   "activityKind": "pin",
+   "slide": {
+    "slide_type": "pinOnImage",
+    "title": "北朝鮮の位置にピンを置いてください",
+    "slide_attributes": {
+     "imageUrl": null,
+     "pinsPerParticipant": 1
+    }
+   },
+   "props": null,
+   "notes": "North Korea is the dark area between China and the bright South Korea. The border between the two Koreas is one of the sharpest development gaps visible from space.",
+   "title": "北朝鮮の位置にピンを置いてください",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 11,
+   "topic": "rgb_app",
+   "title": "Howarth RGB app"
+  },
+  {
+   "kind": "interactive",
+   "id": "K7",
+   "afterPage": 11,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "この地図では、2013年の光は赤、2003年は緑、1993年は青で表示されています。一部の光が赤いのはなぜですか？",
+    "options": [
+     "最も明るい都市だから",
+     "ガスフレアだから",
+     "1993年にだけ光っていたから",
+     "最新の2013年にだけ光っていたから"
+    ],
+    "correct": "D"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "D. Each year is one color channel (Howarth: red 2013, green 2003, blue 1993). A place lit in all three years mixes to white; a place lit only in 2013 shows pure red, so red marks new electrification, for example in China.",
+   "title": "この地図では、2013年の光は赤、2003年は緑、1993年は青で表示されています。一部の光が赤いのはなぜですか？",
+   "answer": "D. 最新の2013年にだけ光っていたから"
+  },
+  {
+   "kind": "image",
+   "page": 12,
+   "topic": "daytime",
+   "title": "Daytime images: why and how?"
+  },
+  {
+   "kind": "image",
+   "page": 13,
+   "topic": "worldcover",
+   "title": "ESA WorldCover"
+  },
+  {
+   "kind": "interactive",
+   "id": "K8",
+   "afterPage": 13,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "昼間の衛星画像では分かり、夜間光では分からないものはどれですか？",
+    "options": [
+     "農地や森林などの土地被覆",
+     "夜の都市の明るさ",
+     "夜間のガスフレア",
+     "海上の漁船の明かり"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "A. The other three are all visible in night lights. Daytime images classify land cover (the ESA WorldCover map has 11 classes at 10 m), which matters most in rural areas where there are few lights.",
+   "title": "昼間の衛星画像では分かり、夜間光では分からないものはどれですか？",
+   "answer": "A. 農地や森林などの土地被覆"
+  },
+  {
+   "kind": "image",
+   "page": 14,
+   "topic": "overview",
+   "title": "Monitoring regional development from outer space"
+  },
+  {
+   "kind": "image",
+   "page": 15,
+   "topic": "sdgs",
+   "title": "Multiple SDGs"
+  },
+  {
+   "kind": "interactive",
+   "id": "K9",
+   "afterPage": 15,
+   "activityKind": "ranking",
+   "slide": {
+    "slide_type": "ranking",
+    "title": "小さな地域のデータが最も必要な目標はどれですか？上位2つを選んでください",
+    "slide_attributes": {
+     "rankingItems": [
+      {
+       "index": 0,
+       "text": "SDG 1：貧困をなくそう"
+      },
+      {
+       "index": 1,
+       "text": "SDG 8：働きがいも経済成長も"
+      },
+      {
+       "index": 2,
+       "text": "SDG 10：人や国の不平等をなくそう"
+      },
+      {
+       "index": 3,
+       "text": "SDG 11：住み続けられるまちづくりを"
+      },
+      {
+       "index": 4,
+       "text": "SDG 13：気候変動に具体的な対策を"
+      }
+     ],
+     "rankingPicksPerParticipant": 2
+    }
+   },
+   "props": null,
+   "notes": "No right answer. The page highlights SDG 11, with goals 8, 10 and 13 beside it. Ask why the top choice needs data below the national level.",
+   "title": "小さな地域のデータが最も必要な目標はどれですか？上位2つを選んでください",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 16,
+   "topic": "combine",
+   "title": "Combining satellite and other data"
+  },
+  {
+   "kind": "interactive",
+   "id": "K10",
+   "afterPage": 16,
+   "activityKind": "poll",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "衛星画像と最初に組み合わせたいデータはどれですか？",
+    "options": [
+     "ドローン画像",
+     "携帯電話データ",
+     "ソーシャルメディアデータ",
+     "世帯調査"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": false,
+    "multipleChoice": false,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "No right answer. Household surveys are what most studies use to train and validate satellite predictions. In Togo, the government combined satellite images with cell phone data to target emergency cash (BBC, 2021).",
+   "title": "衛星画像と最初に組み合わせたいデータはどれですか？",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 17,
+   "topic": "mckinsey",
+   "title": "McKinsey: the disaggregation of development (GIF)"
+  },
+  {
+   "kind": "interactive",
+   "id": "K12",
+   "afterPage": 17,
+   "activityKind": "pick_answer_quiz",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "アニメーションは世界全体を1つのバブルで表すところから始まります。最後にはいくつのミクロ地域になりますか？",
+    "options": [
+     "約200",
+     "約4,000",
+     "40,000以上",
+     "400万以上"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "C. The McKinsey Global Institute view (Pixels of Progress) splits the world into more than 40,000 micro regions, a 230 times increase in resolution over countries. Averages hide most of the variation.",
+   "title": "アニメーションは世界全体を1つのバブルで表すところから始まります。最後にはいくつのミクロ地域になりますか？",
+   "answer": "C. 40,000以上"
+  },
+  {
+   "kind": "image",
+   "page": 18,
+   "topic": "microscope",
+   "title": "The world through a regional microscope"
+  },
+  {
+   "kind": "image",
+   "page": 19,
+   "topic": "big_data",
+   "title": "Big Data and AI"
+  },
+  {
+   "kind": "interactive",
+   "id": "K90",
+   "afterPage": 19,
+   "activityKind": "leaderboard",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": null,
+   "notes": "Final leaderboard. Without names, players show as generated names; congratulate the top three.",
+   "title": "Leaderboard",
+   "answer": ""
+  },
+  {
+   "kind": "interactive",
+   "id": "K91",
+   "afterPage": 19,
+   "activityKind": "idea_board",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "あなたの地域で衛星データを使って何を研究したいですか？",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "3f6c2a8e-1b4d-4c7a-9e2f-5a1b3c4d6e70",
+       "name": "都市と住宅"
+      },
+      {
+       "id": "7a1d4e9b-2c5f-4b8a-8d3e-6b2c4d5e7f81",
+       "name": "農村と農業"
+      },
+      {
+       "id": "9c3e5f1a-4d6b-4e9c-af4b-7c3d5e6f8a92",
+       "name": "環境と気候"
+      },
+      {
+       "id": "b5d7a2c4-6e8f-4fad-b05c-8d4e6f7a9ba3",
+       "name": "その他"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 3
+    }
+   },
+   "props": null,
+   "notes": "The open question that closes the talk. Ideas stay on the board for later visitors, who can add their own and vote (three votes each). Read the top ideas before the thank-you page.",
+   "title": "あなたの地域で衛星データを使って何を研究したいですか？",
+   "answer": ""
+  },
+  {
+   "kind": "image",
+   "page": 20,
+   "topic": "thanks",
+   "title": "Thank you"
+  }
+ ],
+ "counts": {
+  "total": 33,
+  "image": 17,
+  "video": 3,
+  "interactive": 13
+ }
+}

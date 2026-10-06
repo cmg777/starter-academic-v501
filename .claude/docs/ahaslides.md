@@ -32,6 +32,11 @@ this file is the procedure:
   YouTube embeds rebuilt as **playable YouTube slides** and five more types (pin on image,
   photo share, interactive image, ranking, split the points). Its `pages.py` replaces
   `slides.qmd` as the page source. See *PDF-only decks, several parts, videos* below.
+- `content/keynote/ahaslides/` (decks `10280670` EN, `10280671` ES, `10280672` JA) — the
+  sixth: the homepage hero keynote in three languages, **self-paced for website
+  visitors**, built from **captures of the public Canva view** (no PDF), with one
+  activity list translated and anchored by topic. See *Canva capture, three languages,
+  self-paced* below.
 
 ---
 
@@ -313,6 +318,34 @@ When the source is a PDF export (Canva, PowerPoint) rather than `slides.qmd`:
    `content/courses/`, `.md` files in a subfolder become pages; the courses deck folder is
    in `excludeFiles` in `config/_default/config.yaml`.
 
+## Canva capture, three languages, self-paced (hero keynote, 2026-10-06)
+
+1. **No PDF? Capture the public Canva view.** `content/keynote/ahaslides/capture.mjs`
+   (global Playwright): viewport 1920x1080 at device scale 2, hide `header`, `footer` and
+   the cookie banner with CSS (never accept it), pause every `<video>` at frame 0 (GIF
+   pages then show their first frame, which the GIF builder needs), screenshot, press
+   ArrowRight. A click on the page also advances it, so do not click to focus.
+2. **Decks that differ by language** get a topic map (`pages.py`, `TOPICS`): every Canva
+   page has one topic per language and each activity anchors to a topic, so one
+   `activities.py` serves all three; a language without the page skips the activity.
+3. **Website link = audience link.** `https://audience.ahaslides.com/<uniqueAccessCode>`
+   (where `ahaslides.com/<join code>` redirects) is the interactive self-paced view. The
+   share link `presenter.ahaslides.com/share/...` is a read-only viewer with a "Copy"
+   button.
+4. **Self-paced settings** (editor, Settings): *Who takes the lead* → *Audience
+   (self-paced)*; *Collect audience info* off; *Presentation language* per deck
+   (`create_presentation(lang=...)` does not set it; the field is a native select, set
+   its option value — typing picks the wrong language). Scored quizzes still ask for a
+   nickname before the first quiz; that cannot be turned off.
+5. **YouTube slides in self-paced mode:** tick *Also show on audience's smartphones* on
+   every YouTube slide, or visitors see "Please watch the video on the presenter's
+   screen".
+6. **Adding YouTube slides safely:** click *New slide* only once the editor has loaded
+   the thumbnails; a type picked from the right-hand panel converts the selected slide
+   (a Japanese page image became a video). Re-count the image slides by API afterwards,
+   and place new or imported slides with `move_slide` (they land at the end when nothing
+   is selected).
+
 ## Plan behaviour
 
 ### Paid plan (Education Large, measured on FWL 2026-10-06)
@@ -371,3 +404,4 @@ upgrade, and to test a live session before teaching from it.
 - `content/post/python_fwl/ahaslides/` — the paid-plan reference; copy its
   `activities.py`, `build_deck_json.py` and `build_payload.py`.
 - `content/courses/slides/ahaslides/` — PDF-only source, three parts, YouTube slides.
+- `content/keynote/ahaslides/` — Canva view capture, three languages, self-paced.
