@@ -20,6 +20,12 @@ the page's own design, not the server:
    returning visitors.
 5. Google Analytics had not been loaded on the homepage since the 2026-10-03
    redesign.
+6. **Root cause of the intermittent blank page:** `orbital.js` created its WebGL
+   context during startup. Some of the time this held back presentation of the
+   page's first frame until about 1.2 s (old live site, desktop, real throttling:
+   FCP 170 / **1202** / 300 ms across three runs). Frames were produced but not
+   presented. Bisected with page variants: removing the script removed the floor;
+   of the four scripts, only `orbital.js` reproduced it.
 
 ## Changes
 
@@ -35,6 +41,15 @@ the page's own design, not the server:
 - **Scroll reveals** (`assets/js/orbital-cinema.js`): `rootMargin` `0px 0px 12% 0px`,
   `threshold` 0, transitions .6/.7 s, stagger cap 6×50 ms. Elements already in the
   viewport are never tagged (positions are read in one pass before any write).
+- **Globe start-up** (`assets/js/orbital.js`): everything after the mobile-menu
+  handlers runs in `initGlobe()`, called with `requestAnimationFrame(() =>
+  setTimeout(initGlobe, 0))`, i.e. after the first frame is on screen. The static
+  globe image covers the gap. `tests/orbital.test.cjs` flushes this boot step.
+- **Coverflow and gallery start-up**: layout is read for every slide before any
+  style is written (it used to force one full-page layout per slide), and the
+  initial measurements run on the next animation frame.
+- **Hero image priority**: its preload carries `fetchpriority=high` (the request
+  stayed Low before, despite the `<img>` attribute).
 - **Globe texture**: sources moved from `static/media/orbital/` to
   `assets/media/orbital/`. Hugo serves same-size WebP at q88 (3600×1800 desktop,
   1800×900 mobile, about half the bytes, PSNR ≈ 42.7 dB against the JPEG,
@@ -47,6 +62,12 @@ the page's own design, not the server:
   `requestIdleCallback`.
 
 ## Decisions
+
+- **No texture preload.** Tried in 4476e64a and reverted in b5013970: the 358 KB
+  preload split bandwidth with the hero image and script (hero image done at
+  1025 ms vs 563 ms).
+- **CSS stays inline.** With the globe fix, a real-throttling A/B on mobile gave
+  FCP 1020 ms inline vs 1683 ms with an external stylesheet.
 
 - **Language redirect kept as a 302.** An edge rewrite would save one round trip,
   but it would serve Japanese/Spanish content at the English canonical URL and
@@ -82,6 +103,32 @@ the initial gallery measurements run on the next animation frame, and the textur
 is decoded with `image.decode()` first.
 
 PageSpeed Insights: the keyless API returned HTTP 429 (shared daily quota), so PSI
-numbers were taken through the pagespeed.web.dev UI after deploy (see below).
+numbers were not collected; local Lighthouse covers the same lab metrics.
 
-RESULTS_AFTER_PLACEHOLDER
+### Live, after 4476e64a (simulated throttling)
+
+The simulated scores looked worse (for example `/ja/` desktop FCP 457 → 952 ms).
+Two reasons: the LCP element changed (before, the globe was invisible during load,
+so LCP was a small header text; now LCP is the globe image), and Lantern
+modelled the new texture preload competing with the hero. Observed (unsimulated)
+FCP and Speed Index were the same or better on 5 of 6 pages.
+
+### Controlled A/B, real throttling (`--throttling-method=devtools`)
+
+Old build (bf59fc2d) vs final build, both served locally with gzip (`serve`),
+English homepage, medians of 3. URLs return 200 directly: an earlier round that
+requested `/index.html` went through two local redirects (+1.15 s on mobile) and
+was discarded.
+
+| | FCP | LCP | Speed Index | TBT |
+|---|---|---|---|---|
+| Desktop, old | 300 ms (runs 170 / 1202 / 300) | 300 ms | 636 ms | 65 ms |
+| Desktop, new | 196 ms (runs 196 / 189 / 209) | 431 ms | 460 ms | 94 ms |
+| Mobile, old | 1826 ms | 1826 ms | 2165 ms | 122 ms |
+| Mobile, new | **1020 ms** | 2041 ms | **1353 ms** | 324 ms |
+
+LCP is not comparable: old = header text (globe invisible), new = globe image.
+Mobile TBT breakdown (new): Google Analytics ≈ 128 ms (restored on purpose),
+homepage script ≈ 110 ms (old: 134 ms over three files), and ≈ 100 ms of
+style/layout that used to happen before first paint and now falls inside the
+TBT window because first paint is ~0.8 s earlier.

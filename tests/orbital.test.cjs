@@ -42,8 +42,10 @@ function setup({ reduced = false, mobile = false, noWebGL = false, saveData = fa
     IntersectionObserver: class { constructor(fn) { intersection = fn; } observe() {} },
     ResizeObserver: class { observe() {} }
   };
-  context.window = context; context.addEventListener = () => {};
+  context.window = context; context.addEventListener = () => {}; context.setTimeout = fn => fn();
   vm.runInNewContext(source, context);
+  // The globe initializes after the first paint (one animation frame, then a task).
+  const boot = [...frames.values()]; frames.clear(); boot.forEach(fn => fn(0));
   const advance = (n = 150) => { for (let i = 0; i < n && frames.size; i++) { time += 34; const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn(time)); } };
   return { document, earth, canvas, fallback, controls, hint, status, pause, motion, regions, frames, advance, drawn,
     load: () => image?.onload(), error: () => image?.onerror(), texture: () => image?.src,

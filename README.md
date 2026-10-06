@@ -99,7 +99,9 @@ The home template deliberately omits the legacy theme's browser dependencies.
   (`orbital.js`, `lang-pref.js`, `orbital-gallery.js`, `orbital-cinema.js`) ship as one
   deferred, fingerprinted bundle. The opening sequence completes in about 0.6 s, and
   scroll reveals start just before a section enters the viewport. Content already on
-  screen is never hidden. Google Analytics is queued at once but loads only after
+  screen is never hidden. The WebGL globe initializes only after the first frame
+  is on screen (creating it at startup intermittently held the first paint for
+  ~1.2 s; see `logs/2026-10-06-homepage-performance.md`). Google Analytics is queued at once but loads only after
   the page is idle (production builds only).
 - **Shared site theme:** `assets/css/orbital-palette.css` supplies the dark background,
   reading panels, text, blue links, gold accents, and system fonts for both the
