@@ -54,6 +54,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "ほかの地区の賃金が高ければ、どうなるのでしょうか。2011～2015年の大ジャカルタ圏の都市部の正規雇用労働者について、基準モデルでは、実質月額最低賃金が10万ルピア高い場合、比較対象の地区へ通勤する確率の変化は、居住地区の最低賃金では−0.1パーセントポイント、相手地区の最低賃金では＋0.9パーセントポイントと推定されています。点は平均限界効果、横線は居住地区でクラスター化した報告標準誤差の±1倍で、信頼区間ではありません。答えは、通勤が増える、です。因果効果ではなく関連を示します。Siregar・Mendez（2026）の表4に基づきます。"
   caption: ''
   focal_point: ""
   preview_only: false

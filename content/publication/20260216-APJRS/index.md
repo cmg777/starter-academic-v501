@@ -54,6 +54,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Higher wages elsewhere? For urban formal workers in Greater Jakarta, 2011–2015, a baseline model estimates changes in the probability of commuting to a paired district of −0.1 percentage points for home-district minimum wages and +0.9 percentage points for the other district’s minimum wages, per IDR 100,000 higher real monthly minimum wage. Dots show average marginal effects; brackets show ±1 reported standard error clustered by home district, not confidence intervals. Answer: More commuting. These are associations, not causal estimates. Siregar and Mendez (2026), Table 4."
   caption: ''
   focal_point: ""
   preview_only: false

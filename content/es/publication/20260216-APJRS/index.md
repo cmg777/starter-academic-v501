@@ -54,6 +54,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Salarios más altos en otro distrito? Para trabajadores formales urbanos del Gran Yakarta, 2011–2015, el modelo base estima cambios en la probabilidad de desplazarse al distrito emparejado de −0,1 puntos porcentuales para el salario mínimo del distrito de residencia y +0,9 puntos porcentuales para el del otro distrito, por un aumento de 100 000 rupias en el salario mínimo mensual real. Los puntos muestran efectos marginales promedio; los intervalos representan ±1 error estándar reportado, agrupado por distrito de residencia, no intervalos de confianza. Respuesta: Más desplazamientos al trabajo. Son asociaciones, no estimaciones causales. Siregar y Mendez (2026), tabla 4."
   caption: ''
   focal_point: ""
   preview_only: false
