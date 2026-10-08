@@ -88,7 +88,7 @@ EN at `/` (`content/`), ES at `/es/` (`content/es/`, neutral Latin American Span
   - Every cinematic effect has a still fallback.
   - Run `node --test tests/orbital.test.cjs` after globe changes.
 - **Homepage sections:**
-  - Recent research = the 3 newest articles of types 1–3 dated ≤ now.
+  - Recent research = the 3 newest articles of types 1–3 dated ≤ now. Each row shows the article-page buttons (minus Cite) as pills from `partials/orbital-paper-links.html`, and its `summary:` should be plain language for a general audience.
   - The Software block (anchor `#projects`) = the 3 most recently **committed** `software` bundles (`.ByLastmod`). Committing a package change moves it to the front.
 - **Menu:** collapses below **1200px** on both systems. The homepage uses `orbital.css`; content pages use the forked `navbar-expand-xl` (`custom.scss` §7/§7a). From 1200px up it is one `nowrap` row, with only about 13–25px of spare room at 1200px. **Re-run `audit-nav.cjs` after any menu or label change.**
 - **No horizontal page scroll** at 360–1440px. Wide math and code scroll inside their own boxes.

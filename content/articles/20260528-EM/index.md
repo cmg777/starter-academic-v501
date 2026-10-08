@@ -25,7 +25,7 @@ publication_short: ""
 abstract: "We study how output growth translates into unemployment changes across districts in Indonesia, over the 2011–2020 period. Instead of imposing predetermined geographic groups, we apply a data-driven approach to identify districts with similar growth—unemployment dynamics. We find that the growth—unemployment relationship (Okun's law) varies markedly across districts: growth substantially reduces unemployment in some, while it is negligible or even reversed in others. To account for spatial dependence across districts, we estimate spatial models that decompose the total effect into each district's own response and spillovers from neighboring districts. These spillovers are both statistically significant and economically sizeable, suggesting that growth shocks diffuse well beyond individual district borders. Overall, our findings underscore the limitations of aggregate Okun estimates and the need for policies that are locally tailored and coordinated across neighboring regions."
 
 # Summary. An optional shortened abstract.
-summary: "Okun's law varies markedly across Indonesian districts, and growth shocks spill over to neighboring regions — calling for locally tailored, coordinated labor policies."
+summary: "Economic growth does not reduce unemployment equally across Indonesia: it helps a lot in some districts and barely at all in others. Because growth in one district also affects jobs in its neighbors, job policies work best when they fit local conditions and are coordinated across nearby regions."
 
 math: true
 diagram: true

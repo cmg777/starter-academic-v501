@@ -28,7 +28,7 @@ publication_short: ""
 abstract: "Cambodia has grown rapidly yet remains economically vulnerable, with persistent poverty and limited, outdated subnational data. This study combines big-data sources, machine learning, and the Cambodia Socio-Economic Survey to predict and map the Global Multidimensional Poverty Index across 10 indicators in education, health, and living standards at fine spatial scales. By integrating gridded deprivation probabilities with building footprints, we estimate household-level deprivations. A random-forest model attains high accuracy for clean water, sanitation, food consumption, housing materials, cooking fuel, and electricity access. Key predictors include nighttime lights, population density, and road networks. Challenges persist—especially the need for unbiased training data and limited capacity to capture within-province or within-district disparities. Nevertheless, the approach shows how big data and machine learning can complement traditional surveys to deliver more granular and timely measurements on multidimensional poverty."
 
 # Summary. An optional shortened abstract.
-summary: "We use new big data sources, the Cambodia Socio-Economic Survey, and machine learning methods to predict and map multidimensional poverty in Cambodia."
+summary: "Up-to-date poverty data are scarce in Cambodia. We combine household surveys with satellite data, such as nighttime lights, and machine learning to map, down to the household level, where people lack basics like clean water, sanitation, electricity, and education."
 
 tags:
 - big data

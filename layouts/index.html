@@ -198,7 +198,7 @@
           {{ else }}
             <span class="row-number" aria-hidden="true">0{{ add $i 1 }}</span>
           {{ end }}
-          <div class="publication-copy"><p class="meta">{{ .Date.Format "2006" }} <span aria-hidden="true">/</span> {{ .Params.publication | markdownify | plainify }}</p><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>{{ with .Params.summary }}<p>{{ . | plainify }}</p>{{ end }}</div>
+          <div class="publication-copy"><p class="meta">{{ .Date.Format "2006" }} <span aria-hidden="true">/</span> {{ .Params.publication | markdownify | plainify }}</p><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>{{ with .Params.summary }}<p>{{ . | plainify }}</p>{{ end }}{{ partial "orbital-paper-links.html" (dict "page" $paper "label" $t.paperLinksLabel) }}</div>
           <a class="round-link" href="{{ .RelPermalink }}" aria-label="{{ $t.read }}: {{ .Title }}">↗</a>
         </article>
       {{ end }}

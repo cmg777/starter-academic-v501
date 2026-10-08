@@ -948,6 +948,41 @@ html[lang^="en"] .hero h1 .h1-accent {
   max-width:850px
 }
 
+.paper-links {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px
+}
+
+.paper-links a {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:32px;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.2;
+  transition:border-color .2s,color .2s
+}
+
+.paper-links svg {
+  flex:none
+}
+
+.paper-links a:hover,.paper-links a:focus-visible {
+  border-color:var(--gold);
+  color:var(--gold)
+}
+
+.paper-links a:focus-visible {
+  outline:2px solid var(--gold);
+  outline-offset:2px
+}
+
 .round-link {
   border:1px solid #354656;
   border-radius:50%;
@@ -1890,7 +1925,8 @@ html[lang^="es"] .hero h1 {
   }
 
   .publication-row.has-thumbnail h3,
-  .publication-row.has-thumbnail p:not(.meta) {
+  .publication-row.has-thumbnail p:not(.meta),
+  .publication-row.has-thumbnail .paper-links {
     grid-column:1/-1
   }
 
