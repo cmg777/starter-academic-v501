@@ -3,14 +3,14 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Desigualdad regional desde el espacio exterior: predecir el PIB a partir de las luces nocturnas y construir índices de desigualdad en Python"
-summary: "Una réplica integral y didáctica en Python de Lessmann y Seidel (2017): convertir las luces nocturnas satelitales en PIB regional predicho, construir desde cero cinco índices de desigualdad ponderados por población, explorar la dinámica de la desigualdad regional entre países y estimar la curva de Kuznets regional, sus determinantes y una verificación de robustez espacial de Conley (HAC) con PyFixest."
+summary: "Aprenda a convertir imágenes satelitales de luces nocturnas en estimaciones del ingreso regional y a medir cuán desiguales son las regiones dentro de cada país. Paso a paso en Python, ponemos a prueba si la desigualdad regional primero aumenta y luego disminuye a medida que los países se desarrollan."
 date: "2026-06-15T00:00:00Z"
 categories:
   - Python
   - Spatial inequality
   - Fixed Effects and TWFE
 card_url: "/tutorials/python_kuznets_dmsp/"
-featured: false
+featured: true
 _build:
   render: never
   list: always

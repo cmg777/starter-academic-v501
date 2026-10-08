@@ -5,7 +5,7 @@ authors:
 - admin
 
 
-date: "2024-12-19T00:00:00Z"
+date: "2025-12-20T00:00:00Z"
 doi: "10.1080/00036846.2024.2439583"
 
 # Schedule page publish date (NOT publication's date).
@@ -24,7 +24,7 @@ publication_short: ""
 abstract: "This article examines the relationship between income and luminosity across Chinese provinces over the period 2000–2020 using newly harmonized night-time lights (NTL) data. We find that NTL luminosity is suitable for analysing both, time-series and cross-sectional changes in economic activity. However, the relationship between luminosity and GDP changes over time and can even turn negative, challenging the direct application of established GDP-NTL elasticities. We also find that applying time-series filters can substantially increase the R-squared and statistical significance of the GDP-NTL relationship for problematic periods. Moreover, we document that during economic downturns the predictive power of night-time lights drops considerably. Our study also supports the superiority of Visible and Infrared Imaging Suite (VIIRS) data over Defense Meteorological Satellite Program (DMSP) data. However, unlike previous comparative validation studies covering only very few years, we examine a considerably longer period, enabling a more nuanced evaluation. At a more disaggregated level, NTL are most effective at predicting industrial and service sector GDP. VIIRS data particularly outperforms DMSP data for agricultural and service sector GDP. Our examination of regional inequality reveals evidence of relative convergence among Chinese provinces when using GDP and VIIRS data, but this pattern does not hold when using DMSP data.."
 
 # Summary. An optional shortened abstract.
-summary: "This study explores income-luminosity dynamics in China, highlighting VIIRS's superiority over DMSP in predictive accuracy over time."
+summary: "Satellite images of lights at night can track how China's provinces grow, but the link between light and income shifts over time and weakens during downturns. Newer satellite data measure economic activity more accurately than older data, especially for industry and services."
 
 tags:
 - nighttime lights

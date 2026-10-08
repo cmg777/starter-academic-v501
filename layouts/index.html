@@ -187,10 +187,15 @@
       <p class="eyebrow">{{ $t.pubKicker }}</p><div class="section-heading"><h2 id="publications-title">{{ $t.pubTitle }}</h2><a class="text-link" href="{{ "articles/" | relLangURL }}">{{ $t.allPubs }} <span aria-hidden="true">↗</span></a></div>
       <div class="publication-list">
       {{/* Academic papers only: conference papers, journal articles, and preprints.
-           Use publication dates, excluding forthcoming papers even in future-enabled builds. */}}
+           Use publication dates, excluding forthcoming papers even in future-enabled builds.
+           Papers with `featured: true` come first (newest first); the newest others fill any free slots. */}}
       {{ $papers := where (where site.RegularPages "Section" "articles") "Params.publication_types" "intersect" (slice "1" "2" "3") }}
       {{ $papers = where $papers "Date" "le" now }}
-      {{ range $i, $paper := first 3 $papers.ByDate.Reverse }}
+      {{ $featuredPapers := where $papers "Params.featured" true }}
+      {{ $shownPapers := slice }}
+      {{ range $featuredPapers.ByDate.Reverse }}{{ $shownPapers = $shownPapers | append . }}{{ end }}
+      {{ range (complement $featuredPapers $papers).ByDate.Reverse }}{{ $shownPapers = $shownPapers | append . }}{{ end }}
+      {{ range $i, $paper := first 3 $shownPapers }}
         {{ $image := (.Resources.ByType "image").GetMatch "*featured*" }}
         <article class="publication-row{{ if $image }} has-thumbnail{{ end }}">
           {{ with $image }}
@@ -214,7 +219,13 @@
 
     <section id="posts" class="learning-section" aria-labelledby="learn-title"><div class="shell section">
       <p class="eyebrow">{{ $t.learnKicker }}</p><div class="section-heading"><div><h2 id="learn-title">{{ $t.learnTitle }}</h2><p class="section-description">{{ $t.learnIntro }}</p></div><a class="text-link" href="{{ "tutorials/" | relLangURL }}">{{ $t.allPosts }} <span aria-hidden="true">↗</span></a></div>
-      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "tutorials").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
+      {{/* Tutorials with `featured: true` come first (newest date first); the most recently updated others fill any free slots. */}}
+      {{ $tutorials := where site.RegularPages "Section" "tutorials" }}
+      {{ $featuredTutorials := where $tutorials "Params.featured" true }}
+      {{ $shownTutorials := slice }}
+      {{ range $featuredTutorials.ByDate.Reverse }}{{ $shownTutorials = $shownTutorials | append . }}{{ end }}
+      {{ range (complement $featuredTutorials $tutorials).ByLastmod.Reverse }}{{ $shownTutorials = $shownTutorials | append . }}{{ end }}
+      <div class="content-grid">{{ range first 3 $shownTutorials }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
       <a class="text-link courses-link" href="{{ "courses/" | relLangURL }}">{{ $t.courses }} <span aria-hidden="true">→</span></a>
     </div></section>
   </main>

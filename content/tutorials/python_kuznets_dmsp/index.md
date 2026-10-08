@@ -7,7 +7,7 @@ categories:
   - Fixed Effects and TWFE
 date: "2026-06-15T00:00:00Z"
 draft: false
-featured: false
+featured: true
 external_link: ""
 image:
   caption: ""
@@ -59,7 +59,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: A comprehensive, beginner-friendly Python replication of Lessmann and Seidel (2017) — turning satellite nighttime lights into predicted regional GDP, building five population-weighted inequality indices from scratch, exploring the cross-country dynamics of regional inequality, and estimating the regional Kuznets curve, its determinants, and a Conley spatial-HAC robustness check with PyFixest.
+summary: "Learn how to turn satellite images of nighttime lights into estimates of regional income, then measure how unequal regions are within each country. Step by step in Python, we test whether regional inequality first rises and then falls as countries develop."
 tags:
   - python
   - econometrics

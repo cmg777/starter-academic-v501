@@ -34,8 +34,7 @@ tags:
 - satellite nighttime lights
 - ASEAN
 
-featured: true
-
+featured: false
 # links:
 # - name: ""
 #   url: ""

@@ -25,7 +25,7 @@ publication_short: ""
 abstract: "Evaluamos la robustez de la curva de Kuznets regional mediante el promedio bayesiano de estimaciones clásicas para datos de panel e identificamos los determinantes robustos de la desigualdad regional. Nuestro ejercicio de simulación sugiere que este método recupera las variables subyacentes al verdadero proceso generador de datos. Nuestros resultados indican que, además del PIB real per cápita en sus términos lineal y cuadrático, los determinantes más robustos de la desigualdad regional son las rentas de los recursos naturales, la tierra cultivable y la desigualdad étnica. Encontramos una relación en forma de U invertida entre la desigualdad regional y el desarrollo nacional en el rango de 189 a 71 682 USD. Más allá de este umbral, existe evidencia que sugiere una estabilización de la desigualdad."
 
 # Summary. An optional shortened abstract.
-summary: "Estudiamos los determinantes robustos de la desigualdad regional mediante un promedio bayesiano de estimaciones clásicas para datos de panel."
+summary: "¿Las brechas entre las regiones de un país primero se amplían y luego se reducen a medida que el país se enriquece? Encontramos que este patrón de U invertida se cumple, y que la riqueza en recursos naturales, la tierra cultivable y la desigualdad étnica también están entre los predictores más sólidos de la desigualdad regional."
 
 tags:
 - nighttime lights

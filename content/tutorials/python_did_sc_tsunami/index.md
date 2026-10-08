@@ -8,7 +8,7 @@ categories:
   - Synthetic Control
 date: "2026-06-09T00:00:00Z"
 draft: false
-featured: false
+featured: true
 external_link: ""
 image:
   caption: ""
@@ -56,7 +56,7 @@ links:
   icon_pack: fas
   name: "Data dictionary"
   url: data/index.html
-summary: "Evaluate the long-run economic impact of a localized natural disaster with causal inference in Python. A beginner's replication of Heger & Neumayer (2019) on the 2004 Aceh tsunami, using synthetic calibrated data: dynamic difference-in-differences with pyfixest, an event study with diff-diff, a night-lights dose-response, synthetic control with mlsynth, and Conley spatial standard errors."
+summary: "How did the 2004 tsunami affect the economy of Aceh, Indonesia, over the long run? This beginner-friendly Python tutorial uses simulated data, nighttime lights, and several causal methods to compare damaged and undamaged areas before and after the disaster."
 tags:
   - python
   - causal

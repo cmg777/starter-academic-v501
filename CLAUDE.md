@@ -48,7 +48,7 @@ Academic portfolio website for Carlos Mendez (carlos-mendez.org): Hugo + Wowchem
 - **Front matter:** YAML everywhere.
   - Articles require title, authors, date, `publication_types` (0=Uncategorized, 1=Conference paper, 2=Journal article, 3=Preprint, 4=Report, 5=Book, 6=Book section, 7=Thesis, 8=Patent), publication, abstract, tags.
   - `admin` = Carlos Mendez.
-  - `featured: true` is legacy only; the homepage picks papers by date.
+  - `featured: true` picks the homepage articles (types 1–3) and tutorials. Set it in the EN bundle and in the ES/JA counterparts, tutorial stubs included. Featured items need a plain-language `summary:` of at most two sentences.
   - Data science posts use `image.placement: 3`; Colab/script/notebook buttons go in `links:` front matter, not the body.
   - Mermaid diagrams: add `diagram: true`.
 - **Presentations:** `date:` (the talk date) is required, and future dates are allowed (builds use `--buildFuture`). Keep `publishDate:` at now or earlier; a future `publishDate` hides the event.
@@ -88,7 +88,7 @@ EN at `/` (`content/`), ES at `/es/` (`content/es/`, neutral Latin American Span
   - Every cinematic effect has a still fallback.
   - Run `node --test tests/orbital.test.cjs` after globe changes.
 - **Homepage sections:**
-  - Recent research = the 3 newest articles of types 1–3 dated ≤ now. Each row shows the article-page buttons (minus Cite) as pills from `partials/orbital-paper-links.html`, and its `summary:` should be plain language for a general audience.
+  - Featured articles (`#featured`) = articles of types 1–3 dated ≤ now. `featured: true` items come first (newest `date` first), and the newest others fill any free slots, up to 3. Tutorials (`#posts`) work the same way: featured first by `date`, then the most recently committed fill the rest. Each row shows the article-page buttons (minus Cite) as pills from `partials/orbital-paper-links.html`, and its `summary:` should be plain language for a general audience.
   - The Software block (anchor `#projects`) = the 3 most recently **committed** `software` bundles (`.ByLastmod`). Committing a package change moves it to the front.
 - **Menu:** collapses below **1200px** on both systems. The homepage uses `orbital.css`; content pages use the forked `navbar-expand-xl` (`custom.scss` §7/§7a). From 1200px up it is one `nowrap` row, with only about 13–25px of spare room at 1200px. **Re-run `audit-nav.cjs` after any menu or label change.**
 - **No horizontal page scroll** at 360–1440px. Wide math and code scroll inside their own boxes.

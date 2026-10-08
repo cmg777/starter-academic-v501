@@ -6,7 +6,7 @@ categories:
   - Remote Sensing
   - Spatial inequality
 draft: false
-featured: false
+featured: true
 date: "2023-08-26T00:00:00Z"
 external_link: ""
 image:
@@ -22,7 +22,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_monitor_regional_development/index.md
 slides: 
-summary: A geocomputational notebook to monitor regional development in Bolivia using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, spatial inequality, and spatial heterogeneity.
+summary: "Learn to map and monitor regional development across Bolivia with Python. The notebook shows how to explore the data, draw maps, and detect spatial patterns of inequality."
 tags:
 - spatial
 - python

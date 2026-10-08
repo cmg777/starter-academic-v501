@@ -5,7 +5,7 @@ authors:
 - admin
 
 
-date: "2024-12-19T00:00:00Z"
+date: "2025-12-20T00:00:00Z"
 doi: "10.1080/00036846.2024.2439583"
 
 # Schedule page publish date (NOT publication's date).
@@ -24,7 +24,7 @@ publication_short: ""
 abstract: "Este artículo examina la relación entre el ingreso y la luminosidad en las provincias chinas durante el período 2000-2020 mediante datos de luces nocturnas (NTL) recientemente armonizados. Encontramos que la luminosidad NTL es adecuada para analizar los cambios de la actividad económica tanto en series temporales como en cortes transversales. No obstante, la relación entre la luminosidad y el PIB cambia con el tiempo e incluso puede volverse negativa, lo que cuestiona la aplicación directa de las elasticidades PIB-NTL establecidas. También encontramos que aplicar filtros de series temporales puede aumentar de forma sustancial el R cuadrado y la significancia estadística de la relación PIB-NTL en los períodos problemáticos. Asimismo, documentamos que durante las recesiones económicas el poder predictivo de las luces nocturnas disminuye considerablemente. Nuestro estudio también respalda la superioridad de los datos del Visible and Infrared Imaging Suite (VIIRS) sobre los datos del Defense Meteorological Satellite Program (DMSP). Sin embargo, a diferencia de los estudios comparativos de validación previos, que abarcaban muy pocos años, examinamos un período considerablemente más largo, lo que permite una evaluación más matizada. A un nivel más desagregado, las NTL son más eficaces para predecir el PIB de los sectores industrial y de servicios. Los datos VIIRS superan en particular a los datos DMSP para el PIB de los sectores agrícola y de servicios. Nuestro análisis de la desigualdad regional revela evidencia de convergencia relativa entre las provincias chinas al usar datos del PIB y de VIIRS, pero este patrón no se mantiene al usar datos DMSP.."
 
 # Summary. An optional shortened abstract.
-summary: "Este estudio explora la dinámica entre ingreso y luminosidad en China y destaca la superioridad de VIIRS sobre DMSP en cuanto a precisión predictiva a lo largo del tiempo."
+summary: "Las imágenes satelitales de luces nocturnas permiten seguir el crecimiento de las provincias de China, pero la relación entre luz e ingreso cambia con el tiempo y se debilita en las recesiones. Los datos satelitales más recientes miden la actividad económica con mayor precisión que los antiguos, sobre todo en la industria y los servicios."
 
 tags:
 - nighttime lights

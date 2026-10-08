@@ -6,7 +6,7 @@ categories:
   - LASSO
   - Causal Inference
 draft: false
-featured: true
+featured: false
 date: "2026-05-24T00:00:00Z"
 external_link: ""
 image:

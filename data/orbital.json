@@ -70,7 +70,7 @@
       }
     ],
     "pubKicker": "03 / RESEARCH IN FOCUS",
-    "pubTitle": "Recent research",
+    "pubTitle": "Featured articles",
     "allPubs": "All publications",
     "paper": "Research paper",
     "read": "Read the study",
@@ -216,7 +216,7 @@
       }
     ],
     "pubKicker": "03 / INVESTIGACIÓN DESTACADA",
-    "pubTitle": "Investigación reciente",
+    "pubTitle": "Artículos destacados",
     "allPubs": "Todas las publicaciones",
     "paper": "Artículo de investigación",
     "read": "Lea el estudio",
@@ -362,7 +362,7 @@
       }
     ],
     "pubKicker": "03 / 注目の研究",
-    "pubTitle": "最近の研究",
+    "pubTitle": "注目の論文",
     "allPubs": "すべての業績",
     "paper": "研究論文",
     "read": "論文を読む",

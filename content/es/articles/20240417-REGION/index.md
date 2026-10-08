@@ -34,8 +34,7 @@ tags:
 - India
 
 
-featured: true
-
+featured: false
 # Icons: https://fontawesome.com/search
 
 links:

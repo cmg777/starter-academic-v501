@@ -25,7 +25,7 @@ publication_short: ""
 abstract: "We evaluate the robustness of the regional Kuznets curve using the Bayesian average of classical estimates for panel data and identify the robust determinants of regional inequality. Our simulation exercise suggests that this method recovers the variables underlying the true data generating process. Our results indicate that in addition to real GDP per capita, linear and quadratic, the most robust determinants of regional inequality are natural resource rents, arable land and ethnic inequality. We ﬁnd an inverted-U-shaped relationship between regional inequality and national development in the range of USD 189 to USD 71,682. Beyond this threshold, there is evidence suggesting inequality stabilization."
 
 # Summary. An optional shortened abstract.
-summary: "We study the robust determinants of regional inequality using a Bayesian average of classical estimates for panel data."
+summary: "Do regional gaps within a country first widen and then narrow as the country gets richer? We find that this inverted-U pattern holds, and that natural resource wealth, farmland, and ethnic inequality are also among the most reliable predictors of regional inequality."
 
 tags:
 - nighttime lights
