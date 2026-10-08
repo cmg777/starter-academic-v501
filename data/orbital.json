@@ -47,7 +47,7 @@
     ],
     "researchKicker": "01 / THE RESEARCH QUESTIONS",
     "researchTitle": "Why do subnational regions follow different development paths?",
-    "researchIntro": "The QuaRCS Network is an international and interdisciplinary research network in Quantitative Regional and Computational Science.",
+    "researchIntro": "The QuaRCS Network is an international and interdisciplinary research network in Quantitative Regional and Computational Science. We integrate insights from economics and spatial data science to understand and inform the process of sustainable development across subnational regions and countries. Our focus spans the economic, social, and environmental dimensions of sustainable development.",
     "labLink": "Explore the QuaRCS network",
     "researchCards": [
       {
@@ -117,13 +117,14 @@
     "tba": "Date TBA",
     "languageLabel": "Language",
     "researchMethods": "Satellite observations reveal patterns. Spatial econometrics, causal inference, and machine learning help us investigate the forces behind them.",
-    "researchThemesLabel": "Five connected research areas",
+    "researchThemesLabel": "Six connected research areas",
     "researchThemes": [
       "Sustainable regional development",
       "The geography of development",
       "Regional growth and inequality",
       "Spatial structural change",
-      "Spatial energy economics"
+      "Spatial energy economics",
+      "Natural disasters and infrastructure"
     ],
     "projectIntro": "Open-source Python packages for exploring panel data, measuring regional convergence and inequality, and estimating causal effects with spillovers.",
     "galleryKicker": "LIFE AT THE QUARCS LAB",
@@ -191,7 +192,7 @@
     ],
     "researchKicker": "01 / LAS PREGUNTAS DE INVESTIGACIÓN",
     "researchTitle": "¿Por qué las regiones subnacionales siguen distintas trayectorias de desarrollo?",
-    "researchIntro": "La Red QuaRCS es una red de investigación internacional e interdisciplinaria en Ciencia Regional Cuantitativa y Computacional.",
+    "researchIntro": "La Red QuaRCS es una red de investigación internacional e interdisciplinaria en Ciencia Regional Cuantitativa y Computacional. Integramos aportes de la economía y la ciencia de datos espaciales para comprender y orientar el proceso de desarrollo sostenible en regiones subnacionales y países. Nuestro enfoque abarca las dimensiones económica, social y ambiental del desarrollo sostenible.",
     "labLink": "Explore la red QuaRCS",
     "researchCards": [
       {
@@ -261,13 +262,14 @@
     "tba": "Fecha por confirmar",
     "languageLabel": "Idioma",
     "researchMethods": "Las observaciones satelitales revelan patrones. La econometría espacial, la inferencia causal y el aprendizaje automático nos ayudan a investigar los procesos que los explican.",
-    "researchThemesLabel": "Cinco líneas de investigación conectadas",
+    "researchThemesLabel": "Seis líneas de investigación conectadas",
     "researchThemes": [
       "Desarrollo regional sostenible",
       "La geografía del desarrollo",
       "Crecimiento regional y desigualdad",
       "Cambio estructural espacial",
-      "Economía espacial de la energía"
+      "Economía espacial de la energía",
+      "Desastres naturales e infraestructura"
     ],
     "projectIntro": "Paquetes de Python de código abierto para explorar datos de panel, medir la convergencia y la desigualdad regional, y estimar efectos causales con derrames.",
     "galleryKicker": "LA VIDA EN EL LABORATORIO QUARCS",
@@ -335,7 +337,7 @@
     ],
     "researchKicker": "01 / 研究の問い",
     "researchTitle": "なぜ国内の地域は、異なる発展の道を歩むのでしょうか。",
-    "researchIntro": "QuaRCSネットワークは、定量的地域科学・計算科学（Quantitative Regional and Computational Science）における国際的かつ学際的な研究ネットワークです。",
+    "researchIntro": "QuaRCSネットワークは、定量的地域科学・計算科学（Quantitative Regional and Computational Science）における国際的かつ学際的な研究ネットワークです。経済学と空間データサイエンスの知見を統合し、国内の地域や国々における持続可能な開発のプロセスを理解するとともに、その実現に役立つ知見を提供します。私たちの研究は、持続可能な開発の経済的・社会的・環境的側面にわたります。",
     "labLink": "QuaRCSネットワークについて",
     "researchCards": [
       {
@@ -405,13 +407,14 @@
     "tba": "日程未定",
     "languageLabel": "言語",
     "researchMethods": "衛星観測から地域のパターンを捉えます。空間計量経済学、因果推論、機械学習を用いて、その背景にある要因を探ります。",
-    "researchThemesLabel": "つながり合う5つの研究領域",
+    "researchThemesLabel": "つながり合う6つの研究領域",
     "researchThemes": [
       "持続可能な地域開発",
       "開発の地理学",
       "地域の成長と格差",
       "産業構造変化の空間分析",
-      "エネルギーの空間経済学"
+      "エネルギーの空間経済学",
+      "自然災害とインフラ"
     ],
     "projectIntro": "パネルデータの探索、地域の収束と格差の測定、波及効果を考慮した因果効果の推定のためのオープンソースPythonパッケージです。",
     "galleryKicker": "QUARCSラボの日々",
