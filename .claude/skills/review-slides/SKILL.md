@@ -10,13 +10,13 @@ user-invocable: true
 
 Act as an **expert presentation reviewer and science communicator** auditing a
 slide deck produced by the `write-slides` skill. The deck being audited lives at
-`content/post/<slug>/slides/` (`slides.qmd` source + rendered `index.html` +
+`content/tutorials/<slug>/slides/` (`slides.qmd` source + rendered `index.html` +
 `slides_files/`). Your job is to confirm the deck is **correct, faithful to the
 source post, on-brand, and — above all — readable**: clear, simple, short
 sentences a listener can grasp at a glance.
 
 The review is **read-only**. It produces a scored report inline in the
-conversation **and** saves it to `content/post/<slug>/slides/SLIDES_REVIEW.md`.
+conversation **and** saves it to `content/tutorials/<slug>/slides/SLIDES_REVIEW.md`.
 It NEVER edits `slides.qmd`, re-renders the deck, or touches any bundle file.
 Fixes are offered only as a Phase 4 follow-up, delegated to `write-slides`.
 
@@ -102,7 +102,7 @@ overall **verdict** is ACCEPT / MINOR REVISION / MAJOR REVISION.
 1. **Parse arguments.** Extract `<slug>`, optional `focus:` keywords, and the
    `--no-browser` flag. Reject unknown flags with a one-line error.
 
-2. **Locate the deck.** Confirm `content/post/<slug>/slides/` exists and contains
+2. **Locate the deck.** Confirm `content/tutorials/<slug>/slides/` exists and contains
    `slides.qmd`. Note whether `index.html` and `slides_files/` are present (their
    absence is a Dimension 10 finding, not an abort). If the directory is missing
    entirely, stop and tell the user the deck has not been generated — suggest
@@ -123,12 +123,12 @@ overall **verdict** is ACCEPT / MINOR REVISION / MAJOR REVISION.
      `readability-rules.md`, `design-adherence.md`, `review-checklist.md`,
      `report-template.md`, `focus-modes.md`, `headless-browser.md`.
 
-4. **Read the source post (ground truth)** — `content/post/<slug>/index.md` in
-   full, plus `content/post/<slug>/results_report.md` if it exists, plus
-   `content/post/<slug>/script.py` / `script.R` / `.do` if present. These are the
+4. **Read the source post (ground truth)** — `content/tutorials/<slug>/index.md` in
+   full, plus `content/tutorials/<slug>/results_report.md` if it exists, plus
+   `content/tutorials/<slug>/script.py` / `script.R` / `.do` if present. These are the
    authority for every number, figure, equation, and claim. **Never execute them.**
 
-5. **Read the deck** — `content/post/<slug>/slides/slides.qmd` in full and skim
+5. **Read the deck** — `content/tutorials/<slug>/slides/slides.qmd` in full and skim
    the rendered `index.html` (front matter, `<section>` structure, title strip).
 
 ---
@@ -142,12 +142,12 @@ skill does **not** wait for a `y`.
 SCOPE
 =====
 Post slug:          <slug>
-Deck folder:        content/post/<slug>/slides/  (slides.qmd + index.html + slides_files/)
-Source of truth:    content/post/<slug>/index.md  (+ results_report.md: yes|no)
+Deck folder:        content/tutorials/<slug>/slides/  (slides.qmd + index.html + slides_files/)
+Source of truth:    content/tutorials/<slug>/index.md  (+ results_report.md: yes|no)
 Dimensions to run:  <all 10 | focus subset>
 Browser pass:       enabled | SKIPPED (--no-browser)
 Tooling:            node <v>, playwright <v|missing|installing>, quarto <v|n/a>
-Report path:        content/post/<slug>/slides/SLIDES_REVIEW.md
+Report path:        content/tutorials/<slug>/slides/SLIDES_REVIEW.md
 
 Proceeding with audit (read-only)…
 ```
@@ -163,7 +163,7 @@ the quoted violation, and an actionable fix**. Follow `references/review-checkli
 Run the static smoke test (reuse `write-slides`'s own, no re-authoring):
 
 ```bash
-BASE="$PWD/content/post/<slug>/slides" \
+BASE="$PWD/content/tutorials/<slug>/slides" \
   node .claude/skills/write-slides/references/templates/smoke-test.js
 ```
 
@@ -174,9 +174,9 @@ delimiter sanity, and no leaked `{{…}}`. A non-zero exit is a Dimension 3/10 f
 **Branding diff (Dimension 8):**
 
 ```bash
-diff content/post/<slug>/slides/site-brand.scss \
+diff content/tutorials/<slug>/slides/site-brand.scss \
      .claude/skills/write-slides/references/templates/site-brand.scss
-diff content/post/<slug>/slides/title-slide.html \
+diff content/tutorials/<slug>/slides/title-slide.html \
      .claude/skills/write-slides/references/templates/title-slide.html
 ```
 
@@ -206,7 +206,7 @@ walk, plus overflow and word/bullet-density measurement). See
 
 ```bash
 node .claude/skills/review-slides/references/templates/slide-audit.cjs \
-  "$PWD/content/post/<slug>/slides/index.html"
+  "$PWD/content/tutorials/<slug>/slides/index.html"
 ```
 
 It prints, per slide: a math-render verdict, an overflow flag (content extends past
@@ -228,7 +228,7 @@ to the user as a suggestion.
 ## Phase 3 — Report
 
 Assemble the scored report from `references/report-template.md`. **Print it inline
-and write it to `content/post/<slug>/slides/SLIDES_REVIEW.md`** (this is the only
+and write it to `content/tutorials/<slug>/slides/SLIDES_REVIEW.md`** (this is the only
 file the skill writes). Rules:
 
 - Every section header is always emitted (print "None found." when empty).
@@ -252,7 +252,7 @@ After delivering the report, offer (do not execute) up to three next steps:
    the deck itself)."
 2. **Re-review** — `/project:review-slides <slug>` (or `focus: <dim>` on the
    dimension just fixed).
-3. **Preview** — `cd content/post/<slug>/slides && "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender` then open the deck.
+3. **Preview** — `cd content/tutorials/<slug>/slides && "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender` then open the deck.
 
 State plainly that `review-slides` is read-only: it produced a report and one
 `SLIDES_REVIEW.md` file, and changed nothing else in the bundle.

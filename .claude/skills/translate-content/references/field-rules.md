@@ -33,8 +33,8 @@ stub comments), but never alter a comment that documents a query-key contract.
   `authors`, `tags`, `featured`, the `image:` block, all `url_*`, `slides`,
   `projects` (e.g. `- spatial`), `math`, and the Canva/YouTube iframe HTML block.
 
-## projects — FULL translation
-- Path: `content/<lang>/projects/<slug>/index.md` (note: `projects`, not `project`)
+## software / data / webapps / books (former projects) — FULL translation
+- Path: `content/<lang>/{software,data,webapps,books}/<slug>/index.md` (the former `projects/` section is retired)
 - **Translate:** `title`, `summary`, each `links[].name`, body prose + headings,
   and the **visible text** of internal cross-references
   (`[Mastering Causal Metrics](/project/intro2causal/)` → translate the bracketed
@@ -65,7 +65,7 @@ stub comments), but never alter a comment that documents a query-key contract.
 ## post — STUB CARD only (NOT a full translation)
 - Path: `content/<lang>/post/<slug>/index.md`
 - Use `stub-template.md`. **Translate** `title` + `summary` only. **Keep
-  verbatim** English `categories[]` and `date`. Add `card_url: "/post/<slug>/"`,
+  verbatim** English `categories[]` and `date`. Add `card_url: "/tutorials/<slug>/"`,
   `featured: false`, `_build: {render: never, list: always, publishResources:
   false}`. Empty body. **Never** emit the reserved `url:` key.
 - **Assets:** none (figures would leak harmlessly; `publishResources: false`

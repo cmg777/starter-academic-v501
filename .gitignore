@@ -13,104 +13,104 @@ node_modules/
 .DS_Store
 
 # AJR (2001) reference materials — third-party; not committed
-content/post/stata_iv/references/
+content/tutorials/stata_iv/references/
 
 # Fitzgerald et al. (2026) replication archive for r_double_lasso (~510 MB);
 # Matlab .mat files + R source from the JAE Journal Data Archive. The CSVs
 # extracted by prepare_data.R live in data/ and ARE committed.
-content/post/r_double_lasso/references/
+content/tutorials/r_double_lasso/references/
 
 # Clarke et al. (2024) SDID Stata Journal paper for stata_sdid — third-party
 # source (paper markdown + online_supplementary_material.pdf + sdidExamples.pdf
 # + replication_materials.do); Hugo would publish the PDFs. The post cites the
 # paper in References; the source archive is not committed.
-content/post/stata_sdid/references/
+content/tutorials/stata_sdid/references/
 
 # Ben-Michael, Feller & Rothstein (2021) ASCM paper + the full augsynth package
 # source (R/, data/, man/, vignettes/figure/ — several MB incl. a 1.5 MB raw .dta)
 # for r_augsynth — third-party reference material. The post is self-contained:
 # kansas.csv is regenerated from the package and committed, and analysis.R loads
 # it from a GitHub raw URL. The paper is cited in References; source not committed.
-content/post/r_augsynth/references/
+content/tutorials/r_augsynth/references/
 
 # Clarke, Pailanir, Athey & Imbens (2024) SDID Stata Journal paper (full-text .md
 # + 265 KB online_supplementary_material.pdf) and replication_materials.do for
 # stata_sdid_staggered -- third-party reference material; Hugo would publish them.
 # The post is self-contained: quota_example.dta is committed and analysis.do
 # re-fetches it; the paper is cited in References. Source archive not committed.
-content/post/stata_sdid_staggered/reference/
+content/tutorials/stata_sdid_staggered/reference/
 
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
-content/post/stata_iv/stata.log
+content/tutorials/stata_iv/stata.log
 # Stata batch logs of the cheat sheets (they include license details)
-content/post/*/cheatsheet_stata.log
+content/tutorials/*/cheatsheet_stata.log
 
 # Python venv for python_iv post (build artifact, not source)
-content/post/python_iv/.venv/
+content/tutorials/python_iv/.venv/
 
 # Third-party MGWR fork cloned by the python_mgwrfer script (~18 MB; not source)
-content/post/python_mgwrfer/mgwpr_repo/
+content/tutorials/python_mgwrfer/mgwpr_repo/
 
 # Sakaguchi & Tagawa replication package for r_sc_bayes_spatial (~148 MB,
 # includes a 129 MB raw CSV that exceeds GitHub's per-file limit). The 11
 # files analysis.R actually needs are copied into helpers/.
-content/post/r_sc_bayes_spatial/replication-package/
+content/tutorials/r_sc_bayes_spatial/replication-package/
 
 # Baker et al. (2025) DiD practitioner's guide source manuscript for r_did2
 # (~220 KB LaTeX; third-party reference material, not source for this post).
-content/post/r_did2/reference/manuscript.tex
+content/tutorials/r_did2/reference/manuscript.tex
 
 # de Brabander, Juodis & Miyazato Szini (2025) replication package for
 # r_sc_dsc_sdid (~4.5 MB: the authors' 34 R scripts, a 2.3 MB MATLAB binary and
 # the article text). prepare_data.R converts the .mat into the two committed
 # CSVs, which are all analysis.R needs. Obtain the package from the article:
 # https://doi.org/10.1080/07474938.2025.2530649
-content/post/r_sc_dsc_sdid/replicationReference/
+content/tutorials/r_sc_dsc_sdid/replicationReference/
 
 # Cunningham (2026) "Covariates, diff in diff and LaLonde test" Substack source
 # (his prose + Stata/R code) for python_did_covariates_lalonde -- third-party
 # copyrighted reference material. Hugo already excludes it from the build; it is
 # not committed. The post cites and credits the essay in its References.
 # Glob covers the folder under either spelling (key-ref/ or key-referecence/).
-content/post/python_did_covariates_lalonde/key-ref*/
+content/tutorials/python_did_covariates_lalonde/key-ref*/
 
 # Quarto render artefacts in any post directory (tutorial.qmd is the source;
 # readers render their own HTML locally). Python bundles place tutorial.qmd
 # under references/, so render artefacts land there too.
-content/post/*/tutorial.html
-content/post/*/tutorial_files/
-content/post/*/tutorial-render.log
-content/post/*/references/tutorial.html
-content/post/*/references/tutorial_files/
-content/post/*/references/tutorial-render.log
-content/post/*/references/.venv/
-content/post/*/references/.quarto/
+content/tutorials/*/tutorial.html
+content/tutorials/*/tutorial_files/
+content/tutorials/*/tutorial-render.log
+content/tutorials/*/references/tutorial.html
+content/tutorials/*/references/tutorial_files/
+content/tutorials/*/references/tutorial-render.log
+content/tutorials/*/references/.venv/
+content/tutorials/*/references/.quarto/
 # knitr chunk caches and Quarto freeze data are render artefacts too
-content/post/*/_freeze/
-content/post/*/tutorial_cache/
-content/post/*/references/_freeze/
+content/tutorials/*/_freeze/
+content/tutorials/*/tutorial_cache/
+content/tutorials/*/references/_freeze/
 
 # Quarto SLIDE-DECK output is the OPPOSITE of the tutorial artefacts above: the
 # rendered deck (slides/index.html + slides/slides_files/) IS served by Netlify
 # (which runs Hugo, not Quarto), so it MUST be committed. Only ignore Quarto's
 # local render cache here — never slides_files/. (Generated by the write-slides skill.)
-content/post/*/slides/.quarto/
+content/tutorials/*/slides/.quarto/
 
 # pydynpd package source used only as reference material for the python_dynamic_panel
 # tutorial — never publish or commit it (Hugo would copy ~7MB into public/).
-content/post/python_dynamic_panel/referenceMaterials/
+content/tutorials/python_dynamic_panel/referenceMaterials/
 
 # Blankespoor, Emran, Shilpi & Xu (2021) Jamuna Bridge manuscript, online appendix and
 # Stata replication package — reference material only for the python_bridge_impact
 # tutorial. Never commit: Hugo would publish the manuscript PDFs/DOCX and the authors'
 # .dta files. The tutorial ships tidy CSVs under that post's data/ folder instead.
-content/post/python_bridge_impact/referenceMaterials/
+content/tutorials/python_bridge_impact/referenceMaterials/
 
 # Lessmann & Seidel (2017) replication archive — reference material only for the
 # python_kuznets_dmsp tutorial — never publish or commit it (Hugo would copy ~166MB
 # into public/). Kept on local disk for reference; Netlify builds from git so it
 # never reaches production.
-content/post/python_kuznets_dmsp/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/
+content/tutorials/python_kuznets_dmsp/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/
 
 # LaTeX CV build artifacts (content/cv/). The CV SOURCE — main.tex, the moderncv
 # .cls/.sty files, avatar.png, certificates/ — IS committed; only the transient
@@ -129,7 +129,7 @@ content/cv/main.pdf
 
 # Krisztin & Piribauer (2026) estimateW paper full text — the specification for
 # the r_estimateW tutorial. CC BY 4.0, but not republished here.
-content/post/r_estimateW/references/
+content/tutorials/r_estimateW/references/
 
 # r_estimateW MCMC cache: 2.2 MB total, and it IS committed on purpose. The
 # three 90-region chains cost ~34 minutes to regenerate; with the cache present
@@ -138,4 +138,4 @@ content/post/r_estimateW/references/
 # ESTIMATEW_REFIT=TRUE) to force a genuine recompute.
 
 # setup_env.py writes a machine-specific QUARTO_PYTHON pointer next to the tutorial
-content/post/*/references/_environment.local
+content/tutorials/*/references/_environment.local

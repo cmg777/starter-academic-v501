@@ -15,18 +15,18 @@
 
 **Python:**
 ```bash
-cd content/post/<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
+cd content/tutorials/<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
 ```
 
 **Stata:**
 ```bash
-cd content/post/<slug>/ && stata -b do analysis.do
+cd content/tutorials/<slug>/ && stata -b do analysis.do
 # Log is written to analysis.log by the do-file itself
 ```
 
 **R:**
 ```bash
-cd content/post/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
+cd content/tutorials/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
 ```
 
 ### 3. Capture and verify outputs
@@ -76,7 +76,7 @@ R's `png()` function can leave an `Rplots.pdf` artifact in the working
 directory. After execution, check for and remove it:
 
 ```bash
-rm -f content/post/<slug>/Rplots.pdf
+rm -f content/tutorials/<slug>/Rplots.pdf
 ```
 
 ## R warning classification

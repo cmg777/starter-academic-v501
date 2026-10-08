@@ -59,14 +59,14 @@ WORK=$(mktemp -d)
 mkdir -p "$WORK/$SLUG"
 
 # 1. tutorial.qmd lives next to index.md
-cp "content/post/$SLUG/tutorial.qmd" "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/tutorial.qmd" "$WORK/$SLUG/"
 
 # 2. canonical script lives next to index.md
-cp "content/post/$SLUG/analysis.R" "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/analysis.R" "$WORK/$SLUG/"
 
 # 3. _quarto.yml: preserve if present, else generate minimal stub
-if [ -f "content/post/$SLUG/_quarto.yml" ]; then
-  cp "content/post/$SLUG/_quarto.yml" "$WORK/$SLUG/"
+if [ -f "content/tutorials/$SLUG/_quarto.yml" ]; then
+  cp "content/tutorials/$SLUG/_quarto.yml" "$WORK/$SLUG/"
 else
   printf 'project:\n  type: default\n' > "$WORK/$SLUG/_quarto.yml"
 fi
@@ -78,7 +78,7 @@ EOF
 
 # 5. zip + relocate to the post bundle root
 ( cd "$WORK" && zip -r "$SLUG.zip" "$SLUG/" )
-mv "$WORK/$SLUG.zip" "content/post/$SLUG/$SLUG.zip"
+mv "$WORK/$SLUG.zip" "content/tutorials/$SLUG/$SLUG.zip"
 rm -rf "$WORK"
 ```
 
@@ -92,18 +92,18 @@ SLUG="<slug>"
 WORK=$(mktemp -d)
 mkdir -p "$WORK/$SLUG"
 
-cp "content/post/$SLUG/references/tutorial.qmd" "$WORK/$SLUG/"
-cp "content/post/$SLUG/script.py"               "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/references/tutorial.qmd" "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/script.py"               "$WORK/$SLUG/"
 
-if [ -f "content/post/$SLUG/references/_quarto.yml" ]; then
-  cp "content/post/$SLUG/references/_quarto.yml" "$WORK/$SLUG/"
+if [ -f "content/tutorials/$SLUG/references/_quarto.yml" ]; then
+  cp "content/tutorials/$SLUG/references/_quarto.yml" "$WORK/$SLUG/"
 else
   printf 'project:\n  type: default\n' > "$WORK/$SLUG/_quarto.yml"
 fi
 
 # Optional: setup_env.py if the pre-render hook exists
-if [ -f "content/post/$SLUG/references/setup_env.py" ]; then
-  cp "content/post/$SLUG/references/setup_env.py" "$WORK/$SLUG/"
+if [ -f "content/tutorials/$SLUG/references/setup_env.py" ]; then
+  cp "content/tutorials/$SLUG/references/setup_env.py" "$WORK/$SLUG/"
 fi
 
 cat > "$WORK/$SLUG/README.md" <<EOF
@@ -111,7 +111,7 @@ cat > "$WORK/$SLUG/README.md" <<EOF
 EOF
 
 ( cd "$WORK" && zip -r "$SLUG.zip" "$SLUG/" )
-mv "$WORK/$SLUG.zip" "content/post/$SLUG/$SLUG.zip"
+mv "$WORK/$SLUG.zip" "content/tutorials/$SLUG/$SLUG.zip"
 rm -rf "$WORK"
 ```
 
@@ -124,11 +124,11 @@ SLUG="<slug>"
 WORK=$(mktemp -d)
 mkdir -p "$WORK/$SLUG"
 
-cp "content/post/$SLUG/references/tutorial.qmd" "$WORK/$SLUG/"
-cp "content/post/$SLUG/analysis.do"             "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/references/tutorial.qmd" "$WORK/$SLUG/"
+cp "content/tutorials/$SLUG/analysis.do"             "$WORK/$SLUG/"
 
-if [ -f "content/post/$SLUG/references/_quarto.yml" ]; then
-  cp "content/post/$SLUG/references/_quarto.yml" "$WORK/$SLUG/"
+if [ -f "content/tutorials/$SLUG/references/_quarto.yml" ]; then
+  cp "content/tutorials/$SLUG/references/_quarto.yml" "$WORK/$SLUG/"
 else
   printf 'project:\n  type: default\n' > "$WORK/$SLUG/_quarto.yml"
 fi
@@ -138,7 +138,7 @@ cat > "$WORK/$SLUG/README.md" <<EOF
 EOF
 
 ( cd "$WORK" && zip -r "$SLUG.zip" "$SLUG/" )
-mv "$WORK/$SLUG.zip" "content/post/$SLUG/$SLUG.zip"
+mv "$WORK/$SLUG.zip" "content/tutorials/$SLUG/$SLUG.zip"
 rm -rf "$WORK"
 ```
 
@@ -180,7 +180,7 @@ extracted from the post.
 Executable companion to the blog post:
 
 > **<TITLE>**
-> <https://carlos-mendez.org/post/<SLUG>/>
+> <https://carlos-mendez.org/tutorials/<SLUG>/>
 
 ## Contents
 
@@ -221,7 +221,7 @@ next to the script).
 
 ## References
 
-- **Published post:** <https://carlos-mendez.org/post/<SLUG>/>
+- **Published post:** <https://carlos-mendez.org/tutorials/<SLUG>/>
 - **Source repo:** <https://github.com/cmg777/starter-academic-v501>
 - **Methodology:** <METHOD-CITATION>
 - **Data source:** <DATA-CITATION>
@@ -240,7 +240,7 @@ versions via `pip install pkg==x.y.z`".
 Executable companion to the blog post:
 
 > **<TITLE>**
-> <https://carlos-mendez.org/post/<SLUG>/>
+> <https://carlos-mendez.org/tutorials/<SLUG>/>
 
 ## Contents
 
@@ -274,7 +274,7 @@ python <SCRIPT-NAME> 2>&1 | tee execution_log.txt
 
 ## References
 
-- **Published post:** <https://carlos-mendez.org/post/<SLUG>/>
+- **Published post:** <https://carlos-mendez.org/tutorials/<SLUG>/>
 - **Source repo:** <https://github.com/cmg777/starter-academic-v501>
 - **Methodology:** <METHOD-CITATION>
 - **Data source:** <DATA-CITATION>
@@ -292,7 +292,7 @@ that SSC packages cannot be pinned.
 Executable companion to the blog post:
 
 > **<TITLE>**
-> <https://carlos-mendez.org/post/<SLUG>/>
+> <https://carlos-mendez.org/tutorials/<SLUG>/>
 
 ## Contents
 
@@ -329,7 +329,7 @@ stata -b do <SCRIPT-NAME>
 
 ## References
 
-- **Published post:** <https://carlos-mendez.org/post/<SLUG>/>
+- **Published post:** <https://carlos-mendez.org/tutorials/<SLUG>/>
 - **Source repo:** <https://github.com/cmg777/starter-academic-v501>
 - **Methodology:** <METHOD-CITATION>
 - **Data source:** <DATA-CITATION>
@@ -350,16 +350,16 @@ stata -b do <SCRIPT-NAME>
 
 ## Verification
 
-After `mv "$WORK/$SLUG.zip" content/post/$SLUG/$SLUG.zip`, run:
+After `mv "$WORK/$SLUG.zip" content/tutorials/$SLUG/$SLUG.zip`, run:
 
 ```bash
-unzip -l "content/post/$SLUG/$SLUG.zip"
+unzip -l "content/tutorials/$SLUG/$SLUG.zip"
 ```
 
 Expected output (exact filenames vary; structure should not):
 
 ```
-Archive:  content/post/<slug>/<slug>.zip
+Archive:  content/tutorials/<slug>/<slug>.zip
   Length      Date    Time    Name
 ---------  ---------- -----   ----
         0  ...   <slug>/

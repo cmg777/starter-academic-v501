@@ -20,7 +20,7 @@ date: "<DATE>"
 categories:
   - <CATEGORY-1>
   - <CATEGORY-2>
-card_url: "/post/<slug>/"
+card_url: "/tutorials/<slug>/"
 featured: false
 _build:
   render: never
@@ -42,7 +42,7 @@ date: "<DATE>"
 categories:
   - <CATEGORY-1>
   - <CATEGORY-2>
-card_url: "/post/<slug>/"
+card_url: "/tutorials/<slug>/"
 featured: false
 _build:
   render: never

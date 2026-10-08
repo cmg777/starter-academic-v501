@@ -79,8 +79,8 @@ For posts with dark-background figures (set during scope confirmation):
 
 | Output | Path | Notes |
 |--------|------|-------|
-| Blog post | `content/post/<lang>_<slug>/index.md` | Always produced |
-| Jupyter notebook | `content/post/<lang>_<slug>/notebook.ipynb` | Optional, if confirmed in scope |
+| Blog post | `content/tutorials/<lang>_<slug>/index.md` | Always produced |
+| Jupyter notebook | `content/tutorials/<lang>_<slug>/notebook.ipynb` | Optional, if confirmed in scope |
 
 The folder prefix matches the language: `python_`, `stata_`, or `r_`.
 
@@ -93,7 +93,7 @@ The folder prefix matches the language: `python_`, `stata_`, or `r_`.
 Examine `$ARGUMENTS` to determine the mode:
 
 - **If the argument is a post slug** (e.g., `python_doubleml` or
-  `content/post/python_doubleml/`): this is **Mode A**. The post directory
+  `content/tutorials/python_doubleml/`): this is **Mode A**. The post directory
   must already contain `script.py` (or `analysis.do` / `analysis.R`) and
   `results_report.md`.
 - **If the argument contains `dataset:`**: this is **Mode B** (standalone).
@@ -143,8 +143,8 @@ Load the following reference files from `references/`:
 
 Read one existing post for current conventions:
 
-- Python: `content/post/python_ml_random_forest/index.md`
-- Stata: `content/post/stata_rct/index.md`
+- Python: `content/tutorials/python_ml_random_forest/index.md`
+- Stata: `content/tutorials/stata_rct/index.md`
 
 ### 1.6 PDF handling
 
@@ -348,7 +348,7 @@ quality bar (full recipe: `.claude/docs/learning-components.md`). In short:
   the opening tag lines and before `</details>`; `<summary>` is raw HTML (no
   Markdown/backticks/`\_`); no headings inside cards; never inside
   `.concept-pair`. Lint with
-  `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md`.
+  `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md`.
 
 #### 2.2 The sandwich pattern (CRITICAL)
 
@@ -612,7 +612,7 @@ attention.
 
 After delivering the post, offer the user next steps:
 
-"The post is ready at `content/post/<lang>_<slug>/index.md`. Want me to:
+"The post is ready at `content/tutorials/<lang>_<slug>/index.md`. Want me to:
 - Adjust any section, add more figures, or refine interpretations?
 - Run `/project:review-post` for a detailed review?
 - Add learning components? (**"Add learning components to `<post slug>`"** —

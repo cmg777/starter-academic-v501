@@ -1,0 +1,1349 @@
+{
+ "presentation": {
+  "title": "Introduction to Panel Data Methods",
+  "subtitle": "Seven estimators, one wage panel: why the union premium triples",
+  "author": "Carlos Mendez — Nagoya University (GSID)",
+  "language": "en",
+  "source": "content/tutorials/python_panel_intro/slides/slides.qmd",
+  "post": "https://carlos-mendez.org/tutorials/python_panel_intro/",
+  "presentationId": 10245137,
+  "backupPresentationId": 10274743,
+  "publicViewLink": "https://presenter.ahaslides.com/share/1790911128481-t7x8a80cw2",
+  "editorUrl": "https://presenter.ahaslides.com/presentation/10245137",
+  "joinCode": "V62EU",
+  "plan": "AhaSlides Education Large (paid, from 2026-10-06)",
+  "architecture": "content slides are imported PDF pages; only the interactive slides are created through the MCP",
+  "imagePages": 33,
+  "interactivePositions": [
+   2,
+   3,
+   4,
+   5,
+   8,
+   12,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   29,
+   31,
+   32,
+   34,
+   36,
+   38,
+   40,
+   43,
+   45,
+   46,
+   48,
+   51,
+   53,
+   56,
+   57,
+   60,
+   61,
+   62,
+   63,
+   64,
+   66,
+   67,
+   68,
+   69,
+   70
+  ]
+ },
+ "slides": [
+  {
+   "n": 1,
+   "kind": "title",
+   "imagePage": 1,
+   "title": "Introduction to Panel Data Methods",
+   "subtitle": "Seven estimators, one wage panel: why the union premium triples"
+  },
+  {
+   "n": 2,
+   "kind": "interactive",
+   "id": "N1",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 1,
+   "slideType": "qr_code",
+   "prompt": "",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "qr_code"
+   },
+   "props": {},
+   "notes": "Students join at ahaslides.com with code V62EU or by scanning the QR code. Names are required on join, so the leaderboard and the spinner wheels show real names. Ask everyone to open the Colab notebook now and run its first cell, which installs pyfixest and linearmodels; the Colab stop in Act II then runs without waiting.",
+   "legacy": false
+  },
+  {
+   "n": 3,
+   "kind": "interactive",
+   "id": "N2",
+   "tier": "core",
+   "minutes": 1.5,
+   "afterImage": 1,
+   "slideType": "word_cloud",
+   "prompt": "In one word: what can panel data do that a single cross-section cannot?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "In one word: what can panel data do that a single cross-section cannot?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "Warm-up, no right answer. Expect words such as track, compare, change, control or difference. Do not correct anyone yet. The same prompt returns at the end of class, so keep this cloud in mind (or screenshot it) for the comparison.",
+   "legacy": false
+  },
+  {
+   "n": 4,
+   "kind": "interactive",
+   "id": "N3",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 1,
+   "slideType": "scale",
+   "prompt": "Before we start: how confident are you?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "Before we start: how confident are you?",
+    "options": [
+     {
+      "text": "I can explain the difference between within and between variation"
+     },
+     {
+      "text": "I can say which variation each panel estimator uses"
+     },
+     {
+      "text": "I can choose between fixed effects and random effects"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": {},
+   "notes": "Baseline confidence on a 1 to 5 scale. The same three statements return after the exit ticket, so the class can see its own change. Read the averages aloud without comment.",
+   "legacy": false
+  },
+  {
+   "n": 5,
+   "kind": "interactive",
+   "id": "N4",
+   "tier": "core",
+   "minutes": 0.5,
+   "afterImage": 1,
+   "slideType": "q&a",
+   "prompt": "Questions? Ask them here at any time during class",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "q&a",
+    "heading": "Questions? Ask them here at any time during class"
+   },
+   "props": {},
+   "notes": "Q&A stays open on every slide (presentation setting: Q&A on all slides). Questions are anonymous unless students choose to sign them. Point out that upvoting a question pushes it to the top. Check the Q&A at each leaderboard break and at the end.",
+   "legacy": false
+  },
+  {
+   "n": 6,
+   "kind": "divider",
+   "imagePage": 2,
+   "title": "The Tension",
+   "background": "#d97757"
+  },
+  {
+   "n": 7,
+   "kind": "content",
+   "imagePage": 3,
+   "title": "Same workers, same question — but the answer triples depending on the estimator",
+   "notes": "The central tension of the tutorial: pooled OLS and the within (fixed-effects) estimator answer the same applied question — what does union membership do to wages — but disagree by a factor of three. The gap is not noise; it is the empirical signature of selection on unobservables. Everything in Act II is about earning the right to pick a number."
+  },
+  {
+   "n": 8,
+   "kind": "interactive",
+   "id": "N5",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 3,
+   "slideType": "poll",
+   "prompt": "Gut call: which union premium would you report?",
+   "answer": "none (prediction)",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Gut call: which union premium would you report?",
+    "options": [
+     "7.5 log points, from pooled OLS",
+     "21 log points, from the within estimators",
+     "Both, each with the question it answers"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "limitChoice": 1,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "An opinion poll with no right answer at this point. The slide just asked which number to report; this is where the room commits before any method is explained. Do not comment on the split. The same poll returns after the closing sentence, and the lecture argues for C: each number answers a different question, so report both with their estimands.",
+   "legacy": false
+  },
+  {
+   "n": 9,
+   "kind": "content",
+   "imagePage": 4,
+   "title": "Six estimators on one panel disagree by a factor of three",
+   "notes": "The spoiler figure. Don't explain every bar yet — just plant that the estimators split into two camps roughly three-fold apart, and that we come back to this picture in Act III. Cross-sectional methods (POLS 0.075, Between 0.066, RE 0.109) on one side; within methods (FDFE 0.211, FE 0.210, CRE 0.210) on the other."
+  },
+  {
+   "n": 10,
+   "kind": "content",
+   "imagePage": 5,
+   "title": "Where we're going",
+   "notes": "Teaching deck, so we signpost. Seven \"Before you look\" slides along the way ask the room to predict before each reveal; on AhaSlides each one is followed by a live quiz."
+  },
+  {
+   "n": 11,
+   "kind": "divider",
+   "imagePage": 6,
+   "title": "The Investigation",
+   "background": "#6a9bcc"
+  },
+  {
+   "n": 12,
+   "kind": "interactive",
+   "id": "N6",
+   "tier": "opt",
+   "minutes": 2,
+   "afterImage": 6,
+   "slideType": "marketplace/draw-answer-v2",
+   "prompt": "Draw the 2010 to 2012 wage path of a worker who joins a union",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "marketplace/draw-answer-v2",
+    "title": "Draw the 2010 to 2012 wage path of a worker who joins a union",
+    "slide_attributes": {
+     "config": {
+      "question": "Draw the 2010 to 2012 wage path of a worker who joins a union",
+      "allowMultipleSubmissions": false,
+      "clearToken": 0
+     }
+    }
+   },
+   "props": {},
+   "notes": "Give 60 seconds. Most drawings will show a line that rises between the two years. Ask what the line of a comparable worker who never joins would look like: the within estimators compare these changes, not the levels. Keep two or three drawings in mind for the trajectories slide, which shows 30 real workers.",
+   "legacy": false
+  },
+  {
+   "n": 13,
+   "kind": "content",
+   "imagePage": 7,
+   "title": "The lab: 2,199 workers, two years, a perfectly balanced T = 2 panel",
+   "notes": "NLSY-style data on US workers; the full file has five waves (2010–2018) but we keep two for pedagogical clarity. 4,398 worker-year observations, balanced. The low unionization rate (16.3%) matters: any estimator that leans on cross-sectional variation is working mostly with non-union workers."
+  },
+  {
+   "n": 14,
+   "kind": "content",
+   "imagePage": 8,
+   "title": "Each estimator chooses which variation to believe",
+   "notes": "This columns slide replaces the post's Mermaid decision diagram (Quarto revealjs does not bundle mermaid.js, so a fenced mermaid block would render as raw text). The left side leans on between-worker variation; the right side on within-worker variation. CRE/Mundlak sits in the middle and recovers both. We will run both specification tests, and they disagree: the reason (which errors each test assumes) is part of the lesson."
+  },
+  {
+   "n": 15,
+   "kind": "cue",
+   "imagePage": 9,
+   "title": "Before you look: how much of union's variance is within workers?",
+   "background": "#1a3a8a",
+   "notes": "Ask the room to commit before the decomposition. Give 20 seconds, then take the vote. Answer on the next slide: A, only 6.1% is within. The within SD (0.0911) is not a share; the share is its square over the sum of the squared between and within SDs. Just 73 of 2,199 workers switch. (AhaSlides interactive I1 follows.)"
+  },
+  {
+   "n": 16,
+   "kind": "interactive",
+   "id": "I1",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 9,
+   "slideType": "pick_answer_quiz",
+   "prompt": "What share of the variance of union status comes from workers who change status between 2010 and 2012?",
+   "answer": "A. Less than 10%",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "What share of the variance of union status comes from workers who change status between 2010 and 2012?",
+    "options": [
+     "Less than 10%",
+     "About 25%",
+     "About 50%"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A. Only 6.1% of the variance of union status is within workers. The within SD, 0.0911, is not a share: the share is its square divided by the sum of the squared between and within SDs (0.0083 out of 0.1362). Just 73 of 2,199 workers switch, so almost all the variation comes from comparing different workers. If B draws votes, point out that the SD ratio 0.0911/0.369 looks like 25% only because SDs are not variances. The next slide shows the decomposition.",
+   "legacy": true
+  },
+  {
+   "n": 17,
+   "kind": "content",
+   "imagePage": 10,
+   "title": "94% of union variation is between workers — only 6.1% is within",
+   "notes": "The answer to the vote: A. Fixed effects only use the within part. For union that is a thin 6.1% slice of total variance. Schooling has zero within-variation (nobody's education changes across two years), so FE mechanically drops it. The consequence: FE standard errors will be much larger than POLS — the FE-vs-RE choice is about precision as much as bias."
+  },
+  {
+   "n": 18,
+   "kind": "interactive",
+   "id": "N7",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 10,
+   "slideType": "marketplace/true-or-false",
+   "prompt": "Fixed effects can estimate the wage return to schooling in this panel.",
+   "answer": "False",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Fixed effects can estimate the wage return to schooling in this panel.",
+    "slide_attributes": {
+     "config": {
+      "question": "Fixed effects can estimate the wage return to schooling in this panel.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": {},
+   "notes": "Answer: False. Schooling has zero within variation: no worker changes education between 2010 and 2012, so the worker effect absorbs it and fixed effects drop it mechanically. This is the price of within identification, and the reason the CRE model returns at the end of Act II.",
+   "legacy": false
+  },
+  {
+   "n": 19,
+   "kind": "content",
+   "imagePage": 11,
+   "title": "Only the workers who switch status identify the within estimators",
+   "notes": "Most lines are flat-colored — always-union (orange) or never-union (blue). Only the teal \"changer\" lines carry identifying information for FE, FD, and Mundlak. One-way fixed effects reads only the teal lines, because a line whose union status never changes carries no within-worker contrast; the blue and orange lines can only be compared with each other, which is the cross-sectional comparison. The tension is literally a question of which lines you choose to read."
+  },
+  {
+   "n": 20,
+   "kind": "interactive",
+   "id": "N8",
+   "tier": "opt",
+   "minutes": 1.5,
+   "afterImage": 11,
+   "slideType": "spinner_wheel",
+   "prompt": "Cold call: why do only the teal lines identify fixed effects?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: why do only the teal lines identify fixed effects?",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Spin the wheel; it fills itself with the names of joined students. A good answer: a worker whose union status never changes has no within-worker contrast, so the worker effect absorbs everything about that worker. Only the 73 switchers, the teal lines, show a wage change alongside a union change.",
+   "legacy": false
+  },
+  {
+   "n": 21,
+   "kind": "content",
+   "imagePage": 12,
+   "title": "Pooled OLS — the naive baseline — reports a 7.5-log-point premium",
+   "notes": "POLS treats every worker-year as independent, ignoring the panel. 7.5 log points, SE 2.3. This is the textbook cross-sectional answer and the number a naive analyst reports. The rest of the post is a tour through ways of subtracting the selection bias out. Between is its near-twin (0.066) because 94% of union variance is between-worker."
+  },
+  {
+   "n": 22,
+   "kind": "interactive",
+   "id": "N9",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 12,
+   "slideType": "marketplace/true-or-false",
+   "prompt": "Pooled OLS is highly significant (t = 3.25), so its 7.5-log-point premium is unbiased.",
+   "answer": "False",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Pooled OLS is highly significant (t = 3.25), so its 7.5-log-point premium is unbiased.",
+    "slide_attributes": {
+     "config": {
+      "question": "Pooled OLS is highly significant (t = 3.25), so its 7.5-log-point premium is unbiased.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": {},
+   "notes": "Answer: False. Significance measures noise, not bias. If workers with higher unobserved ability are less likely to hold union jobs, pooled OLS mixes the union effect with that selection, however small its standard error. The rest of Act II is a tour of ways to remove the fixed part of that selection.",
+   "legacy": false
+  },
+  {
+   "n": 23,
+   "kind": "cue",
+   "imagePage": 13,
+   "title": "Before you look: smaller, the same, or larger than pooled OLS?",
+   "background": "#1a3a8a",
+   "notes": "Ask: which way does first-differencing move the estimate, and what happens to its precision? Answer on the next slide: C. FD gives 0.2113 with SE 0.0792, about 3.4 times the POLS SE: differencing removes the fixed traits that depress the cross-sectional comparison but keeps only the 73 switchers. (AhaSlides interactive I2 follows.)"
+  },
+  {
+   "n": 24,
+   "kind": "interactive",
+   "id": "I2",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 13,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Pooled OLS gave 0.0750 (SE 0.0231). How will the first-difference estimate compare?",
+   "answer": "C. Larger, with a larger standard error",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Pooled OLS gave 0.0750 (SE 0.0231). How will the first-difference estimate compare?",
+    "options": [
+     "Smaller than 0.075",
+     "About the same",
+     "Larger, with a larger standard error"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C. FD gives 0.2113 with SE 0.0792, almost three times the POLS estimate and about 3.4 times its standard error. Differencing removes the fixed worker traits that depress the cross-sectional comparison, but it also discards every worker who never changes status, which leaves only 73 informative workers. The next slide writes out the differenced model.",
+   "legacy": true
+  },
+  {
+   "n": 25,
+   "kind": "content",
+   "imagePage": 14,
+   "title": "First-differencing erases $\\alpha_i$ and triples the estimate to 0.211",
+   "notes": "The answer to the vote: C. Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that excludes zero but also contains the POLS 0.075, so the upward revision is large in size but not statistically decisive on its own. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner."
+  },
+  {
+   "n": 26,
+   "kind": "interactive",
+   "id": "N10",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 14,
+   "slideType": "marketplace/fill-in-the-blanks",
+   "prompt": "Complete the logic of first differences",
+   "answer": "time, switch",
+   "slide": {
+    "slide_type": "marketplace/fill-in-the-blanks",
+    "title": "Complete the logic of first differences",
+    "slide_attributes": {
+     "config": {
+      "question": "First differencing removes the worker effect because it does not change over [blank]. The estimate is identified only by workers who [blank] union status.",
+      "blanks": [
+       {
+        "id": "b1",
+        "acceptedAnswers": [
+         "time"
+        ],
+        "dropdownOptions": [
+         "workers",
+         "time",
+         "industries"
+        ]
+       },
+       {
+        "id": "b2",
+        "acceptedAnswers": [
+         "switch"
+        ],
+        "dropdownOptions": [
+         "keep",
+         "report",
+         "switch"
+        ]
+       }
+      ],
+      "answerType": "dropdown",
+      "partialScoring": true
+     }
+    }
+   },
+   "props": {},
+   "notes": "Answer: time, switch. The worker effect is constant over the two years, so it cancels when we subtract the 2010 row from the 2012 row. A worker who never changes union status has a change of zero in the regressor, so only the 73 switchers move the estimate. That is why the standard error is 3.4 times larger than in pooled OLS.",
+   "legacy": false
+  },
+  {
+   "n": 27,
+   "kind": "content",
+   "imagePage": 15,
+   "title": "The within transformation demeans the data — and the slope steepens to 0.21",
+   "notes": "Same observations, two pictures. Left (raw): POLS slope 0.075, dragged down because union and non-union mean wages sit close together. Right (demeaned): FE slope ≈ 0.21, identified only by the points that move off the origin — the switchers. The within estimator subtracts each worker's mean, so α_i vanishes; OLS on the demeaned data gives the FE coefficient."
+  },
+  {
+   "n": 28,
+   "kind": "cue",
+   "imagePage": 16,
+   "title": "Before you look: does fixed effects match FD's 0.2113?",
+   "background": "#1a3a8a",
+   "notes": "Ask, and as a follow-up: if it differs, which feature of the FD regression could explain the gap? Answer on the next slide: B. FE gives 0.2103, a gap of 0.001, because the FD regression has an intercept that absorbs the common wage growth of 0.0727. Without the intercept FD returns exactly 0.2103. (AhaSlides interactive I3 follows.)"
+  },
+  {
+   "n": 29,
+   "kind": "interactive",
+   "id": "I3",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 16,
+   "slideType": "pick_answer_quiz",
+   "prompt": "With two periods, will the FE estimate equal the FD estimate of 0.2113?",
+   "answer": "B. Slightly different",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "With two periods, will the FE estimate equal the FD estimate of 0.2113?",
+    "options": [
+     "Exactly equal",
+     "Slightly different",
+     "Very different"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B. FE gives 0.2103, a gap of 0.001. The gap comes from the intercept in the FD regression, which absorbs the common wage growth of 0.0727; drop the intercept and FD returns exactly 0.2103. If anyone chose A, they have the right intuition about the identity; the intercept is the one detail that breaks it. The next slide shows three recipes that all give 0.2103.",
+   "legacy": true
+  },
+  {
+   "n": 30,
+   "kind": "content",
+   "imagePage": 17,
+   "title": "Three recipes, one number: FD, demeaning, and dummy FE all give 0.2103",
+   "notes": "The answer to the vote: B, slightly different. DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: about 2,200 dummies still run fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap is the common time trend: FD without an intercept returns 0.2103, and adding a year effect to FE reproduces FD with an intercept (0.2113) — that is two-way FE, next."
+  },
+  {
+   "n": 31,
+   "kind": "interactive",
+   "id": "N11",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 17,
+   "slideType": "match_pairs_quiz",
+   "prompt": "Match each fixed-effects recipe to what it does",
+   "answer": "First differences = Subtract the 2010 row from the 2012 row; Within (demeaning) = Subtract the mean of each worker; Dummy-variable FE = Add one dummy per worker, 2,198 in all; Absorbed FE (| ID) = The fast software route to the same estimate",
+   "slide": {
+    "slide_type": "match_pairs_quiz",
+    "heading": "Match each fixed-effects recipe to what it does",
+    "pairs": [
+     {
+      "left_item": "First differences",
+      "right_item": "Subtract the 2010 row from the 2012 row"
+     },
+     {
+      "left_item": "Within (demeaning)",
+      "right_item": "Subtract the mean of each worker"
+     },
+     {
+      "left_item": "Dummy-variable FE",
+      "right_item": "Add one dummy per worker, 2,198 in all"
+     },
+     {
+      "left_item": "Absorbed FE (| ID)",
+      "right_item": "The fast software route to the same estimate"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: first differences subtract periods, demeaning subtracts worker means, dummy-variable FE adds 2,198 worker dummies, and absorption is the fast computational route. With T = 2 all of them return 0.2103, except that FD with an intercept gives 0.2113 because the intercept absorbs the common wage trend.",
+   "legacy": false
+  },
+  {
+   "n": 32,
+   "kind": "interactive",
+   "id": "N12",
+   "tier": "core",
+   "minutes": 5,
+   "afterImage": 17,
+   "slideType": "short_answer_quiz",
+   "prompt": "Colab stop: run the notebook from the top through Section 10. What union coefficient does fixed effects print?",
+   "answer": "0.2103",
+   "slide": {
+    "slide_type": "short_answer_quiz",
+    "heading": "Colab stop: run the notebook from the top through Section 10. What union coefficient does fixed effects print?",
+    "correct_answer": "0.2103"
+   },
+   "props": {
+    "timeToAnswer": 300,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "The single live-coding stop, about five minutes. Students open the Google Colab button on the post (https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/tutorials/python_panel_intro/notebook.ipynb) and run the cells from the top through Section 10, Within / Fixed effects. The first cell installs pyfixest and linearmodels, and Section 4 downloads the data from GitHub, so students who started the install at the beginning of class finish first. The cell prints Union coefficient: 0.2103 (SE 0.0812) and, on the next line, the FD slope without an intercept, also 0.2103. Type the answer with four decimals. Students who finish early can explain to a neighbor why the two printed numbers agree.",
+   "legacy": false
+  },
+  {
+   "n": 33,
+   "kind": "cue",
+   "imagePage": 18,
+   "title": "Before you look: where does two-way FE land?",
+   "background": "#1a3a8a",
+   "notes": "Ask the room to pick before the code. Answer on the next slide: A. With T = 2 the year effect plays exactly the role of the FD intercept, so two-way FE equals FD with an intercept to six decimals. (AhaSlides interactive I4 follows.)"
+  },
+  {
+   "n": 34,
+   "kind": "interactive",
+   "id": "I4",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 18,
+   "slideType": "pick_answer_quiz",
+   "prompt": "FE gave 0.2103 and FD gave 0.2113. Where will two-way FE land?",
+   "answer": "A. Exactly equal to FD, 0.2113",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "FE gave 0.2103 and FD gave 0.2113. Where will two-way FE land?",
+    "options": [
+     "Exactly equal to FD, 0.2113",
+     "Equal to FE, 0.2103",
+     "Somewhere else"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A. Two-way FE gives 0.2113, identical to FD with an intercept to six decimals. With T = 2 the year effect plays exactly the role of the FD intercept, so the gap between FD and one-way FE closes. The next slide shows the code and output.",
+   "legacy": true
+  },
+  {
+   "n": 35,
+   "kind": "content",
+   "imagePage": 19,
+   "title": "Two-way FE absorbs year shocks and lands at 0.2113 — exactly first differences",
+   "notes": "The answer to the vote: A. TWFE = 0.2113, identical to FD with an intercept: with T = 2 the two coincide exactly, while one-way FE (0.2103) equals FD without an intercept. The 0.001 gap is the common time trend that the year effect and FD's intercept both absorb. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables."
+  },
+  {
+   "n": 36,
+   "kind": "interactive",
+   "id": "N13",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 19,
+   "slideType": "marketplace/true-or-false",
+   "prompt": "Two-way fixed effects can estimate the wage gap between women and men.",
+   "answer": "False",
+   "slide": {
+    "slide_type": "marketplace/true-or-false",
+    "title": "Two-way fixed effects can estimate the wage gap between women and men.",
+    "slide_attributes": {
+     "config": {
+      "question": "Two-way fixed effects can estimate the wage gap between women and men.",
+      "correctAnswer": "false",
+      "hasTimeLimit": true,
+      "timeLimitSeconds": 30,
+      "maxPointsPerCorrect": 100,
+      "minPoint": 0,
+      "speedBonus": true
+     }
+    }
+   },
+   "props": {},
+   "notes": "Answer: False. Being female never changes within a worker, so the worker effect absorbs it silently, exactly like schooling. The female penalty of −27.3 log points comes from the cross-sectional camp (POLS, RE, CRE), which is one reason researchers reach for CRE when they want both kinds of coefficient.",
+   "legacy": false
+  },
+  {
+   "n": 37,
+   "kind": "content",
+   "imagePage": 20,
+   "title": "Random effects bets on no-correlation — and is pulled toward POLS at 0.109",
+   "notes": "RE treats α_i as a random draw uncorrelated with the regressors and uses GLS to blend within and between efficiently. Here it lands at 0.109, squarely between POLS (0.075) and FE (0.210), leaning toward POLS because within variation is thin. The SE (0.030) is striking — but that precision is real only if individual effects are uncorrelated with union status. The FE–POLS gap suggests they are not, so the precision is bought with bias."
+  },
+  {
+   "n": 38,
+   "kind": "interactive",
+   "id": "N14",
+   "tier": "opt",
+   "minutes": 1.5,
+   "afterImage": 20,
+   "slideType": "spinner_wheel",
+   "prompt": "Cold call: why does random effects land closer to pooled OLS than to fixed effects?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: why does random effects land closer to pooled OLS than to fixed effects?",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Spin and ask the student to explain the slide in their own words. A good answer: random effects is a precision-weighted blend of the between and within estimators, and only 6.1% of the union variance is within workers, so the between comparison gets most of the weight. That is why RE lands at 0.109, much closer to 0.075 than to 0.210.",
+   "legacy": false
+  },
+  {
+   "n": 39,
+   "kind": "cue",
+   "imagePage": 21,
+   "title": "Before you look: what do robust SEs do to the Hausman statistic?",
+   "background": "#1a3a8a",
+   "notes": "Ask: the robust FE SE grows much more than the robust RE SE, so what happens to the denominator V_FE − V_RE? Answer on the next slide: B. H falls from 5.62 (p = 0.018) to 1.79 (p = 0.180). But the plug-in number is not a valid test, because with robust errors V_FE − V_RE is no longer the variance of the difference. (AhaSlides interactive I5 follows.)"
+  },
+  {
+   "n": 40,
+   "kind": "interactive",
+   "id": "I5",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 21,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Plug the robust SEs (0.0812 for FE, 0.0299 for RE) into the Hausman formula instead of the classical ones. What happens to H?",
+   "answer": "B. Fall enough to flip the verdict",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Plug the robust SEs (0.0812 for FE, 0.0299 for RE) into the Hausman formula instead of the classical ones. What happens to H?",
+    "options": [
+     "Rise, so the test rejects more strongly",
+     "Fall enough to flip the verdict",
+     "Fall, but still reject at 5%"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B. H falls from 5.62 (p = 0.018) to 1.79 (p = 0.180), so the verdict flips from rejecting RE to not rejecting it. The robust FE standard error grows much more than the robust RE one, which inflates the denominator V_FE − V_RE. But stress that the plug-in number is not a valid test: with robust errors V_FE − V_RE is no longer the variance of the difference. The next slide shows the textbook test; the Mundlak alternative comes right after.",
+   "legacy": true
+  },
+  {
+   "n": 41,
+   "kind": "content",
+   "imagePage": 22,
+   "title": "The textbook Hausman test rejects RE, if the errors are classical",
+   "notes": "The answer to the vote: B, the verdict flips, but only in an invalid test. β_FE − β_RE = +0.101. The textbook test (Stata's hausman fe re, R's phtest) uses classical variances because its formula relies on RE being fully efficient under the null. That gives H = 5.62 on 1 df, p = 0.018: reject. The robust SEs are much larger, especially for FE (0.0812 vs 0.0509), which suggests the classical assumption is doubtful. Plugging them in flips the verdict (H = 1.79, p = 0.180), but the result has no chi-square distribution. With robust errors, the valid check is the Mundlak test, next."
+  },
+  {
+   "n": 42,
+   "kind": "cue",
+   "imagePage": 23,
+   "title": "Before you look: what happens to the union coefficient in CRE?",
+   "background": "#1a3a8a",
+   "notes": "Ask the room to commit. Answer on the next slide: A, exactly 0.2103. Once the worker mean of union status is controlled for, the only variation left in union is within variation, so RE has nothing else to use; this holds for any RE weight θ. (AhaSlides interactive I6 follows.)"
+  },
+  {
+   "n": 43,
+   "kind": "interactive",
+   "id": "I6",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 23,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Random effects gave 0.1092. After adding union_bar, the worker mean of union status, what is the coefficient on union?",
+   "answer": "A. It equals the FE value, 0.2103",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Random effects gave 0.1092. After adding union_bar, the worker mean of union status, what is the coefficient on union?",
+    "options": [
+     "It equals the FE value, 0.2103",
+     "It stays near 0.11",
+     "It moves between 0.11 and 0.21"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A, exactly 0.2103. Once the worker mean of union status is controlled for, the only variation left in union is within variation, so random effects has nothing else to use. This holds for any RE weight θ, which is the Mundlak (1978) result; the post proves it with FWL. The next slide shows the Mundlak model and its test.",
+   "legacy": true
+  },
+  {
+   "n": 44,
+   "kind": "content",
+   "imagePage": 24,
+   "title": "Mundlak recovers the FE coefficient and flags negative selection",
+   "notes": "The answer to the vote: A. Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. In this balanced panel γ is exactly Between minus FE (0.0662 − 0.2103). Unlike the plug-in Hausman number, this test stays valid with robust SEs; clustered by worker it gives p = 0.106. So: the textbook test rejects, the robust test is borderline."
+  },
+  {
+   "n": 45,
+   "kind": "interactive",
+   "id": "N15",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 24,
+   "slideType": "categorise_quiz",
+   "prompt": "Sort the estimators by the variation they use",
+   "answer": "Cross-sectional camp: Pooled OLS, Between, Random effects; Within camp: First differences, Fixed effects, Two-way fixed effects",
+   "slide": {
+    "slide_type": "categorise_quiz",
+    "heading": "Sort the estimators by the variation they use",
+    "options": [
+     {
+      "name": "Cross-sectional camp",
+      "items": [
+       "Pooled OLS",
+       "Between",
+       "Random effects"
+      ]
+     },
+     {
+      "name": "Within camp",
+      "items": [
+       "First differences",
+       "Fixed effects",
+       "Two-way fixed effects"
+      ]
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: pooled OLS, between and random effects lean on comparisons across workers; first differences, fixed effects and two-way FE use only changes within a worker. CRE was left out on purpose: it is the bridge, with a within coefficient equal to FE inside a random-effects model. Ask where the room would put it and why.",
+   "legacy": false
+  },
+  {
+   "n": 46,
+   "kind": "interactive",
+   "id": "N16",
+   "tier": "core",
+   "minutes": 0.5,
+   "afterImage": 24,
+   "slideType": "leaderboard",
+   "prompt": "",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": {},
+   "notes": "End of Act II checkpoint. Read the top five aloud, then check the Q&A for questions that collected upvotes before moving on to the resolution.",
+   "legacy": false
+  },
+  {
+   "n": 47,
+   "kind": "divider",
+   "imagePage": 25,
+   "title": "The Resolution",
+   "background": "#00d4c8"
+  },
+  {
+   "n": 48,
+   "kind": "interactive",
+   "id": "N17",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 25,
+   "slideType": "correct_order_quiz",
+   "prompt": "Order these union estimates from smallest to largest",
+   "answer": "Between estimator → Pooled OLS → Random effects → Fixed effects",
+   "slide": {
+    "slide_type": "correct_order_quiz",
+    "heading": "Order these union estimates from smallest to largest",
+    "options": [
+     {
+      "position": 1,
+      "text": "Between estimator"
+     },
+     {
+      "position": 2,
+      "text": "Pooled OLS"
+     },
+     {
+      "position": 3,
+      "text": "Random effects"
+     },
+     {
+      "position": 4,
+      "text": "Fixed effects"
+     }
+    ]
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: Between 0.0662, pooled OLS 0.0750, random effects 0.1092, fixed effects 0.2103. The order is the whole story: the more an estimator leans on comparisons across workers, the smaller the premium, which is the signature of negative selection into union jobs. The next slides make that case.",
+   "legacy": false
+  },
+  {
+   "n": 49,
+   "kind": "content",
+   "imagePage": 26,
+   "title": "Within-worker, joining a union pays 0.21 log points — nearly triple the naive 0.075",
+   "background": "#141413",
+   "notes": "The Act-III payoff. Cross-sectional methods say 7–11 log points; within methods say about 21. The factor-of-three gap is the empirical signature of selection on unobservables: higher-ability workers are less likely to be unionized in this sample, so cross-sectional comparisons understate the within-worker payoff to *joining* a union. Caveat for Q&A: the 0.21 rests on 73 switchers and is specific to 2010–2012; with all five waves two-way FE falls to 0.040 (SE 0.026)."
+  },
+  {
+   "n": 50,
+   "kind": "content",
+   "imagePage": 27,
+   "title": "Two camps, three-fold apart — and the gap is selection, not noise",
+   "notes": "The payoff table. The seven methods cluster into two camps roughly three-fold apart; TWFE equals FDFE exactly because T = 2. Cross-sectional standard errors are 2.6–3.5× smaller, but these methods identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one."
+  },
+  {
+   "n": 51,
+   "kind": "interactive",
+   "id": "N18",
+   "tier": "opt",
+   "minutes": 1.5,
+   "afterImage": 27,
+   "slideType": "spinner_wheel",
+   "prompt": "Cold call: why are the within-camp standard errors so much larger?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "spinner_wheel",
+    "heading": "Cold call: why are the within-camp standard errors so much larger?",
+    "options": []
+   },
+   "props": {
+    "metadata": {
+     "autoFillParticipantName": true
+    }
+   },
+   "notes": "Spin and ask. A good answer: the within estimators throw away every comparison across workers and keep only the 73 switchers, so they estimate the premium from a thin 6.1% slice of the union variance. The cross-sectional standard errors are 2.6 to 3.5 times smaller, but they buy precision with bias if selection is real.",
+   "legacy": false
+  },
+  {
+   "n": 52,
+   "kind": "cue",
+   "imagePage": 28,
+   "title": "Before you look: what happens to the age coefficient under two-way FE?",
+   "background": "#1a3a8a",
+   "notes": "Ask, then hint: between 2010 and 2012 most workers age by exactly two years. Answer on the next slide: B, it turns negative (−0.0576). The year effect absorbs the two-year step for 1,885 workers, so the coefficient rests on the 314 whose interviews were not exactly two years apart: fragile, not an age profile. (AhaSlides interactive I7 follows.)"
+  },
+  {
+   "n": 53,
+   "kind": "interactive",
+   "id": "I7",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 28,
+   "slideType": "pick_answer_quiz",
+   "prompt": "With controls, age raises log wages by about 0.02 per year in pooled OLS. What happens to the age coefficient under two-way FE?",
+   "answer": "B. Change sign",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "With controls, age raises log wages by about 0.02 per year in pooled OLS. What happens to the age coefficient under two-way FE?",
+    "options": [
+     "Stay near +0.02",
+     "Change sign",
+     "Shrink toward zero"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 30,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B. It turns negative, −0.0576. Between 2010 and 2012, age rises by exactly two years for 1,885 of the 2,199 workers, which the year effect absorbs completely, so the coefficient is identified only by the 314 workers whose age rose by one or three years, mostly because of interview timing. Read it as fragile, not as an age profile of wages. The next slide shows all four models with controls.",
+   "legacy": true
+  },
+  {
+   "n": 54,
+   "kind": "content",
+   "imagePage": 29,
+   "title": "Adding controls leaves the two-camp gap intact",
+   "notes": "The answer to the vote: B, the within age coefficient turns negative. With age, schooling, female, and year effects in every model, POLS drops to 0.057 (controls absorb some confounding) and RE to 0.088, but TWFE and CRE both report 0.213; CRE reproduces the TWFE coefficients exactly. Schooling (+11.1 log pts/yr) and the female penalty (−27.3 log pts) are stable across POLS/RE/CRE because they are time-invariant — and absorbed by FE. The within age coefficient (TWFE and CRE) flips to −0.058, a fragile estimate (age is not exactly collinear with the year dummy, but only the 314 workers whose age did not rise by exactly two years identify it), not a real age–wage relationship."
+  },
+  {
+   "n": 55,
+   "kind": "content",
+   "imagePage": 30,
+   "title": "Does FE make this causal? No — strict exogeneity still carries the weight",
+   "notes": "Steelman, don't strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the 73 of 2,199 workers (3.3%) who switched union status (36 joined, 37 left) — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move."
+  },
+  {
+   "n": 56,
+   "kind": "interactive",
+   "id": "N19",
+   "tier": "opt",
+   "minutes": 2,
+   "afterImage": 30,
+   "slideType": "marketplace/two-by-two-grid-v2",
+   "prompt": "Where does each threat to the within estimate land?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "marketplace/two-by-two-grid-v2",
+    "title": "Where does each threat to the within estimate land?",
+    "slide_attributes": {
+     "config": {
+      "question": "Where does each threat to the within estimate land?",
+      "xAxisLabel": "How likely in real data",
+      "yAxisLabel": "How much bias it causes",
+      "items": [
+       {
+        "id": "i1",
+        "label": "A promotion that coincides with joining a union",
+        "color": ""
+       },
+       {
+        "id": "i2",
+        "label": "Fixed ability differences across workers",
+        "color": ""
+       },
+       {
+        "id": "i3",
+        "label": "Only 73 switchers",
+        "color": ""
+       },
+       {
+        "id": "i4",
+        "label": "Joiners and leavers respond differently",
+        "color": ""
+       },
+       {
+        "id": "i5",
+        "label": "Only two waves, 2010 and 2012",
+        "color": ""
+       }
+      ],
+      "canSkip": false
+     }
+    }
+   },
+   "props": {},
+   "notes": "Unscored; it sets up a discussion. The reference answers come from the slides. A time-varying shock such as a promotion that coincides with joining biases every within estimator. Fixed ability differences are exactly what fixed effects remove, so they cause no bias here. Seventy-three switchers mean noise and a local estimand, not bias. Joiners (0.345) and leavers (0.081) respond differently, so the symmetric model averages two effects. With all five waves two-way FE falls to 0.040, so the two-wave number is fragile. Ask which dot the room placed furthest from these answers.",
+   "legacy": false
+  },
+  {
+   "n": 57,
+   "kind": "interactive",
+   "id": "N20",
+   "tier": "opt",
+   "minutes": 3,
+   "afterImage": 30,
+   "slideType": "ideaBoard",
+   "prompt": "A panel question from your research: unit, treatment, and a fixed confounder",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "ideaBoard",
+    "title": "A panel question from your research: unit, treatment, and a fixed confounder",
+    "slide_attributes": {
+     "groups": [
+      {
+       "id": "4a7c1e2b-3d5f-4a8b-9c1d-2e3f4a5b6c71",
+       "name": "Development and growth"
+      },
+      {
+       "id": "5b8d2f3c-4e6a-4b9c-8d2e-3f4a5b6c7d82",
+       "name": "Policy and public economics"
+      },
+      {
+       "id": "6c9e3a4d-5f7b-4cad-9e3f-4a5b6c7d8e93",
+       "name": "Health, education and labor"
+      },
+      {
+       "id": "7daf4b5e-6a8c-4dbe-af4a-5b6c7d8e9fa4",
+       "name": "Other fields"
+      }
+     ],
+     "preSetGroupEnabled": true,
+     "votesEnabled": true,
+     "votesPerParticipant": 3
+    }
+   },
+   "props": {},
+   "notes": "Ask each student for one example in the form unit, treatment, fixed confounder (for example: districts, a cash-transfer rollout, local institutions). After two minutes, open the voting round and discuss the top two. For each, ask whether the treatment varies within units over time; if it does not, fixed effects cannot identify it.",
+   "legacy": false
+  },
+  {
+   "n": 58,
+   "kind": "content",
+   "imagePage": 31,
+   "title": "The 0.21 rests on 73 switchers and on two waves",
+   "notes": "These are the post's Exercises 5 and 6. Each subsample has fewer than 40 switchers, so the asymmetry is noisy, but it warns that the symmetric within model averages two very different responses. With T = 5, FD and FE also stop coinciding (they weight the periods differently), and neither is significant at 5%. None of this makes the cross-sectional 0.075 right; it says the within answer is local and fragile."
+  },
+  {
+   "n": 59,
+   "kind": "content",
+   "imagePage": 32,
+   "title": "With robust errors, lead with CRE/Mundlak and its built-in test",
+   "background": "#141413",
+   "notes": "CRE/Mundlak gives you three things in one regression: the FE coefficient on the time-varying treatment, the RE framework that retains schooling and gender, and a built-in specification test (the t-stat on the Mundlak term) that can be made robust to heteroskedasticity and clustering, which the Hausman formula cannot. Here the two tests disagree because they assume different errors; the honest summary is that the evidence against RE is suggestive, not conclusive. The cost — one extra regressor per time-varying covariate — is essentially free in modern software."
+  },
+  {
+   "n": 60,
+   "kind": "interactive",
+   "id": "R1",
+   "tier": "core",
+   "minutes": 0.75,
+   "afterImage": 32,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Review 1 of 4: fixed effects identify the union premium from which workers?",
+   "answer": "B. Workers who switch union status",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Review 1 of 4: fixed effects identify the union premium from which workers?",
+    "options": [
+     "Workers who are always in a union",
+     "Workers who switch union status",
+     "Workers who are never in a union"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Final review round, question 1 of 4, with a 20-second timer. Answer: B. Only the 73 switchers (36 joined, 37 left) have a within-worker change in union status; for everyone else the worker effect absorbs union status completely.",
+   "legacy": false
+  },
+  {
+   "n": 61,
+   "kind": "interactive",
+   "id": "R2",
+   "tier": "core",
+   "minutes": 0.75,
+   "afterImage": 32,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Review 2 of 4: random effects is consistent only if the worker effect is",
+   "answer": "C. uncorrelated with union status",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Review 2 of 4: random effects is consistent only if the worker effect is",
+    "options": [
+     "constant over time",
+     "larger than the idiosyncratic error",
+     "uncorrelated with union status"
+    ],
+    "correct": "C"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: C. Every model here assumes the worker effect is constant over time; random effects adds that it is uncorrelated with the regressors. The gap between FE (0.210) and RE (0.109) suggests that assumption fails in this panel.",
+   "legacy": false
+  },
+  {
+   "n": 62,
+   "kind": "interactive",
+   "id": "R3",
+   "tier": "core",
+   "minutes": 0.75,
+   "afterImage": 32,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Review 3 of 4: with T = 2, two-way fixed effects equals which estimator exactly?",
+   "answer": "A. First differences with an intercept",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Review 3 of 4: with T = 2, two-way fixed effects equals which estimator exactly?",
+    "options": [
+     "First differences with an intercept",
+     "One-way fixed effects",
+     "Pooled OLS"
+    ],
+    "correct": "A"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: A, both give 0.2113. The year effect in two-way FE plays the role of the intercept in the differenced regression. One-way FE (0.2103) equals FD without an intercept instead.",
+   "legacy": false
+  },
+  {
+   "n": 63,
+   "kind": "interactive",
+   "id": "R4",
+   "tier": "core",
+   "minutes": 0.75,
+   "afterImage": 32,
+   "slideType": "pick_answer_quiz",
+   "prompt": "Review 4 of 4: with robust errors, which specification test stays valid?",
+   "answer": "B. The Mundlak term in CRE",
+   "slide": {
+    "slide_type": "pick_answer_quiz",
+    "heading": "Review 4 of 4: with robust errors, which specification test stays valid?",
+    "options": [
+     "The textbook Hausman test",
+     "The Mundlak term in CRE",
+     "Neither"
+    ],
+    "correct": "B"
+   },
+   "props": {
+    "timeToAnswer": 20,
+    "fastAnswerGetMorePoint": true
+   },
+   "notes": "Answer: B. The Hausman formula needs random effects to be fully efficient, which fails with heteroskedastic or clustered errors. The t-test on the Mundlak term can use robust or clustered standard errors; here it gives p = 0.072 robust and 0.106 clustered. End the round on this before the podium.",
+   "legacy": false
+  },
+  {
+   "n": 64,
+   "kind": "interactive",
+   "id": "N21",
+   "tier": "core",
+   "minutes": 0.5,
+   "afterImage": 32,
+   "slideType": "leaderboard",
+   "prompt": "",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "leaderboard"
+   },
+   "props": {},
+   "notes": "Final podium for the quiz points of the whole class. Congratulate the top three; the prize raffle at the end gives everyone else a chance as well.",
+   "legacy": false
+  },
+  {
+   "n": 65,
+   "kind": "divider",
+   "imagePage": 33,
+   "title": "Let the within variation, not the pooled average, tell you what a treatment does.",
+   "background": "#141413",
+   "notes": "The single takeaway. When selection on unobservables is plausible, the gap between 0.075 and 0.210 is the whole story — and CRE/Mundlak is the specification that recovers the within answer while keeping the RE machinery and an honest specification test."
+  },
+  {
+   "n": 66,
+   "kind": "interactive",
+   "id": "N22",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 33,
+   "slideType": "poll",
+   "prompt": "Now: which union premium would you report?",
+   "answer": "none (prediction)",
+   "slide": {
+    "slide_type": "poll",
+    "heading": "Now: which union premium would you report?",
+    "options": [
+     "7.5 log points, from pooled OLS",
+     "21 log points, from the within estimators",
+     "Both, each with the question it answers"
+    ]
+   },
+   "props": {
+    "hasTimeLimit": true,
+    "timeToAnswer": 30,
+    "multipleChoice": false,
+    "limitChoice": 1,
+    "typeChart": "barChart",
+    "showPercentage": true
+   },
+   "notes": "The opening poll again. Put the two bar charts side by side. The lecture argues for C: 0.075 answers how union and non-union workers differ, 0.21 answers what joining a union does for the 73 switchers, and an honest report gives both with their assumptions.",
+   "legacy": false
+  },
+  {
+   "n": 67,
+   "kind": "interactive",
+   "id": "N23",
+   "tier": "opt",
+   "minutes": 1,
+   "afterImage": 33,
+   "slideType": "word_cloud",
+   "prompt": "Again, in one word: what can panel data do that a single cross-section cannot?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "word_cloud",
+    "heading": "Again, in one word: what can panel data do that a single cross-section cannot?"
+   },
+   "props": {
+    "entriesPerParticipant": 2
+   },
+   "notes": "The opening prompt again. A good outcome is a shift toward words such as within, difference, switchers, demean, or fixed effects.",
+   "legacy": false
+  },
+  {
+   "n": 68,
+   "kind": "interactive",
+   "id": "N24",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 33,
+   "slideType": "scale",
+   "prompt": "After class: how confident are you now?",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "scale",
+    "heading": "After class: how confident are you now?",
+    "options": [
+     {
+      "text": "I can explain the difference between within and between variation"
+     },
+     {
+      "text": "I can say which variation each panel estimator uses"
+     },
+     {
+      "text": "I can choose between fixed effects and random effects"
+     }
+    ],
+    "scale_config": {
+     "low_label": "Not at all",
+     "high_label": "Completely",
+     "low_value": 1,
+     "high_value": 5,
+     "must_rate": true,
+     "show_average": true,
+     "show_mid_values": true
+    }
+   },
+   "props": {},
+   "notes": "The same three statements as the opening scale. Compare the averages with the baseline aloud. The statement with the smallest gain is the one to revisit at the start of the next class.",
+   "legacy": false
+  },
+  {
+   "n": 69,
+   "kind": "interactive",
+   "id": "N25",
+   "tier": "core",
+   "minutes": 2,
+   "afterImage": 33,
+   "slideType": "open_ended_survey",
+   "prompt": "Exit ticket: what is still unclear about panel methods? One sentence.",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "open_ended_survey",
+    "heading": "Exit ticket: what is still unclear about panel methods? One sentence."
+   },
+   "props": {
+    "imageSubmission": false,
+    "layout": "grid"
+   },
+   "notes": "The exit ticket. Responses are named, because names are required on join, so they can be followed up individually. Skim them after class and open the next session with the two most common points of confusion.",
+   "legacy": false
+  },
+  {
+   "n": 70,
+   "kind": "interactive",
+   "id": "N26",
+   "tier": "core",
+   "minutes": 1,
+   "afterImage": 33,
+   "slideType": "marketplace/duck-race",
+   "prompt": "",
+   "answer": "none (unscored)",
+   "slide": {
+    "slide_type": "marketplace/duck-race",
+    "slide_attributes": {
+     "config": {
+      "durationSeconds": 20,
+      "resultMode": "winner"
+     }
+    }
+   },
+   "props": {},
+   "notes": "Prize raffle. Every joined student becomes a duck and the winner is pure luck, so students who scored low on the quizzes still have a chance. Students pick a duck design on their phones before the start.",
+   "legacy": false
+  }
+ ]
+}

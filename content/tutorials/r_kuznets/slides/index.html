@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-08-04">
+  <title>Spatial Inequality and the Kuznets Curve</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #e1e4e8; background-color: #24292e; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #e1e4e8; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Spatial Inequality and the Kuznets Curve</h1>
+  <p class="subtitle">Is there an inverted-U? A synthetic replication in R</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">inverted-U</span><span class="kr-cap">development → spatial inequality</span></div>
+    <div class="kr"><span class="kr-num">$2,100 / $31,000</span><span class="kr-cap">turning points</span></div>
+    <div class="kr"><span class="kr-num">cubic n.s.</span><span class="kr-cap">within countries (panel FE)</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">August 4, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="why-do-some-countries-have-huge-regional-gaps-and-others-almost-none" class="slide level2 center">
+<h2>Why do some countries have huge regional gaps and others almost none?</h2>
+<p>Kuznets and Williamson had an answer: <strong>rise, then fall</strong>.</p>
+<div class="fragment">
+<p>Nobody could test it — the regional data barely exist.</p>
+<p><span class="takeaway fragment">Lessmann (2014) built them. We rebuild the whole exercise on <strong>synthetic</strong> data.</span></p>
+<aside class="notes">
+<p>The hook: an old, intuitive hypothesis — Kuznets (1955) and Williamson (1965) — that was very hard to test, because testing it needs regional accounts for poor <em>and</em> rich countries, and those barely exist. Lessmann (2014) assembled them; the data are proprietary, so we rebuild the exercise on synthetic data calibrated to the paper. That keeps the whole pipeline open and reproducible, which is what makes it teachable.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="two-pictures-of-the-same-question-and-they-disagree" class="slide level2 center">
+<h2>Two pictures of the same question — and they disagree</h2>
+
+<img data-src="../r_kuznets_04_crosssection_polys.png" class="r-stretch quarto-figure-center"><p class="caption">Cross-section: a line declines, a quadratic bends, a cubic adds a high-income upturn.</p><p><span class="takeaway fragment">The shape you see depends on the functional form you assume.</span></p>
+<aside class="notes">
+<p>Plant the puzzle: the same scatter supports three different stories depending on the polynomial. We earn each curve in Act II, then resolve the between-vs-within tension.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="four-estimators-one-question-and-they-dont-all-agree" class="slide level2 center">
+<h2>Four estimators, one question — and they don’t all agree</h2>
+<ul>
+<li class="fragment"><strong>Measure</strong> it — the weighted coefficient of variation (WCV)</li>
+<li class="fragment"><strong>Estimate</strong> it — cross-section OLS, panel fixed effects, two semiparametric checks</li>
+<li class="fragment"><strong>The twist</strong> — the upturn is <strong>between</strong> countries, not <strong>within</strong> them</li>
+</ul>
+<p><span class="takeaway fragment">Same data, three shapes. Fixed effects settle which one is real.</span></p>
+<aside class="notes">
+<p>The roadmap. The four estimators are cross-section polynomial OLS, two-way fixed effects with fixest, Robinson (1988) and Baltagi–Li (2002). Each asks the same question with fewer shape assumptions than the last. The payoff is the between-vs-within contrast at the end — that is where the deck is going.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="we-compute-inequality-not-assume-it" class="slide level2 center">
+<h2>We <em>compute</em> inequality, not assume it</h2>
+<p><span class="math display">\[\mathrm{WCV} = \frac{1}{\bar{y}}\left[\sum_{j} p_j\,(\bar{y}-y_j)^2\right]^{1/2}\]</span></p>
+<p>Population-weighted spread of regional GDP per capita.</p>
+<div class="fragment">
+<p><strong>56 countries · 1980–2009 · 890 annual observations</strong></p>
+<p><span class="takeaway fragment">A populous poor region counts; a tiny rich enclave barely moves it.</span></p>
+<aside class="notes">
+<p>We simulate regions inside each country and compute the WCV from them, rather than taking an inequality index off the shelf. Here p_j is region j’s share of the country’s population and ybar is the country’s population-weighted mean regional income; the index is scale-free, so it compares a $400 economy with an $80,000 one. The synthetic panel has 890 annual country-year observations over 56 countries, 1980–2009 — close to the paper’s 915 / 56. The worked two-region example in the post gives WCV = 0.434.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="spatial-inequality-is-related-to-personal-inequality-but-not-the-same" class="slide level2 center">
+<h2>Spatial inequality is related to personal inequality — but not the same</h2>
+
+<img data-src="../r_kuznets_03_gini_vs_wcv.png" class="r-stretch quarto-figure-center"><p class="caption">GINI = 0.31 + 0.21·WCV (t = 2.5, r = 0.32).</p><p><span class="takeaway fragment">Regional gaps explain about a third of the cross-country variation in personal inequality — not all of it.</span></p>
+<aside class="notes">
+<p>Motivates why we study the spatial dimension in its own right: the correlation is 0.32, close to the paper’s 0.324, so spatial inequality explains a real but partial share of personal inequality. A country can have high personal inequality with low regional inequality, or the reverse.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="cross-section-the-inverted-u-emerges-with-controls-and-a-cubic-adds-the-upturn" class="slide level2 center">
+<h2>Cross-section: the inverted-U emerges with controls, and a cubic adds the upturn</h2>
+
+<img data-src="../r_kuznets_table2_crosssection.png" style="width:80.0%" class="r-stretch quarto-figure-center"><p class="caption">Five specifications: bivariate → quadratic → +controls (inverted-U) → +cubic (N-shape).</p><p><span class="takeaway fragment">With controls the inverted-U appears (+0.34* / −0.02**); the cubic term adds the high-income upturn.</span></p>
+<aside class="notes">
+<p>Column 1: the bivariate slope is negative (−0.092<strong><em>) — richer countries look more equal, but a straight line hides the structure. Column 4: +0.34</em> / −0.02</strong> — the inverted-U. Column 5: cubic significant on all three income terms (+4.40*** / −0.499*** / +0.0184***) — the N-shape upturn. Every control carries the paper’s sign: trade and the number of regions raise spatial inequality; federalism and urbanisation lower it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-does-the-curve-turn-set-the-derivative-to-zero" class="slide level2 center">
+<h2>Where does the curve turn? Set the derivative to zero</h2>
+
+<img data-src="../r_kuznets_07_turning_points.png" class="r-stretch quarto-figure-center"><p class="caption">Solving <span class="math inline">\(\partial \mathrm{WCV}/\partial \ln(\mathrm{GDP}) = \beta_1 + 2\beta_2 Y + 3\beta_3 Y^2 = 0\)</span> gives a peak near $2,100 and a trough near $31,000.</p><p><span class="takeaway fragment">Three phases: gaps widen up to $2,100, close until $31,000, then widen again.</span></p>
+<aside class="notes">
+<p>Three phases: rise during the industrial take-off, fall through convergence, rise again at the post-industrial top. The roots come out in logs — ln(GDP) = 7.67 and 10.36 — so exponentiate to read them in dollars ($2,146 and $31,443). The paper reports ≈ $2,000 and ≈ $24,000.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="significant-a-genuine-bend-check-the-discriminant" class="slide level2 center">
+<h2>Significant ≠ a genuine bend — check the discriminant</h2>
+<p>The test: <span class="math inline">\(D=\beta_2^2-3\beta_1\beta_3\)</span></p>
+<ul>
+<li class="fragment"><span class="math inline">\(D&gt;0\)</span> → two turning points · <span class="math inline">\(D=0\)</span> → inflection only · <span class="math inline">\(D&lt;0\)</span> → monotonic</li>
+<li class="fragment">Cross-section: <span class="math inline">\(D=+0.0055&gt;0\)</span>, both turning points in range → <strong>genuine N-shape</strong></li>
+<li class="fragment">Panel cubic: insignificant, and a turning point falls far outside the data → <strong>no within-country bend</strong></li>
+</ul>
+<p><span class="takeaway fragment">Significance says keep the term; the discriminant says whether the curve bends.</span></p>
+<aside class="notes">
+<p>Say this aloud: all three cubic terms can be significant and the curve still not bend inside the observed range. Significance answers “does the data prefer keeping this term?”; the discriminant answers “does the fitted curve actually reverse?” — and a third check asks “does it reverse <em>inside</em> the data?” The cross-section passes all three (D = +0.0055, turning points $2,146 and $31,443 inside the observed $315–$82,653). The panel cubic fails on significance (t = −0.26) and, taken at face value, puts one turning point near $0.0003.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-discriminant-decides-the-shape" class="slide level2 center">
+<h2>The discriminant decides the shape</h2>
+
+<img data-src="../r_kuznets_14_discriminant_regimes.png" class="r-stretch quarto-figure-center"><p class="caption">Same significant terms, three shapes — only the discriminant tells them apart.</p><p><span class="takeaway fragment">One number — the sign of <span class="math inline">\(D\)</span> — separates a cubic that bends from one that merely curves.</span></p>
+<aside class="notes">
+<p>Same sign pattern, vary only the squared term: D&lt;0 monotonic, D=0 inflection, D&gt;0 genuine N. In BMA the same trap reads “high PIP ≠ a genuine bend.” See the companion note (Mendez 2026).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="fixed-effects-change-the-story-not-just-the-standard-errors" class="slide level2 center">
+<h2>Fixed effects change the story, not just the standard errors</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">feols</span>(wcv <span class="sc">~</span> lnGDP <span class="sc">+</span> <span class="fu">I</span>(lnGDP<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> trade_gdp <span class="sc">+</span> urbanization <span class="sc">|</span></span>
+<span id="cb1-2"><a href=""></a>            country <span class="sc">+</span> year, <span class="at">data =</span> annual, <span class="at">vcov =</span> <span class="st">"hetero"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li class="fragment">Within-country quadratic, <strong>two-way fixed effects (TWFE)</strong>: <strong>+0.394** / −0.021**</strong> — a clean inverted-U</li>
+<li class="fragment">Cubic term: <strong>insignificant</strong> — <em>no</em> within-country upturn</li>
+</ul>
+<p><span class="takeaway fragment">The upturn was a <em>between</em>-country artefact all along.</span></p>
+<aside class="notes">
+<p>The vertical bar in fixest absorbs the country and year dummies; vcov = “hetero” reproduces the paper’s White standard errors (clustering by country is the modern alternative). Cross-section comparisons mix countries that sit at very different inequality levels for reasons unrelated to income; the panel compares each country with itself. The within-country cubic term is −0.0008 with t = −0.26 — no upturn. The 5-year averages give the same inverted-U, so this is not a business-cycle artefact.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="within-a-country-inequality-peaks-near-18000-and-then-falls" class="slide level2 center">
+<h2>Within a country, inequality peaks near $18,000 and then falls</h2>
+
+<img data-src="../r_kuznets_06_twfe_fit.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">Fitted WCV from the TWFE quadratic, peaking near $18,000.</p><p><span class="takeaway fragment">Past the peak, a country’s regional gaps start to close as it keeps growing.</span></p>
+<aside class="notes">
+<p>The fitted two-way fixed-effects quadratic peaks at ln(GDP) ≈ 9.8, about $18,000 per capita. Read it as the within-country trajectory: below the peak, growth widens regional gaps; above it, growth narrows them. This is the panel counterpart of the cross-section peak at $2,100 — a different question, so a different number.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="semiparametric-no-polynomial-assumed-same-shape" class="slide level2 center">
+<h2>Semiparametric, no polynomial assumed — same shape</h2>
+
+<img data-src="../r_kuznets_08_robinson_partial.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Robinson (1988) partial fit with a 90% band: inverted-U with a high-income upturn.</p><p><span class="takeaway fragment">A curve that was never told to be a cubic traces the same shape.</span></p>
+<aside class="notes">
+<p>Triangulation: a kernel-based estimator that never sees the word “cubic” recovers the same curve, and the 90% band widens where the data are sparse. The linear-part coefficients match the parametric ones, and np::npplreg returns the same point estimates as the hand-built double-residual version. Baltagi–Li (B-spline FE) agrees within countries — inverted-U, no upturn.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="structural-change-tracks-the-curve" class="slide level2 center">
+<h2>Structural change tracks the curve</h2>
+
+<img data-src="../r_kuznets_11_sectoral.png" style="width:68.0%" class="r-stretch quarto-figure-center"><p class="caption">Replace income with the non-agricultural share of output — the inverted-U returns.</p><p><span class="takeaway fragment">Swap income for the non-agricultural share and the same inverted-U appears (+0.0165*** / −0.00014***).</span></p>
+<aside class="notes">
+<p>Kuznets and Williamson argued that the real driver is structural change, with income only a proxy. As an economy industrialises a few regions capture the new activity and gaps widen; as the modern sector spreads, gaps close. Estimand note: this is an association, not identification — the whole study is descriptive, so “mechanism” here means a channel consistent with the data, not an estimated causal effect.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection">Objection.</span> The high-income upturn is a measurement artefact — it shows up with income in levels and disappears in logs — and the data are synthetic anyway.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Agreed on the upturn: we report it as fragile, not as a finding. The inverted-U itself survives logs, levels, fixed effects and both semiparametric estimators.</p>
+<aside class="notes">
+<p>Steelman the critique from §11.4 of the post: the existence of the upturn is partly a measurement choice, which is exactly why Lessmann hedges it and why we hedge it too. It also weakens when the poorest countries are dropped. On the data: the synthetic world is calibrated to the paper’s published estimates, so it demonstrates the estimators — it is not independent evidence for the hypothesis.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="four-estimators-agree-on-the-inverted-u-and-disagree-only-on-the-upturn" class="slide level2 center">
+<h2>Four estimators agree on the inverted-U — and disagree only on the upturn</h2>
+<ul>
+<li class="fragment"><strong>Inverted-U confirmed</strong> across cross-section OLS, panel TWFE, and two semiparametric estimators</li>
+<li class="fragment"><strong>Turning points</strong> at ~$2,100 and ~$31,000 of GDP per capita</li>
+<li class="fragment"><strong>The upturn is between-country, not within-country</strong> — fixed effects reveal it</li>
+</ul>
+<p>All of it on <strong>synthetic</strong> data calibrated to Lessmann (2014) — a method demo, not new evidence.</p>
+<p><span class="takeaway fragment">The shape is robust; only the upturn depends on whether you look between or within countries.</span></p>
+<aside class="notes">
+<p>The scorecard. Four estimators, one shape: the inverted-U appears in the cross-section with controls, within countries under two-way fixed effects, and in both semiparametric fits. They part company only on the high-income upturn, which the cross-section shows and the panel does not. Keep the caveat audible: these are engineered numbers that reproduce the paper’s estimates, so the exercise teaches the estimators rather than testing the hypothesis afresh.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-high-income-upturn-is-real-but-fragile" class="slide level2 center">
+<h2>The high-income upturn is real but fragile</h2>
+
+<img data-src="../r_kuznets_12_log_vs_level.png" style="width:85.0%" class="r-stretch quarto-figure-center"><p class="caption">It appears in income levels, vanishes in logs (and within countries).</p><p><span class="takeaway fragment">Report the inverted-U with confidence; report the upturn with a caveat.</span></p>
+<aside class="notes">
+<p>The post’s most important caveat (§11.4): with income in logs there is no high-income upturn; with income in levels a slight upturn reappears. So the existence of the upturn is partly a measurement choice. The robust finding is the inverted-U; the N-shape is real but fragile — which is why Lessmann hedges it and why we should too.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="wide-regional-gaps-are-a-transitional-stage-of-development-not-a-destination" class="slide level2 center">
+<h2>Wide regional gaps are a transitional stage of development — not a destination</h2>
+<p>The high-income upturn lives <strong>between</strong> countries, not <strong>within</strong> them.</p>
+<p>Full tutorial, code, data and web app: <strong>carlos-mendez.org/tutorials/r_kuznets</strong></p>
+<aside class="notes">
+<p>Reference: Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? Journal of Development Economics 106, 35–51. Synthetic data; pedagogical replication. The policy reading: gaps tend to widen during take-off and narrow as economies mature, but the transition can take decades, and the sectoral result points to the lever — human capital and connectivity in lagging regions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

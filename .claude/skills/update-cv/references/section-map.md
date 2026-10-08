@@ -5,9 +5,9 @@ This skill **only** ever inserts into the three below. Everything else is off-li
 
 | # | Website source | CV `\section{…}` | What feeds it |
 |---|---|---|---|
-| 1 | `content/publication/*/index.md` | `Publications and Research` (subsections) | new publications, routed by `publication_types` |
-| 2 | `content/event/*/index.md` | `Recent Presentations` | new talks newer than the latest already listed |
-| 3 | `content/projects/*/index.md` | `Software, Databases, and Web Applications` | flagged candidates only (fuzzy mapping) |
+| 1 | `content/articles/*/index.md` | `Publications and Research` (subsections) | new publications, routed by `publication_types` |
+| 2 | `content/presentations/*/index.md` | `Recent Presentations` | new talks newer than the latest already listed |
+| 3 | `content/{software,data,webapps}/*/index.md` | `Software, Databases, and Web Applications` | flagged candidates only (fuzzy mapping) |
 
 **Hand-maintained — NEVER touch:** `Academic Positions`, `Education`, `Research and Teaching Fields`,
 `Teaching Experience`, `Other Experience`, `Awards`, `Research Grants`, `Professional Activities`.
@@ -64,7 +64,7 @@ Recent Presentations, and that aren't already listed. Never re-add historical ta
 
 ## 3. Projects → `Software, Databases, and Web Applications`
 
-This mapping is **fuzzy** — many `content/projects/` items are teaching resources, not software. Do
+This mapping is **fuzzy** — items in `content/software/`, `content/data/` and `content/webapps/` map to different CV subsections. Do
 **not** auto-insert. Instead list each unmatched project as a **candidate** in the SCOPE block with
 its `title` + primary `links[].url`, and let the user pick which (if any) to add and to which
 subsection (`Software` / `Databases` / `Web Applications`), using the `\cvitem{<year>}{<desc>. \url{<url>}}`

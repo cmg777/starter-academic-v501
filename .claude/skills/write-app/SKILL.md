@@ -26,7 +26,7 @@ reading the post, the skill uses `AskUserQuestion` to confirm:
 Only after explicit user confirmation does the skill write any file.
 
 The deliverable is the same shape as
-[`content/post/r_double_lasso/web_app/`](../../content/post/r_double_lasso/web_app/) —
+[`content/tutorials/r_double_lasso/web_app/`](../../content/tutorials/r_double_lasso/web_app/) —
 the first post to ship an interactive companion, which serves as the
 reference implementation and the canonical test case for this skill.
 
@@ -85,18 +85,18 @@ Every successful run produces:
 
 | Path | Purpose |
 |---|---|
-| `content/post/<slug>/web_app/index.html` | 4-tab single-page app shell |
-| `content/post/<slug>/web_app/styles.css` | Dark-theme styling (verbatim template) |
-| `content/post/<slug>/web_app/dgp.js` | Seeded RNG + Box–Muller + standardise (verbatim template) |
-| `content/post/<slug>/web_app/lasso.js` | Coordinate-descent LASSO + CV + rlasso + Cholesky OLS (verbatim template) |
-| `content/post/<slug>/web_app/charts.js` | D3 chart-builder library, extended with widget-specific functions |
-| `content/post/<slug>/web_app/app.js` | Tab routing + slider glue (assembled from `app.js.tmpl` + widget fragments) |
-| `content/post/<slug>/web_app/data/results.json` | Post's actual numbers, parsed from results CSVs (empty stub if Pattern B/C) |
+| `content/tutorials/<slug>/web_app/index.html` | 4-tab single-page app shell |
+| `content/tutorials/<slug>/web_app/styles.css` | Dark-theme styling (verbatim template) |
+| `content/tutorials/<slug>/web_app/dgp.js` | Seeded RNG + Box–Muller + standardise (verbatim template) |
+| `content/tutorials/<slug>/web_app/lasso.js` | Coordinate-descent LASSO + CV + rlasso + Cholesky OLS (verbatim template) |
+| `content/tutorials/<slug>/web_app/charts.js` | D3 chart-builder library, extended with widget-specific functions |
+| `content/tutorials/<slug>/web_app/app.js` | Tab routing + slider glue (assembled from `app.js.tmpl` + widget fragments) |
+| `content/tutorials/<slug>/web_app/data/results.json` | Post's actual numbers, parsed from results CSVs (empty stub if Pattern B/C) |
 
 Plus the `index.md` update injecting the `Web app` YAML link, unless
 `--no-link` is given.
 
-The app is reachable at `/post/<slug>/web_app/index.html` once Hugo
+The app is reachable at `/tutorials/<slug>/web_app/index.html` once Hugo
 builds.
 
 ---
@@ -135,18 +135,18 @@ Reject any other argument or flag with a clear error.
 
 ### 1.2 Locate the post
 
-The post directory is `content/post/<slug>/`. Hard-fail if it doesn't
+The post directory is `content/tutorials/<slug>/`. Hard-fail if it doesn't
 exist with a clear message suggesting `/project:write-post` first.
 
 ### 1.3 Detect existing app
 
-If `content/post/<slug>/web_app/` already exists, ask the user whether
+If `content/tutorials/<slug>/web_app/` already exists, ask the user whether
 to (a) overwrite (default), (b) cancel, or (c) generate into a
 suffixed folder like `web_app_v2/`. Do not silently clobber.
 
 ### 1.4 Read the post
 
-Read `content/post/<slug>/index.md` in full. Extract:
+Read `content/tutorials/<slug>/index.md` in full. Extract:
 
 - **Title** (from front matter `title:`).
 - **Language**: inferred from front-matter `categories:` plus presence
@@ -306,8 +306,8 @@ Wait for explicit `y`. On change requests, revise and re-print.
 ### 3.1 Create folders
 
 ```
-content/post/<slug>/web_app/
-content/post/<slug>/web_app/data/
+content/tutorials/<slug>/web_app/
+content/tutorials/<slug>/web_app/data/
 ```
 
 ### 3.2 Copy verbatim templates
@@ -398,19 +398,19 @@ Run the checklist in
 Start a Hugo dev server on a free port (≥ 1316; check before binding).
 Hit each app resource and assert HTTP 200:
 
-- `/post/<slug>/web_app/`
-- `/post/<slug>/web_app/styles.css`
-- `/post/<slug>/web_app/dgp.js`
-- `/post/<slug>/web_app/lasso.js`
-- `/post/<slug>/web_app/charts.js`
-- `/post/<slug>/web_app/app.js`
-- `/post/<slug>/web_app/data/results.json`
+- `/tutorials/<slug>/web_app/`
+- `/tutorials/<slug>/web_app/styles.css`
+- `/tutorials/<slug>/web_app/dgp.js`
+- `/tutorials/<slug>/web_app/lasso.js`
+- `/tutorials/<slug>/web_app/charts.js`
+- `/tutorials/<slug>/web_app/app.js`
+- `/tutorials/<slug>/web_app/data/results.json`
 
 ### 4.2 YAML link check
 
-Unless `--no-link`. Hit `/post/<slug>/` and confirm the rendered HTML
+Unless `--no-link`. Hit `/tutorials/<slug>/` and confirm the rendered HTML
 contains an `<a>` whose `href` is exactly
-`/post/<slug>/web_app/index.html` (catches the trailing-slash bug).
+`/tutorials/<slug>/web_app/index.html` (catches the trailing-slash bug).
 
 ### 4.3 JS smoke test
 
@@ -440,10 +440,10 @@ Print a structured `[✓]/[✗]/[~]` block:
 ```
 VERIFICATION REPORT
 ===================
-[✓] web_app/ created at content/post/<slug>/web_app/
+[✓] web_app/ created at content/tutorials/<slug>/web_app/
 [✓] 7 files written (index.html, styles.css, dgp.js, lasso.js, charts.js, app.js, data/results.json)
 [✓] All assets return HTTP 200 from Hugo dev server
-[✓] index.md "Web app" link points to /post/<slug>/web_app/index.html
+[✓] index.md "Web app" link points to /tutorials/<slug>/web_app/index.html
 [✓] JS smoke test: 5/5 assertions passed
 [~] Stub widget(s) used: <list> — placeholder rendered, see catalog for implementation status
 ```
@@ -455,13 +455,13 @@ NEXT STEPS (copy + paste)
 =========================
 1. Preview locally:
    "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender
-   open http://localhost:1313/post/<slug>/web_app/
+   open http://localhost:1313/tutorials/<slug>/web_app/
 
 2. Review the post against the app:
    /project:review-post <slug>
 
 3. Commit + push:
-   git add content/post/<slug>/web_app/ content/post/<slug>/index.md
+   git add content/tutorials/<slug>/web_app/ content/tutorials/<slug>/index.md
    git commit -m "<slug>: add interactive web app for the post
 
    Co-Authored-By: Claude Code <noreply@anthropic.com>"
@@ -519,7 +519,7 @@ The 3 posts used to validate the skill: see
 Run after editing this `SKILL.md` to confirm the contract still works.
 
 1. **Reproduce `r_double_lasso`.** Move existing
-   `content/post/r_double_lasso/web_app/` aside to `web_app.bak/`.
+   `content/tutorials/r_double_lasso/web_app/` aside to `web_app.bak/`.
    Invoke `/project:write-app r_double_lasso`. Walk through the
    interview answering as Carlos did in the original session.
    Expect: templates byte-identical for `styles.css / dgp.js / lasso.js`;
@@ -555,9 +555,9 @@ Run after editing this `SKILL.md` to confirm the contract still works.
    overwriting. On `y`, produce identical output (deterministic
    templates).
 
-7. **Hugo URL quirk.** After Phase 3.7, fetch `/post/<slug>/` from
+7. **Hugo URL quirk.** After Phase 3.7, fetch `/tutorials/<slug>/` from
    the Hugo dev server. The rendered HTML must contain
-   `href="/post/<slug>/web_app/index.html"` exactly — never
+   `href="/tutorials/<slug>/web_app/index.html"` exactly — never
    `/web_app/` and never a 404 link.
 
 8. **JS smoke-test failure surfaces correctly.** Manually corrupt

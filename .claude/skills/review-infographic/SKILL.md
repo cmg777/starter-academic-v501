@@ -39,7 +39,7 @@ inline review report with a verdict.
 ```
 /project:review-infographic python_doubleml
 /project:review-infographic python_dowhy
-/project:review-infographic content/post/python_partial_identification/
+/project:review-infographic content/tutorials/python_partial_identification/
 ```
 
 ---
@@ -47,8 +47,8 @@ inline review report with a verdict.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_doubleml`), resolve to `content/post/<slug>/`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_doubleml`), resolve to `content/tutorials/<slug>/`.
 
 2. **Verify infographic_instructions.md exists.** Check for
    `infographic_instructions.md` in the resolved directory. If it does not
@@ -73,7 +73,7 @@ inline review report with a verdict.
 Present a brief confirmation to the user:
 
 1. **Files identified:** "Found `infographic_instructions.md` and `index.md`
-   at `content/post/<slug>/`."
+   at `content/tutorials/<slug>/`."
 
 2. **Scope:** "Running full review of infographic instructions against source
    post across all 8 dimensions: accuracy, completeness, prompt leanness,

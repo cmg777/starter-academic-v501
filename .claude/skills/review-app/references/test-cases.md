@@ -3,7 +3,7 @@
 Six tests cover the skill's input space and its failure modes.
 Re-run whenever `SKILL.md` or any reference file changes.
 
-The reference app is `content/post/r_double_lasso/web_app/`, which
+The reference app is `content/tutorials/r_double_lasso/web_app/`, which
 was the validation target for `write-app`. Sabotage tests modify a
 single file at a time and revert before the next test.
 
@@ -23,7 +23,7 @@ single file at a time and revert before the next test.
 - Every dimension ≥ 8.
 - Smoke test: 7/7 assertions pass.
 - Playwright pass: 4 tabs cycle; no console errors; mobile passes.
-- `content/post/r_double_lasso/web_app/REVIEW.md` written with full
+- `content/tutorials/r_double_lasso/web_app/REVIEW.md` written with full
   template populated.
 - No screenshots committed (cleanup deletes them on ACCEPT).
 - Stdout summary names: ACCEPT verdict, zero HIGH issues.
@@ -34,7 +34,7 @@ single file at a time and revert before the next test.
 
 **Setup:**
 ```bash
-mv content/post/r_double_lasso/web_app/dgp.js /tmp/dgp.js.bak
+mv content/tutorials/r_double_lasso/web_app/dgp.js /tmp/dgp.js.bak
 ```
 
 **Invocation:** `/project:review-app r_double_lasso`
@@ -48,15 +48,15 @@ mv content/post/r_double_lasso/web_app/dgp.js /tmp/dgp.js.bak
 
 **Cleanup:**
 ```bash
-mv /tmp/dgp.js.bak content/post/r_double_lasso/web_app/dgp.js
-git checkout content/post/r_double_lasso/web_app/REVIEW.md
+mv /tmp/dgp.js.bak content/tutorials/r_double_lasso/web_app/dgp.js
+git checkout content/tutorials/r_double_lasso/web_app/REVIEW.md
 ```
 
 ---
 
 ## Test 3 — Sabotage: trailing-slash YAML link
 
-**Setup:** edit `content/post/r_double_lasso/index.md`'s YAML link
+**Setup:** edit `content/tutorials/r_double_lasso/index.md`'s YAML link
 from `url: web_app/index.html` to `url: web_app/`.
 
 **Invocation:** `/project:review-app r_double_lasso focus: hugo`
@@ -68,13 +68,13 @@ from `url: web_app/index.html` to `url: web_app/`.
 - Fix suggestion cites the catalogued entry "Hugo trailing-slash URL
   rewrite" from `write-app/references/render-and-fix.md`.
 
-**Cleanup:** `git checkout content/post/r_double_lasso/index.md`
+**Cleanup:** `git checkout content/tutorials/r_double_lasso/index.md`
 
 ---
 
 ## Test 4 — Sabotage: remove all aria-labels from sliders
 
-**Setup:** `sed -i '' 's/aria-label="[^"]*"//g' content/post/r_double_lasso/web_app/index.html`
+**Setup:** `sed -i '' 's/aria-label="[^"]*"//g' content/tutorials/r_double_lasso/web_app/index.html`
 
 **Invocation:** `/project:review-app r_double_lasso focus: accessibility`
 
@@ -84,7 +84,7 @@ from `url: web_app/index.html` to `url: web_app/`.
   REVISION** if only one.
 - Issues table lists each affected slider by `id`.
 
-**Cleanup:** `git checkout content/post/r_double_lasso/web_app/index.html`
+**Cleanup:** `git checkout content/tutorials/r_double_lasso/web_app/index.html`
 
 ---
 
@@ -103,7 +103,7 @@ from `url: web_app/index.html` to `url: web_app/`.
 - Report's "Pedagogical alignment" section shows the takeaway list,
   the extracted app messaging (Lorem Ipsum), and explicit 0/3.
 
-**Cleanup:** `git checkout content/post/r_double_lasso/web_app/index.html`
+**Cleanup:** `git checkout content/tutorials/r_double_lasso/web_app/index.html`
 
 ---
 
@@ -172,7 +172,7 @@ npx playwright uninstall chromium
 
 **Expected:**
 - Skill exits Phase 0 with clear message: "No web_app/ folder found
-  at content/post/r_did/web_app/. Run `/project:write-app r_did`
+  at content/tutorials/r_did/web_app/. Run `/project:write-app r_did`
   first."
 - No REVIEW.md written.
 - Exit code non-zero.

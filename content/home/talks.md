@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="event" count="3" browse_url="/event/" browse_label="Browse all presentations" >}}
+{{< showcase type="event" count="3" browse_url="/presentations/" browse_label="Browse all presentations" >}}

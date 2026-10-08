@@ -10,13 +10,13 @@ user-invocable: true
 
 Act as an **expert UX-meets-data-science reviewer** auditing a generated
 interactive web app on this site. The app being audited lives at
-`content/post/<slug>/web_app/` and was produced by
+`content/tutorials/<slug>/web_app/` and was produced by
 [`/project:write-app`](../write-app/SKILL.md). This skill checks that
 the app is functioning correctly, complete, pedagogical, and easy to
 work with — across 10 non-overlapping dimensions.
 
 The review is **read-only**. It produces a scored report at
-`content/post/<slug>/web_app/REVIEW.md` (plus a stdout summary) without
+`content/tutorials/<slug>/web_app/REVIEW.md` (plus a stdout summary) without
 modifying the app, the post, or any other site file.
 
 The skill is the sibling of `review-post`, `review-script`,
@@ -131,7 +131,7 @@ Each dimension scored 1–10 per
 Extract from `$ARGUMENTS`:
 
 - **Slug** — first positional token. Mandatory. Accept either a slug
-  (`r_double_lasso`) or a full path (`content/post/r_double_lasso/`).
+  (`r_double_lasso`) or a full path (`content/tutorials/r_double_lasso/`).
 - **`focus:`** — comma- or `and`-separated keywords from the focus
   table above. Apply
   [`references/focus-modes.md`](references/focus-modes.md) to resolve
@@ -140,8 +140,8 @@ Extract from `$ARGUMENTS`:
 
 ### 0.2 Verify inputs
 
-- `content/post/<slug>/index.md` must exist.
-- `content/post/<slug>/web_app/` must exist.
+- `content/tutorials/<slug>/index.md` must exist.
+- `content/tutorials/<slug>/web_app/` must exist.
 - The 7 expected app files are present (`index.html`, `styles.css`,
   `dgp.js`, `lasso.js`, `charts.js`, `app.js`,
   `data/results.json`).
@@ -192,11 +192,11 @@ Print and proceed:
 SCOPE
 =====
 Post slug:          <slug>
-Web app folder:     content/post/<slug>/web_app/
+Web app folder:     content/tutorials/<slug>/web_app/
 Dimensions to run:  <list — all 10 or focus subset>
 Browser pass:       enabled | SKIPPED (--no-browser)
 Tooling:            node <v>, playwright <v|missing|installing>
-Report path:        content/post/<slug>/web_app/REVIEW.md
+Report path:        content/tutorials/<slug>/web_app/REVIEW.md
 
 Proceeding with audit (read-only)…
 ```
@@ -211,7 +211,7 @@ Read everything once into in-memory state:
 
 ### 1.1 Post artefacts
 
-- `content/post/<slug>/index.md` — extract title, language, tags,
+- `content/tutorials/<slug>/index.md` — extract title, language, tags,
   learning objectives (bulleted block under "Learning objectives"),
   conclusion / takeaways (final § with that heading), spoiler-figure
   caption (first `!\[...\](...)` after §1).
@@ -267,7 +267,7 @@ Skip only if Node is missing (logged as a Dim-3 HIGH issue).
 Run:
 
 ```bash
-BASE=content/post/<slug>/web_app node \
+BASE=content/tutorials/<slug>/web_app node \
   .claude/skills/write-app/references/templates/smoke-test.js
 ```
 
@@ -288,13 +288,13 @@ Start the local Hugo binary on the first free port ≥ 1316:
 
 Wait ~3 s for startup, then assert HTTP 200 for:
 
-- `/post/<slug>/web_app/`
-- `/post/<slug>/web_app/{styles.css,dgp.js,lasso.js,charts.js,app.js}`
-- `/post/<slug>/web_app/data/results.json`
-- `/post/<slug>/` (the post itself still renders)
+- `/tutorials/<slug>/web_app/`
+- `/tutorials/<slug>/web_app/{styles.css,dgp.js,lasso.js,charts.js,app.js}`
+- `/tutorials/<slug>/web_app/data/results.json`
+- `/tutorials/<slug>/` (the post itself still renders)
 
-Then fetch `/post/<slug>/` and scrape for the `Web app` `<a>` tag.
-Confirm its `href` is exactly `/post/<slug>/web_app/index.html` (no
+Then fetch `/tutorials/<slug>/` and scrape for the `Web app` `<a>` tag.
+Confirm its `href` is exactly `/tutorials/<slug>/web_app/index.html` (no
 trailing-slash bug). Failures populate Dim-8.
 
 ### 4.2 Playwright
@@ -303,7 +303,7 @@ Skip if `--no-browser`. Otherwise run the script in
 [`references/headless-browser.md`](references/headless-browser.md):
 
 - Launch headless Chromium with desktop viewport (1280×800).
-- Visit `http://localhost:<port>/post/<slug>/web_app/`.
+- Visit `http://localhost:<port>/tutorials/<slug>/web_app/`.
 - For each tab button (expect 4): click, wait for `.tab-pane.active`,
   capture console errors during the interaction. Move one
   `<input type="range">` per tab if any exist; confirm no uncaught
@@ -317,7 +317,7 @@ Cleanup:
 - Kill the Hugo process.
 - Delete temp screenshots UNLESS a HIGH-severity visual or mobile
   issue was detected, in which case copy the relevant screenshots to
-  `content/post/<slug>/web_app/REVIEW_<tabid>.png` and reference them
+  `content/tutorials/<slug>/web_app/REVIEW_<tabid>.png` and reference them
   from the report.
 
 Console errors populate Dim-3. Visual layout issues populate Dim-9.
@@ -345,7 +345,7 @@ in:
   was detected).
 - "How to re-review" snippet.
 
-Write to `content/post/<slug>/web_app/REVIEW.md`. This is the only
+Write to `content/tutorials/<slug>/web_app/REVIEW.md`. This is the only
 file the skill writes (besides the optional screenshots).
 
 ### 5.2 Print summary + follow-ups
@@ -357,12 +357,12 @@ Slug:               <slug>
 Verdict:            <ACCEPT | MINOR REVISION | MAJOR REVISION>
 Total issues:       <H> HIGH, <M> MED, <L> LOW
 Dimension scores:   1:10  2:9  3:10  4:10  5:8  6:10  7:9  8:10  9:9  10:8
-Report written to:  content/post/<slug>/web_app/REVIEW.md
+Report written to:  content/tutorials/<slug>/web_app/REVIEW.md
 
 NEXT STEPS (copy + paste)
 =========================
 1. View the report:
-   open content/post/<slug>/web_app/REVIEW.md
+   open content/tutorials/<slug>/web_app/REVIEW.md
 
 2. Re-review after fixes:
    /project:review-app <slug>
@@ -433,7 +433,7 @@ Re-run these whenever this SKILL.md or any reference file changes.
 1. **Reference app — no changes.** Run
    `/project:review-app r_double_lasso`. Expect verdict **ACCEPT**;
    every dimension ≥ 8; no HIGH issues;
-   `content/post/r_double_lasso/web_app/REVIEW.md` written.
+   `content/tutorials/r_double_lasso/web_app/REVIEW.md` written.
 
 2. **Sabotage tests** (run each, observe, then revert):
    - Delete `dgp.js` ⇒ Dim 1 ≤ 3; verdict MAJOR REVISION.

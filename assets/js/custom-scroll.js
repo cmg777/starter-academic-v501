@@ -35,7 +35,7 @@
     }
   });
 
-  // --- Fix: Prevent category dropdown from scrolling the page on /post/ ---
+  // --- Fix: Prevent category dropdown from scrolling the page on /tutorials/ ---
   // Wowchemy's .pub-filters change handler sets window.location.hash,
   // which triggers the hashchange listener and scrolls the page.
   // Override: use replaceState instead to avoid the scroll.

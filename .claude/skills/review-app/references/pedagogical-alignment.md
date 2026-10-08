@@ -9,7 +9,7 @@ post↔app cross-read.
 
 ## Inputs
 
-### From `content/post/<slug>/index.md`
+### From `content/tutorials/<slug>/index.md`
 
 Extract three text sources:
 
@@ -30,7 +30,7 @@ under Dim 7 ("post lacks an explicit learning-objectives or
 conclusion section — alignment audit used the opening paragraph as a
 proxy").
 
-### From `content/post/<slug>/web_app/index.html`
+### From `content/tutorials/<slug>/web_app/index.html`
 
 Extract three text sources:
 

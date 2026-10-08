@@ -69,7 +69,7 @@ Currency: `\\$`. AVOID list still applies — do not put `\text{var\_name}`,
 
 ## Copy-paste template (one full concept)
 
-This block is lifted verbatim from `content/post/python_EconML/index.md`
+This block is lifted verbatim from `content/tutorials/python_EconML/index.md`
 which ships on the live site. Use it as the canonical template; replace
 the term, math, definition, example, and analogy text with the post's own
 content. Keep the HTML structure, class names, and blank-line whitespace

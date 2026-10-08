@@ -1,7 +1,7 @@
 // smoke-test.js — verifies a Quarto-rendered reveal.js deck WITHOUT a browser.
 //
 // Usage:
-//   BASE=/abs/path/to/content/post/<slug>/slides node smoke-test.js
+//   BASE=/abs/path/to/content/tutorials/<slug>/slides node smoke-test.js
 //
 // The deck is rendered by `quarto render slides.qmd` to index.html + slides_files/
 // (non-embedded, because the chalkboard plugin requires external assets). This script

@@ -10,7 +10,7 @@ Do NOT save it to a file.
 ```
 # Referee Report: <Post Title>
 
-**Post:** `content/post/<slug>/index.md`
+**Post:** `content/tutorials/<slug>/index.md`
 **Date reviewed:** <current date>
 **Reviewer perspective:** Expert professor of data science and econometrics
 

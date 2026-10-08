@@ -11,7 +11,7 @@
 # Usage:
 #   scripts/i18n-parity.sh                     # human report, both langs
 #   scripts/i18n-parity.sh --lang es           # only Spanish gaps
-#   scripts/i18n-parity.sh --section publication
+#   scripts/i18n-parity.sh --section articles
 #   scripts/i18n-parity.sh --mode full         # full-translation sections only
 #   scripts/i18n-parity.sh --list              # TSV worklist (for backfill)
 #   scripts/i18n-parity.sh --stale             # also flag stale (advisory)
@@ -28,20 +28,34 @@ set -u
 
 # --- section configuration: section|index_file|mode|asset_globs -------------
 # mode is an intrinsic property of the section in this site (full vs stub card).
+# Sections are content FOLDERS: articles/ (Wowchemy type publication),
+# presentations/ (type event), tutorials/ (type post). content/projects/ is
+# retired (only a hidden, never-listed bundle remains) and is not tracked.
 SECTION_CONFIG="
-publication|index.md|full|featured.* cite.bib
-event|index.md|full|featured.*
-projects|index.md|full|featured.*
+articles|index.md|full|featured.* cite.bib
+presentations|index.md|full|featured.*
+books|index.md|full|featured.* cite.bib
+software|index.md|full|featured.*
+data|index.md|full|featured.*
+webapps|index.md|full|featured.*
 authors|_index.md|full|avatar.*
-post|index.md|stub|
+tutorials|index.md|stub|
 slides|index.md|full|
 "
 
 # --- singleton pages (not section/item-dir bundles): relpath|asset_globs -----
 # Pages that are a single file rather than a directory of items (courses landing
-# page, alumni widget page, draft privacy/terms). Each is checked for an es/ja
+# page, alumni widget page, draft privacy/terms, and each section _index.md
+# with its translated filters: dropdown labels). Each is checked for an es/ja
 # counterpart and reported under the pseudo-section "page".
 SINGLETON_CONFIG="
+articles/_index.md|
+presentations/_index.md|
+tutorials/_index.md|
+books/_index.md|
+software/_index.md|
+data/_index.md|
+webapps/_index.md|
 courses/_index.md|featured.*
 alumni/index.md|
 alumni/people.md|
@@ -60,7 +74,7 @@ STRICT_STALE=0
 STRICT_ASSETS=0
 
 usage() {
-  sed -n '3,33p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '3,25p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [ $# -gt 0 ]; do
@@ -183,7 +197,7 @@ for lang in $LANGS; do
     done
 
     if [ "$FORMAT" = "human" ]; then
-      printf '  %-12s %-5s present %3d / %-3d  missing %3d  stale %3d  asset-warn %3d\n' \
+      printf '  %-13s %-5s present %3d / %-3d  missing %3d  stale %3d  asset-warn %3d\n' \
         "$section" "$mode" "$present" "$total" "$missing" "$stale" "$asset_warn"
       if [ "$missing" -gt 0 ]; then
         printf '    MISSING:%s\n' "$missing_list"

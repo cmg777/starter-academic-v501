@@ -32,7 +32,7 @@ interpretation quality. Produces an inline review report with a verdict.
 ```
 /project:review-results-report python_doubleml
 /project:review-results-report python_dowhy
-/project:review-results-report content/post/python_pyfixest/
+/project:review-results-report content/tutorials/python_pyfixest/
 ```
 
 ---
@@ -40,8 +40,8 @@ interpretation quality. Produces an inline review report with a verdict.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_doubleml`), resolve to `content/post/<slug>/`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_doubleml`), resolve to `content/tutorials/<slug>/`.
 
 2. **Verify results_report.md exists.** Check for `results_report.md` in the
    resolved directory. If it does not exist, report the error and stop. Suggest
@@ -82,9 +82,9 @@ interpretation quality. Produces an inline review report with a verdict.
 
 8. **Read the write-results-report exemplars** (in parallel) to calibrate
    your sense of the new quality bar:
-   - `content/post/r_did_ring/results_report.md` (332 lines, the newer
+   - `content/tutorials/r_did_ring/results_report.md` (332 lines, the newer
      exemplar)
-   - `content/post/r_did2/results_report.md` (455 lines, the longer
+   - `content/tutorials/r_did2/results_report.md` (455 lines, the longer
      exemplar)
 
 ---
@@ -94,7 +94,7 @@ interpretation quality. Produces an inline review report with a verdict.
 Present a brief confirmation to the user:
 
 1. **Report identified:** "Found `results_report.md` at
-   `content/post/<slug>/results_report.md`."
+   `content/tutorials/<slug>/results_report.md`."
 
 2. **Script identified:** "Script: `<filename>` (<language>)."
 
@@ -295,7 +295,7 @@ PARTIAL, or FAIL with a one-line justification in the review report.
 ## Step 7 -- Produce and save review report
 
 Deliver the review inline using the format from `references/review-checklist.md`,
-then save it as `content/post/<slug>/results_report_review.md`.
+then save it as `content/tutorials/<slug>/results_report_review.md`.
 
 ### Severity definitions
 
@@ -358,7 +358,7 @@ how many matched, and list any mismatches with the correct values.>
 ### Save the review
 
 After delivering the review inline, save the full review report to
-`content/post/<slug>/results_report_review.md`. This file serves as an
+`content/tutorials/<slug>/results_report_review.md`. This file serves as an
 audit trail and can be referenced when writing the blog post.
 
 ---

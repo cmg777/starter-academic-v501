@@ -81,7 +81,7 @@ plt.rcParams.update({
 4. Use `edgecolors=DARK_NAVY` on scatter points for clean edges against the
    dark background
 
-Reference implementation: `content/post/python_fwl/script.py`
+Reference implementation: `content/tutorials/python_fwl/script.py`
 
 ## R ggplot2 dark theme
 
@@ -124,7 +124,7 @@ theme_site <- function(base_size = 14) {
    secondary, teal for highlights
 4. Use `scale_fill_manual()` / `scale_color_manual()` with named values
 
-Reference implementation: `content/post/r_dynamic_bma2/analysis.R`
+Reference implementation: `content/tutorials/r_dynamic_bma2/analysis.R`
 
 ## Color families for related methods
 

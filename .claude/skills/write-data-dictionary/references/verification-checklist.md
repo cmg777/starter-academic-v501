@@ -64,7 +64,7 @@ button resolving to `/post/<slug>/data/index.html` (and the GitHub data buttons 
 chose to remove them).
 
 ## E. Cleanliness
-`git status` should show only the intended new/changed files under `content/post/<slug>/` (and the
+`git status` should show only the intended new/changed files under `content/tutorials/<slug>/` (and the
 one `index.md` edit); nothing under `content/es` or `content/ja`. Re-running the renderer changes
 `.dta` bytes only via their embedded timestamp — `git restore` that churn before committing if the
 data is unchanged.

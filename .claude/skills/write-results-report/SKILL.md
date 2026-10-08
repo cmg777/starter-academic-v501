@@ -34,9 +34,9 @@ that drive the narrative.
 Before writing a single line, read both reference exemplars end to end. They
 define the bar this skill is meant to clear:
 
-- `content/post/r_did_ring/results_report.md` — 332 lines, 9 key findings,
+- `content/tutorials/r_did_ring/results_report.md` — 332 lines, 9 key findings,
   10 inline-embedded figures, full reproduction audit against Butts (2023)
-- `content/post/r_did2/results_report.md` — 455 lines, 8 key findings,
+- `content/tutorials/r_did2/results_report.md` — 455 lines, 8 key findings,
   8 inline-embedded figures, reproduction audit against Baker et al. (2025)
 
 A pointer summary with section-line ranges lives at
@@ -51,7 +51,7 @@ Step 3 if you are uncertain about depth or shape.
 /project:write-results-report python_doubleml
 /project:write-results-report python_dowhy
 /project:write-results-report r_did_ring
-/project:write-results-report content/post/python_esda2/
+/project:write-results-report content/tutorials/python_esda2/
 ```
 
 ---
@@ -60,16 +60,16 @@ Step 3 if you are uncertain about depth or shape.
 
 | Output | Path | Description |
 |--------|------|-------------|
-| Results report | `content/post/<slug>/results_report.md` | Structured report with raw output + inline tables + interpretations |
-| Execution log | `content/post/<slug>/execution_log.txt` | Full console output from the script run |
+| Results report | `content/tutorials/<slug>/results_report.md` | Structured report with raw output + inline tables + interpretations |
+| Execution log | `content/tutorials/<slug>/execution_log.txt` | Full console output from the script run |
 
 ---
 
 ## Step 0 — Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_doubleml`), resolve to `content/post/<slug>/`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_doubleml`), resolve to `content/tutorials/<slug>/`.
 
 2. **Verify the script exists.** Look for the analysis script in the resolved
    directory:
@@ -96,9 +96,9 @@ Step 3 if you are uncertain about depth or shape.
 
 7. **Read the two reference exemplars** (in parallel) so you internalize the
    target shape, depth, and rhythm before writing:
-   - `content/post/r_did_ring/results_report.md` (newer; recommended as
+   - `content/tutorials/r_did_ring/results_report.md` (newer; recommended as
      primary reference)
-   - `content/post/r_did2/results_report.md` (longer; richer audit appendix)
+   - `content/tutorials/r_did2/results_report.md` (longer; richer audit appendix)
 
 8. **Read the skill reference files** (in parallel):
    - `references/report-structure.md` — template and section guidelines for
@@ -120,7 +120,7 @@ asking. The user already approved the scope upstream.
 confirmation block before executing:
 
 1. **Script identified:** "I found `script.py` (Python) at
-   `content/post/<slug>/script.py`."
+   `content/tutorials/<slug>/script.py`."
 2. **Language detected:** "Language: Python / Stata / R."
 3. **Script summary:** "The script loads [DATASET], applies [METHOD(S)],
    and generates [N] figures + [M] CSVs."
@@ -150,13 +150,13 @@ Run the script fresh from the post directory. Capture all output.
 ### Python
 
 ```bash
-cd content/post/<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
+cd content/tutorials/<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
 ```
 
 ### Stata
 
 ```bash
-cd content/post/<slug>/ && stata -b do analysis.do
+cd content/tutorials/<slug>/ && stata -b do analysis.do
 ```
 
 The do-file writes its own `analysis.log`. Copy or rename it:
@@ -168,7 +168,7 @@ cp analysis.log execution_log.txt
 ### R
 
 ```bash
-cd content/post/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
+cd content/tutorials/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
 ```
 
 ### Handle execution errors
@@ -212,7 +212,7 @@ Read the full execution log. Identify and extract:
 ### 2b. List all PNG files
 
 ```bash
-ls -la content/post/<slug>/*.png
+ls -la content/tutorials/<slug>/*.png
 ```
 
 Record each PNG with:
@@ -227,7 +227,7 @@ The console log rounds; the CSVs do not. **Open every `table_*.csv` and
 report when you need to source a numeric claim.
 
 ```bash
-ls -la content/post/<slug>/*.csv
+ls -la content/tutorials/<slug>/*.csv
 ```
 
 For each small CSV (< ~50 rows, < ~10 KB), read the full contents into
@@ -265,7 +265,7 @@ If a PDF is the only source available, delegate the extraction to an
 ## Step 3 — Write results_report.md
 
 Follow the template in `references/report-structure.md` exactly. Write the
-report to `content/post/<slug>/results_report.md`.
+report to `content/tutorials/<slug>/results_report.md`.
 
 The four patterns from Step 0 are mandatory in every report:
 
@@ -475,8 +475,8 @@ Report the verification results to the user:
 
 ```
 Results report complete.
-- Saved: content/post/<slug>/results_report.md (N lines)
-- Execution log: content/post/<slug>/execution_log.txt (N lines)
+- Saved: content/tutorials/<slug>/results_report.md (N lines)
+- Execution log: content/tutorials/<slug>/execution_log.txt (N lines)
 - Figures: N inline embeds + N inventory rows (must match)
 - Key findings: N (minimum 8)
 - Interpretation paragraphs: N (minimum 10)
@@ -505,8 +505,8 @@ The two reports that define the quality bar for this skill:
 
 | Exemplar | Lines | Strengths |
 |---|---:|---|
-| `content/post/r_did_ring/results_report.md` | 332 | Three-layer headline; 9 Key Findings; 10 inline-embedded figures; Butts (2023) audit with line citations |
-| `content/post/r_did2/results_report.md` | 455 | Reproduces a flagship sign-reversal numerically to 3 decimals; 8 Key Findings; rich audit against Baker et al. (2025) |
+| `content/tutorials/r_did_ring/results_report.md` | 332 | Three-layer headline; 9 Key Findings; 10 inline-embedded figures; Butts (2023) audit with line citations |
+| `content/tutorials/r_did2/results_report.md` | 455 | Reproduces a flagship sign-reversal numerically to 3 decimals; 8 Key Findings; rich audit against Baker et al. (2025) |
 
 See `references/exemplars.md` for section-by-section line ranges and
 explicit "what to imitate" callouts.

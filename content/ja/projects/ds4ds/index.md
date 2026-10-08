@@ -1,4 +1,9 @@
 ---
+# Hidden: kept for reference, not rendered or listed (2026-10-08 nav restructure).
+_build:
+  render: never
+  list: never
+  publishResources: false
 date: "2025-04-08T00:00:00Z"
 external_link: ""
 image:

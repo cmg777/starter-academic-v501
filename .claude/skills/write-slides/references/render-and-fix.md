@@ -134,8 +134,8 @@ deliberately does **not** ignore `slides_files/`.
 
 **Fix.** Commit the **whole** `slides/` dir — `slides.qmd` + `site-brand.scss` +
 `title-slide.html` (source) **and** `index.html` + `slides_files/` (the served deck, ~8 MB):
-`git add content/post/<slug>/slides/`. Only Quarto's local cache is ignored
-(`content/post/*/slides/.quarto/`). Never add a `.gitignore` rule that catches `slides_files/`.
+`git add content/tutorials/<slug>/slides/`. Only Quarto's local cache is ignored
+(`content/tutorials/*/slides/.quarto/`). Never add a `.gitignore` rule that catches `slides_files/`.
 
 ---
 

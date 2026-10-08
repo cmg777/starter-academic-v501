@@ -39,7 +39,7 @@ stripping the backslash. This breaks LaTeX commands that use punctuation.
 
 The patterns below render correctly on local Hugo 0.84.2 but break on the
 deployed Netlify site (Hugo 0.89.4 + MathJax v3). Fixes verified empirically
-on `content/post/python_EconML/index.md`. Flag every occurrence in a post
+on `content/tutorials/python_EconML/index.md`. Flag every occurrence in a post
 under review as **HIGH severity**.
 
 | Avoid | Why it breaks | Use instead |

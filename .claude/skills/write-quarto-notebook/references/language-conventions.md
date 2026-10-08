@@ -55,9 +55,9 @@ truly archived versions may require manual intervention.
 
 ## R
 
-**Output path:** `content/post/<slug>/tutorial.qmd` (next to `index.md`).
-**Precedent:** `content/post/r_demeaning_twfe/tutorial.qmd`,
-`content/post/r_dynamic_bma/tutorial.qmd`.
+**Output path:** `content/tutorials/<slug>/tutorial.qmd` (next to `index.md`).
+**Precedent:** `content/tutorials/r_demeaning_twfe/tutorial.qmd`,
+`content/tutorials/r_dynamic_bma/tutorial.qmd`.
 
 ### Front matter
 
@@ -168,9 +168,9 @@ Notes:
 
 ## Python
 
-**Output path:** `content/post/<slug>/references/tutorial.qmd` (in
+**Output path:** `content/tutorials/<slug>/references/tutorial.qmd` (in
 `references/` subfolder, as per existing precedent).
-**Precedent:** `content/post/python_EconML/references/tutorial-econml-resource-curse.qmd`.
+**Precedent:** `content/tutorials/python_EconML/references/tutorial-econml-resource-curse.qmd`.
 
 ### Front matter
 
@@ -278,8 +278,8 @@ plt.show()
 
 ## Stata
 
-**Output path:** `content/post/<slug>/references/tutorial.qmd`.
-**Precedent:** `content/post/stata_cate2/references/tutorial-cate-resource-curse.qmd`.
+**Output path:** `content/tutorials/<slug>/references/tutorial.qmd`.
+**Precedent:** `content/tutorials/stata_cate2/references/tutorial-cate-resource-curse.qmd`.
 
 ### Front matter
 
@@ -319,7 +319,7 @@ execute:
 
 clear all
 set seed 42
-use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/<dataset>.dta"
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/<dataset>.dta"
 describe
 ```
 ````

@@ -46,7 +46,7 @@ matplotlib plots, and are referenced in the CSS styling below.
 
 For posts that use dark-background figures (e.g., to match the site's dark
 navbar/footer), use this extended palette for figure backgrounds, grid lines,
-and text. Reference post: `content/post/python_fwl/script.py`.
+and text. Reference post: `content/tutorials/python_fwl/script.py`.
 
 | Name | Hex | Use in plots |
 |------|-----|-------------|
@@ -61,19 +61,19 @@ and text. Reference post: `content/post/python_fwl/script.py`.
 
 | Output | Path |
 |--------|------|
-| Blog post | `content/post/python_<topic-slug>/index.md` |
-| Python script (optional) | `content/post/python_<topic-slug>/script.py` |
-| Jupyter notebook (optional) | `content/post/python_<topic-slug>/notebook.ipynb` |
-| Figures (>= 3) | `content/post/python_<topic-slug>/<slug>_*.png` |
+| Blog post | `content/tutorials/python_<topic-slug>/index.md` |
+| Python script (optional) | `content/tutorials/python_<topic-slug>/script.py` |
+| Jupyter notebook (optional) | `content/tutorials/python_<topic-slug>/notebook.ipynb` |
+| Figures (>= 3) | `content/tutorials/python_<topic-slug>/<slug>_*.png` |
 
 ### Stata posts
 
 | Output | Path |
 |--------|------|
-| Blog post | `content/post/stata_<topic-slug>/index.md` |
-| Stata do-file | `content/post/stata_<topic-slug>/analysis.do` |
-| Stata log | `content/post/stata_<topic-slug>/analysis.log` |
-| Figures | `content/post/stata_<topic-slug>/stata_<slug>_*.png` |
+| Blog post | `content/tutorials/stata_<topic-slug>/index.md` |
+| Stata do-file | `content/tutorials/stata_<topic-slug>/analysis.do` |
+| Stata log | `content/tutorials/stata_<topic-slug>/analysis.log` |
+| Figures | `content/tutorials/stata_<topic-slug>/stata_<slug>_*.png` |
 
 Stata-specific conventions:
 - Code blocks use ` ```stata ` (not ` ```python `)
@@ -101,8 +101,8 @@ Stata-specific conventions:
    - Python: note `pip install` commands in the setup code block
    - Stata: note `ssc install` / `net install` commands with `capture` prefix
 6. **Read reference post** -- read an existing post in the same language to confirm current conventions:
-   - Python: `content/post/python_ml_random_forest/index.md`
-   - Stata: `content/post/stata_rct/index.md`
+   - Python: `content/tutorials/python_ml_random_forest/index.md`
+   - Stata: `content/tutorials/stata_rct/index.md`
 
 ### Handling PDF reference materials
 
@@ -187,7 +187,7 @@ single formatted block:
 
 **Plan archival:** When a plan is created and approved (e.g., via plan mode),
 save the approved plan as `plan.md` in the post directory
-(e.g., `content/post/python_<topic-slug>/plan.md`). This documents the
+(e.g., `content/tutorials/python_<topic-slug>/plan.md`). This documents the
 design decisions and outline that guided the post's creation. The plan file
 is not referenced in the post itself --- it serves as internal documentation
 for future reference and revisions.
@@ -196,7 +196,7 @@ for future reference and revisions.
 
 ## Step 1: Create the post
 
-Create `content/post/<lang>_<topic-slug>/index.md` with YAML front matter.
+Create `content/tutorials/<lang>_<topic-slug>/index.md` with YAML front matter.
 The folder prefix matches the language: `python_`, `stata_`, or `r_`.
 
 ### Python front matter
@@ -684,14 +684,14 @@ comments. Key conventions:
   ```
 - Check the log for errors (`grep "^r(" analysis.log`)
 - Save the log in the post directory and link it in the front matter
-- Reference post: `content/post/stata_rct/analysis.do`
+- Reference post: `content/tutorials/stata_rct/analysis.do`
 
 ---
 
 ## Step 5: Verify
 
 1. **Check deliverables:**
-   - `content/post/<lang>_<slug>/index.md` with complete front matter
+   - `content/tutorials/<lang>_<slug>/index.md` with complete front matter
    - `toc: true` in front matter
    - `image.placement: 3` in front matter
    - At least 3 figure references
@@ -701,7 +701,7 @@ comments. Key conventions:
 2. **Run the code and verify output:**
 
    **Python:**
-   - If `script.py` exists, run it: `cd content/post/python_<slug> && python3 script.py`
+   - If `script.py` exists, run it: `cd content/tutorials/python_<slug> && python3 script.py`
    - If not, assemble code blocks from `index.md` into a temporary script and run it
    - Compare actual printed output against the output blocks in `index.md`
 
@@ -748,7 +748,7 @@ comments. Key conventions:
 
 After delivering the post and reporting results, offer the user next steps:
 
-"The post is ready at `content/post/<lang>_<slug>/`. Want me to:
+"The post is ready at `content/tutorials/<lang>_<slug>/`. Want me to:
 - Adjust any section or add more figures?
 - Run `/project:proofread-post` for a final QA check?
 - Run `/project:referee-post` for a deep expert review?

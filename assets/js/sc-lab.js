@@ -5,7 +5,7 @@
  * (js.Build with target es2017, minified, fingerprinted). It has no
  * dependencies, and it starts every `.sc-lab[data-sc-lab]` element on the page.
  *
- * Every tab runs on the data of content/post/python_sc101: the cigarette sales
+ * Every tab runs on the data of content/tutorials/python_sc101: the cigarette sales
  * of 39 states in 1970–2000 and the donor weights of each mlsynth fit. The
  * lab rebuilds every synthetic path and every gap from these two inputs:
  *
@@ -22,7 +22,7 @@
  *
  * With its default controls, every tab reproduces sc101_results.json, and
  * tests/sc-lab.test.cjs checks this to 1e-9. The generated block below comes
- * from content/post/python_sc101/build_sc_lab_data.py and is never edited
+ * from content/tutorials/python_sc101/build_sc_lab_data.py and is never edited
  * by hand.
  *
  * Page-safety contract: the script writes only plain numbers and words into
@@ -39,7 +39,7 @@
   if (W.ScLab && W.ScLab.__loaded) return; // loaded twice: keep the first copy
 
   // BEGIN GENERATED DATA: build_sc_lab_data.py
-  // Written from content/post/python_sc101/sc101_results.json. Do not edit
+  // Written from content/tutorials/python_sc101/sc101_results.json. Do not edit
   // this block by hand; rerun the generator named above after script.py changes.
   var YEAR0 = 1970, T = 31, T0 = 19, CA = 2;
   var STATES = [

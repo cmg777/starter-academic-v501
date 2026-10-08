@@ -70,7 +70,7 @@ quantitative method.
 
 The patterns below render correctly on local Hugo 0.84.2 but break on the
 deployed Netlify site (Hugo 0.89.4 + MathJax v3). Fixes verified empirically
-on `content/post/python_EconML/index.md`. Do not use these in new posts.
+on `content/tutorials/python_EconML/index.md`. Do not use these in new posts.
 
 | Avoid | Why it breaks | Use instead |
 |-------|---------------|-------------|

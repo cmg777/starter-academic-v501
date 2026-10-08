@@ -1,7 +1,7 @@
 // smoke-test.js — runs under Node to verify a generated web_app/ bundle.
 //
 // Usage:
-//   BASE=/path/to/content/post/<slug>/web_app node smoke-test.js
+//   BASE=/path/to/content/tutorials/<slug>/web_app node smoke-test.js
 //
 // Loads dgp.js + lasso.js into an isolated vm context, then runs sanity
 // assertions. Exits 0 on success, 1 on any failure. Prints a [✓]/[✗]

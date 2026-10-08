@@ -43,7 +43,7 @@ These colors must be used consistently in all generated figures.
 ### Dark theme palette
 
 For posts that use dark-background figures (requested via `theme: dark` or
-confirmed during scope). Reference implementation: `content/post/python_fwl/script.py`.
+confirmed during scope). Reference implementation: `content/tutorials/python_fwl/script.py`.
 
 | Name | Hex | Use in plots |
 |------|-----|-------------|
@@ -58,25 +58,25 @@ confirmed during scope). Reference implementation: `content/post/python_fwl/scri
 
 | Output | Path |
 |--------|------|
-| Script | `content/post/python_<slug>/script.py` |
-| Execution log | `content/post/python_<slug>/execution_log.txt` |
-| Figures (>= 3) | `content/post/python_<slug>/<slug>_*.png` |
+| Script | `content/tutorials/python_<slug>/script.py` |
+| Execution log | `content/tutorials/python_<slug>/execution_log.txt` |
+| Figures (>= 3) | `content/tutorials/python_<slug>/<slug>_*.png` |
 
 ### Stata
 
 | Output | Path |
 |--------|------|
-| Do-file | `content/post/stata_<slug>/analysis.do` |
-| Stata log | `content/post/stata_<slug>/analysis.log` |
-| Figures | `content/post/stata_<slug>/stata_<slug>_*.png` |
+| Do-file | `content/tutorials/stata_<slug>/analysis.do` |
+| Stata log | `content/tutorials/stata_<slug>/analysis.log` |
+| Figures | `content/tutorials/stata_<slug>/stata_<slug>_*.png` |
 
 ### R
 
 | Output | Path |
 |--------|------|
-| Script | `content/post/r_<slug>/analysis.R` |
-| Execution log | `content/post/r_<slug>/execution_log.txt` |
-| Figures (>= 3) | `content/post/r_<slug>/<slug>_*.png` |
+| Script | `content/tutorials/r_<slug>/analysis.R` |
+| Execution log | `content/tutorials/r_<slug>/execution_log.txt` |
+| Figures (>= 3) | `content/tutorials/r_<slug>/<slug>_*.png` |
 
 ---
 
@@ -222,7 +222,7 @@ contain the confirmed scope block above plus any user adjustments.
 Create the post directory if it does not exist:
 
 ```bash
-mkdir -p content/post/<lang>_<slug>
+mkdir -p content/tutorials/<lang>_<slug>
 ```
 
 Write the script file following `references/script-templates.md`. The script
@@ -320,13 +320,13 @@ pip install <package1> <package2>
 
 ```bash
 # Python
-cd content/post/python_<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
+cd content/tutorials/python_<slug>/ && python3 script.py 2>&1 | tee execution_log.txt
 
 # Stata
-cd content/post/stata_<slug>/ && "/Applications/Stata 18.0/StataMP.app/Contents/MacOS/stata-mp" -b do analysis.do
+cd content/tutorials/stata_<slug>/ && "/Applications/Stata 18.0/StataMP.app/Contents/MacOS/stata-mp" -b do analysis.do
 
 # R
-cd content/post/r_<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
+cd content/tutorials/r_<slug>/ && Rscript analysis.R 2>&1 | tee execution_log.txt
 ```
 
 **Post-execution checks:**
@@ -352,7 +352,7 @@ For R scripts, check for and remove the `Rplots.pdf` artifact that R's
 `png()` function can leave behind:
 
 ```bash
-rm -f content/post/<lang>_<slug>/Rplots.pdf
+rm -f content/tutorials/<lang>_<slug>/Rplots.pdf
 ```
 
 ### Step 4: Generate README.md
@@ -394,7 +394,7 @@ If any check fails, describe the issue and fix it before delivering.
 **Detailed deliverables summary:**
 
 ```
-Script executed successfully at content/post/<lang>_<slug>/
+Script executed successfully at content/tutorials/<lang>_<slug>/
 
 DELIVERABLES:
 - <script filename> (N lines)
@@ -417,7 +417,7 @@ DELIVERABLES:
 
 After delivering the verification report, offer the user next steps:
 
-"The script is ready at `content/post/<lang>_<slug>/`. Want me to:
+"The script is ready at `content/tutorials/<lang>_<slug>/`. Want me to:
 - Run `/project:review-script` for a code quality review?
 - Run `/project:write-results-report` to generate the interpretation report?
 - Adjust the script (add sections, change figures, modify parameters)?

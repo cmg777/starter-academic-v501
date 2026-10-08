@@ -1,6 +1,6 @@
 r"""Lint the learning-component markup (custom.scss §24) in a post's index.md.
 
-Usage:  python .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md
+Usage:  python .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md
 
 Checks, outside code fences: exact class names; <summary> on the line right
 after <details>; a blank line after every <summary>...</summary> and after the

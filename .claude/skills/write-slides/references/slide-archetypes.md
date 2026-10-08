@@ -62,7 +62,7 @@ $endfor$
 ```
 Optionally tighten the strip in this deck (`.title-result-strip { gap: 0.9em; }`).
 **Word strips only — never numeric key-results** (arrows between `−0.096` / `+0.019` / `284`
-are nonsense). Reference: `content/event/20260721GSID/slides/`.
+are nonsense). Reference: `content/presentations/20260721GSID/slides/`.
 
 ---
 

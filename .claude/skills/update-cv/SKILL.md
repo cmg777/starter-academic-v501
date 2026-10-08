@@ -11,8 +11,11 @@ user-invocable: true
 Fold the website's newest content into the LaTeX CV and refresh the published PDF. The website is
 the **content feed**; `static/media/CV.pdf` is the **published artifact**.
 
-- **Source (read):** `content/publication/` (journal articles, books, chapters, reports,
-  dissertations), `content/event/` (talks), `content/projects/` (software / databases / web apps).
+- **Source (read):** `content/articles/` (journal articles, books, chapters, reports,
+  dissertations), `content/presentations/` (talks), and the former projects, now split into
+  `content/software/` (packages), `content/data/` (databases / data portals), `content/webapps/`
+  (standalone GEE and Streamlit apps) and `content/books/` (books; the former type-5 publications
+  there keep `type: publication` + `publication_types`). `content/projects/` is retired.
 - **Target (write):** `content/cv/main.tex` — a hand-written **moderncv** project. Only three of
   its sections are website-driven: **Publications and Research**, **Recent Presentations**, and
   **Software, Databases, and Web Applications**.
@@ -58,7 +61,7 @@ every existing line byte-for-byte. A run that finds nothing new makes **zero** e
 ```
 /project:update-cv                       # all three sections; full interactive run
 /project:update-cv --dry-run             # show the SCOPE block (what WOULD be added), then stop
-/project:update-cv --section publications  # only sync content/publication/
+/project:update-cv --section publications  # only sync content/articles/
 /project:update-cv --section presentations
 /project:update-cv --no-build            # edit main.tex but skip compile + PDF copy
 ```
@@ -73,14 +76,17 @@ every existing line byte-for-byte. A run that finds nothing new makes **zero** e
    `latex-format.md`: the set of DOIs (from `% https://doi.org/…` comments) and the set of
    normalized entry titles (from `\cvitem{…}{…}` / `\cventry{…}{…}` inside the in-scope sections).
 4. **Read the website sources** in scope. For publications, parse each
-   `content/publication/*/index.md` front matter (`title`, `authors`, `date`, `doi`,
-   `publication`, `publication_types`); for events, `content/event/*/index.md`
-   (`title`, `subtitle`, `event`, `location`, `date`); for projects, `content/projects/*/index.md`
-   (`title`, `summary`, `links`, `date`).
+   `content/articles/*/index.md` front matter (`title`, `authors`, `date`, `doi`,
+   `publication`, `publication_types`); for events, `content/presentations/*/index.md`
+   (`title`, `subtitle`, `event`, `location`, `date`); for books, `content/books/*/index.md`
+   (`title`, `date`, `doi`, `publication`, `publication_types`, `book_format`) — route those with
+   `type: publication` like publications, the rest as candidates; for software/data/web apps,
+   `content/{software,data,webapps}/*/index.md` (`title`, `summary`, `links`, `date`, plus
+   `app_url` for web apps).
 5. **Compute the additive diff.** A website item is **new** iff it matches **no** CV entry by DOI
    **and** no CV entry by normalized title. For presentations, additionally keep only talks **newer
    than the most recent `\cventry` already in Recent Presentations** (the CV deliberately curates
-   recent talks; older ones are pruned/commented). For projects, produce **candidates only**.
+   recent talks; older ones are pruned/commented). For software/data/web apps, produce **candidates only**.
 
 ## Phase 2 — Confirm scope (print SCOPE, wait for `y`)
 

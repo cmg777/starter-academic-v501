@@ -6,7 +6,7 @@ Canonical markdown skeleton for the audit report. Fields in
 ```markdown
 # Review: <slug> Web App
 
-**Audited:** content/post/<slug>/web_app/
+**Audited:** content/tutorials/<slug>/web_app/
 **Date:** <YYYY-MM-DD>
 **Audit version:** review-app v1.0
 **Focus:** <all | comma-separated dimension names>
@@ -47,7 +47,7 @@ the Notes column.
 
 | #  | Dim | Severity | Location                       | Issue                                                  | Suggested fix                                                       |
 |---:|----:|----------|--------------------------------|--------------------------------------------------------|---------------------------------------------------------------------|
-| 1  | 8   | HIGH     | content/post/<slug>/index.md:18 | YAML `url: web_app/` triggers Hugo trailing-slash bug | Change to `url: web_app/index.html` (see `render-and-fix.md` entry "Hugo trailing-slash URL rewrite") |
+| 1  | 8   | HIGH     | content/tutorials/<slug>/index.md:18 | YAML `url: web_app/` triggers Hugo trailing-slash bug | Change to `url: web_app/index.html` (see `render-and-fix.md` entry "Hugo trailing-slash URL rewrite") |
 | 2  | 5   | MED      | index.html:122                  | Slider `lab-l` has no `aria-label`                    | Add `aria-label="penalty index"` to match the other 3 sliders        |
 | …  | …   | …        | …                               | …                                                      | …                                                                   |
 

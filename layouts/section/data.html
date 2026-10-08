@@ -1,0 +1,13 @@
+{{/* Data — filterable list of data repositories and portals. See layouts/partials/catalog.html. */}}
+{{- define "main" -}}
+{{ partial "page_header.html" . }}
+{{ $items := slice }}
+{{ range .Pages.ByDate.Reverse }}
+  {{ $items = $items | append (dict
+      "title" .Title "summary" .Summary "href" .RelPermalink "external" false
+      "img" ((.Resources.ByType "image").GetMatch "*featured*")
+      "attrs" (dict "type" (.Params.data_type | default "") "region" (.Params.region | default ""))
+      "page" .) }}
+{{ end }}
+{{ partial "catalog.html" (dict "page" . "items" $items) }}
+{{- end -}}

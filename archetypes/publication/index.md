@@ -1,8 +1,8 @@
 ---
 # Carlos Mendez publication archetype.
-# Used when you run: hugo new content/publication/<slug>/index.md
+# Used when you run: hugo new content/articles/<slug>/index.md
 # Tip: add a `featured.jpg`, `featured.png`, or `featured.webp` to this folder
-# so the publication shows an image on /publication/. Without one, the page
+# so the publication shows an image on /articles/. Without one, the page
 # falls back to a Font Awesome icon picked from `publication_types[0]`.
 
 title: "{{ replace .Name "-" " " | title }}"

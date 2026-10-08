@@ -35,9 +35,9 @@ Variants that run only part of the recipe: "Add predict checks to `<post>`" (ste
 6. **Exercises (3–8, graded).** Under `## Exercises`, graded Warm-up → Core → Stretch in increasing order, under `###` headings in either of two layouts (match the post's heading-numbering style): (a) one `###` per exercise, labeled by difficulty (e.g. `### 1. Warm-up: Recover the slope by hand`); or (b) one `###` per difficulty level (`### 22.1 Warm-up`, `### 22.2 Core`, `### 22.3 Stretch`), each holding 1–3 exercises that open with a bold `**Exercise N — Title.**` lead-in (the python_fwl reference layout). Either way, each exercise is a short prompt followed by exactly one solution card. Write the solution code, **run it**, paste the printed output verbatim into a `text` fence, then add 1–3 sentences.
 7. **Interactive widget (optional).** Only when a slider genuinely teaches something the static figures cannot. Follow the pattern below.
 8. **Verify.**
-   - Lint the source: `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md` (exit 0).
-   - Build: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --gc --minify` (never while another build is running). Count cards in the output — minification may drop the quotes around single-token attribute values (multi-class values keep them), so grep the class names themselves rather than `class="…"`: `grep -o 'learn-card [a-z]*-card' public/post/<slug>/index.html | sort | uniq -c`.
-   - Visual check on the dev server, from a scratch directory: `node <repo>/.claude/skills/write-post/scripts/check_learn_cards.cjs http://127.0.0.1:1313/post/<slug>/` — light, dark, 375px; accents, raw-Markdown leaks, overflow, page errors (exit 0), then look at the screenshots.
+   - Lint the source: `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md` (exit 0).
+   - Build: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --gc --minify` (never while another build is running). Count cards in the output — minification may drop the quotes around single-token attribute values (multi-class values keep them), so grep the class names themselves rather than `class="…"`: `grep -o 'learn-card [a-z]*-card' public/tutorials/<slug>/index.html | sort | uniq -c`.
+   - Visual check on the dev server, from a scratch directory: `node <repo>/.claude/skills/write-post/scripts/check_learn_cards.cjs http://127.0.0.1:1313/tutorials/<slug>/` — light, dark, 375px; accents, raw-Markdown leaks, overflow, page errors (exit 0), then look at the screenshots.
    - Review: `/project:review-post <slug> focus: learning`.
 9. **i18n.** Posts are the stub exception: the ES/JA counterparts are card-only stubs, so the learning components live only in the English body. Nothing to translate.
 10. **Log.** Add or update the post's entry in `logs/`.
@@ -148,7 +148,7 @@ The ratio reproduces the full-model coefficient exactly, because a one-regressor
 </details>
 ````
 
-(The solution output above was produced by running the snippet on `content/post/python_fwl/data/fwl_store_data.csv` on 2026-09-28.)
+(The solution output above was produced by running the snippet on `content/tutorials/python_fwl/data/fwl_store_data.csv` on 2026-09-28.)
 
 ````markdown
 <details class="learn-card misconception-card">
@@ -217,7 +217,7 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 
 ### Reference implementation #2: `panel-lab`
 
-`layouts/shortcodes/panel-lab.html` + `assets/js/panel-lab.js` + `assets/css/panel-lab.css`, for `content/post/python_panel_intro/`. Same conventions as `fwl-lab`: Scratch guard key `panelLabAssets`, global `window.PanelLab`, classes prefixed `pl-` under `.panel-lab`, plain Unicode labels (no TeX), dark tokens under `.dark .panel-lab`.
+`layouts/shortcodes/panel-lab.html` + `assets/js/panel-lab.js` + `assets/css/panel-lab.css`, for `content/tutorials/python_panel_intro/`. Same conventions as `fwl-lab`: Scratch guard key `panelLabAssets`, global `window.PanelLab`, classes prefixed `pl-` under `.panel-lab`, plain Unicode labels (no TeX), dark tokens under `.dark .panel-lab`.
 
 - **Params:** `id` (default `panel-lab-<ordinal>`), `tab` (`selection` default, or `demeaning`), e.g. `{{</* panel-lab */>}}`.
 - **Tabs** (ARIA tablist; Left/Right/Home/End):
@@ -228,18 +228,18 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 
 ### Reference implementation #3: `did-lab`
 
-`layouts/shortcodes/did-lab.html` + `assets/js/did-lab.js` + `assets/css/did-lab.css`, for `content/post/python_did101/`. The Scratch guard key is `didLabAssets`, the global is `window.DidLab`, and the classes carry the prefix `dl-`. It follows the same three-file pattern as `fwl-lab` and `panel-lab`.
+`layouts/shortcodes/did-lab.html` + `assets/js/did-lab.js` + `assets/css/did-lab.css`, for `content/tutorials/python_did101/`. The Scratch guard key is `didLabAssets`, the global is `window.DidLab`, and the classes carry the prefix `dl-`. It follows the same three-file pattern as `fwl-lab` and `panel-lab`.
 
 - **Params:** `id` (default `did-lab-<ordinal>`), `tab` (`twobytwo` default, or `event`).
 - **Data:** the GPA values of the post are embedded as JS array literals. The sliders shift the outcome exactly inside the span of the regressors, so the defaults reproduce every printed number of the post.
 
 ### Reference implementation #4: `sc-lab`
 
-`layouts/shortcodes/sc-lab.html` + `assets/js/sc-lab.js` + `assets/css/sc-lab.css`, for `content/post/python_sc101/`. The Scratch guard key is `scLabAssets`, the global is `window.ScLab`, and the classes carry the prefix `sl-`. It follows the same three-file pattern and adds a generated data block, described below.
+`layouts/shortcodes/sc-lab.html` + `assets/js/sc-lab.js` + `assets/css/sc-lab.css`, for `content/tutorials/python_sc101/`. The Scratch guard key is `scLabAssets`, the global is `window.ScLab`, and the classes carry the prefix `sl-`. It follows the same three-file pattern and adds a generated data block, described below.
 
 - **Params:** `id` (default `sc-lab-<ordinal>`), `tab` (`mixer` default, `cutoff`, `intime`, or `loo`). Any other value stops the build through `errorf`.
 - **Tabs:** a weight mixer with presets and share sliders that rebuilds synthetic California live; a placebo cutoff with stops 1, 1.5, 2, 3, 5, 10, 20, and none; an in-time placebo for fake starts 1985 to 1988; and a leave-one-out view of the five refits.
-- **Data block:** `content/post/python_sc101/build_sc_lab_data.py` writes the block between `// BEGIN GENERATED DATA` and `// END GENERATED DATA` from `sc101_results.json`. Sales are stored as integers equal to ten times the value and decoded with `Math.fround`, which reproduces the float32 data exactly. Every synthetic path is rebuilt from full-precision weights, and `--check` exits 1 when the block is stale.
+- **Data block:** `content/tutorials/python_sc101/build_sc_lab_data.py` writes the block between `// BEGIN GENERATED DATA` and `// END GENERATED DATA` from `sc101_results.json`. Sales are stored as integers equal to ten times the value and decoded with `Math.fround`, which reproduces the float32 data exactly. Every synthetic path is rebuilt from full-precision weights, and `--check` exits 1 when the block is stale.
 - **Tests:** `node --test tests/sc-lab.test.cjs` checks every default and every `lab_scenarios` entry against the results JSON to 1e-9. Set `SC_LAB_JS` to the minified bundle of a build to run the same tests on the published file.
 - **Minifier gotcha (found 2026-10-05):** the minifier deletes `<rect>` elements whose width is zero in the markup, so shaded bands that JS sizes later silently disappear. Draw such bands as `<path>` elements instead.
 
@@ -247,6 +247,6 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 
 ## Reference implementation
 
-`content/post/python_fwl/` (Frisch–Waugh–Lovell theorem, 50 simulated stores): §7.2 predict card, §8.2 proof card, §16 the `fwl-lab` interactive widget, §18 Common misconceptions, §22 graded exercises with solution cards. Canonical numbers: `content/post/python_fwl/fwl_results.json` (written by `script.py`).
+`content/tutorials/python_fwl/` (Frisch–Waugh–Lovell theorem, 50 simulated stores): §7.2 predict card, §8.2 proof card, §16 the `fwl-lab` interactive widget, §18 Common misconceptions, §22 graded exercises with solution cards. Canonical numbers: `content/tutorials/python_fwl/fwl_results.json` (written by `script.py`).
 
 Related: `.claude/skills/write-post/references/learning-components-template.md` (authoring template + quality bar), `.claude/skills/review-post/SKILL.md` (Dimension 3 "Learning components" checklist, `focus: learning`), `.claude/skills/write-post/references/key-concepts-template.md` (§20 Key-concepts cards).

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * capture-dashboard-screenshots.cjs — capture 16:9 thumbnails of the published
- * Google Earth Engine dashboard apps via headless Chromium, for the card gallery
- * on /projects/dashboards/.
+ * standalone web apps (Google Earth Engine and Streamlit) via headless Chromium,
+ * for the cards on /webapps/.
  *
  * Usage:
  *   npx playwright install chromium     # one-time, only if Playwright/Chrome missing
@@ -12,7 +12,7 @@
  *   --wait <ms>     override the post-load settle time (default 10000)
  *
  * APPS below is the single source of truth: add/edit an entry, re-run, commit.
- * Each PNG is written to the EN bundle then copied byte-for-byte into the ES and
+ * Each JPEG is written to the EN bundle then copied byte-for-byte into the ES and
  * JA bundles (page-bundle resources do not cross languages; the app UI is English
  * so one capture serves all three).
  *
@@ -30,18 +30,20 @@ const { createRequire } = require("module");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-// Where the thumbnails live, per language bundle. EN is the capture target;
-// the others are copies.
-const BUNDLES = [
-  path.join(REPO_ROOT, "content", "projects", "dashboards", "screenshots"),
-  path.join(REPO_ROOT, "content", "es", "projects", "dashboards", "screenshots"),
-  path.join(REPO_ROOT, "content", "ja", "projects", "dashboards", "screenshots"),
+// Where the thumbnails live: each app is a WebApps bundle whose featured.jpg is
+// the card image. EN is the capture target; ES/JA get byte-for-byte copies.
+const LANG_ROOTS = [
+  path.join(REPO_ROOT, "content", "webapps"),
+  path.join(REPO_ROOT, "content", "es", "webapps"),
+  path.join(REPO_ROOT, "content", "ja", "webapps"),
 ];
 
 const BASE = "https://carlos-mendez.projects.earthengine.app/view";
 
-// Single source of truth — keep in sync with the {{< dashboard-card >}} calls in
-// content/{,es/,ja/}projects/dashboards/index.md (the `image` param is `<slug>.jpg`).
+// Single source of truth — one entry per standalone app bundle in
+// content/{,es/,ja/}webapps/<slug>/ (GEE apps use BASE/<slug>; others give `url`).
+// The Streamlit app bundles are NOT listed: their maps live in nested iframes that
+// headless Chromium leaves blank, so those cards reuse the package's featured.webp.
 const APPS = [
   { slug: "viirs-like-monthly" },
   { slug: "viirs-like-monthly-regions" },
@@ -52,6 +54,13 @@ const APPS = [
   { slug: "dmsp-like-econ-split-view" },
   { slug: "geoexplorer1" },
   { slug: "japan-regional-gdp-disparities" },
+  { slug: "geoexplorer1v100bolivia" },
+  { slug: "dynamics-dmsp-like" },
+  { slug: "dynamicsegdpv2" },
+  { slug: "viirs-like2-dynamics" },
+  { slug: "world-dmsp-extended" },
+  { slug: "world-dmsp-like" },
+  { slug: "world-viirs-annualv2" },
 ].map((a) => ({ ...a, url: a.url || `${BASE}/${a.slug}` }));
 
 // 16:9 capture; deviceScaleFactor 1 → 1600x900 PNG, ~2x the 800x450 display size.
@@ -116,7 +125,6 @@ async function main() {
     process.exit(3);
   }
 
-  for (const dir of BUNDLES) fs.mkdirSync(dir, { recursive: true });
 
   const targets = args.slugs.length
     ? APPS.filter((a) => args.slugs.includes(a.slug))
@@ -134,13 +142,18 @@ async function main() {
     browser = await chromium.launch();
   }
 
-  const [enDir, ...copyDirs] = BUNDLES;
+  const [enRoot, ...copyRoots] = LANG_ROOTS;
   let failures = 0;
 
   for (const app of targets) {
     // JPEG keeps the committed source small (maps compress well); Hugo downsizes
     // each to an 800x450 webp at render time anyway.
-    const enPath = path.join(enDir, `${app.slug}.jpg`);
+    const enPath = path.join(enRoot, app.slug, "featured.jpg");
+    if (!fs.existsSync(path.dirname(enPath))) {
+      process.stdout.write(`    skip: no bundle content/webapps/${app.slug}/\n`);
+      failures++;
+      continue;
+    }
     process.stdout.write(`→ ${app.slug}  (${app.url})\n`);
     const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: 1 });
     try {
@@ -150,13 +163,20 @@ async function main() {
       // fine, the UI is usually painted; log and continue to the settle wait.
       process.stdout.write(`    (load wait: ${e.message.split("\n")[0]})\n`);
     }
+    // A sleeping Streamlit app shows a wake-up button first; press it and wait.
+    const wake = page.getByRole("button", { name: /get this app back up/i });
+    if (await wake.count().catch(() => 0)) {
+      await wake.first().click().catch(() => {});
+      await page.waitForTimeout(60000);
+    }
     await page.waitForTimeout(args.waitMs); // let EE map tiles + panels paint
     await page.screenshot({ path: enPath, type: "jpeg", quality: 82 });
     await page.close();
 
     // Mirror the EN capture into the ES/JA bundles.
-    for (const dir of copyDirs) {
-      fs.copyFileSync(enPath, path.join(dir, `${app.slug}.jpg`));
+    for (const root of copyRoots) {
+      const dir = path.join(root, app.slug);
+      if (fs.existsSync(dir)) fs.copyFileSync(enPath, path.join(dir, "featured.jpg"));
     }
     process.stdout.write(`    saved ${path.relative(REPO_ROOT, enPath)} (+es,+ja)\n`);
   }

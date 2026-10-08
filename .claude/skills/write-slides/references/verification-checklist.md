@@ -10,7 +10,7 @@ kernel or package install is needed.
 
 From the deck dir:
 ```bash
-cd content/post/<slug>/slides
+cd content/tutorials/<slug>/slides
 /Applications/quarto/bin/quarto render slides.qmd
 ```
 Must produce `index.html` (> 30 KB) + a `slides_files/` directory. On failure, apply the
@@ -45,7 +45,7 @@ Fetch `/post/<slug>/` and confirm an `<a>` whose `href` is exactly
 ## Layer B — Node static smoke test
 
 ```bash
-BASE="/abs/.../content/post/<slug>/slides" node \
+BASE="/abs/.../content/tutorials/<slug>/slides" node \
   .claude/skills/write-slides/references/templates/smoke-test.js
 ```
 Exits 0/1, `[✓]/[✗]` per assertion. Checks the rendered files: `index.html` + `slides_files/`
@@ -75,7 +75,7 @@ existed). Drive a real browser to confirm the LaTeX typesets — no `NODE_PATH` 
 `math-check.cjs` auto-locates Playwright:
 ```bash
 node .claude/skills/write-slides/references/templates/math-check.cjs \
-  "$PWD/content/post/<slug>/slides/index.html"
+  "$PWD/content/tutorials/<slug>/slides/index.html"
 # First run only, if Playwright is missing (exit 3):  npx playwright install chromium
 ```
 `math-check.cjs` auto-resolves Playwright (project / any npx-cache hash / global npm root — via
@@ -94,7 +94,7 @@ per `.claude/skills/review-app/references/headless-browser.md`). **Never commit 
 ```
 VERIFICATION REPORT
 ===================
-Deck:        content/post/<slug>/slides/  (index.html + slides_files/)
+Deck:        content/tutorials/<slug>/slides/  (index.html + slides_files/)
 Quarto:      <version>           Hugo port: <port | n/a>
 Render:      <OK | FAILED>       Smoke test: <PASS | FAIL>
 
@@ -102,14 +102,14 @@ Render (Layer 0)
   [✓] quarto render → index.html (<size>) + slides_files/
 
 Static checks (Layer A)
-  [✓] /post/<slug>/slides/                       (200)
-  [✓] /post/<slug>/slides/  reveal asset          (200)
+  [✓] /tutorials/<slug>/slides/                       (200)
+  [✓] /tutorials/<slug>/slides/  reveal asset          (200)
   [✓] figures resolve via ../ : <N>/<N>           (200)
-  [✓] /post/<slug>/  (post still renders)         (200)
+  [✓] /tutorials/<slug>/  (post still renders)         (200)
   OR [~] Skipped (no ≥0.96 Hugo binary)
 
 YAML link check
-  [✓] /post/<slug>/  links to slides/index.html (no trailing-slash bug)
+  [✓] /tutorials/<slug>/  links to slides/index.html (no trailing-slash bug)
   OR [~] Skipped (--no-link)
 
 Node smoke test (Layer B)

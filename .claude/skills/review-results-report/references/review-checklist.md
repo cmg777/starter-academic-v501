@@ -90,7 +90,7 @@ Five gates that every report should clear. Mark each PASS / PARTIAL / FAIL.
 ## Report format
 
 Deliver the review inline AND save to
-`content/post/<slug>/results_report_review.md`:
+`content/tutorials/<slug>/results_report_review.md`:
 
 ```
 # Results Report Review: <slug>

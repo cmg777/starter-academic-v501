@@ -1,0 +1,13 @@
+{{/* Software — filterable list of the Python packages. See layouts/partials/catalog.html. */}}
+{{- define "main" -}}
+{{ partial "page_header.html" . }}
+{{ $items := slice }}
+{{ range .Pages.ByLastmod.Reverse }}
+  {{ $items = $items | append (dict
+      "title" .Title "summary" .Summary "href" .RelPermalink "external" false
+      "img" ((.Resources.ByType "image").GetMatch "*featured*")
+      "attrs" (dict "tag" (delimit (.Params.tags | default slice) " "))
+      "page" .) }}
+{{ end }}
+{{ partial "catalog.html" (dict "page" . "items" $items) }}
+{{- end -}}

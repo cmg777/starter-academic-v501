@@ -11,9 +11,9 @@ is either `[✓]`, `[✗]`, or `[~]` (skipped).
 ### Files
 
 - [ ] **`.qmd` written to expected path**
-  - R → `content/post/<slug>/tutorial.qmd`
-  - Python → `content/post/<slug>/references/tutorial.qmd`
-  - Stata → `content/post/<slug>/references/tutorial.qmd`
+  - R → `content/tutorials/<slug>/tutorial.qmd`
+  - Python → `content/tutorials/<slug>/references/tutorial.qmd`
+  - Stata → `content/tutorials/<slug>/references/tutorial.qmd`
 
 - [ ] **File line count is sensible** (heuristic: between 50% and 110%
   of the source `index.md` line count; outside that range, surface as
@@ -50,7 +50,7 @@ is either `[✓]`, `[✗]`, or `[~]` (skipped).
 
 ### ZIP project bundle (only if Phase 4.5 ran)
 
-- [ ] **`<slug>.zip` exists** at `content/post/<slug>/<slug>.zip`.
+- [ ] **`<slug>.zip` exists** at `content/tutorials/<slug>/<slug>.zip`.
 
 - [ ] **`unzip -l` returns exactly 4 file entries inside `<slug>/`**:
   `_quarto.yml`, `tutorial.qmd`, the canonical script (`analysis.R` /
@@ -184,15 +184,15 @@ Follow-ups
      /project:review-post <slug>
 
 2. Commit and push (Netlify auto-deploys):
-     git add content/post/<slug>/<output-path> \
-             content/post/<slug>/<slug>.zip \
-             content/post/<slug>/index.md \
+     git add content/tutorials/<slug>/<output-path> \
+             content/tutorials/<slug>/<slug>.zip \
+             content/tutorials/<slug>/index.md \
              logs/<YYYY-MM-DD>-<slug>-quarto.md
      git commit -m "<slug>: add Quarto tutorial for local execution"
      git push origin master
 
 3. Open the rendered notebook locally:
-     open content/post/<slug>/<output-path-no-extension>.html
+     open content/tutorials/<slug>/<output-path-no-extension>.html
 ```
 
 The skill suggests creating a `logs/<date>-<slug>-quarto.md` entry, but
@@ -205,10 +205,10 @@ user's commit workflow.
 Follow-ups
 ----------
 1. Inspect the failing .qmd:
-     open content/post/<slug>/<output-path>
+     open content/tutorials/<slug>/<output-path>
 
 2. Re-render manually after editing:
-     cd content/post/<slug>[/references]
+     cd content/tutorials/<slug>[/references]
      quarto render tutorial.qmd
 
 3. Re-run the skill with --no-render to keep the draft and skip the
@@ -222,7 +222,7 @@ Follow-ups
 Follow-ups
 ----------
 1. Render the draft manually:
-     cd content/post/<slug>[/references]
+     cd content/tutorials/<slug>[/references]
      quarto render tutorial.qmd
 
 2. If the render succeeds, re-run the skill without --no-render to add

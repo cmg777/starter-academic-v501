@@ -9,7 +9,7 @@ user-invocable: true
 # Write Data Dictionary: interactive HTML page + Stata pipeline for a post's data
 
 Generate the same kind of data-dictionary page that ships at
-`content/post/python_kuznets_dmsp/data/` (the **reference implementation**) for any post that has
+`content/tutorials/python_kuznets_dmsp/data/` (the **reference implementation**) for any post that has
 tabular data files. Architecture: a **generic renderer** (`build_data_dictionary.py`, copied
 verbatim into the post's `data/`) reads a **per-post `data_dictionary.yaml`** and the data, then
 emits a labeled Stata `.dta` per dataset, `README.md`, `stata_codebook.do`, `<slug>_data.zip`, and
@@ -34,7 +34,7 @@ truth for prose, the data is the source of truth for statistics.
 /project:write-data-dictionary r_kuznets --no-verify
 ```
 
-## Deliverables (written into `content/post/<slug>/data/`)
+## Deliverables (written into `content/tutorials/<slug>/data/`)
 
 | Path | Purpose |
 |---|---|
@@ -44,7 +44,7 @@ truth for prose, the data is the source of truth for statistics.
 | `README.md` | GitHub-facing codebook (dictionary + stats + links) |
 | `stata_codebook.do` | run once in Stata to attach long-form per-variable notes |
 | `<slug>_data.zip` | download-all bundle (every `.dta` + source + README + `.do`) |
-| `index.html` | the interactive data-dictionary page (served at `/post/<slug>/data/`) |
+| `index.html` | the interactive data-dictionary page (served at `/tutorials/<slug>/data/`) |
 
 Plus, unless `--no-link`, one front-matter `links:` entry in the post's `index.md`:
 `{ icon: book, icon_pack: fas, name: "Data dictionary", url: data/index.html }` (relative,
@@ -71,7 +71,7 @@ all of it — do not re-implement; only update the renderer template if a featur
 (skip Phase 5 browser/Hugo checks).
 
 ### 1.2 Locate the post + data
-Confirm `content/post/<slug>/index.md` and `content/post/<slug>/data/` exist (abort with a clear
+Confirm `content/tutorials/<slug>/index.md` and `content/tutorials/<slug>/data/` exist (abort with a clear
 message if the post has no `data/` folder). Inventory data files by extension:
 `.csv` / `.dta` / `.parquet` / `.xlsx` (see input-format handling in
 [`references/metadata-schema.md`](references/metadata-schema.md)). If `.parquet`/`.xlsx` are
@@ -116,7 +116,7 @@ End with a final SCOPE block and explicit `y` before proceeding.
 
 ## Phase 3 — Draft + review the metadata
 
-Write `content/post/<slug>/data/data_dictionary.yaml`, auto-populated per
+Write `content/tutorials/<slug>/data/data_dictionary.yaml`, auto-populated per
 [`references/auto-draft.md`](references/auto-draft.md) against the schema in
 [`references/metadata-schema.md`](references/metadata-schema.md):
 `study` (title/subtitle/overview/panel_structure/optional kpis), `sources`, `formulas_html`,
@@ -128,9 +128,9 @@ user review/edit before rendering. A filled example is in
 
 ## Phase 4 — Generate
 
-1. Copy `references/templates/build_data_dictionary.py` → `content/post/<slug>/data/build_data_dictionary.py`.
+1. Copy `references/templates/build_data_dictionary.py` → `content/tutorials/<slug>/data/build_data_dictionary.py`.
 2. If `.parquet`/`.xlsx` inputs exist: `.venv/bin/python3 -m pip install pyarrow openpyxl`.
-3. Run it: `cd content/post/<slug>/data && <repo>/.venv/bin/python3 build_data_dictionary.py`
+3. Run it: `cd content/tutorials/<slug>/data && <repo>/.venv/bin/python3 build_data_dictionary.py`
    (writes the `.dta`, README, `.do`, ZIP, `index.html`; self-checks `.dta` release 118).
 4. Unless `--no-link`: add the `"Data dictionary"` `links:` entry to the post's `index.md`
    (`url: data/index.html`). If the user chose to remove the GitHub data buttons, delete those
@@ -142,7 +142,7 @@ Run the checks in [`references/verification-checklist.md`](references/verificati
 structural greps on `index.html`; a headless-Chromium pass (tabs show one panel each; "Expand all"
 reveals every panel — proves Ctrl+F/print coverage; dark toggle changes + persists; a cross-file
 index variable link sets `#var-…`; print media shows all panels; no JS console errors); and a Hugo
-build with the pinned binary (0.96–0.119 window) confirming `public/post/<slug>/data/index.html`
+build with the pinned binary (0.96–0.119 window) confirming `public/tutorials/<slug>/data/index.html`
 publishes and the button renders. Then print a `[✓]/[✗]` report and offer copy-paste follow-ups:
 open the page locally, review/edit `data_dictionary.yaml` and rerun the renderer, and commit + push
 (the page goes live after Netlify deploys).

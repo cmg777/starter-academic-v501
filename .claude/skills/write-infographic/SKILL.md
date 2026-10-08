@@ -38,7 +38,7 @@ manual overlay.
 
 ## Reference output
 
-Inspect `content/post/python_sc101/featured.webp` as the approved visual reference:
+Inspect `content/tutorials/python_sc101/featured.webp` as the approved visual reference:
 strong blue headings, bright strokes against dark navy, separated panels, clear
 callouts, and complete edge labels. Read its `infographic_instructions.md` for
 storytelling and source mapping, not as an authoritative palette or layout spec.
@@ -53,8 +53,8 @@ to modify images. Other example posts calibrate narrative structure only.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_dowhy`), resolve to `content/post/<slug>/index.md`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_dowhy`), resolve to `content/tutorials/<slug>/index.md`.
 
 2. **Verify the post exists.** Read `index.md` in the resolved directory. If it
    does not exist, report the error and stop.
@@ -165,7 +165,7 @@ is needed, wait for a response; silence is not approval.
 ## Step 1 -- Generate the prompt file
 
 Write `infographic_instructions.md` in the post's page bundle directory
-(e.g. `content/post/<slug>/infographic_instructions.md`), unless the user specifies
+(e.g. `content/tutorials/<slug>/infographic_instructions.md`), unless the user specifies
 a different destination, such as an isolated scratch location for a dry run.
 
 The file has four sections (A, B, C, D). Use `---` horizontal rules to
@@ -565,7 +565,7 @@ After writing the file:
 
 After verification, offer the user next steps:
 
-"The infographic prompt is ready at `content/post/<slug>/infographic_instructions.md`.
+"The infographic prompt is ready at `content/tutorials/<slug>/infographic_instructions.md`.
 Would you like me to:
 - Adjust any story beat or sketch metaphor?
 - Change the 3 BIG numbers?

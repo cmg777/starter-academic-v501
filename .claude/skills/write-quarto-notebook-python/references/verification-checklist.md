@@ -11,24 +11,24 @@ is either `[✓]`, `[✗]`, or `[~]` (skipped).
 ### Bundle source files (Phase 3)
 
 - [ ] **`tutorial.qmd`** written to
-  `content/post/<slug>/references/tutorial.qmd`.
+  `content/tutorials/<slug>/references/tutorial.qmd`.
 - [ ] **`setup_env.py`** written to
-  `content/post/<slug>/references/setup_env.py`.
+  `content/tutorials/<slug>/references/setup_env.py`.
   - `KERNEL_NAME` field equals `<slug>-tutorial`.
   - `PINNED` is non-empty and contains at minimum `jupyter` +
     `ipykernel`.
 - [ ] **`_quarto.yml`** written to
-  `content/post/<slug>/references/_quarto.yml`.
+  `content/tutorials/<slug>/references/_quarto.yml`.
   - Contains `pre-render: python3 setup_env.py`.
 - [ ] **`render.command`** written to
-  `content/post/<slug>/references/render.command` (executable).
+  `content/tutorials/<slug>/references/render.command` (executable).
 - [ ] **`render.bat`** written to
-  `content/post/<slug>/references/render.bat`.
+  `content/tutorials/<slug>/references/render.bat`.
 - [ ] **`README.md`** written to
-  `content/post/<slug>/references/README.md`.
+  `content/tutorials/<slug>/references/README.md`.
   - First line is `# <slug> — Quarto project`.
 - [ ] **`build_bundle.sh`** written to
-  `content/post/<slug>/build_bundle.sh` (executable).
+  `content/tutorials/<slug>/build_bundle.sh` (executable).
 
 ### Render (only if Phase 4 ran)
 
@@ -40,7 +40,7 @@ is either `[✓]`, `[✗]`, or `[~]` (skipped).
 
 ### ZIP bundle (Phase 5)
 
-- [ ] **`<slug>.zip`** exists at `content/post/<slug>/<slug>.zip`.
+- [ ] **`<slug>.zip`** exists at `content/tutorials/<slug>/<slug>.zip`.
 - [ ] **`unzip -l` shows exactly 7 file entries inside `<slug>/`**:
   - `tutorial.qmd`
   - `setup_env.py`
@@ -104,7 +104,7 @@ Verification
 [✓] _quarto.yml + render.command + render.bat + README.md + build_bundle.sh written
 [✓] quarto render exited 0                                (<elapsed>s, attempt <K>/3)
 [✓] tutorial.html produced                                (<F> figures inline)
-[✓] <slug>.zip written to content/post/<slug>/<slug>.zip  (<size> KB, 7 files in <slug>/)
+[✓] <slug>.zip written to content/tutorials/<slug>/<slug>.zip  (<size> KB, 7 files in <slug>/)
 [✓] Tempdir end-to-end render succeeded                   (<elapsed>s)
 [✓] index.md links: entry inserted                        ("Quarto project (.zip)" → <slug>.zip)
 
@@ -135,10 +135,10 @@ Last error (stderr tail):
 [~] index.md left untouched — Phase 7 skipped.
 
 What to do:
-  1. Open content/post/<slug>/references/tutorial.qmd and inspect the failing chunk.
-  2. Inspect content/post/<slug>/references/setup_env.py's PINNED dict.
+  1. Open content/tutorials/<slug>/references/tutorial.qmd and inspect the failing chunk.
+  2. Inspect content/tutorials/<slug>/references/setup_env.py's PINNED dict.
   3. Re-run setup manually:
-       cd content/post/<slug>/references && python3 setup_env.py && quarto render tutorial.qmd
+       cd content/tutorials/<slug>/references && python3 setup_env.py && quarto render tutorial.qmd
   4. Or re-run the skill with --no-render to keep the bundle:
        /project:write-quarto-notebook-python <slug> --no-render
 ```
@@ -173,15 +173,15 @@ Follow-ups
      /project:review-post <slug>
 
 2. Commit and push (Netlify auto-deploys):
-     git add content/post/<slug>/references/ \
-             content/post/<slug>/build_bundle.sh \
-             content/post/<slug>/<slug>.zip \
-             content/post/<slug>/index.md
+     git add content/tutorials/<slug>/references/ \
+             content/tutorials/<slug>/build_bundle.sh \
+             content/tutorials/<slug>/<slug>.zip \
+             content/tutorials/<slug>/index.md
      git commit -m "<slug>: add Quarto tutorial bundle for local execution"
      git push origin master
 
 3. Open the rendered notebook locally:
-     open content/post/<slug>/references/tutorial.html
+     open content/tutorials/<slug>/references/tutorial.html
 ```
 
 ### When render failed
@@ -190,10 +190,10 @@ Follow-ups
 Follow-ups
 ----------
 1. Inspect the failing tutorial:
-     open content/post/<slug>/references/tutorial.qmd
+     open content/tutorials/<slug>/references/tutorial.qmd
 
 2. Re-run setup + render manually after editing:
-     cd content/post/<slug>/references
+     cd content/tutorials/<slug>/references
      python3 setup_env.py
      quarto render tutorial.qmd
 
@@ -208,7 +208,7 @@ Follow-ups
 Follow-ups
 ----------
 1. Render manually from the bundle:
-     cd content/post/<slug>/references
+     cd content/tutorials/<slug>/references
      python3 setup_env.py
      quarto render tutorial.qmd
 

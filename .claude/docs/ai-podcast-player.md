@@ -20,19 +20,19 @@ An embedded audio player overlay. The player is self-contained inline HTML/CSS/J
    - icon: podcast
      icon_pack: fas
      name: AI Podcast
-     url: "/post/<post-slug>/#podcast-player"
+     url: "/tutorials/<post-slug>/#podcast-player"
    ```
 
-2. **Post body** — append the podcast player block at the very end of the file, after a `---` separator. Copy the full `<style>` + `<div>` + `<script>` block from an existing post (e.g., `content/post/python_dowhy_intro/index.md`) and customize three things:
+2. **Post body** — append the podcast player block at the very end of the file, after a `---` separator. Copy the full `<style>` + `<div>` + `<script>` block from an existing post (e.g., `content/tutorials/python_dowhy_intro/index.md`) and customize three things:
    - **Audio `src`**: the URL the user provides (typically a catbox.moe link, `.m4a` or `.wav`)
    - **Title text**: update the `<h4>` inside `.podcast-title-block` (e.g., "AI Podcast: Topic Name")
    - **Stream link `href`**: same audio URL, with `target="_blank"` (no `download` attribute — stream, don't download)
 
 ### Reference implementations
 
-- `content/post/python_dowhy_intro/index.md` — podcast only (m4a, stream link)
-- `content/post/stata_did/index.md` — podcast + video player (wav, download link)
-- `content/post/r_sc_multi_country/index.md` — podcast only (m4a, stream link; R post)
+- `content/tutorials/python_dowhy_intro/index.md` — podcast only (m4a, stream link)
+- `content/tutorials/stata_did/index.md` — podcast + video player (wav, download link)
+- `content/tutorials/r_sc_multi_country/index.md` — podcast only (m4a, stream link; R post)
 
 ### Player features
 
@@ -50,7 +50,7 @@ Trigger: the same **"Add AI Podcast to `<post slug>`"**, when the link supplied 
      url: https://open.spotify.com/episode/<ID>
    ```
 
-2. **Post body** — immediately after the closing `---` of the front matter and **before `## Abstract`**, insert this block (copied from `content/post/python_bridge_impact/index.md`, lines 87–89), with one blank line after it:
+2. **Post body** — immediately after the closing `---` of the front matter and **before `## Abstract`**, insert this block (copied from `content/tutorials/python_bridge_impact/index.md`, lines 87–89), with one blank line after it:
    ```html
    <div style="background:#0e1545; border-radius:12px; padding:8px;">
    <iframe style="border-radius:8px" src="https://open.spotify.com/embed/episode/<ID>?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
@@ -84,5 +84,5 @@ If the post already has a Pattern A inline player for the same episode, **replac
 
 ### Reference implementations
 
-- `content/post/python_bridge_impact/index.md` — button (line 17) + embed (lines 87–89)
-- `content/post/python_sc_bayes_spatial/index.md`, `content/post/python_sc_dsc_sdid/index.md`, `content/post/r_sc_dsc_sdid/index.md`, `content/post/python_dowhy/index.md` — same pattern
+- `content/tutorials/python_bridge_impact/index.md` — button (line 17) + embed (lines 87–89)
+- `content/tutorials/python_sc_bayes_spatial/index.md`, `content/tutorials/python_sc_dsc_sdid/index.md`, `content/tutorials/r_sc_dsc_sdid/index.md`, `content/tutorials/python_dowhy/index.md` — same pattern

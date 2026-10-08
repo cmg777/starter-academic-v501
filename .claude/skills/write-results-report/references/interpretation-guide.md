@@ -7,8 +7,8 @@
 
 Every number in the script output deserves context. Do not just restate the
 output — translate it into domain meaning. Aim for the rhythm of the two
-exemplars (`content/post/r_did_ring/results_report.md`,
-`content/post/r_did2/results_report.md`): a 2–4 sentence paragraph that
+exemplars (`content/tutorials/r_did_ring/results_report.md`,
+`content/tutorials/r_did2/results_report.md`): a 2–4 sentence paragraph that
 quotes specific values, translates them to a domain quantity (percent,
 dollars, count), and connects to the research question.
 

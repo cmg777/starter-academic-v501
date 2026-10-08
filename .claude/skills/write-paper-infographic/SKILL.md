@@ -20,7 +20,7 @@ Use the repository's documented `/project:` notation:
 
 ```text
 /project:write-paper-infographic 20260528-EM
-/project:write-paper-infographic content/publication/20260528-EM --mode brief --output /tmp/okun-brief.md
+/project:write-paper-infographic content/articles/20260528-EM --mode brief --output /tmp/okun-brief.md
 /project:write-paper-infographic <publication-slug> --mode render --output /tmp/paper-candidate
 /project:write-paper-infographic <publication-slug> --mode install
 ```
@@ -28,7 +28,7 @@ Use the repository's documented `/project:` notation:
 Current Claude Code exposes project skills directly as
 `/write-paper-infographic`; `/project:` above follows this repository's existing
 documentation, not an additional registered alias. Parse `$ARGUMENTS` and the
-surrounding request together. Resolve a bare slug under `content/publication/`;
+surrounding request together. Resolve a bare slug under `content/articles/`;
 accept an explicit publication bundle, paper PDF, or source path. Preserve path
 case. If the paper or requested destination is ambiguous, ask only for the
 missing choice and continue independent source inspection. Do not create a
@@ -63,10 +63,10 @@ headings, column labels, notes, and surrounding interpretation. An abstract alon
 does not establish numerical chart data.
 
 Inspect actual publication thumbnails, not tutorial artwork. Start with
-`content/publication/20260528-EM/featured.webp`, then the newest relevant papers
+`content/articles/20260528-EM/featured.webp`, then the newest relevant papers
 selected by publication date in `layouts/index.html`. Useful contrasting references
-are `content/publication/20260216-APJRS/featured.webp` (commuting estimates and
-reported standard errors) and `content/publication/20251006-SIR/featured.webp`
+are `content/articles/20260216-APJRS/featured.webp` (commuting estimates and
+reported standard errors) and `content/articles/20251006-SIR/featured.webp`
 (poverty-indicator prediction accuracy). These show different evidence choices
 within the same question/evidence/answer hierarchy. Inspect the target's existing
 image too. Preserve semantic scientific colors when using a chart or map. If a
@@ -197,8 +197,8 @@ the **encoded file's bytes** and dimensions, and report bytes (optionally KiB),
 not an estimate based on a generation setting. Inspect the WebP itself. No arbitrary
 byte target takes priority over readability.
 
-For installation, update the corresponding bundle under `content/publication/`,
-`content/es/publication/`, and `content/ja/publication/`. Read the glossary and
+For installation, update the corresponding bundle under `content/articles/`,
+`content/es/articles/`, and `content/ja/articles/`. Read the glossary and
 publication/asset conventions in
 `../translate-content/references/glossary.md` and
 `../translate-content/references/field-rules.md` relative to this skill. Default
@@ -242,7 +242,7 @@ checks actually performed versus pending. Leave changes uncommitted.
 ## Worked example: Okun's law in Indonesia
 
 Use this to calibrate source fidelity and hierarchy, not as a universal chart:
-`content/publication/20260528-EM/` contains *Okun's law and spatial regimes in
+`content/articles/20260528-EM/` contains *Okun's law and spatial regimes in
 Indonesia: A machine learning approach*. Its approved image asks **"Growth up,
 unemployment down?"**, shows four estimates with uncertainty in the middle, and
 answers **"Not everywhere."** The user removed filled bars: preserve **estimate

@@ -32,11 +32,11 @@ links:
   - icon: open-data
     icon_pack: ai
     name: "[Python] Google Colab"
-    url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_<slug>/notebook.ipynb
+    url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/tutorials/python_<slug>/notebook.ipynb
   - icon: markdown
     icon_pack: fab
     name: "MD version"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_<slug>/index.md
+    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_<slug>/index.md
 slides:
 summary: "<Single-line case study summary -- no line breaks>"
 tags:
@@ -82,7 +82,7 @@ links:
   - icon: markdown
     icon_pack: fab
     name: "MD version"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_<slug>/index.md
+    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_<slug>/index.md
 slides:
 summary: "<Single-line case study summary>"
 tags:
@@ -124,7 +124,7 @@ links:
   - icon: markdown
     icon_pack: fab
     name: "MD version"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_<slug>/index.md
+    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_<slug>/index.md
 slides:
 summary: "<Single-line case study summary>"
 tags:

@@ -47,9 +47,9 @@ path:
 
 | Language | Slug pattern | Script path |
 |----------|-------------|-------------|
-| Python | `python_*` | `content/post/<slug>/script.py` |
-| Stata | `stata_*` | `content/post/<slug>/analysis.do` |
-| R | `r_*` | `content/post/<slug>/analysis.R` |
+| Python | `python_*` | `content/tutorials/<slug>/script.py` |
+| Stata | `stata_*` | `content/tutorials/<slug>/analysis.do` |
+| R | `r_*` | `content/tutorials/<slug>/analysis.R` |
 
 If the slug does not start with a language prefix, check the post directory for
 whichever script file exists (`script.py`, `analysis.do`, `analysis.R`).
@@ -107,13 +107,13 @@ Run the script fresh and capture output:
 
 ```bash
 # Python
-cd content/post/<slug>/ && python3 script.py 2>&1 | tee execution_log_review.txt
+cd content/tutorials/<slug>/ && python3 script.py 2>&1 | tee execution_log_review.txt
 
 # Stata
-cd content/post/<slug>/ && "/Applications/Stata 18.0/StataMP.app/Contents/MacOS/stata-mp" -b do analysis.do
+cd content/tutorials/<slug>/ && "/Applications/Stata 18.0/StataMP.app/Contents/MacOS/stata-mp" -b do analysis.do
 
 # R
-cd content/post/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log_review.txt
+cd content/tutorials/<slug>/ && Rscript analysis.R 2>&1 | tee execution_log_review.txt
 ```
 
 Check:
@@ -125,7 +125,7 @@ Check:
 
 After execution checks are complete, clean up the review log:
 ```bash
-rm content/post/<slug>/execution_log_review.txt
+rm content/tutorials/<slug>/execution_log_review.txt
 ```
 
 ### Dimension 2: Structure and organization
@@ -195,7 +195,7 @@ Skip this dimension if the script is not a causal inference analysis. Check:
 
 Deliver the review **both inline in the conversation AND saved as a file**.
 Save the report as `script-review.md` in the post directory (e.g.,
-`content/post/<slug>/script-review.md`). This file serves as a permanent
+`content/tutorials/<slug>/script-review.md`). This file serves as a permanent
 record of the review for downstream skills and future reference.
 
 After saving, also update the post's `README.md` to add `script-review.md`

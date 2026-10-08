@@ -162,7 +162,7 @@ After running the script, parse `OUTPUT_JSON` and apply these rules:
     left in the repo.
   - **If verdict is MINOR or MAJOR and a HIGH issue exists under
     Dim 9 or Dim 10**, copy the relevant screenshots into
-    `content/post/<slug>/web_app/REVIEW_<tabid>.png` and reference
+    `content/tutorials/<slug>/web_app/REVIEW_<tabid>.png` and reference
     them in REVIEW.md. Keep at most 3 screenshots; prefer mobile
     ones over desktop.
   - **Otherwise** (MINOR/MAJOR but no visual/mobile HIGH), delete the

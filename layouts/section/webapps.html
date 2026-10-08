@@ -1,0 +1,51 @@
+{{/* WebApps — every interactive app, with cards that open the app itself.
+     Two sources:
+       1. Standalone apps: content/webapps/<slug>/index.md (GEE and Streamlit apps;
+          `app_url`, `platform`, `region`, `topic`; featured.jpg from
+          scripts/capture-dashboard-screenshots.cjs).
+       2. Tutorial apps, found automatically: every English tutorial bundle that
+          ships web_app/index.html. Title comes from the current language's tutorial
+          stub; image is the tutorial's featured image; topic is the first matching
+          topic in data/tutorial_topics.yaml. Adding a web_app/ to a tutorial is all
+          it takes to list it here.
+     See layouts/partials/catalog.html. */}}
+{{- define "main" -}}
+{{ partial "page_header.html" . }}
+{{ $topics := site.Data.tutorial_topics.topics }}
+{{ $items := slice }}
+
+{{ range .Pages.ByDate.Reverse }}
+  {{ $items = $items | append (dict
+      "title" .Title "summary" .Summary "href" .Params.app_url "external" true
+      "img" ((.Resources.ByType "image").GetMatch "*featured*")
+      "attrs" (dict "platform" (.Params.platform | default "") "region" (.Params.region | default "") "topic" (.Params.topic | default ""))
+      "page" .) }}
+{{ end }}
+
+{{ $en := index site.Sites 0 }}
+{{ $tutLabel := .Params.tutorial_label | default "Tutorial" }}
+{{ $openLabel := .Params.open_label | default "Open app" }}
+{{ range (where $en.RegularPages "Section" "tutorials").ByDate.Reverse }}
+  {{ $tut := . }}
+  {{ $app := .Resources.GetMatch "web_app/index.html" }}
+  {{ if $app }}
+    {{/* Localized title/summary from this language's stub, when it exists. */}}
+    {{ $loc := $tut }}
+    {{ range where (where site.Pages "Section" "tutorials") "Params.card_url" (printf "/tutorials/%s/" (path.Base (strings.TrimSuffix "/" $tut.File.Dir))) }}{{ $loc = . }}{{ end }}
+    {{ $topic := "" }}
+    {{ range $topics }}
+      {{ if and (not $topic) (ne .id "foundations") (intersect (.category_matches | default slice) ($tut.Params.categories | default slice)) }}{{ $topic = .id }}{{ end }}
+    {{ end }}
+    {{ $items = $items | append (dict
+        "title" $loc.Title "summary" $loc.Summary
+        "href" (printf "%sweb_app/index.html" $tut.RelPermalink) "external" true
+        "img" (($tut.Resources.ByType "image").GetMatch "*featured*")
+        "attrs" (dict "platform" "browser" "topic" ($topic | default "foundations"))
+        "buttons" (slice
+          (dict "name" $openLabel "url" (printf "%sweb_app/index.html" $tut.RelPermalink) "icon_pack" "fas" "icon" "laptop-code")
+          (dict "name" $tutLabel "url" $tut.RelPermalink "icon_pack" "fas" "icon" "book-open"))) }}
+  {{ end }}
+{{ end }}
+
+{{ partial "catalog.html" (dict "page" . "items" $items) }}
+{{- end -}}

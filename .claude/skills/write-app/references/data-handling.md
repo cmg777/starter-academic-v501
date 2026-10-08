@@ -4,7 +4,7 @@ The app is static — every interaction must run in the browser without a
 backend. That constraints how the skill binds the post's data to the
 app.
 
-Three patterns cover all 81 posts in `content/post/`. Phase 1 detects
+Three patterns cover all 81 posts in `content/tutorials/`. Phase 1 detects
 the pattern; Phase 2 confirms; Phase 3 bakes the data into
 `web_app/data/results.json`.
 
@@ -41,7 +41,7 @@ get baked into `data/results.json` matching the post's Figure 1.
 
 ## Pattern B — raw `data/` folder only
 
-**Signal.** A `content/post/<slug>/data/` subfolder exists with one or
+**Signal.** A `content/tutorials/<slug>/data/` subfolder exists with one or
 more CSVs, but no precomputed result tables at the post root.
 
 **What the skill does.**

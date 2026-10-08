@@ -2,7 +2,7 @@
 
 The renderer (`templates/build_data_dictionary.py`) already implements every feature below; this
 is the spec/source-of-truth so you can confirm parity and know what to fix if a feature regresses.
-The reference page is `content/post/python_kuznets_dmsp/data/index.html`.
+The reference page is `content/tutorials/python_kuznets_dmsp/data/index.html`.
 
 ## Page sections (in order; optional ones auto-omit when their metadata is empty)
 

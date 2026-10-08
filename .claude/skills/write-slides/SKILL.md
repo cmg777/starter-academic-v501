@@ -1,6 +1,6 @@
 ---
 name: write-slides
-description: Generate a Quarto reveal.js slide deck from an existing post on carlos-mendez.org. The skill reads the post's prose, figures, tables, and results_report.md, runs an audience-triage + key-takeaway + outline-checkpoint interview (porting Scott Cunningham's "Rhetoric of Decks"), then writes a slides.qmd (+ a branded SCSS theme + a custom title-slide partial), renders it with `quarto render` to content/post/<slug>/slides/, and opens it from a "Slides (HTML)" button. Built-in menu / chalkboard / speaker view / preview-links / overview; assertion titles, 3-act arc, one idea per slide; key-result title strip; English-only.
+description: Generate a Quarto reveal.js slide deck from an existing post on carlos-mendez.org. The skill reads the post's prose, figures, tables, and results_report.md, runs an audience-triage + key-takeaway + outline-checkpoint interview (porting Scott Cunningham's "Rhetoric of Decks"), then writes a slides.qmd (+ a branded SCSS theme + a custom title-slide partial), renders it with `quarto render` to content/tutorials/<slug>/slides/, and opens it from a "Slides (HTML)" button. Built-in menu / chalkboard / speaker view / preview-links / overview; assertion titles, 3-act arc, one idea per slide; key-result title strip; English-only.
 argument-hint: "<post slug> [--no-link] [--no-verify]"
 disable-model-invocation: true
 user-invocable: true
@@ -15,7 +15,7 @@ post's own figures, tables, and numbers, restructured into a talk with reveal.js
 **menu, chalkboard, speaker view, preview-links, and overview**.
 
 The deck is authored as a `slides.qmd` (`format: revealjs`) and rendered by the **Quarto CLI**
-to `content/post/<slug>/slides/` (mirroring the `web_app/` precedent). It is branded to a
+to `content/tutorials/<slug>/slides/` (mirroring the `web_app/` precedent). It is branded to a
 **fixed** site SCSS theme and needs no CDN (reveal + plugins are bundled by Quarto).
 
 The skill's signature behaviour is **the interview** (Phase 2): it ports `beautiful_deck`'s
@@ -72,21 +72,21 @@ Devil's-Advocate) lives in [`references/rhetoric-of-decks.md`](references/rhetor
 
 | Path | Purpose |
 |---|---|
-| `content/post/<slug>/slides/slides.qmd` | Deck source (`format: revealjs`) — the only per-post authored file |
-| `content/post/<slug>/slides/site-brand.scss` | revealjs theme (copied verbatim from `references/templates/`) |
-| `content/post/<slug>/slides/title-slide.html` | title-slide partial rendering the key-result strip (copied verbatim) |
-| `content/post/<slug>/slides/index.html` | the rendered deck (`quarto render` output) |
-| `content/post/<slug>/slides/slides_files/` | reveal.js + plugins + libs (`quarto render` output, ~8 MB) |
+| `content/tutorials/<slug>/slides/slides.qmd` | Deck source (`format: revealjs`) — the only per-post authored file |
+| `content/tutorials/<slug>/slides/site-brand.scss` | revealjs theme (copied verbatim from `references/templates/`) |
+| `content/tutorials/<slug>/slides/title-slide.html` | title-slide partial rendering the key-result strip (copied verbatim) |
+| `content/tutorials/<slug>/slides/index.html` | the rendered deck (`quarto render` output) |
+| `content/tutorials/<slug>/slides/slides_files/` | reveal.js + plugins + libs (`quarto render` output, ~8 MB) |
 
 Plus the `index.md` update injecting the `Slides (HTML)` YAML link, unless `--no-link`. The
-deck is reachable at `/post/<slug>/slides/index.html`. Figures are reused in place via
+deck is reachable at `/tutorials/<slug>/slides/index.html`. Figures are reused in place via
 relative `../<slug>_*.png` (not copied).
 
 **Commit the whole `slides/` dir.** Unlike Quarto *tutorials* (whose `tutorial.html` /
 `tutorial_files/` are git-ignored because readers render locally), the deck's rendered
 `index.html` + `slides_files/` (~8 MB) are **production assets Netlify serves** — Netlify runs
 Hugo, not Quarto, so the rendered output must be in git. Only Quarto's local cache is ignored
-(`content/post/*/slides/.quarto/`). See `references/render-and-fix.md` §11.
+(`content/tutorials/*/slides/.quarto/`). See `references/render-and-fix.md` §11.
 
 ---
 
@@ -124,16 +124,16 @@ Do not write any file in this phase.
 Reject unknown flags.
 
 ### 1.2 Locate the post
-`content/post/<slug>/`. Hard-fail with a message pointing to `/project:write-post` if absent.
+`content/tutorials/<slug>/`. Hard-fail with a message pointing to `/project:write-post` if absent.
 
 ### 1.3 Detect existing deck + button collisions
-If `content/post/<slug>/slides/` exists, ask: **(a)** overwrite [default], **(b)** cancel,
+If `content/tutorials/<slug>/slides/` exists, ask: **(a)** overwrite [default], **(b)** cancel,
 **(c)** suffixed `slides_v2/`. Note any pre-existing `slides.pdf` or Wowchemy
 `content/slides/<name>` page — they do **not** collide (different folders/labels); surface in
 the SCOPE block for Phase-2 Round 4.
 
 ### 1.4 Read the post
-Read `content/post/<slug>/index.md` in full. Extract: `title:`; `subtitle`/`summary`; language;
+Read `content/tutorials/<slug>/index.md` in full. Extract: `title:`; `subtitle`/`summary`; language;
 `tags`/`categories`; the **Abstract** and **Overview**; **Learning objectives**; method
 headings; **interpretation paragraphs** (→ speaker notes); the **Summary/Conclusion**; every
 image `![caption](<slug>_*.png)` with its caption; every Markdown table; every `$$…$$`.
@@ -181,7 +181,7 @@ Existing slides/:  <none | present — overwrite | present — abort>
 slides.pdf / Wowchemy page: <none | present — coexists>
 Engine:            Quarto revealjs → index.html + slides_files/ (chalkboard, menu, speaker view)
 Theme:             FIXED site brand (steel/orange/teal/heading-blue/ink)
-Output:            content/post/<slug>/slides/{slides.qmd, site-brand.scss, title-slide.html, index.html}
+Output:            content/tutorials/<slug>/slides/{slides.qmd, site-brand.scss, title-slide.html, index.html}
 Flags:             --no-link=<t/f>  --no-verify=<t/f>
 ```
 
@@ -203,7 +203,7 @@ before `y`.
 ## Phase 3: Generate the deck
 
 ### 3.1 Create the folder
-`content/post/<slug>/slides/`.
+`content/tutorials/<slug>/slides/`.
 
 ### 3.2 Copy verbatim templates
 Copy unchanged from `references/templates/`: **`site-brand.scss`** and **`title-slide.html`**.
@@ -232,7 +232,7 @@ Unicode (slide-mapping § "Math symbols → LaTeX"). Run the **MB/MC + one-idea-
 
 ### 3.4 Render
 ```bash
-cd content/post/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
+cd content/tutorials/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
 ```
 → `index.html` + `slides_files/`. On failure, apply the **render-and-fix loop (max 3
 attempts)** from [`references/render-and-fix.md`](references/render-and-fix.md) (e.g. the
@@ -283,29 +283,29 @@ NEXT STEPS (copy + paste)
 =========================
 1. Preview (serve over http; press M=menu, B=chalkboard, S=speaker view, O=overview):
    /tmp/hugo-verify/hugo server --disableFastRender        # or your ≥0.96 hugo
-   open http://localhost:1313/post/<slug>/slides/
+   open http://localhost:1313/tutorials/<slug>/slides/
 
 2. Export a PDF handout (the skill does not build one). Either:
    a) in-browser:
-      open "http://localhost:1313/post/<slug>/slides/?print-pdf"
+      open "http://localhost:1313/tutorials/<slug>/slides/?print-pdf"
       then Print → Save as PDF (landscape, no margins, background graphics on)
    b) scriptable — exactly one page per slide, fragments flattened:
       CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
       "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
         --run-all-compositor-stages-before-draw --virtual-time-budget=40000 \
         --print-to-pdf=deck.pdf \
-        "http://localhost:1313/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
+        "http://localhost:1313/tutorials/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
       # verify: pdfinfo deck.pdf  ->  Pages == Reveal.getTotalSlides()
 
 3. Re-render after editing slides.qmd:
-   cd content/post/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
+   cd content/tutorials/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
 
 4. Optional — republish as an interactive AhaSlides deck (audience polls/quizzes on
    top of pixel-faithful slide images). Needs the PDF from step 2b:
    see .claude/docs/ahaslides.md
 
 5. Commit + push:
-   git add content/post/<slug>/slides/ content/post/<slug>/index.md
+   git add content/tutorials/<slug>/slides/ content/tutorials/<slug>/index.md
    git commit -m "<slug>: add Quarto reveal.js slide deck
 
    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
@@ -350,7 +350,7 @@ suggest the matching `render-and-fix.md` entry; offer a re-run.
 5. **`--no-verify`.** Phases 1–3 + 5 run; Phase 4 skipped; minimal file sanity still runs.
 6. **Idempotent re-run.** Second run detects `slides/`, asks before overwriting, reproduces
    byte-identical `site-brand.scss`/`title-slide.html`; the link inject does not duplicate.
-7. **Trailing-slash guard.** The rendered post page contains `href="/post/<slug>/slides/index.html"`.
+7. **Trailing-slash guard.** The rendered post page contains `href="/tutorials/<slug>/slides/index.html"`.
 8. **Chalkboard/embed-resources guard.** `embed-resources: true` is NOT set (render would
    fail); the deck ships `index.html` + `slides_files/`.
 9. **Takeaway cards.** Substantive content slides end with a `[…]{.takeaway .fragment}` card

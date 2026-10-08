@@ -12,9 +12,9 @@ en:
   languageName: English
   weight: 1
 
-# Spanish — served at /es/. The homepage, the items it shows, and the Courses
-# page are translated. Courses links to the localized /es/courses/; hash-anchor
-# items scroll the /es/ homepage and the external Events link is unchanged.
+# Spanish — served at /es/. Section items (Books, Courses, Software, WebApps,
+# Data) link to the localized /es/<section>/ pages; hash-anchor items scroll the
+# /es/ homepage and the external Events link is unchanged.
 es:
   languageCode: es-es
   languageName: Español
@@ -29,35 +29,40 @@ es:
       - name: 'Laboratorio'
         url: '#researchLab'
         weight: 20
-      - name: 'Publicaciones'
+      - name: 'Artículos'
         url: '#featured'
         weight: 30
-      - name: 'Presentaciones'
-        url: '#talks'
+      - name: 'Libros'
+        url: '/es/books/'
         weight: 40
-      - name: 'Tutoriales'
-        url: '#posts'
-        weight: 41
-      - name: 'Proyectos'
-        url: '#projects'
-        weight: 45
-      - name: 'Estudiantes'
-        url: '#people'
-        weight: 60
       - name: 'Cursos'
         url: '/es/courses/'
+        weight: 50
+      - name: 'Presentaciones'
+        url: '#talks'
+        weight: 60
+      - name: 'Software'
+        url: '/es/software/'
         weight: 70
+      - name: 'Apps web'
+        url: '/es/webapps/'
+        weight: 75
+      - name: 'Datos'
+        url: '/es/data/'
+        weight: 80
+      - name: 'Tutoriales'
+        url: '#posts'
+        weight: 90
       - name: 'Eventos'
         url: 'https://lu.ma/cmg'
-        weight: 80
+        weight: 100
       - name: 'Contacto'
         url: '#contact'
-        weight: 90
+        weight: 110
 
-# Japanese — served at /ja/. Mirrors the Spanish layer: the homepage, the items
-# it shows, and the Courses page are translated. Courses links to the localized
-# /ja/courses/; hash-anchor items scroll the /ja/ homepage and the external
-# Events link is unchanged. Infra hooks live in config.yaml (content/ja mount + hasCJKLanguage),
+# Japanese — served at /ja/. Mirrors the Spanish layer: section items link to the
+# localized /ja/<section>/ pages; hash-anchor items scroll the /ja/ homepage and
+# the external Events link is unchanged. Infra hooks live in config.yaml (content/ja mount + hasCJKLanguage),
 # netlify/edge-functions/geo-lang.ts (JP -> /ja/), and assets/js/lang-pref.js.
 ja:
   languageCode: ja-jp
@@ -73,27 +78,33 @@ ja:
       - name: '研究室'
         url: '#researchLab'
         weight: 20
-      - name: '業績'
+      - name: '論文'
         url: '#featured'
         weight: 30
-      - name: '講演'
-        url: '#talks'
+      - name: '著書'
+        url: '/ja/books/'
         weight: 40
-      - name: 'チュートリアル'
-        url: '#posts'
-        weight: 41
-      - name: 'プロジェクト'
-        url: '#projects'
-        weight: 45
-      - name: '学生'
-        url: '#people'
-        weight: 60
       - name: 'コース'
         url: '/ja/courses/'
+        weight: 50
+      - name: '講演'
+        url: '#talks'
+        weight: 60
+      - name: 'ソフトウェア'
+        url: '/ja/software/'
         weight: 70
+      - name: 'Webアプリ'
+        url: '/ja/webapps/'
+        weight: 75
+      - name: 'データ'
+        url: '/ja/data/'
+        weight: 80
+      - name: 'チュートリアル'
+        url: '#posts'
+        weight: 90
       - name: 'イベント'
         url: 'https://lu.ma/cmg'
-        weight: 80
+        weight: 100
       - name: 'お問い合わせ'
         url: '#contact'
-        weight: 90
+        weight: 110

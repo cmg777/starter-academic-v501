@@ -9,7 +9,7 @@ hand and then used to design the present version of the skill. Both clear
 the gates in `SKILL.md` § Step 4. Read both end to end before writing a new
 report, then refer back to them by section line range as needed.
 
-## Exemplar A — `content/post/r_did_ring/results_report.md` (332 lines)
+## Exemplar A — `content/tutorials/r_did_ring/results_report.md` (332 lines)
 
 **Topic:** Difference-in-differences with geocoded microdata (the ring
 approach). Replicates Butts (2023, *Journal of Urban Economics*) on the
@@ -45,7 +45,7 @@ Linden & Rockoff (2008) home-sales × sex-offender data.
 4. **Surprises walked, not skipped.** The Surprises section walks each of
    the 7 categories as a bullet — no open-ended "anything else" prompt.
 
-## Exemplar B — `content/post/r_did2/results_report.md` (455 lines)
+## Exemplar B — `content/tutorials/r_did2/results_report.md` (455 lines)
 
 **Topic:** Difference-in-differences for regional data (county-level ACA
 Medicaid expansion vs adult mortality). Replicates Baker, Callaway,

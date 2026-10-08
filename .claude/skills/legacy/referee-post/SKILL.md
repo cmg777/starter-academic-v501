@@ -20,7 +20,7 @@ report inline in the conversation without modifying any files.
 ```
 /project:referee-post python_doubleml
 /project:referee-post python_dowhy
-/project:referee-post content/post/python_ml_random_forest/
+/project:referee-post content/tutorials/python_ml_random_forest/
 /project:referee-post python_dowhy focus: code
 /project:referee-post python_dowhy focus: interpretations and rigor
 ```
@@ -47,8 +47,8 @@ Multiple keywords can be combined: `focus: code and interpretations`.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_doubleml`), resolve to `content/post/<slug>/index.md`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_doubleml`), resolve to `content/tutorials/<slug>/index.md`.
    - If `focus:` is present, extract the keywords and determine which passes to run.
 
 2. **Verify the post exists.** Read `index.md` in the resolved directory. If it
@@ -60,7 +60,7 @@ Multiple keywords can be combined: `focus: code and interpretations`.
 4. **Read calibration materials** (in parallel):
    - The data-science-post skill: `.claude/skills/data-science-post/SKILL.md`
      -- to understand all conventions the post should follow.
-   - The reference post: `content/post/python_ml_random_forest/index.md`
+   - The reference post: `content/tutorials/python_ml_random_forest/index.md`
      -- as a quality benchmark.
    - The scoring and criteria: `references/scoring-and-criteria.md`
      -- for severity levels, verdict criteria, and scoring guidelines.
@@ -75,7 +75,7 @@ Multiple keywords can be combined: `focus: code and interpretations`.
 Before starting the review, present the user with a brief confirmation:
 
 1. **Post identified**: "I'll review **[POST TITLE]** at
-   `content/post/<slug>/index.md`."
+   `content/tutorials/<slug>/index.md`."
 
 2. **Scope**: If `focus:` was provided: "Running focused review:
    [PASS NAMES]."

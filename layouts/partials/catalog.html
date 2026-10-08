@@ -1,0 +1,123 @@
+{{/* Catalog list — the filterable showcase used by /books/, /software/, /data/ and
+     /webapps/. It reuses the /articles/ look: a search box and dropdown filters on
+     top, then .cz-showcase rows (assets/scss/custom.scss).
+
+     Args (dict):
+       page   the section page. Its front matter `filters:` defines the dropdowns:
+                filters:
+                  - key: region            # item attribute to match
+                    label: Region          # first (all) option
+                    options:               # in display order; unused values are hidden
+                      - {value: global, label: Global}
+              `year_filter: <label>` adds a year dropdown built from item years.
+       items  slice of dicts, one per row:
+                title, summary, href, external (bool), img (image resource or nil),
+                year (string), attrs (dict key -> space-separated values),
+                page (optional; its `links:` buttons are rendered),
+                buttons (optional slice of dicts name/url/icon_pack/icon). */}}
+{{ $page := .page }}
+{{ $items := .items }}
+
+{{/* Collect the values actually present, so empty options never show. */}}
+{{ $present := dict }}
+{{ $years := slice }}
+{{ range $items }}
+  {{ range $k, $v := .attrs }}
+    {{ range (split $v " ") }}{{ if . }}{{ $present = merge $present (dict (printf "%s:%s" $k .) true) }}{{ end }}{{ end }}
+  {{ end }}
+  {{ with .year }}{{ $years = $years | append . }}{{ end }}
+{{ end }}
+{{ $years = sort (uniq $years) "value" "desc" }}
+
+<div class="universal-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      {{ with $page.Content }}<div class="article-style">{{ . }}</div>{{ end }}
+      <div class="form-row mb-4 catalog-filters">
+        <div class="col-auto">
+          <input type="search" class="filter-search" placeholder="{{ i18n "search_placeholder" }}" autocapitalize="off"
+            autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" aria-label="{{ i18n "search_placeholder" }}">
+        </div>
+        {{ range $page.Params.filters }}
+          {{ $key := .key }}
+          <div class="col-auto">
+            <select class="pub-filters form-control form-control-sm" data-catalog-filter="{{ $key }}" aria-label="{{ .label }}">
+              <option value="*">{{ .label }}</option>
+              {{ range .options }}
+                {{ if index $present (printf "%s:%s" $key .value) }}<option value="{{ .value }}">{{ .label }}</option>{{ end }}
+              {{ end }}
+            </select>
+          </div>
+        {{ end }}
+        {{ with $page.Params.year_filter }}{{ if $years }}
+          <div class="col-auto">
+            <select class="pub-filters form-control form-control-sm" data-catalog-filter="year" aria-label="{{ . }}">
+              <option value="*">{{ . }}</option>
+              {{ range $years }}<option value="{{ . }}">{{ . }}</option>{{ end }}
+            </select>
+          </div>
+        {{ end }}{{ end }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="universal-wrapper">
+  <div class="cz-showcase pub-showcase catalog-showcase">
+    {{ range $items }}
+      {{ $it := . }}
+      {{ $target := cond .external "target=\"_blank\" rel=\"noopener\"" "" }}
+      <article class="cz-showcase-item" data-search="{{ lower (printf "%s %s" .title (.summary | default "" | plainify)) }}"
+        {{- with .year }} data-year="{{ . }}"{{ end }}
+        {{- range $k, $v := .attrs }} data-{{ $k }}="{{ $v }}"{{ end }}>
+        <a class="cz-showcase-media" href="{{ .href }}" {{ $target | safeHTMLAttr }} aria-label="{{ .title }}">
+          {{ with .img }}
+            {{ $thumb := .Fit "1200x900" }}
+            <img src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" alt="{{ $it.title }}" loading="lazy" decoding="async">
+          {{ else }}
+            <span class="cz-showcase-noimg"><i class="fas fa-{{ $page.Params.icon | default "cube" }}" aria-hidden="true"></i></span>
+          {{ end }}
+        </a>
+        <div class="cz-showcase-body">
+          <h3 class="cz-showcase-title"><a href="{{ .href }}" {{ $target | safeHTMLAttr }}>{{ .title }}</a></h3>
+          {{ with .summary }}<div class="cz-showcase-summary"><p>{{ . | markdownify | plainify }}</p></div>{{ end }}
+          {{ with .page }}
+            {{ if partial "functions/has_attachments" . }}
+              <div class="btn-links cz-showcase-links">{{ partial "page_links" (dict "page" . "is_list" 1) }}</div>
+            {{ end }}
+          {{ end }}
+          {{ with .buttons }}
+            <div class="btn-links cz-showcase-links">
+              {{ range . }}<a class="btn btn-outline-primary btn-page-header btn-sm" href="{{ .url }}"{{ if hasPrefix .url "http" }} target="_blank" rel="noopener"{{ end }}><i class="{{ .icon_pack }} fa-{{ .icon }} mr-1"></i>{{ .name }}</a> {{ end }}
+            </div>
+          {{ end }}
+        </div>
+      </article>
+    {{ end }}
+  </div>
+</div>
+
+<script>
+  (function() {
+    var search = document.querySelector('.catalog-filters .filter-search');
+    var selects = document.querySelectorAll('.catalog-filters [data-catalog-filter]');
+    var items = document.querySelectorAll('.catalog-showcase .cz-showcase-item');
+    if (!items.length) return;
+    function apply() {
+      var q = (search && search.value || '').toLowerCase().trim();
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var ok = !q || (item.getAttribute('data-search') || '').indexOf(q) !== -1;
+        for (var j = 0; ok && j < selects.length; j++) {
+          var want = selects[j].value;
+          if (want === '*') continue;
+          var have = (item.getAttribute('data-' + selects[j].getAttribute('data-catalog-filter')) || '').split(' ');
+          ok = have.indexOf(want) !== -1;
+        }
+        item.style.display = ok ? '' : 'none';
+      }
+    }
+    if (search) search.addEventListener('input', apply);
+    for (var k = 0; k < selects.length; k++) selects[k].addEventListener('change', apply);
+  })();
+</script>

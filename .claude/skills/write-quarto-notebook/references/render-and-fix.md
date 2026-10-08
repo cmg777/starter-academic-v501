@@ -176,7 +176,7 @@ rewriting the path to the GitHub raw URL (Stata can read URLs over HTTP
 since 13+):
 
 ```stata
-use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/<file>.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/<file>.dta", clear
 ```
 
 Retry.

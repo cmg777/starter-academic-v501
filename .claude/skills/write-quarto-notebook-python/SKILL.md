@@ -22,7 +22,7 @@ inside the kernel is fine; use this skill for student-facing tutorials
 where the friction-free bundle pattern matters.
 
 The bundle pattern was validated end-to-end on
-`content/post/python_pyfixest/` in May 2026 over 8 iterations. This
+`content/tutorials/python_pyfixest/` in May 2026 over 8 iterations. This
 skill codifies the final result so any Python post can produce the same
 deliverable.
 
@@ -71,14 +71,14 @@ Every successful run produces these eight artifacts:
 
 | Path | Purpose |
 |---|---|
-| `content/post/<slug>/references/tutorial.qmd` | Executable Quarto notebook (jupyter: `<slug>-tutorial`; responsive-figure CSS in header) |
-| `content/post/<slug>/references/setup_env.py` | Hermetic `.venv` bootstrap + preflight + auto-relaunch + kernel registration |
-| `content/post/<slug>/references/_quarto.yml` | Wires `setup_env.py` to Quarto's `pre-render` hook |
-| `content/post/<slug>/references/render.command` | macOS one-click wrapper (executable) |
-| `content/post/<slug>/references/render.bat` | Windows one-click wrapper |
-| `content/post/<slug>/references/README.md` | Bundle README (prerequisites, how-to, troubleshooting) |
-| `content/post/<slug>/build_bundle.sh` | Bash packager that produces the ZIP |
-| `content/post/<slug>/<slug>.zip` | Downloadable bundle (7 files inside `<slug>/`) |
+| `content/tutorials/<slug>/references/tutorial.qmd` | Executable Quarto notebook (jupyter: `<slug>-tutorial`; responsive-figure CSS in header) |
+| `content/tutorials/<slug>/references/setup_env.py` | Hermetic `.venv` bootstrap + preflight + auto-relaunch + kernel registration |
+| `content/tutorials/<slug>/references/_quarto.yml` | Wires `setup_env.py` to Quarto's `pre-render` hook |
+| `content/tutorials/<slug>/references/render.command` | macOS one-click wrapper (executable) |
+| `content/tutorials/<slug>/references/render.bat` | Windows one-click wrapper |
+| `content/tutorials/<slug>/references/README.md` | Bundle README (prerequisites, how-to, troubleshooting) |
+| `content/tutorials/<slug>/build_bundle.sh` | Bash packager that produces the ZIP |
+| `content/tutorials/<slug>/<slug>.zip` | Downloadable bundle (7 files inside `<slug>/`) |
 
 Plus the `index.md` update (Phase 7), unless `--no-link` is given.
 
@@ -116,13 +116,13 @@ Reject any other argument or flag with a clear error.
 
 ### 1.2 Locate the post
 
-The post directory is `content/post/<slug>/`. Error out if it does
+The post directory is `content/tutorials/<slug>/`. Error out if it does
 not exist.
 
 ### 1.3 Verify required inputs
 
-- `content/post/<slug>/index.md` must exist.
-- `content/post/<slug>/script.py` must exist.
+- `content/tutorials/<slug>/index.md` must exist.
+- `content/tutorials/<slug>/script.py` must exist.
 
 If `script.py` is missing, stop and tell the user to run
 `/project:write-script <topic> dataset: <dataset>` first.
@@ -139,9 +139,9 @@ If `script.py` is missing, stop and tell the user to run
 Compute the target output paths. If any of these already exist, ask
 the user whether to overwrite. Do not silently clobber:
 
-- `content/post/<slug>/references/tutorial.qmd`
-- `content/post/<slug>/references/setup_env.py`
-- `content/post/<slug>/<slug>.zip`
+- `content/tutorials/<slug>/references/tutorial.qmd`
+- `content/tutorials/<slug>/references/setup_env.py`
+- `content/tutorials/<slug>/<slug>.zip`
 
 ### 1.6 Read source materials
 
@@ -226,18 +226,18 @@ SCOPE
 Post slug:        <slug>
 Kernel name:      <slug>-tutorial
 Source files:
-  - content/post/<slug>/index.md   (<N> lines)
-  - content/post/<slug>/script.py  (<M> lines)
+  - content/tutorials/<slug>/index.md   (<N> lines)
+  - content/tutorials/<slug>/script.py  (<M> lines)
 
 Bundle output paths:
-  - content/post/<slug>/references/tutorial.qmd
-  - content/post/<slug>/references/setup_env.py
-  - content/post/<slug>/references/_quarto.yml
-  - content/post/<slug>/references/render.command
-  - content/post/<slug>/references/render.bat
-  - content/post/<slug>/references/README.md
-  - content/post/<slug>/build_bundle.sh
-  - content/post/<slug>/<slug>.zip
+  - content/tutorials/<slug>/references/tutorial.qmd
+  - content/tutorials/<slug>/references/setup_env.py
+  - content/tutorials/<slug>/references/_quarto.yml
+  - content/tutorials/<slug>/references/render.command
+  - content/tutorials/<slug>/references/render.bat
+  - content/tutorials/<slug>/references/README.md
+  - content/tutorials/<slug>/build_bundle.sh
+  - content/tutorials/<slug>/<slug>.zip
 
 Render step:           will run | SKIPPED (--no-render)
 Tempdir verification:  will run | SKIPPED (--no-render)
@@ -281,7 +281,7 @@ request, adjust and re-print the scope block.
 
 Write seven files. See `references/templates/` for canonical templates.
 
-### 3.1 `content/post/<slug>/references/tutorial.qmd`
+### 3.1 `content/tutorials/<slug>/references/tutorial.qmd`
 
 Apply the five transformation passes from
 [`references/transformations.md`](references/transformations.md):
@@ -300,7 +300,7 @@ OK/MISMATCH). See `transformations.md` §5 for the template.
 
 Append the "Source files" footer.
 
-### 3.2 `content/post/<slug>/references/setup_env.py`
+### 3.2 `content/tutorials/<slug>/references/setup_env.py`
 
 Copy `templates/setup_env.py.template` and substitute:
 
@@ -312,20 +312,20 @@ Copy `templates/setup_env.py.template` and substitute:
   Tutorial", "Python PCA Tutorial"). Title-case the slug after
   stripping the `python_` prefix.
 
-### 3.3 `content/post/<slug>/references/_quarto.yml`
+### 3.3 `content/tutorials/<slug>/references/_quarto.yml`
 
 Copy `templates/_quarto.yml.template` verbatim (no substitutions).
 
-### 3.4 `content/post/<slug>/references/render.command`
+### 3.4 `content/tutorials/<slug>/references/render.command`
 
 Copy `templates/render.command.template` verbatim. `chmod +x` after
 writing.
 
-### 3.5 `content/post/<slug>/references/render.bat`
+### 3.5 `content/tutorials/<slug>/references/render.bat`
 
 Copy `templates/render.bat.template` verbatim.
 
-### 3.6 `content/post/<slug>/references/README.md`
+### 3.6 `content/tutorials/<slug>/references/README.md`
 
 Copy `templates/README.md.template` and substitute:
 
@@ -333,7 +333,7 @@ Copy `templates/README.md.template` and substitute:
 - `<SLUG>` ← the post slug
 - `<KERNEL_NAME>` ← `<slug>-tutorial`
 
-### 3.7 `content/post/<slug>/build_bundle.sh`
+### 3.7 `content/tutorials/<slug>/build_bundle.sh`
 
 Copy `templates/build_bundle.sh.template` verbatim. The template
 derives `SLUG` from `basename "${POST_DIR}"`, so no substitutions are
@@ -348,7 +348,7 @@ Skip if `--no-render` was given.
 Run from the `references/` directory:
 
 ```bash
-cd content/post/<slug>/references
+cd content/tutorials/<slug>/references
 python3 setup_env.py 2>&1     # one-time setup (idempotent on re-runs)
 quarto render tutorial.qmd 2>&1
 ```
@@ -372,12 +372,12 @@ report (do not delete any bundle file).
 Run:
 
 ```bash
-bash content/post/<slug>/build_bundle.sh
+bash content/tutorials/<slug>/build_bundle.sh
 ```
 
 The script copies the seven source files into a staged `<slug>/`
 folder under `mktemp`, `chmod +x`s `render.command`, and produces
-`content/post/<slug>/<slug>.zip`.
+`content/tutorials/<slug>/<slug>.zip`.
 
 Verify with `unzip -l`:
 
@@ -400,7 +400,7 @@ Reproduces the "fresh student" experience:
 ```bash
 TEMP=/tmp/<slug>-verify-$(date +%s)
 mkdir -p "$TEMP"
-unzip -q content/post/<slug>/<slug>.zip -d "$TEMP"
+unzip -q content/tutorials/<slug>/<slug>.zip -d "$TEMP"
 cd "$TEMP/<slug>"
 bash render.command 2>&1 | head -200
 test -s tutorial.html
@@ -489,7 +489,7 @@ Run after editing this `SKILL.md` to confirm the contract still
 works.
 
 1. **Reproduce `python_pyfixest`.** Move existing
-   `content/post/python_pyfixest/references/tutorial.qmd` and
+   `content/tutorials/python_pyfixest/references/tutorial.qmd` and
    `setup_env.py` aside to `.before-skill`. Invoke the skill on
    `python_pyfixest`. Expect the regenerated files to be functionally
    identical (modulo whitespace and comment ordering), the ZIP to
@@ -504,7 +504,7 @@ works.
      `ipykernel`.
    - If the script transitively pulls in `numba`, the Intel-override
      is applied automatically.
-   - ZIP at `content/post/<slug>/<slug>.zip` with the 7 expected
+   - ZIP at `content/tutorials/<slug>/<slug>.zip` with the 7 expected
      entries.
    - Tempdir render produces a non-empty `tutorial.html`.
    - `index.md` gains a `"Quarto project (.zip)"` link entry.

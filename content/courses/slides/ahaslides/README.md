@@ -3,7 +3,7 @@
 > **The procedure lives in [`.claude/docs/ahaslides.md`](../../../../.claude/docs/ahaslides.md).**
 > This file records only what is specific to these decks: the first ones built from a
 > **Canva PDF** (not a Quarto deck), split into **three lectures**, with **playable YouTube
-> slides**. The generators follow the FWL pattern (`content/post/python_fwl/ahaslides/`).
+> slides**. The generators follow the FWL pattern (`content/tutorials/python_fwl/ahaslides/`).
 
 | Part | Presentation | Join code | Share link | Slides |
 |---|---|---|---|---|

@@ -88,5 +88,5 @@ imports + `jupyter` + `ipykernel`.
 
 The `numba`/`llvmlite` entries were verified during the
 `python_pyfixest` iteration 2 (2026-03–05). They are the cause for
-the existence of this catalog. See `content/post/python_pyfixest/`
+the existence of this catalog. See `content/tutorials/python_pyfixest/`
 for the original validation.

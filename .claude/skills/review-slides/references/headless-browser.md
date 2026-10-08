@@ -23,7 +23,7 @@ measurement.
 
 ```bash
 node .claude/skills/review-slides/references/templates/slide-audit.cjs \
-  "$PWD/content/post/<slug>/slides/index.html"
+  "$PWD/content/tutorials/<slug>/slides/index.html"
 ```
 
 It prints one line per slide:

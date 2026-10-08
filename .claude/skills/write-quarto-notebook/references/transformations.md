@@ -88,9 +88,9 @@ under `https://carlos-mendez.org/`. Relative Hugo links like
 
 | Source pattern | Replacement |
 |---|---|
-| `(/post/<slug>/)` | `(https://carlos-mendez.org/post/<slug>/)` |
-| `(/publication/<slug>/)` | `(https://carlos-mendez.org/publication/<slug>/)` |
-| `(/event/<slug>/)` | `(https://carlos-mendez.org/event/<slug>/)` |
+| `(/tutorials/<slug>/)` | `(https://carlos-mendez.org/tutorials/<slug>/)` |
+| `(/articles/<slug>/)` | `(https://carlos-mendez.org/articles/<slug>/)` |
+| `(/presentations/<slug>/)` | `(https://carlos-mendez.org/presentations/<slug>/)` |
 | `#section-anchor` (intra-doc) | leave as-is (Quarto generates anchors) |
 
 External links (`https://...`) are left alone.
@@ -244,7 +244,7 @@ of the `.qmd`:
 ## Source files
 
 - Companion script: [`<script>`](<raw URL>)
-- Published post: <https://carlos-mendez.org/post/<slug>/>
+- Published post: <https://carlos-mendez.org/tutorials/<slug>/>
 - GitHub repo: <https://github.com/cmg777/starter-academic-v501>
 ```
 

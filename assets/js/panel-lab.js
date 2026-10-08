@@ -4,7 +4,7 @@
  * Loaded once per page by layouts/shortcodes/panel-lab.html through Hugo Pipes
  * (js.Build, target es2017, minified, fingerprinted). No dependencies.
  * Initializes every `.panel-lab[data-panel-lab]` element on the page.
- * Companion of content/post/python_panel_intro (union wage premium, T = 2).
+ * Companion of content/tutorials/python_panel_intro (union wage premium, T = 2).
  *
  * Tab A, "Selection lab": a simulated balanced panel, N = 2,199 workers, T = 2.
  *   worker effect   alpha_i = 0.55 * a_i,                a_i ~ N(0, 1)

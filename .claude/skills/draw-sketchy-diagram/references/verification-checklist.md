@@ -36,6 +36,6 @@ isn't being propagated — check that the layout JSON has a `seed` key.
 ## 4. Provenance
 
 When committing a rendered diagram into a blog post, commit the layout
-JSON alongside it (e.g. `content/post/<slug>/figures/foo.layout.json`
+JSON alongside it (e.g. `content/tutorials/<slug>/figures/foo.layout.json`
 next to `foo.svg`). That makes the diagram reproducible — a future edit
 just needs the JSON, not the chat that produced it.

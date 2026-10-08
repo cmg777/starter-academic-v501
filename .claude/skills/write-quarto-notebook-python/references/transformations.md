@@ -98,9 +98,9 @@ Rewrite:
 
 | Source pattern | Replacement |
 |---|---|
-| `(/post/<slug>/)` | `(https://carlos-mendez.org/post/<slug>/)` |
-| `(/publication/<slug>/)` | `(https://carlos-mendez.org/publication/<slug>/)` |
-| `(/event/<slug>/)` | `(https://carlos-mendez.org/event/<slug>/)` |
+| `(/tutorials/<slug>/)` | `(https://carlos-mendez.org/tutorials/<slug>/)` |
+| `(/articles/<slug>/)` | `(https://carlos-mendez.org/articles/<slug>/)` |
+| `(/presentations/<slug>/)` | `(https://carlos-mendez.org/presentations/<slug>/)` |
 | `#section-anchor` (intra-doc) | leave as-is (Quarto generates anchors) |
 
 External `https://...` links are left alone.
@@ -265,8 +265,8 @@ end of the `.qmd`:
 ```markdown
 ## Source files
 
-- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/script.py)
-- Published post: <https://carlos-mendez.org/post/<slug>/>
+- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/script.py)
+- Published post: <https://carlos-mendez.org/tutorials/<slug>/>
 - GitHub repo: <https://github.com/cmg777/starter-academic-v501>
 ```
 

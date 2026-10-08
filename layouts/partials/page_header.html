@@ -82,7 +82,7 @@
 <div class="article-container pt-3">
   <h1>{{ $title }}</h1>
 
-  {{ if and $page.Params.subtitle (ne $page.Section "event") }}
+  {{ if and $page.Params.subtitle (ne $page.Type "event") }}
   <p class="page-subtitle">{{ $page.Params.subtitle | markdownify | emojify }}</p>
   {{end}}
 
@@ -100,7 +100,7 @@
 <div class="{{$ctnr}} pt-3">
   <h1>{{ $title }}</h1>
 
-  {{ if and $page.Params.subtitle (ne $page.Section "event") }}
+  {{ if and $page.Params.subtitle (ne $page.Type "event") }}
   <p class="page-subtitle">{{ $page.Params.subtitle | markdownify | emojify }}</p>
   {{end}}
 

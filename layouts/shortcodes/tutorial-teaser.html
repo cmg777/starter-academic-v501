@@ -7,7 +7,7 @@
 */}}
 {{ $count := int (.Get "count" | default 6) }}
 
-{{ $posts := where site.RegularPages "Section" "post" }}
+{{ $posts := where site.RegularPages "Section" "tutorials" }}
 {{/* Most-recently-updated first: .Lastmod = git commit date of the post's index.md
      (enableGitInfo), falling back to the `date` front matter when no git info exists. */}}
 {{ $posts = $posts.ByLastmod.Reverse }}
@@ -32,6 +32,6 @@
     {{ end }}
   </div>
   <div class="tg-teaser-link-row">
-    <a class="tg-teaser-link" href="/post/">{{ $browseLabel }} &rarr;</a>
+    <a class="tg-teaser-link" href="/tutorials/">{{ $browseLabel }} &rarr;</a>
   </div>
 </div>

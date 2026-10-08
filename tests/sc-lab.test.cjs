@@ -2,7 +2,7 @@
 // Run with `node --test tests/sc-lab.test.cjs` from the repository root. Set the
 // environment variable SC_LAB_JS to test another copy of the script, such as the
 // minified bundle of a Hugo build. Every expected value comes from
-// content/post/python_sc101/sc101_results.json, written by script.py; numbers
+// content/tutorials/python_sc101/sc101_results.json, written by script.py; numbers
 // must agree to 1e-9 (relative to the size of the number when it exceeds one).
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
@@ -12,7 +12,7 @@ const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
 const FILE = process.env.SC_LAB_JS ? path.resolve(process.env.SC_LAB_JS) : path.join(ROOT, 'assets/js/sc-lab.js');
-const R = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/post/python_sc101/sc101_results.json'), 'utf8'));
+const R = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/tutorials/python_sc101/sc101_results.json'), 'utf8'));
 const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(FILE, 'utf8'), context, { filename: FILE });

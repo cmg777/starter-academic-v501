@@ -30,7 +30,7 @@ asks the user to confirm key choices before generating.
 
 ## Reference output
 
-Use `content/post/python_partial_identification/infographic_instructions.md` as
+Use `content/tutorials/python_partial_identification/infographic_instructions.md` as
 the reference for tone, structure, and level of detail.
 
 ---
@@ -38,8 +38,8 @@ the reference for tone, structure, and level of detail.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_dowhy`), resolve to `content/post/<slug>/index.md`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_dowhy`), resolve to `content/tutorials/<slug>/index.md`.
 
 2. **Verify the post exists.** Read `index.md` in the resolved directory. If it
    does not exist, report the error and stop.
@@ -48,7 +48,7 @@ the reference for tone, structure, and level of detail.
    case study, methods, key results, and takeaways.
 
 4. **Read the reference output.** Read
-   `content/post/python_partial_identification/infographic_instructions.md` to
+   `content/tutorials/python_partial_identification/infographic_instructions.md` to
    calibrate the scene description style and prompt structure.
 
 5. **Extract key content.** Identify:
@@ -100,7 +100,7 @@ their response. Display all items in a single formatted block:
 ## Step 1 -- Generate the prompt file
 
 Write `infographic_instructions.md` in the post's page bundle directory
-(e.g. `content/post/<slug>/infographic_instructions.md`).
+(e.g. `content/tutorials/<slug>/infographic_instructions.md`).
 
 The file has four sections (A, B, C, D). Use `---` horizontal rules to
 separate them. Use `##` headers to label each section.
@@ -434,7 +434,7 @@ After writing the file:
 
 After verification, offer the user next steps:
 
-"The infographic prompt is ready at `content/post/<slug>/infographic_instructions.md`.
+"The infographic prompt is ready at `content/tutorials/<slug>/infographic_instructions.md`.
 Would you like me to:
 - Adjust any panel content (numbers, headlines, callouts)?
 - Change the text rendering option (A/B/C)?

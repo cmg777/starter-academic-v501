@@ -1,9 +1,9 @@
-{{/* Publication showcase — projects-style alternating image/text rows for /publication/.
-     Sits above the search/filter UI in layouts/section/publication.html. Reuses the
+{{/* Publication showcase — projects-style alternating image/text rows for /articles/.
+     Sits above the search/filter UI in layouts/section/articles.html. Reuses the
      .cz-showcase SCSS at assets/scss/custom.scss and Wowchemy's page_links /
      page_metadata_authors partials, so author rendering and action buttons match the
      Featured widget cards on the homepage. */}}
-{{ $items := (where site.RegularPages "Section" "publication").ByDate.Reverse }}
+{{ $items := (where site.RegularPages "Section" "articles").ByDate.Reverse }}
 {{ $typeIcons := dict
   "0" "file"
   "1" "users"

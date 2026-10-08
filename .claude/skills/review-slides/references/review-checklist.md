@@ -3,7 +3,7 @@
 The working list for the audit. Walk each dimension in order. For every failed
 check, record: **severity · location · quoted violation · actionable fix**.
 Locations are `slides.qmd:NN` or `slide N — "title"`. The source post
-(`content/post/<slug>/index.md` + `results_report.md`) is ground truth.
+(`content/tutorials/<slug>/index.md` + `results_report.md`) is ground truth.
 
 ---
 

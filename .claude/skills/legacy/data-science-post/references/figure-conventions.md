@@ -91,7 +91,7 @@ plt.rcParams.update({
 4. Use `edgecolors=DARK_NAVY` on scatter points for clean edges against the
    dark background
 
-Reference implementation: `content/post/python_fwl/script.py`
+Reference implementation: `content/tutorials/python_fwl/script.py`
 
 ## Mermaid diagrams
 

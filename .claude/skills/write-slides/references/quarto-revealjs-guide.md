@@ -30,7 +30,7 @@ in place as `../<slug>_*.png` (Quarto keeps the relative ref; Hugo resolves it).
 `embed-resources: true` would inline everything into one `index.html`, BUT **RevealChalkboard
 is incompatible with self-contained output** (`quarto render` errors out). Because chalkboard
 is a core feature, the deck ships **`index.html` + `slides_files/`** instead. This is proven
-to serve correctly by the `content/post/r_double_lasso/tutorial.html` precedent. (If a deck
+to serve correctly by the `content/tutorials/r_double_lasso/tutorial.html` precedent. (If a deck
 ever drops chalkboard, `embed-resources: true` becomes available again.)
 
 ---

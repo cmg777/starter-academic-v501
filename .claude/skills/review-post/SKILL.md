@@ -23,7 +23,7 @@ conversation without modifying any files.
 ```
 /project:review-post python_doubleml
 /project:review-post python_dowhy
-/project:review-post content/post/python_ml_random_forest/
+/project:review-post content/tutorials/python_ml_random_forest/
 /project:review-post python_dowhy focus: code
 /project:review-post python_doubleml focus: math and interpretations
 /project:review-post python_fwl focus: learning
@@ -58,8 +58,8 @@ If omitted, run all 13 dimensions. Multiple keywords can be combined with
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
-   - If a slug is given (e.g. `python_doubleml`), resolve to `content/post/<slug>/index.md`.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
+   - If a slug is given (e.g. `python_doubleml`), resolve to `content/tutorials/<slug>/index.md`.
    - If `focus:` is present, extract the keywords and determine which dimensions to run.
 
 2. **Verify the post exists.** Read `index.md` in the resolved directory. If it
@@ -71,7 +71,7 @@ If omitted, run all 13 dimensions. Multiple keywords can be combined with
 4. **Read calibration materials** (in parallel):
    - The write-post skill: `.claude/skills/write-post/SKILL.md`
      -- to understand all conventions the post should follow.
-   - The reference post: `content/post/python_ml_random_forest/index.md`
+   - The reference post: `content/tutorials/python_ml_random_forest/index.md`
      -- as a quality benchmark.
    - The scoring and criteria: `references/scoring-and-criteria.md`
      -- for severity levels, verdict criteria, and scoring guidelines.
@@ -86,7 +86,7 @@ If omitted, run all 13 dimensions. Multiple keywords can be combined with
 Before starting the review, present the user with a brief confirmation:
 
 1. **Post identified**: "I'll review **[POST TITLE]** at
-   `content/post/<slug>/index.md`."
+   `content/tutorials/<slug>/index.md`."
 
 2. **Scope**: If `focus:` was provided: "Running focused review:
    [DIMENSION NAMES]."
@@ -230,7 +230,7 @@ If the front matter `links:` section contains a Google Colab URL:
 
 If the post contains a "Key concepts" or similarly-titled section that uses
 `<div class="concept-pair">` and `<details class="concept-card ...">` blocks
-(canonical example: `content/post/python_EconML/index.md`):
+(canonical example: `content/tutorials/python_EconML/index.md`):
 
 - [ ] Section appears after Learning objectives, before Setup and imports
 - [ ] Each concept has bold term + always-visible definition paragraph
@@ -259,11 +259,11 @@ new terms used repeatedly in the body.
 
 Predict / solution / misconception / proof cards styled by `custom.scss` §24
 (contract: `.claude/docs/learning-components.md`; reference post:
-`content/post/python_fwl/index.md`). Start with the linter — it catches most
+`content/tutorials/python_fwl/index.md`). Start with the linter — it catches most
 markup defects mechanically:
 
 ```bash
-python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md
+python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md
 ```
 
 - [ ] Class names exact: `learn-card predict-card`, `learn-card solution-card`,
@@ -596,7 +596,7 @@ If no companion files exist, mark deliverables as N/A.
 
 Every substantive tutorial opens with a journal-style `## Abstract` section: a
 single paragraph that previews the whole arc (canonical example:
-`content/post/python_doubleml/index.md`). Verify:
+`content/tutorials/python_doubleml/index.md`). Verify:
 
 - [ ] A `## Abstract` heading exists and is the **first** section of the body
       -- it appears before `## Overview` (or before the first `## ` heading).

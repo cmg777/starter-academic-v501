@@ -9,7 +9,7 @@ Do NOT save it to a file.
 ```
 # Post Review: <Post Title>
 
-**Post:** `content/post/<slug>/index.md`
+**Post:** `content/tutorials/<slug>/index.md`
 **Date reviewed:** <current date>
 **Reviewer perspective:** Expert professor of data science and econometrics
 

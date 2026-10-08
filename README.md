@@ -24,17 +24,21 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 ├── config/_default/          # Hugo configuration
 │   ├── config.yaml           # Site title, baseURL, modules, markup settings
 │   ├── params.yaml           # Theme, contact info, features, analytics
-│   ├── menus.yaml            # Navigation menu (10 items)
+│   ├── menus.yaml            # Navigation menu (12 items)
 │   └── languages.yaml        # Language / i18n settings
 │
 ├── content/                  # All site content (Markdown + YAML front matter)
 │   ├── home/                 # Homepage widget sections (~14 active widgets)
 │   ├── authors/              # Author profiles (~43 authors)
-│   ├── publication/          # Academic publications (~41 entries)
-│   ├── event/                # Conference talks & presentations (~30 entries)
-│   ├── projects/             # Research projects & dashboards (~5 entries)
+│   ├── articles/             # Academic articles (Wowchemy type `publication`)
+│   ├── books/                # Books (print + open online books)
+│   ├── presentations/        # Conference talks (Wowchemy type `event`)
+│   ├── software/             # Python packages (expdpy, geometrics, scspill)
+│   ├── webapps/              # Standalone GEE + Streamlit apps (one bundle each)
+│   ├── data/                 # Data repositories and portals
+│   ├── tutorials/            # Tutorials & blog posts (Wowchemy type `post`)
 │   ├── courses/              # Teaching materials
-│   ├── post/                 # Blog posts & tutorials (~30 entries)
+│   ├── projects/             # Retired (only the hidden ds4ds bundle remains)
 │   └── slides/               # Presentation slides
 │
 ├── assets/
@@ -44,7 +48,9 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 │
 ├── layouts/
 │   ├── partials/             # Hugo template overrides
+│   │   ├── catalog.html      # Shared search + dropdown list for books/software/data/webapps
 │   │   └── page_header.html  # Image-first layout (featured image above title)
+│   ├── section/              # Section list templates (articles, presentations, tutorials, books, …)
 │   └── shortcodes/           # Custom Hugo shortcodes
 │       └── fullwidth-iframe.html
 │
@@ -81,7 +87,22 @@ Site appearance and features:
 
 ### `config/_default/menus.yaml`
 
-Navigation links: AboutMe, ResearchLab, Publications, Presentations, Projects, Students, Courses, Events, Posts & Tutorials, Contact.
+Navigation links: AboutMe, ResearchLab, Articles, Books, Courses, Presentations, Software, WebApps, Data, Tutorials, Events, Contact (ES/JA copies in `languages.yaml`). Projects and Students are no longer in the nav.
+
+| Nav item | Where to add files |
+|----------|--------------------|
+| Articles | `content/articles/` |
+| Books | `content/books/` |
+| Courses | `content/courses/` |
+| Presentations | `content/presentations/` |
+| Software | `content/software/` |
+| WebApps | `content/webapps/` (standalone apps) plus any tutorial `web_app/` folder (listed automatically) |
+| Data | `content/data/` |
+| Tutorials | `content/tutorials/` |
+| AboutMe / ResearchLab / Contact | homepage sections (`data/orbital.json`, `content/home/`) |
+| Events | external (`https://lu.ma/cmg`) |
+
+Every item also needs its Spanish (`content/es/…`) and Japanese (`content/ja/…`) copy. Old URLs (`/post/*`, `/publication/*`, `/event/*`, `/talk/*`, `/projects/`) are redirected in `netlify.toml`, and moved items carry `aliases:`.
 
 ## Cinematic landing page
 
@@ -137,7 +158,8 @@ The home template deliberately omits the legacy theme's browser dependencies.
   Sentinel-2 spacecraft and footer horizon are generated decorative imagery under
   `assets/media/orbital/`; Hugo serves optimized responsive WebP derivatives.
 - **Featured research:** three satellite-data papers selected by bundle slug in
-  `layouts/index.html`. Projects and tutorials continue to sort by last edit;
+  `layouts/index.html`. The Software block (former Projects, anchor `#projects`)
+  and tutorials sort by last edit;
   presentations sort by date. Set `date_tba: true` for an unknown event date.
 - **Students:** the directory uses the localized `content/home/people.md` group
   configuration and existing author profiles; every matching student has a visible
@@ -171,7 +193,7 @@ changing a widget's weight or hero text no longer changes the landing page:
 | Research Lab | `researchLab.md` | 15 | blank (YouTube + GEE maps) |
 | Featured Publications | `featured.md` | 20 | featured |
 | Presentations | `talks.md` | 30 | pages |
-| Projects | `projects.md` | 35 | portfolio |
+| Projects (now Software) | `projects.md` | 35 | portfolio |
 | Gallery | `gallery/` | 66 | blank |
 | Events | `eventsOnline.md` | 75 | blank (lu.ma calendar) |
 | Posts & Tutorials | `posts.md` | 80 | pages |
@@ -215,7 +237,7 @@ Interactive Frisch-Waugh-Lovell lab embedded in the `python_fwl` tutorial: contr
 Main sections:
 1. **Homepage fix** -- Full-width container for Hero2 widget
 2. **Full-width iframe breakout** -- Viewport-width breakout class + overflow resets for all ancestor containers
-3. **Dashboards gallery** -- `.dashboard-gallery`/`.dashboard-card` card grid on the dashboards project page (3/2/1-column responsive + dark mode; the legacy `.dashboard-entry` collapsible styling is retained but unused)
+3. **Dashboards gallery** -- `.dashboard-gallery`/`.dashboard-card` card grid of the retired dashboards page, now unused because the apps moved to `/webapps/` (3/2/1-column responsive + dark mode; the legacy `.dashboard-entry` collapsible styling is retained but unused)
 4. **Notebook-style post styling** -- Teal-accented code blocks, figure borders, table styling, blockquotes, blue headings, learning objectives lists, mobile adjustments
 5. **Python syntax highlighting** -- Site-consistent colors for highlight.js tokens
 6. **Left-side Table of Contents** -- Sticky sidebar TOC activated by `toc: true` in front matter
@@ -227,39 +249,35 @@ Posts can expose extra learning resources as front-matter `links:` buttons. Two 
 
 - **AI Podcast** -- a self-contained inline audio-player overlay appended to the post's `index.md` (front-matter `icon: podcast` link to `#podcast-player`), or, for an episode hosted on Spotify, a `spotify` link button plus a Spotify embed above the Abstract. See CLAUDE.md -> *AI Podcast Player* and `.claude/docs/ai-podcast-player.md`.
 - **Slides (PDF)** -- a `file-pdf` link button to a `slides.pdf` shipped in the post bundle, using an **absolute** URL so the theme opens it in a new tab. See CLAUDE.md -> *Slides (PDF) link button*.
-- **Slides (HTML)** -- a `person-chalkboard` link button to a Quarto-rendered reveal.js deck at `content/post/<slug>/slides/` (with menu, chalkboard, and speaker view), using a **relative** `url: slides/index.html`. Generated by the `write-slides` skill. See CLAUDE.md -> *Slides (HTML) link button*.
+- **Slides (HTML)** -- a `person-chalkboard` link button to a Quarto-rendered reveal.js deck at `content/tutorials/<slug>/slides/` (with menu, chalkboard, and speaker view), using a **relative** `url: slides/index.html`. Generated by the `write-slides` skill. See CLAUDE.md -> *Slides (HTML) link button*.
 
 ## Content Conventions
 
-### Publications (`content/publication/`)
+### Articles (`content/articles/`, type `publication`)
 
 - **Folder naming:** `YYYYMMDD-abbreviation` (e.g., `20241219-AE`)
 - **Front matter:** title, authors, date, DOI, publication_types (0-8), publication name, abstract, tags, links
 - **Publication types:** 0=Uncategorized, 1=Conference paper, 2=Journal article, 3=Preprint, 4=Report, 5=Book, 6=Book section, 7=Thesis, 8=Patent
 
-### Events (`content/event/`)
+### Presentations (`content/presentations/`, type `event`)
 
 - **Folder naming:** `YYYYMMDD-abbreviation` (e.g., `20241113GDSL`)
 - **Front matter:** title, date, event name, location, abstract, links
 
-### Posts & Tutorials (`content/post/`)
+### Tutorials (`content/tutorials/`, type `post`)
 
 - **Folder naming:** `YYYYMMDD-slug` for posts, descriptive slug for tutorials (e.g., `gee_ntl_viirs_like`)
 - **Categories:** `Tutorial` for tutorial content, `Post`/`Demo` for blog posts
 - **Tags:** world, regional, spatial, causal, python, gee, r, stata (tutorials); Academic, Seminar, etc. (posts)
 
-### Dashboards (`content/projects/dashboards/`)
+### Books, Software, Data, WebApps
 
-A gallery of screenshot cards; each card links out to a published Google Earth Engine app. Built from two shortcodes (`dashboard-gallery` wrapper + per-app `dashboard-card`), with thumbnails generated by `scripts/capture-dashboard-screenshots.cjs`:
+Each is a section of page bundles listed by `layouts/section/<section>.html` through the shared `layouts/partials/catalog.html` (search box + dropdowns defined by `filters:` in the section `_index.md`, plus an optional `year_filter`).
 
-```markdown
-{{</* dashboard-gallery */>}}
-{{</* dashboard-card title="Title" cite="Mendez, C. (2026). Google Earth Engine Application." url="https://carlos-mendez.projects.earthengine.app/view/<slug>" image="<slug>.jpg" */>}}
-<!-- Source code (GEE): https://code.earthengine.google.com/<id>?hideCode=true -->
-{{</* /dashboard-gallery */>}}
-```
-
-See **CLAUDE.md → Dashboards gallery** for the full add-item workflow (screenshot capture, top-of-grid placement, ES/JA translation, the GEE source-comment convention).
+- **Books** (`content/books/`) — `book_format: print|online`; the former type-5 publications keep `type: publication` + `publication_types`.
+- **Software** (`content/software/`) — one bundle per package; the homepage Software block shows the three most recently committed packages.
+- **Data** (`content/data/`) — `data_type: repository|portal`, `region`.
+- **WebApps** (`content/webapps/`) — one bundle per standalone Google Earth Engine or Streamlit app, with `app_url`, `platform: gee|streamlit`, `region`, `topic` (an id from `data/tutorial_topics.yaml`), `links:` and `_build: {render: never, list: always}`, so the card opens the app directly. `featured.jpg` comes from `node scripts/capture-dashboard-screenshots.cjs --slug <slug>` (add the slug to its `APPS` array first). Every tutorial that ships `web_app/index.html` is listed automatically. Full workflow: `.claude/docs/webapps.md`.
 
 ### Authors (`content/authors/`)
 
@@ -269,7 +287,7 @@ Each author has a folder with `_index.md` containing name, role, organization, b
 
 The site is **trilingual**: English at `/` (`content/`), Spanish at `/es/` (`content/es/`), and Japanese at `/ja/` (`content/ja/`). Each language has its own content tree, isolated by Hugo module mounts in `config/_default/config.yaml` (the English mount uses `excludeFiles: '{es,ja}/**'`); languages and menus live in `config/_default/languages.yaml`.
 
-Homepage widgets query the **current language's** pages with **no English fallback** — an item that lacks a `content/es/<section>/<slug>/` or `content/ja/<section>/<slug>/` counterpart simply will not appear on the `/es/` or `/ja/` homepage. As of 2026-06-05, **every page type is translated except the long bodies of tutorial posts**. Publications, events, projects, author profiles, the Courses page (with localized `/es/courses/` and `/ja/courses/` menu items), the Alumni page, the Slides demo, and the draft Privacy/Terms pages are **full translations**; tutorial posts are lightweight **stub cards** whose card links back to the English tutorial (the long body stays in English by design). `scripts/i18n-parity.sh` tracks all of it — per-section bundles **plus** the singleton pages (courses/alumni/privacy/terms) — and currently reports **0 gaps** for both languages.
+Homepage widgets query the **current language's** pages with **no English fallback** — an item that lacks a `content/es/<section>/<slug>/` or `content/ja/<section>/<slug>/` counterpart simply will not appear on the `/es/` or `/ja/` homepage. As of 2026-06-05, **every page type is translated except the long bodies of tutorial posts**. Articles, presentations, books, software, data, web apps, author profiles, the Courses page (with localized `/es/courses/` and `/ja/courses/` menu items), the Alumni page, the Slides demo, and the draft Privacy/Terms pages are **full translations**; tutorial posts are lightweight **stub cards** whose card links back to the English tutorial (the long body stays in English by design). `scripts/i18n-parity.sh` tracks all of it — per-section bundles **plus** the singleton pages (courses/alumni/privacy/terms) — and currently reports **0 gaps** for both languages.
 
 To keep this sustainable, whenever you add content of those types you must create its ES + JA counterparts in the same change:
 
@@ -294,7 +312,7 @@ A local Hugo Extended binary is available at:
 ~/Library/Application Support/Hugo/0.111.3/hugo
 ```
 
-> **Note:** Older binaries (v0.84.2, v0.89.4) also sit under that directory — **do not use them.** The site requires Hugo **≥ 0.96** (the `continue` keyword in `layouts/section/event.html`), and both fail with `function "continue" not defined` before rendering any content. Use a 0.96–0.119 **extended** binary; 0.111.3 is installed and matches the `netlify.toml` pin. The theme minimum is 0.78.
+> **Note:** Older binaries (v0.84.2, v0.89.4) also sit under that directory — **do not use them.** The site requires Hugo **≥ 0.96** (the `continue` keyword in `layouts/section/presentations.html`), and both fail with `function "continue" not defined` before rendering any content. Use a 0.96–0.119 **extended** binary; 0.111.3 is installed and matches the `netlify.toml` pin. The theme minimum is 0.78.
 
 ```bash
 # Run the dev server
@@ -329,33 +347,41 @@ This script:
 
 ## Adding Content
 
-> **Translate it too.** Any new publication, event, project, author, course, or other page (everything except tutorial-post bodies) MUST also be translated into Spanish and Japanese in the same change, or it will not appear on `/es/` or `/ja/`. Run `/project:translate-content <slug> --lang all` and confirm `bash scripts/i18n-parity.sh` reports 0 gaps. See [Internationalization (i18n)](#internationalization-i18n).
+> **Translate it too.** Any new article, presentation, book, software package, data resource, web app, author, course, or other page (everything except tutorial-post bodies) MUST also be translated into Spanish and Japanese in the same change, or it will not appear on `/es/` or `/ja/`. Run `/project:translate-content <slug> --lang all` and confirm `bash scripts/i18n-parity.sh` reports 0 gaps. See [Internationalization (i18n)](#internationalization-i18n).
 
-### New Publication
+### New Article
 
 ```bash
-hugo new content/publication/YYYYMMDD-abbreviation/index.md
+hugo new content/articles/YYYYMMDD-abbreviation/index.md
 ```
 
-Add `featured.jpg` to the folder. Fill in front matter fields (see existing publications for examples).
+Add `featured.jpg` to the folder. Fill in front matter fields (see existing articles for examples).
 
-### New Event
+### New Presentation
 
 ```bash
-hugo new content/event/YYYYMMDD-abbreviation/index.md
+hugo new content/presentations/YYYYMMDD-abbreviation/index.md
 ```
 
 ### New Tutorial
 
 ```bash
-hugo new content/post/slug-name/index.md
+hugo new content/tutorials/slug-name/index.md
 ```
 
 Add `categories: [Tutorial]` to the front matter to categorize it as a tutorial.
 
-### New Dashboard
+### New Book, Software Package, or Data Resource
 
-Add a `{{</* dashboard-card */>}}` at the top of the gallery in `content/projects/dashboards/index.md` (plus its ES/JA counterparts) and run the screenshot capture script. See **CLAUDE.md → Dashboards gallery** for the full step-by-step workflow.
+```bash
+hugo new content/books/slug/index.md      # or content/software/… or content/data/…
+```
+
+Copy the front matter of an existing bundle in the same section (filter params such as `book_format`, `data_type` and `region` drive the dropdowns) and add a `featured.*` image.
+
+### New Web App
+
+Create `content/webapps/<slug>/index.md` (plus its ES/JA counterparts), add the slug to `APPS` in `scripts/capture-dashboard-screenshots.cjs`, and run `node scripts/capture-dashboard-screenshots.cjs --slug <slug>`. Trigger for Claude: "Add web app: `<App URL>` — `<English title>`". See `.claude/docs/webapps.md`.
 
 ### Skill Architecture
 
@@ -453,7 +479,7 @@ Codified from the 8-iteration `python_pyfixest` validation in May 2026.
 **Skill:** `/project:write-app <post slug> [--no-link] [--no-verify]`
 **Location:** `.claude/skills/write-app/SKILL.md`
 
-Generate a 4-tab interactive web app for an existing post. The signature behaviour is the **interactive interview**: the skill reads the post's `index.md`, results CSVs, and `data/` folder, then uses `AskUserQuestion` to confirm key takeaways, tab structure, data source, and performance caps before writing any file. Output is a static HTML/CSS/JS bundle (D3.js v7 from CDN) at `content/post/<slug>/web_app/` that opens from a YAML `Web app` button in a new tab. Runs entirely client-side — no backend, no build step. Validated against `content/post/r_double_lasso/web_app/` (the reference implementation).
+Generate a 4-tab interactive web app for an existing post. The signature behaviour is the **interactive interview**: the skill reads the post's `index.md`, results CSVs, and `data/` folder, then uses `AskUserQuestion` to confirm key takeaways, tab structure, data source, and performance caps before writing any file. Output is a static HTML/CSS/JS bundle (D3.js v7 from CDN) at `content/tutorials/<slug>/web_app/` that opens from a YAML `Web app` button in a new tab. Runs entirely client-side — no backend, no build step. Validated against `content/tutorials/r_double_lasso/web_app/` (the reference implementation).
 
 The widget catalog ships 10 archetypes — 4 READY (concept-animation, penalty-slider, forest-plot, dgp-simulator) and 6 STUB (DiD event-study, feature-importance, Moran's I scatter, train/test split, sensitivity heatmap, Bayesian posterior). The skill picks 3–4 per post based on topic detection (causal-inference / ml / spatial / panel / bayesian / time-series / mixed) and confirms in the interview.
 
@@ -466,7 +492,7 @@ Verification: Hugo dev server + Node `vm.runInThisContext` smoke test on `dgp.js
 
 Comprehensive audit of a generated web app across 10 non-overlapping dimensions: file completeness, HTML structure, JS correctness, data contract, accessibility, performance, pedagogy, Hugo integration, visual design, and mobile responsiveness. Reuses `write-app`'s `smoke-test.js` under Node `vm`, starts a Hugo dev server for HTTP-200 checks, then drives a headless Chromium via Playwright across all four tabs at desktop (1280×800) and mobile (375×667) viewports. Includes a post↔app **pedagogical alignment** check (n-gram overlap between the post's top 3 takeaways and the app's Tab-1 lede + tab headings). Read-only.
 
-Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 score per dimension and an issues table written to `content/post/<slug>/web_app/REVIEW.md`. Verdict-changing rules cover: missing required files, smoke-test failure, the Hugo trailing-slash YAML bug, 0/3 takeaway alignment, and all-STUB tab sets. First-run Playwright bootstrap auto-downloads Chromium (~200 MB, ~2 min); subsequent runs reuse the cache.
+Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 score per dimension and an issues table written to `content/tutorials/<slug>/web_app/REVIEW.md`. Verdict-changing rules cover: missing required files, smoke-test failure, the Hugo trailing-slash YAML bug, 0/3 takeaway alignment, and all-STUB tab sets. First-run Playwright bootstrap auto-downloads Chromium (~200 MB, ~2 min); subsequent runs reuse the cache.
 
 Focus modes for targeted re-reviews: `pedagogy`, `code` (Dim 3+4), `accessibility`, `data`, `hugo`, `visual` (Dim 9+10). Combine with `and`/`,`. `--no-browser` skips the Playwright pass (Dims 9+10 become "not audited").
 
@@ -475,7 +501,7 @@ Focus modes for targeted re-reviews: `pedagogy`, `code` (Dim 3+4), `accessibilit
 **Skill:** `/project:write-slides <post slug> [--no-link] [--no-verify]`
 **Location:** `.claude/skills/write-slides/SKILL.md`
 
-Generate a Quarto reveal.js slide deck from an existing post. The signature behaviour is an interview that ports Scott Cunningham's "Rhetoric of Decks": audience triage (teaching / seminar / conference / working-external with an ethos·pathos·logos balance), a 3-act Tension→Investigation→Resolution arc, assertion titles ("Treatment raised K/L by 18%", not "Results"), one-idea-per-slide, the Narrative→Application→Picture→Codeblock→Technical pedagogical movement, an MB/MC pacing pass, and a Devil's-Advocate slide — with an **outline checkpoint** the user approves before any slide is written. The skill writes a `slides.qmd` (`format: revealjs`) + a branded SCSS theme + a title-slide partial (a key-result number strip) and runs `quarto render` → `content/post/<slug>/slides/` (`index.html` + `slides_files/`). Built-in menu / chalkboard / speaker view / preview-links / overview; reveal.js bundled locally (MathJax math from a CDN); branded to the fixed site palette; opened from a "Slides (HTML)" button. Reuses the post's figures in place. English-only (rides with the English post like `web_app/`). Verification: `quarto render` + Hugo ≥0.96 HTTP-200 checks + a Node static smoke test. Needs the Quarto CLI to (re)generate. Paired with `review-slides`.
+Generate a Quarto reveal.js slide deck from an existing post. The signature behaviour is an interview that ports Scott Cunningham's "Rhetoric of Decks": audience triage (teaching / seminar / conference / working-external with an ethos·pathos·logos balance), a 3-act Tension→Investigation→Resolution arc, assertion titles ("Treatment raised K/L by 18%", not "Results"), one-idea-per-slide, the Narrative→Application→Picture→Codeblock→Technical pedagogical movement, an MB/MC pacing pass, and a Devil's-Advocate slide — with an **outline checkpoint** the user approves before any slide is written. The skill writes a `slides.qmd` (`format: revealjs`) + a branded SCSS theme + a title-slide partial (a key-result number strip) and runs `quarto render` → `content/tutorials/<slug>/slides/` (`index.html` + `slides_files/`). Built-in menu / chalkboard / speaker view / preview-links / overview; reveal.js bundled locally (MathJax math from a CDN); branded to the fixed site palette; opened from a "Slides (HTML)" button. Reuses the post's figures in place. English-only (rides with the English post like `web_app/`). Verification: `quarto render` + Hugo ≥0.96 HTTP-200 checks + a Node static smoke test. Needs the Quarto CLI to (re)generate. Paired with `review-slides`.
 
 ### Review Slide Deck (Quarto reveal.js)
 
@@ -484,7 +510,7 @@ Generate a Quarto reveal.js slide deck from an existing post. The signature beha
 
 Read-only audit of a generated deck across 10 non-overlapping dimensions: source fidelity, conceptual correctness, technical & render correctness, title↔body consistency, readability & simplicity, typos & grammar, write-slides design adherence, branding integrity, accessibility & legibility, and deliverable completeness. Cross-checks every slide number/figure/table/equation/code snippet against the source post (`index.md` + `results_report.md`) as ground truth — it never re-executes code. Reuses `write-slides`'s `smoke-test.js` for static structure, diffs `site-brand.scss`/`title-slide.html` against the canonical templates to catch theme drift, then drives a headless browser (`slide-audit.cjs`, an extension of `math-check.cjs`) across every slide to flag un-typeset LaTeX, content overflow, and over-dense slides. **Readability is the primary emphasis**: each slide is scanned for long sentences, >5 bullets, complex words, passive voice, and undefined jargon, and every finding ships a concrete simpler rewrite.
 
-Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 score per dimension and an issues table written to `content/post/<slug>/slides/SLIDES_REVIEW.md`. Verdict-changing rules cover: a slide number that contradicts the source post, raw LaTeX on any slide, smoke-test failure, branding-file tampering, and the trailing-slash deck-link bug. Strictly read-only — it offers fixes only as a follow-up (delegated to `write-slides`) and writes nothing but the review file. Focus modes: `fidelity` (Dim 1), `correctness` (2+3), `readability` (5+6), `consistency` (4), `design` (7), `branding` (8), `accessibility` (9), `render` (3+10). `--no-browser` skips the Playwright pass.
+Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 score per dimension and an issues table written to `content/tutorials/<slug>/slides/SLIDES_REVIEW.md`. Verdict-changing rules cover: a slide number that contradicts the source post, raw LaTeX on any slide, smoke-test failure, branding-file tampering, and the trailing-slash deck-link bug. Strictly read-only — it offers fixes only as a follow-up (delegated to `write-slides`) and writes nothing but the review file. Focus modes: `fidelity` (Dim 1), `correctness` (2+3), `readability` (5+6), `consistency` (4), `design` (7), `branding` (8), `accessibility` (9), `render` (3+10). `--no-browser` skips the Playwright pass.
 
 ### Update Author Profile
 

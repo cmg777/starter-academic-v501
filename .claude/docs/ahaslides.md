@@ -10,18 +10,18 @@ audience layer.
 **Worked reference implementations** — their `README.md`s record each deck's specifics;
 this file is the procedure:
 
-- `content/post/python_bridge_impact/ahaslides/` (deck `10040213`) — the first build, with
+- `content/tutorials/python_bridge_impact/ahaslides/` (deck `10040213`) — the first build, with
   the full narrative of why the image architecture exists.
-- `content/post/python_sc_bayes_spatial/ahaslides/` (deck `10042312`) — the second, built
+- `content/tutorials/python_sc_bayes_spatial/ahaslides/` (deck `10042312`) — the second, built
   from this doc. Its generators add real validation, including a check that `deck.md`'s
   titles still match `slides.qmd`. Read its free-plan section before promising a cap.
-- `content/post/python_fwl/ahaslides/` (deck `10198190`) — the third, and since 2026-10-06
+- `content/tutorials/python_fwl/ahaslides/` (deck `10198190`) — the third, and since 2026-10-06
   the **reference for paid-plan decks**: 35 interactive slides of 18 types, defined in
   `activities.py` (exact MCP bodies + settings + notes) and built by generators that read
   titles and notes straight from `slides.qmd`, validate every type, and letter and reverse
   the options (see *Hard constraints*). **Copy `activities.py` + its generators for new
   decks.**
-- `content/post/python_panel_intro/ahaslides/` (deck `10245137`) — the fourth. Its
+- `content/tutorials/python_panel_intro/ahaslides/` (deck `10245137`) — the fourth. Its
   "Before you look" cues were added to `slides.qmd` for the deck (mirroring the post's
   predict cards). Rebuilt for the paid plan on 2026-10-06 with the FWL generators (37
   interactive slides): the second example of the `activities.py` pattern, with the cue
@@ -60,7 +60,7 @@ it is good at.
 
 ## Prerequisites
 
-- The post already has a rendered Quarto deck at `content/post/<slug>/slides/` and it is
+- The post already has a rendered Quarto deck at `content/tutorials/<slug>/slides/` and it is
   **deployed** (render from the published URL — self-contained and guaranteed current).
   If there is no deck yet, run `/project:write-slides <slug>` first.
 - The AhaSlides MCP is connected:
@@ -82,12 +82,12 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
   --run-all-compositor-stages-before-draw --virtual-time-budget=40000 \
   --print-to-pdf=deck.pdf \
-  "https://carlos-mendez.org/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
+  "https://carlos-mendez.org/tutorials/<slug>/slides/?print-pdf&pdfSeparateFragments=false"
 ```
 
 Use the **published** URL when the deck is deployed — self-contained and guaranteed to
 match what readers see. A local `hugo server` URL
-(`http://localhost:1313/post/<slug>/slides/?print-pdf&pdfSeparateFragments=false`) works
+(`http://localhost:1313/tutorials/<slug>/slides/?print-pdf&pdfSeparateFragments=false`) works
 identically, and is the right choice immediately after `write-slides` when the deck has
 not been pushed yet.
 
@@ -130,7 +130,7 @@ holding one Image block at exactly **1280×720** — genuinely edge to edge.
 
 ### 4. Author the interactive slides
 
-Define them in `content/post/<slug>/ahaslides/activities.py` (copy the `python_fwl`
+Define them in `content/tutorials/<slug>/ahaslides/activities.py` (copy the `python_fwl`
 one): each activity holds its anchor page, a `core`/`opt` tier, a time estimate, the
 exact `create_slides` body, its `update_slide_properties` settings and its notes.
 `build_deck_json.py` reads titles and notes straight from `slides.qmd`, validates
@@ -420,10 +420,10 @@ upgrade, and to test a live session before teaching from it.
 
 - `/project:write-slides` — builds the Quarto deck this consumes.
 - `post-resource-buttons.md` — the `links:` button rules.
-- `content/post/python_bridge_impact/ahaslides/README.md` — worked example, incl. the
+- `content/tutorials/python_bridge_impact/ahaslides/README.md` — worked example, incl. the
   interaction-design patterns worth reusing (prediction poll → callback quiz).
-- `content/post/python_sc_bayes_spatial/ahaslides/` — second example.
-- `content/post/python_fwl/ahaslides/` — the paid-plan reference; copy its
+- `content/tutorials/python_sc_bayes_spatial/ahaslides/` — second example.
+- `content/tutorials/python_fwl/ahaslides/` — the paid-plan reference; copy its
   `activities.py`, `build_deck_json.py` and `build_payload.py`.
 - `content/courses/slides/ahaslides/` — PDF-only source, three parts, YouTube slides.
 - `content/keynote/ahaslides/` — Canva view capture, three languages, self-paced.

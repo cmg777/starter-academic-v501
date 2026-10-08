@@ -13,8 +13,8 @@ and at most one short annotation, excluding the panel numeral. Sub-tags and
 in-panel equations count as annotations and must use full contrast. Move extra
 labels and equations to Section D before shrinking text or safe margins.
 
-`content/post/python_partial_identification/infographic_instructions.md` and
-`content/post/python_mgwrfer/infographic_instructions.md` are narrative examples
+`content/tutorials/python_partial_identification/infographic_instructions.md` and
+`content/tutorials/python_mgwrfer/infographic_instructions.md` are narrative examples
 for simple and layered scenes respectively, not current palette/texture defaults.
 The dramatic function of each panel is independent of its density.
 

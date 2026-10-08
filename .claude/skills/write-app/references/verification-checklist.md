@@ -91,21 +91,21 @@ After both layers run, print this block. Substitute every `<placeholder>`.
 ```
 VERIFICATION REPORT
 ===================
-Web app:      content/post/<slug>/web_app/
+Web app:      content/tutorials/<slug>/web_app/
 Hugo port:    <port>
 Smoke test:   <PASS | FAIL>
 
 Static checks
-  [✓] /post/<slug>/web_app/                                   (200)
-  [✓] /post/<slug>/web_app/styles.css                         (200)
-  [✓] /post/<slug>/web_app/dgp.js                             (200)
-  [✓] /post/<slug>/web_app/lasso.js                           (200)
-  [✓] /post/<slug>/web_app/charts.js                          (200)
-  [✓] /post/<slug>/web_app/app.js                             (200)
-  [✓] /post/<slug>/web_app/data/results.json                  (200)
+  [✓] /tutorials/<slug>/web_app/                                   (200)
+  [✓] /tutorials/<slug>/web_app/styles.css                         (200)
+  [✓] /tutorials/<slug>/web_app/dgp.js                             (200)
+  [✓] /tutorials/<slug>/web_app/lasso.js                           (200)
+  [✓] /tutorials/<slug>/web_app/charts.js                          (200)
+  [✓] /tutorials/<slug>/web_app/app.js                             (200)
+  [✓] /tutorials/<slug>/web_app/data/results.json                  (200)
 
 YAML link check
-  [✓] /post/<slug>/  links to web_app/index.html (no trailing-slash bug)
+  [✓] /tutorials/<slug>/  links to web_app/index.html (no trailing-slash bug)
   OR [~] Skipped (--no-link)
 
 JS smoke test

@@ -13,7 +13,7 @@ This is the post the skill was built around. The original
 
 **Setup.**
 ```bash
-mv content/post/r_double_lasso/web_app content/post/r_double_lasso/web_app.bak
+mv content/tutorials/r_double_lasso/web_app content/tutorials/r_double_lasso/web_app.bak
 ```
 
 **Invocation.**
@@ -54,9 +54,9 @@ mv content/post/r_double_lasso/web_app content/post/r_double_lasso/web_app.bak
 
 **Cleanup.**
 ```bash
-rm -rf content/post/r_double_lasso/web_app
-mv content/post/r_double_lasso/web_app.bak content/post/r_double_lasso/web_app
-git checkout content/post/r_double_lasso/index.md   # revert YAML change
+rm -rf content/tutorials/r_double_lasso/web_app
+mv content/tutorials/r_double_lasso/web_app.bak content/tutorials/r_double_lasso/web_app
+git checkout content/tutorials/r_double_lasso/index.md   # revert YAML change
 ```
 
 ---
@@ -138,7 +138,7 @@ includes only assertions about `DGP.simulate_lasso` (since
 Run on any post with `--no-link`. After Phase 3:
 
 ```bash
-diff <(git show HEAD:content/post/<slug>/index.md) content/post/<slug>/index.md
+diff <(git show HEAD:content/tutorials/<slug>/index.md) content/tutorials/<slug>/index.md
 # should be empty
 ```
 
@@ -161,7 +161,7 @@ After running on any post, fetch `/post/<slug>/` from a Hugo dev
 server and confirm the rendered HTML contains:
 
 ```html
-href="/post/<slug>/web_app/index.html"
+href="/tutorials/<slug>/web_app/index.html"
 ```
 
 Anywhere — never `/web_app/` (missing the post-path prefix) and never

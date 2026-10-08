@@ -8,7 +8,7 @@
 #
 # NOTE: X-Frame-Options is SAMEORIGIN (not the theme default DENY) so that
 # same-origin pages can embed our own self-hosted content in an <iframe>
-# (e.g. the Quarto reveal.js seminar deck at /event/<slug>/slides/index.html
+# (e.g. the Quarto reveal.js seminar deck at /presentations/<slug>/slides/index.html
 # embedded on the event page). SAMEORIGIN still blocks all cross-origin
 # framing, so clickjacking protection is preserved.
 /*

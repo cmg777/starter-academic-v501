@@ -87,7 +87,7 @@ plt.rcParams.update({
 2. Save with matching facecolor/edgecolor and `pad_inches=0`
 3. Use `edgecolors=DARK_NAVY` on scatter points
 
-Reference implementation: `content/post/python_fwl/script.py`
+Reference implementation: `content/tutorials/python_fwl/script.py`
 
 ## Mermaid diagrams
 

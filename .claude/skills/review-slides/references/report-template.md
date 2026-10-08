@@ -1,14 +1,14 @@
 # SLIDES_REVIEW.md Template
 
 Canonical markdown skeleton for the audit. The same content is printed inline and
-written to `content/post/<slug>/slides/SLIDES_REVIEW.md`. Fields in
+written to `content/tutorials/<slug>/slides/SLIDES_REVIEW.md`. Fields in
 `<angle brackets>` are placeholders the skill substitutes in Phase 3.
 
 ```markdown
 # Review: <slug> Slide Deck
 
-**Audited:** content/post/<slug>/slides/
-**Source of truth:** content/post/<slug>/index.md<+ results_report.md>
+**Audited:** content/tutorials/<slug>/slides/
+**Source of truth:** content/tutorials/<slug>/index.md<+ results_report.md>
 **Date:** <YYYY-MM-DD>
 **Audit version:** review-slides v1.0
 **Focus:** <all | comma-separated dimension names>

@@ -7,7 +7,7 @@
 ## script.py (optional)
 
 If the post warrants a standalone script, create
-`content/post/python_<topic-slug>/script.py`:
+`content/tutorials/python_<topic-slug>/script.py`:
 
 ```python
 """
@@ -46,7 +46,7 @@ Include in front matter links:
 ## notebook.ipynb (optional)
 
 If the post would benefit from a companion Jupyter notebook, create
-`content/post/python_<topic-slug>/notebook.ipynb` (nbformat 4, Python 3 kernel).
+`content/tutorials/python_<topic-slug>/notebook.ipynb` (nbformat 4, Python 3 kernel).
 
 Structure the notebook as alternating markdown cells (explanations) and code
 cells (matching the blog post code blocks). The notebook should be runnable
@@ -71,7 +71,7 @@ If the notebook is pushed to the GitHub repo, add a Colab link:
 - icon: open-data
   icon_pack: ai
   name: "[Python] Google Colab"
-  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_<topic-slug>/notebook.ipynb
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/tutorials/python_<topic-slug>/notebook.ipynb
 ```
 
 ## Featured image

@@ -16,7 +16,7 @@ Run through every item before delivering the post.
 - [ ] Date set to yesterday's date
 - [ ] No emojis in post content
 - [ ] `links:` only reference files that exist in the page bundle
-- [ ] `links:` ends with the **MD version** entry pointing to `https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/index.md`
+- [ ] `links:` ends with the **MD version** entry pointing to `https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/index.md`
 - [ ] All `links:` entries share the same indentation (no mixing column-0 and column-2 list items within the same list)
 
 ## Sandwich pattern and interpretations
@@ -57,7 +57,7 @@ Run through every item before delivering the post.
 
 ## Learning components (if present)
 
-- [ ] `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md` exits 0
+- [ ] `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md` exits 0
 - [ ] Class names exact: `learn-card predict-card`, `learn-card solution-card`, `learn-card misconception-card`, `learn-card proof-card`, `learn-card-reveal`
 - [ ] Blank line after the kicker `<p>` and every `<summary>...</summary>`, and before every `</details>`
 - [ ] `<summary>` holds raw HTML only (no Markdown, backticks or `\_`; use `<code>`); no headings inside cards; no card inside `.concept-pair`

@@ -165,7 +165,7 @@ stating the task and what to report.
 **Exercise 2 — Next title.** ...
 ````
 
-Filled examples with real numbers (from `content/post/python_fwl/`) are in
+Filled examples with real numbers (from `content/tutorials/python_fwl/`) are in
 `.claude/docs/learning-components.md` § *Filled examples*.
 
 ## Section intro paragraph (Common misconceptions)
@@ -192,4 +192,4 @@ Learning-objectives box). For example:
 | Proof | Short (two-minute read), `^\top` transposes, placed right after the theorem statement |
 | `<summary>` | Raw HTML only — no Markdown, backticks, or `\_` |
 | Headings in cards | None |
-| Lint | `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/post/<slug>/index.md` exits 0 |
+| Lint | `python3 .claude/skills/write-post/scripts/lint_learn_cards.py content/tutorials/<slug>/index.md` exits 0 |

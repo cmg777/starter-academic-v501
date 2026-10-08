@@ -5,7 +5,7 @@
  * (js.Build, target es2017, minified, fingerprinted). No dependencies.
  * Initializes every `.fwl-lab[data-fwl-lab]` element on the page.
  *
- * Data-generating process (the defaults reproduce content/post/python_fwl):
+ * Data-generating process (the defaults reproduce content/tutorials/python_fwl):
  *   income     I ~ N(50, 10)
  *   dayofweek  D ~ U{1, ..., 7}
  *   coupons    C = 60 + pi * I + eC,                            eC ~ N(0, 5)
@@ -35,11 +35,11 @@
   var SVGNS = 'http://www.w3.org/2000/svg';
 
   // The post's 50 restaurants, copied row for row from
-  // content/post/python_fwl/data/fwl_store_data.csv (written by
-  // content/post/python_fwl/script.py, seed 42; columns sales, coupons, income, dayofweek -> dow).
+  // content/tutorials/python_fwl/data/fwl_store_data.csv (written by
+  // content/tutorials/python_fwl/script.py, seed 42; columns sales, coupons, income, dayofweek -> dow).
   // Do not edit by hand. If the CSV changes, run this from the repo root and
   // paste its four printed lines over the four arrays below:
-  //   node -e "const r=require('fs').readFileSync('content/post/python_fwl/data/fwl_store_data.csv','utf8').trim().split('\n').slice(1).map(l=>l.split(',').map(Number));console.log(['sales','coupons','income','dow'].map((k,j)=>'    '+k+': ['+r.map(x=>x[j])+']').join(',\n'))"
+  //   node -e "const r=require('fs').readFileSync('content/tutorials/python_fwl/data/fwl_store_data.csv','utf8').trim().split('\n').slice(1).map(l=>l.split(',').map(Number));console.log(['sales','coupons','income','dow'].map((k,j)=>'    '+k+': ['+r.map(x=>x[j])+']').join(',\n'))"
   var POST_STORES = {
     sales: [37.37,36.88,33.09,35.09,27.01,31.18,28.46,35.91,32.92,26.69,33.2,36.03,35.16,41.23,43.12,32.69,31.67,25.76,36.98,29.77,31.94,29.48,33.53,38.29,33.21,32.94,33.26,29.35,32.6,33.77,44.38,32.13,36.08,30.21,29.45,33.8,33.33,37.11,27.44,37.39,33.75,39.11,32.35,34.6,34.87,29.95,38.26,32.3,34.54,30.64],
     coupons: [36.93,38.06,32.04,33.43,43.21,43.79,31.05,34.77,33.18,33.29,33.04,28.76,34.73,31.77,34.9,42.62,32.66,37.68,30.21,26.81,28.69,31.79,23.9,37.77,32.61,34.87,38.83,31.39,36.62,28.18,23.26,32.28,35.87,43.27,23.28,31.53,36.76,36.23,31.89,32.11,28.64,33.45,38.44,41.85,33.22,28.79,31.54,34.98,38.4,38.84],

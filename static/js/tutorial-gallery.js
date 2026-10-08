@@ -1,5 +1,5 @@
 /* tutorial-gallery.js
- * Behaviors for the /post/ tutorial gallery:
+ * Behaviors for the /tutorials/ tutorial gallery:
  *   - live search (title + summary)
  *   - language filter chips
  *   - sort within each strip (newest / oldest / A-Z)

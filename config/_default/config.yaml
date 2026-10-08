@@ -106,7 +106,7 @@ footnotereturnlinkcontents: <sup>^</sup>
 # bundle (a directory with an `index.md`) they are page RESOURCES and Hugo never
 # publishes them. In a directory WITHOUT an `index.md` they are ordinary content
 # files, and Hugo turns each one into a live page: that is how
-# `content/post/r_dynamic_bma2/` came to serve /post/r_dynamic_bma2/plan/,
+# `content/tutorials/r_dynamic_bma2/` came to serve /tutorials/r_dynamic_bma2/plan/,
 # /readme/, /results_report/, /results_report_review/, /script-review/ and
 # /web_app/review/ — six sets of internal notes, in the sitemap and the search
 # index. Ignoring them by name fixes that directory and makes the other ~400
@@ -116,7 +116,7 @@ ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$, /\.v
               /plan\.md$, /README\.md$, /results_report\.md$, /results_report_review\.md$,
               /script-review\.md$, /REVIEW\.md$, /SLIDES_REVIEW\.md$]
 permalinks:
-  event: '/talk/:slug/'
+  presentations: '/presentations/:slug/'
   tags: '/tag/:slug/'
   categories: '/category/:slug/'
   publication_types: '/publication-type/:slug/'

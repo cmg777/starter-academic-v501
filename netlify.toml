@@ -57,6 +57,98 @@
     Content-Type = "text/plain; charset=utf-8"
     Content-Disposition = "inline"
 
+# Navigation restructure (2026-10-08): old section URLs. Per-item moves are
+# covered by `aliases` (Wowchemy writes them to _redirects, which wins over these).
+[[redirects]]
+  from = "/projects/"
+  to = "/software/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/projects/"
+  to = "/es/software/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/projects/"
+  to = "/ja/software/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/post/*"
+  to = "/tutorials/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/publication/*"
+  to = "/articles/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/event/*"
+  to = "/presentations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/talk/*"
+  to = "/presentations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/post/*"
+  to = "/es/tutorials/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/*"
+  to = "/es/articles/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/event/*"
+  to = "/es/presentations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/talk/*"
+  to = "/es/presentations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/post/*"
+  to = "/ja/tutorials/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/*"
+  to = "/ja/articles/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/event/*"
+  to = "/ja/presentations/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/talk/*"
+  to = "/ja/presentations/:splat"
+  status = 301
+  force = true
+
 [[plugins]]
   package = "netlify-plugin-hugo-cache-resources"
   [plugins.inputs]

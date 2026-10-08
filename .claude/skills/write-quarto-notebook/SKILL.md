@@ -74,18 +74,18 @@ script).
 
 | Language | Output path | Quarto theme | Engine line in YAML |
 |---|---|---|---|
-| R | `content/post/<slug>/tutorial.qmd` | `darkly` | (none --- knitr is default) |
-| Python | `content/post/<slug>/references/tutorial.qmd` | `cosmo` | `jupyter: python3` |
-| Stata | `content/post/<slug>/references/tutorial.qmd` | `cosmo` | `jupyter: nbstata` |
+| R | `content/tutorials/<slug>/tutorial.qmd` | `darkly` | (none --- knitr is default) |
+| Python | `content/tutorials/<slug>/references/tutorial.qmd` | `cosmo` | `jupyter: python3` |
+| Stata | `content/tutorials/<slug>/references/tutorial.qmd` | `cosmo` | `jupyter: nbstata` |
 
 These conventions are pinned to existing precedents:
-- R: `content/post/r_demeaning_twfe/tutorial.qmd`, `content/post/r_dynamic_bma/tutorial.qmd`
-- Python: `content/post/python_EconML/references/tutorial-econml-resource-curse.qmd`
-- Stata: `content/post/stata_cate2/references/tutorial-cate-resource-curse.qmd`
+- R: `content/tutorials/r_demeaning_twfe/tutorial.qmd`, `content/tutorials/r_dynamic_bma/tutorial.qmd`
+- Python: `content/tutorials/python_EconML/references/tutorial-econml-resource-curse.qmd`
+- Stata: `content/tutorials/stata_cate2/references/tutorial-cate-resource-curse.qmd`
 
-On success the skill also writes `content/post/<slug>/<slug>.zip` (the
+On success the skill also writes `content/tutorials/<slug>/<slug>.zip` (the
 downloadable Quarto-project bundle produced in Phase 4.5) and modifies
-`content/post/<slug>/index.md` with a new `links:` entry: `icon:
+`content/tutorials/<slug>/index.md` with a new `links:` entry: `icon:
 file-code`, `name: "Quarto project (.zip)"`, `url: <slug>.zip`. See
 **Phase 4.5** for the bundle recipe and **Phase 5** for the link
 placement rule.
@@ -138,7 +138,7 @@ Reject any other argument or flag with a clear error.
 
 ### 1.2 Locate the post
 
-The post directory is `content/post/<slug>/`. Error out if it does not
+The post directory is `content/tutorials/<slug>/`. Error out if it does not
 exist.
 
 ### 1.3 Detect language
@@ -155,7 +155,7 @@ Apply these rules in order:
 
 ### 1.4 Verify required inputs
 
-`content/post/<slug>/index.md` must exist (always required).
+`content/tutorials/<slug>/index.md` must exist (always required).
 
 The matching companion script must exist (R: `analysis.R`, Python:
 `script.py`, Stata: `analysis.do`). If missing, stop and tell the user to
@@ -258,8 +258,8 @@ SCOPE
 Post slug:        <slug>
 Detected language: R | Python | Stata
 Source files:
-  - content/post/<slug>/index.md   (<N> lines)
-  - content/post/<slug>/<script>   (<M> lines)
+  - content/tutorials/<slug>/index.md   (<N> lines)
+  - content/tutorials/<slug>/<script>   (<M> lines)
 Output file:      <output path from Deliverables table>
 Quarto theme:     darkly | cosmo
 Engine:           knitr (R) | jupyter: python3 | jupyter: nbstata
@@ -351,7 +351,7 @@ table:
 | ` ```r ` / ` ```python ` / ` ```stata ` fence | Rewrite to ` ```{r} ` / ` ```{python} ` / ` ```{stata} `, add `#| label:` |
 | ` ```text ` output block | **Drop entirely** --- Quarto re-executes and prints |
 | `![alt](figN.png)` line | Replace with the chunk that *generates* the figure (lift from companion script if missing from index.md) |
-| Internal site link `/post/foo/` | Rewrite to `https://carlos-mendez.org/post/foo/` |
+| Internal site link `/tutorials/foo/` (or legacy `/post/foo/`) | Rewrite to `https://carlos-mendez.org/tutorials/foo/` |
 | Hugo shortcode `{{< ... >}}` | Drop or convert (see transformations.md) |
 
 **Math-escape transform.** Goldmark + Hugo double-escapes backslashes
@@ -484,7 +484,7 @@ in the post directory (e.g. `proposition99.rds`, `dataSIM4RCT.dta`,
 `Iris.csv`) hard-code the **GitHub raw URL** of this project:
 
 ```
-https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/<filename>
+https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/<filename>
 ```
 
 Wrap the download in a `if (!file.exists(...))` guard so re-renders skip
@@ -498,8 +498,8 @@ Append a short final section to the `.qmd`:
 ```markdown
 ## Source files
 
-- Companion script: [`<script>`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/<script>)
-- Published post: <https://carlos-mendez.org/post/<slug>/>
+- Companion script: [`<script>`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/<slug>/<script>)
+- Published post: <https://carlos-mendez.org/tutorials/<slug>/>
 - GitHub repo: <https://github.com/cmg777/starter-academic-v501>
 ```
 
@@ -515,9 +515,9 @@ Run from the post directory (so caches and figure outputs land in the
 right place):
 
 ```bash
-cd content/post/<slug>      # (R) the .qmd lives here directly
+cd content/tutorials/<slug>      # (R) the .qmd lives here directly
 # OR
-cd content/post/<slug>/references   # (Python / Stata) .qmd is one level deeper
+cd content/tutorials/<slug>/references   # (Python / Stata) .qmd is one level deeper
 quarto render tutorial.qmd 2>&1
 ```
 
@@ -564,7 +564,7 @@ project directory on first open; the unzipped folder is itself a
 recognised Quarto project (thanks to a minimal `_quarto.yml`), so
 there's no prompt.
 
-The pattern was validated on `content/post/r_did_ring/` in
+The pattern was validated on `content/tutorials/r_did_ring/` in
 2026-05-19; codified in
 [`references/zip-bundle.md`](references/zip-bundle.md).
 
@@ -596,13 +596,13 @@ cp <bundle>/<canonical-script> "$WORK/$SLUG/"
 # _quarto.yml: preserve if present, else generate stub
 # README.md: from template
 ( cd "$WORK" && zip -r "$SLUG.zip" "$SLUG/" )
-mv "$WORK/$SLUG.zip" "content/post/$SLUG/$SLUG.zip"
+mv "$WORK/$SLUG.zip" "content/tutorials/$SLUG/$SLUG.zip"
 rm -rf "$WORK"
 ```
 
 ### 4.5.3 Post-build verification
 
-Run `unzip -l content/post/<slug>/<slug>.zip` and confirm:
+Run `unzip -l content/tutorials/<slug>/<slug>.zip` and confirm:
 
 - Exactly **4 entries inside `<slug>/`**:
   `_quarto.yml`, `tutorial.qmd`, `<canonical-script>`, `README.md`
@@ -690,13 +690,13 @@ Follow-ups
    /project:review-post <slug>
 
 2. Commit and push (Netlify auto-deploys):
-   git add content/post/<slug>/<output-path> content/post/<slug>/index.md \
+   git add content/tutorials/<slug>/<output-path> content/tutorials/<slug>/index.md \
            logs/<YYYY-MM-DD>-<slug>-quarto.md
    git commit -m "<slug>: add Quarto tutorial for local execution"
    git push origin master
 
 3. Open the rendered notebook locally:
-   open content/post/<slug>/<output-path-no-extension>.html
+   open content/tutorials/<slug>/<output-path-no-extension>.html
 ```
 
 Do not auto-run any follow-up. The skill ends here.
@@ -737,7 +737,7 @@ follow-up offer templates: see
 Run after editing this `SKILL.md` to confirm the contract still works.
 
 1. **R reproduction.** Move
-   `content/post/r_causalpolicy_workshop/tutorial.qmd` aside to
+   `content/tutorials/r_causalpolicy_workshop/tutorial.qmd` aside to
    `tutorial.qmd.before-skill`. Invoke
    `/project:write-quarto-notebook r_causalpolicy_workshop`. The regenerated
    file must render cleanly and structurally match the backup (line count
@@ -762,7 +762,7 @@ Run after editing this `SKILL.md` to confirm the contract still works.
 
 6. **ZIP project bundle round-trip.** Invoke the skill on an R post
    without a pre-existing `_quarto.yml` in the bundle.
-   `content/post/<slug>/<slug>.zip` must exist after Phase 4.5. Run
+   `content/tutorials/<slug>/<slug>.zip` must exist after Phase 4.5. Run
    `unzip -l` and confirm exactly 4 entries inside the `<slug>/`
    folder: `tutorial.qmd`, `analysis.R`, `_quarto.yml` (the 2-line
    stub), and `README.md`. The Phase-5 link entry must read

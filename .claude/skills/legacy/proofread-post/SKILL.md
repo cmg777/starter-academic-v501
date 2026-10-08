@@ -19,7 +19,7 @@ in the conversation without modifying any files.
 ```
 /project:proofread-post python_partial_identification
 /project:proofread-post python_dowhy
-/project:proofread-post content/post/python_ml_random_forest/
+/project:proofread-post content/tutorials/python_ml_random_forest/
 /project:proofread-post python_dowhy focus: math
 /project:proofread-post python_doubleml focus: code
 /project:proofread-post python_partial_identification focus: grammar
@@ -41,9 +41,9 @@ in the conversation without modifying any files.
 ## Step 0 -- Pre-flight
 
 1. **Parse arguments.** Extract the post slug or path from `$ARGUMENTS`.
-   - If a full path is given (e.g. `content/post/python_dowhy/`), use it directly.
+   - If a full path is given (e.g. `content/tutorials/python_dowhy/`), use it directly.
    - If a slug is given (e.g. `python_partial_identification`), resolve to
-     `content/post/<slug>/index.md`.
+     `content/tutorials/<slug>/index.md`.
 
 2. **Parse `focus:` argument (optional).** If `focus:` is present, extract the
    keyword and run only the matching step(s). If omitted, run all steps.
@@ -80,7 +80,7 @@ Before running checks, briefly announce what you will do. This is a fast QA
 tool, so proceed immediately after displaying the message (do not wait for
 confirmation -- the user invoked the skill, so intent is clear).
 
-"Proofreading **[POST TITLE]** (`content/post/<slug>/index.md`).
+"Proofreading **[POST TITLE]** (`content/tutorials/<slug>/index.md`).
 Running: [all 10 checks / focused checks: LIST]."
 
 ---
@@ -340,7 +340,7 @@ Mark skipped steps as "SKIP" in the checklist.
 ```
 # Proofread Report: <Post Title>
 
-**Post:** `content/post/<slug>/index.md`
+**Post:** `content/tutorials/<slug>/index.md`
 **Date:** <current date>
 **Status:** PASS / FAIL
 **Focus:** <focus keyword, or "full" if all steps run>

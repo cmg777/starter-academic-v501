@@ -10,7 +10,7 @@ study:
   subtitle: "One-line description under the title"   # optional
   overview: "HTML/prose paragraph for the Overview section."   # optional; omitted if blank
   panel_structure: "Optional note box under the overview (HTML allowed)."   # optional
-  post_url: "https://carlos-mendez.org/post/<slug>/"  # optional; auto-derived from baseURL+slug
+  post_url: "https://carlos-mendez.org/tutorials/<slug>/"  # optional; auto-derived from baseURL+slug
   kpis:                                              # optional; overrides the 4 default KPI cards
     - {n: 180, l: "countries"}
     - {n: "1992–2012", l: "years"}

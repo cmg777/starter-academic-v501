@@ -1,5 +1,5 @@
 # Tutorial gallery topic taxonomy
-# Source of truth for /post/ gallery grouping and the homepage Posts & Tutorials widget.
+# Source of truth for /tutorials/ gallery grouping and the homepage Posts & Tutorials widget.
 # Multi-bucket: a post appears in EVERY topic whose `category_matches` overlaps
 # its categories: list. The `foundations` topic is a residual catch-all —
 # only tutorials (slug starts python_/r_/stata_/gee_/rpy_) that match NO other

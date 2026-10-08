@@ -1,0 +1,15 @@
+{{/* Books — filterable list of whole books (former type-5 publications and the
+     open online books). Rows link to each book's page. See layouts/partials/catalog.html. */}}
+{{- define "main" -}}
+{{ partial "page_header.html" . }}
+{{ $items := slice }}
+{{ range .Pages.ByDate.Reverse }}
+  {{ $items = $items | append (dict
+      "title" .Title "summary" .Summary "href" .RelPermalink "external" false
+      "img" ((.Resources.ByType "image").GetMatch "*featured*")
+      "year" (.Date.Format "2006")
+      "attrs" (dict "format" (.Params.book_format | default ""))
+      "page" .) }}
+{{ end }}
+{{ partial "catalog.html" (dict "page" . "items" $items) }}
+{{- end -}}

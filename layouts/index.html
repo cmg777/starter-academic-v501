@@ -184,11 +184,11 @@
     {{ partial "orbital-gallery.html" (dict "t" $t) }}
 
     <section id="featured" class="section section-lined shell" aria-labelledby="publications-title">
-      <p class="eyebrow">{{ $t.pubKicker }}</p><div class="section-heading"><h2 id="publications-title">{{ $t.pubTitle }}</h2><a class="text-link" href="{{ "publication/" | relLangURL }}">{{ $t.allPubs }} <span aria-hidden="true">↗</span></a></div>
+      <p class="eyebrow">{{ $t.pubKicker }}</p><div class="section-heading"><h2 id="publications-title">{{ $t.pubTitle }}</h2><a class="text-link" href="{{ "articles/" | relLangURL }}">{{ $t.allPubs }} <span aria-hidden="true">↗</span></a></div>
       <div class="publication-list">
       {{/* Academic papers only: conference papers, journal articles, and preprints.
            Use publication dates, excluding forthcoming papers even in future-enabled builds. */}}
-      {{ $papers := where (where site.RegularPages "Section" "publication") "Params.publication_types" "intersect" (slice "1" "2" "3") }}
+      {{ $papers := where (where site.RegularPages "Section" "articles") "Params.publication_types" "intersect" (slice "1" "2" "3") }}
       {{ $papers = where $papers "Date" "le" now }}
       {{ range $i, $paper := first 3 $papers.ByDate.Reverse }}
         {{ $image := (.Resources.ByType "image").GetMatch "*featured*" }}
@@ -208,13 +208,13 @@
     {{ partial "orbital-talks.html" (dict "t" $t) }}
 
     <section id="projects" class="section shell" aria-labelledby="projects-title">
-      <p class="eyebrow">{{ $t.projectKicker }}</p><div class="section-heading"><div><h2 id="projects-title">{{ $t.projectTitle }}</h2><p class="section-description">{{ $t.projectIntro }}</p></div><a class="text-link" href="{{ "projects/" | relLangURL }}">{{ $t.allProjects }} <span aria-hidden="true">↗</span></a></div>
-      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "projects").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.projectLink "kind" $t.project) }}{{ end }}</div>
+      <p class="eyebrow">{{ $t.projectKicker }}</p><div class="section-heading"><div><h2 id="projects-title">{{ $t.projectTitle }}</h2><p class="section-description">{{ $t.projectIntro }}</p></div><a class="text-link" href="{{ "software/" | relLangURL }}">{{ $t.allProjects }} <span aria-hidden="true">↗</span></a></div>
+      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "software").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.projectLink "kind" $t.project) }}{{ end }}</div>
     </section>
 
     <section id="posts" class="learning-section" aria-labelledby="learn-title"><div class="shell section">
-      <p class="eyebrow">{{ $t.learnKicker }}</p><div class="section-heading"><div><h2 id="learn-title">{{ $t.learnTitle }}</h2><p class="section-description">{{ $t.learnIntro }}</p></div><a class="text-link" href="{{ "post/" | relLangURL }}">{{ $t.allPosts }} <span aria-hidden="true">↗</span></a></div>
-      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "post").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
+      <p class="eyebrow">{{ $t.learnKicker }}</p><div class="section-heading"><div><h2 id="learn-title">{{ $t.learnTitle }}</h2><p class="section-description">{{ $t.learnIntro }}</p></div><a class="text-link" href="{{ "tutorials/" | relLangURL }}">{{ $t.allPosts }} <span aria-hidden="true">↗</span></a></div>
+      <div class="content-grid">{{ range first 3 (where site.RegularPages "Section" "tutorials").ByLastmod.Reverse }}{{ partial "orbital-card.html" (dict "page" . "label" $t.tutorialLink "kind" $t.tutorial) }}{{ end }}</div>
       <a class="text-link courses-link" href="{{ "courses/" | relLangURL }}">{{ $t.courses }} <span aria-hidden="true">→</span></a>
     </div></section>
   </main>
