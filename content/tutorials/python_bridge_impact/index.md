@@ -8,7 +8,7 @@ categories:
   - Development Economics
 date: "2026-08-05T00:00:00Z"
 draft: false
-featured: false
+featured: true
 image:
   caption: ""
   focal_point: Smart
@@ -66,7 +66,7 @@ links:
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_bridge_impact/index.md
-summary: "In June 1998 a 4.8-kilometre bridge over the Jamuna river connected 26 million isolated Bangladeshis to Dhaka and cut freight costs in half. This tutorial rebuilds the difference-in-differences evaluation of that bridge from the ground up in Python, using the Padma hinterland — a symmetric region left isolated by a river whose own bridge was not started until 2015 — as the comparison group. It teaches the 2x2 logic, parallel trends, two-way fixed effects, event studies and honest sensitivity analysis on satellite nighttime lights, then runs the same machinery over census employment shares, rice yields and a public-goods placebo. The two doubly robust estimators of the original paper are rebuilt by hand in NumPy and pushed through both diff-diff and pyfixest. All 122 published coefficients are audited side by side with the replication, and the defects found inside the shipped Stata package are documented in full."
+summary: "When a major bridge connected millions of people in northwest Bangladesh to the capital in 1998, did the region's economy take off? This beginner-friendly Python tutorial uses satellite images of nighttime lights to compare the connected region with a similar one that stayed isolated, before and after the bridge opened."
 tags:
   - python
   - causal inference

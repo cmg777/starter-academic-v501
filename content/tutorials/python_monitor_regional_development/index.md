@@ -6,7 +6,7 @@ categories:
   - Remote Sensing
   - Spatial inequality
 draft: false
-featured: true
+featured: false
 date: "2023-08-26T00:00:00Z"
 external_link: ""
 image:

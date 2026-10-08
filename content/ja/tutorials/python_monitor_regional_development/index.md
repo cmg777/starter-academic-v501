@@ -10,7 +10,7 @@ categories:
   - Remote Sensing
   - Spatial inequality
 card_url: "/tutorials/python_monitor_regional_development/"
-featured: true
+featured: false
 _build:
   render: never
   list: always

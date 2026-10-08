@@ -5,7 +5,7 @@
   - `layouts/index.html` lists flagged items first (newest `date` first) and fills the remaining slots (3 per section) with the previous automatic rule. For articles that is the newest papers of types 1–3; for tutorials it is the most recently committed.
 - **Picks (satellite and big-data work)**, flagged in EN/ES/JA, 18 files in all:
   - Articles: `20241219-AE`, `20251006-SIR`, `20250605-EE`.
-  - Tutorials: `python_kuznets_dmsp`, `python_did_sc_tsunami`, `python_monitor_regional_development`.
+  - Tutorials: `python_kuznets_dmsp`, `python_did_sc_tsunami`, `python_monitor_regional_development` (replaced the same day by `python_bridge_impact`).
 - **Old flags cleared:**
   - Articles `20200817-RSPP` and `20240417-REGION` (EN/ES/JA).
   - Tutorials `python_double_lasso`, `r_double_lasso` and `stata_double_lasso`.
