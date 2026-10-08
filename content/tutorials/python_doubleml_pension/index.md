@@ -43,7 +43,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_doubleml_pension/index.md
 slides:
-summary: Estimating the causal effect of 401(k) eligibility and participation on net financial assets using three DoubleML models (PLR, IRM, IIVM) with the 1991 SIPP pension dataset
+summary: "Does access to a workplace retirement savings plan make American households save more, or do the households that get it simply earn more? This Python tutorial uses double machine learning, which lets flexible prediction models account for income and other differences, on 1991 survey data. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

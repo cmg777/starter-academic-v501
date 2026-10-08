@@ -61,7 +61,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_sc_dsc_sdid/index.md
 slides:
-summary: "Climbing the ladder from difference-in-differences to synthetic difference-in-differences, one stage at a time, with every estimator hand-coded before it is run with its package. The case study is the 2016 Brexit referendum and what it cost UK GDP. Includes cheat sheets in R, Stata and Python."
+summary: "How much did the 2016 Brexit vote cost the economy of the United Kingdom? We build a look-alike United Kingdom from other rich countries, step by step through a ladder of increasingly flexible methods, and compare what each step says. This R tutorial includes cheat sheets for Stata and Python and an interactive app that runs in your web browser."
 tags:
   - r
   - stata

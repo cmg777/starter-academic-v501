@@ -46,7 +46,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_basic_synthetic_control/index.md
 slides:
-summary: A beginner-friendly tutorial on the synthetic control method in R, using the Basque Country case study to estimate the economic cost of conflict on regional GDP per capita from 1970 to 1997.
+summary: "What did years of terrorist violence cost the economy of the Basque Country in Spain? This beginner R tutorial builds a look-alike Basque Country from other Spanish regions, mostly Catalonia and Madrid, and finds income per person roughly 8 percent lower at the widest point of the gap. It comes with an interactive app that runs in your web browser."
 tags:
 - r
 - causal

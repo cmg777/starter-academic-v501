@@ -39,7 +39,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_dynamic_panel/index.md
 slides:
-summary: Estimate the within-country dynamic effect of war on log GDP per capita using Arellano-Bond GMM in Stata, reproducing Thies and Baum (2020) on a 1955-2015 panel of 160 countries.
+summary: "How much does war lower the living standards of a country? Using data on 160 countries from 1955 to 2015 in Stata, we follow each country over time to separate the damage of war from lasting national differences, and find that about half of the long-run cost works through weaker institutions. The tutorial includes an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

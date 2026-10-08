@@ -46,7 +46,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: A beginner-friendly introduction to causal inference using DoWhy's four-step framework with simulated observational data on working from home and productivity
+summary: "Does working from home make employees more productive, or do productive people simply choose to work from home? This beginner Python tutorial uses simulated data with a known answer to show a four-step approach to cause and effect: state your assumptions, decide what to compare, estimate the effect and stress-test it. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

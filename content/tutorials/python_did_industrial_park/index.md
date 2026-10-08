@@ -47,7 +47,7 @@ links:
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_did_industrial_park/index.md
-summary: "Do industrial parks raise local economic activity — and for whom? A beginner's staggered difference-in-differences evaluation of Ethiopian industrial parks in Python, replicating Huang, Wang & Xu (2026) on synthetic calibrated data: TWFE and an event study with pyfixest, the modern Sun-Abraham, Borusyak/Gardner and Callaway-Sant'Anna estimators plus a Goodman-Bacon decomposition with diff-diff, survey-weighted repeated-cross-section DiD on DHS household welfare and women's empowerment, and Conley spatial standard errors."
+summary: "Do industrial parks bring more economic activity to nearby towns, and who benefits? This Python tutorial compares places that got a park with places that did not, before and after it opened, using simulated data modeled on Ethiopia, and also looks at household welfare and outcomes for women. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

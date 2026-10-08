@@ -1,6 +1,6 @@
 ---
 title: "Doble LASSO para inferencia causal: ¿reduce el aborto la delincuencia?"
-summary: "Un recorrido accesible por el Doble LASSO para inferencia causal, replicando el análisis de Fitzgerald, Lattimore, Robinson y Zhu (2026) sobre la cuestión del aborto y la delincuencia de Donohue–Levitt con 284 controles candidatos y errores estándar agrupados por estado."
+summary: "¿La legalización del aborto redujo la delincuencia en Estados Unidos, como afirmó un famoso estudio de 2001? En lugar de elegir a mano unas pocas variables de control, dejamos que un método guiado por los datos elija entre 284 candidatas y verificamos si el hallazgo original se sostiene. Este tutorial en R incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-21T00:00:00Z"
 categories:
   - R

@@ -42,7 +42,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Building a composite Health Index from Life Expectancy and Infant Mortality using manual PCA with simulated data for 50 countries, then verifying against scikit-learn
+summary: "How can two health measures, life expectancy and infant mortality, be combined into one fair health score? Using simulated data for 50 countries, this Python tutorial builds the index step by step with principal component analysis, a method that finds the single direction capturing most of the shared information. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - world

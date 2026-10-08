@@ -40,7 +40,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_convergence/index.md
 slides:
-summary: Test whether poorer countries are catching up to richer ones using beta and sigma convergence analysis with Penn World Tables 10.0 data in Stata
+summary: "Are poorer countries catching up to richer ones? Using international income data, we test whether poorer countries grow faster and whether income gaps across the world are shrinking, and we see how the answer changed after 2000. This Stata tutorial comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - convergence

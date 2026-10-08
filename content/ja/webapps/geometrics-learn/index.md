@@ -1,7 +1,7 @@
 ---
 title: "geometrics — 学習アプリ"
 date: "2026-07-02T00:00:00Z"
-summary: "空間的収束と格差の手法を、実行できるサンドボックスと平易な解説で学べます。"
+summary: "地域の追い上げや地域間格差の研究は初めてですか？平易な解説と、自分で動かして変えられる小さなインタラクティブな例で、主な考え方を学べます。Streamlit 上でウェブブラウザから利用できます。"
 app_url: "https://geometrics-learn.streamlit.app/"
 platform: streamlit
 topic: spatial

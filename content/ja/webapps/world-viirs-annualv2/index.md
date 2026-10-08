@@ -1,7 +1,7 @@
 ---
 title: "夜間光の時空間動態：VIIRS-annualデータ"
 date: "2024-04-01T00:00:00Z"
-summary: "インタラクティブな Google Earth Engine アプリ。"
+summary: "近年、世界のどこで夜が明るくなっているでしょうか？近年のみを対象とする、より新しく詳細な衛星データを使って、世界の夜間光の年ごとの地図をたどれます。Google Earth Engine 上でウェブブラウザから利用できます。"
 app_url: "https://carlos-mendez.projects.earthengine.app/view/world-viirs-annualv2"
 platform: gee
 region: global

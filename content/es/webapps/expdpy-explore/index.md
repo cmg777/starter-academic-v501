@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Explorar app"
 date: "2026-06-18T00:00:00Z"
-summary: "Describa y visualice un panel: distribuciones, valores faltantes, tendencias, variación within/between y dinámica del panel."
+summary: "¿Qué patrones esconden los datos que siguen a los mismos países, empresas o personas durante muchos años? Explore distribuciones, valores faltantes, tendencias en el tiempo y las diferencias entre unidades y dentro de cada unidad, sin necesidad de programar. Funciona en Streamlit, en su navegador web."
 app_url: "https://expdpy-explore.streamlit.app/"
 platform: streamlit
 topic: panel-fe

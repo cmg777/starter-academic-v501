@@ -46,7 +46,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_sc_multi_country/index.md
 slides:
-summary: "A hands-on tour of the Augmented Synthetic Control Method in a multi-country setting with the augsynth package — learning single_augsynth, multisynth, and augsynth_multiout on simulated data, then replicating Papaioannou (2021) on the EMU and productivity convergence."
+summary: "Did joining the euro make countries more productive? We build look-alike comparison countries from economies that did not join, first with simulated data and then with a published study of the euro area, and check whether the effect is real or just noise. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
 - r
 - causal inference

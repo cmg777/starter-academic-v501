@@ -1,7 +1,7 @@
 ---
 title: "geometrics — Analyze app"
 date: "2026-07-02T00:00:00Z"
-summary: "Estimate beta-, sigma- and club convergence, spatial econometric models, Markov dynamics, Gini/Theil inequality and (M)GWR."
+summary: "Are poorer regions catching up with richer ones, and is inequality between regions falling? Measure catching up, regional inequality and how regions move between income groups, with methods that take neighboring regions into account. It runs on Streamlit in your web browser."
 app_url: "https://geometrics-analyze.streamlit.app/"
 platform: streamlit
 topic: spatial

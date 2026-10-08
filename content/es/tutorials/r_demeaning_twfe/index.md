@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "¿Qué hace realmente TWFE? Centrado manual y el teorema FWL"
-summary: "Centrado manual frente a efectos fijos de dos vías --- mostrando que TWFE es simplemente MCO sobre datos centrados a través del teorema de Frisch-Waugh-Lovell, con una demostración práctica utilizando un panel de convergencia de Barro de 150 países."
+summary: "¿Qué hace realmente con los datos una regresión que ajusta por las diferencias entre países y entre años? Con datos simulados de 150 países en R, mostramos paso a paso que equivale a restar los promedios por país y por año y luego estimar una regresión simple, y por qué los márgenes de error habituales necesitan entonces una corrección. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-04-02T00:00:00Z"
 categories:
   - R

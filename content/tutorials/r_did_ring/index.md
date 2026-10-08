@@ -42,7 +42,7 @@ links:
     name: AI Podcast
     url: "/tutorials/r_did_ring/#podcast-player"
 slides:
-summary: "When the 'treatment' is a point in space, distance becomes the running variable. We walk through the parametric ring DiD and a data-driven nonparametric alternative, first on a simulated world with a known answer, then on Linden and Rockoff's home-prices study, and reconcile a parametric −5.78 % with a nonparametric −20.6 %."
+summary: "What happens to nearby home prices when a registered sex offender moves into a neighborhood? We compare homes close to the address with homes a little farther away, before and after the move, and show how the distance chosen as the cutoff can change the answer. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

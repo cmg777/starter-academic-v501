@@ -47,7 +47,7 @@ links:
     name: AI Podcast
     url: "/tutorials/python_mgwrfer/#podcast-player"
 slides:
-summary: A faithful Python tutorial on Li & Fotheringham (2026) — using a two-stage MGWFER algorithm to remove time-invariant spatial confounders from Multiscale GWR and recover both unbiased spatially varying slopes and intrinsic contextual effects from simulated panel data (225 units x 3 periods).
+summary: "When we measure how a relationship changes from place to place, hidden features of each place can distort the answer. This Python tutorial follows a 2026 study by Li and Fotheringham and uses simulated data on 225 places over three periods to show how following the same places over time removes that distortion. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - spatial

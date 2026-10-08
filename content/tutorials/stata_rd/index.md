@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_rd/index.md
 slides:
-summary: Evaluate the causal effect of a school tutoring program on student exit exam scores using sharp regression discontinuity design with parametric OLS and nonparametric rdrobust estimation in Stata
+summary: "Does extra tutoring raise final exam scores? In Stata, we compare students who scored just below and just above the cutoff of 70 on an entrance exam that decided who got tutoring, and find gains of about 9 to 11 points. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

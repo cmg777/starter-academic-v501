@@ -39,7 +39,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_iv/index.md
 slides:
-summary: "Replicate Acemoglu, Johnson and Robinson (2001) in Stata: instrument modern institutions with settler mortality across 64 ex-colonies and learn how IV recovers a causal effect that OLS understates by 80 percent."
+summary: "Do good institutions make countries richer? Following the 2001 study by Acemoglu, Johnson and Robinson in Stata, we use the death rates of early European settlers in 64 former colonies as a natural experiment, and find an effect much larger than a simple comparison suggests. The tutorial includes an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

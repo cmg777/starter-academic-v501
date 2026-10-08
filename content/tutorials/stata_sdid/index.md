@@ -48,7 +48,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_sdid/index.md
 slides:
-summary: Introduce and derive synthetic difference-in-differences, then apply it to California's Proposition 99 — comparing SDID with the original difference-in-differences and synthetic control (synth2), and how to run placebo inference with a single treated unit.
+summary: "Did the 1988 tobacco tax in California reduce smoking? In Stata, we compare three ways of building a comparison for California from other states, including a newer method that blends their strengths, and all three agree that cigarette sales fell, though by different amounts. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

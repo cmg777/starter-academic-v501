@@ -42,7 +42,7 @@ links:
   name: AI Podcast
   url: "/tutorials/r_did2/#podcast-player"
 slides:
-summary: A case study on the Affordable Care Act's Medicaid expansion --- working through 2x2 cell-means, TWFE, covariate-adjusted DRDID, 2xT and Callaway-Sant'Anna staggered event studies, and HonestDiD sensitivity --- to show how population weighting changes the target parameter when the units are regions of very different sizes.
+summary: "Did expanding Medicaid health coverage to low-income adults reduce deaths? We compare counties in states that expanded coverage with counties in states that did not, and show how counting each county equally or each person equally can change the answer. This R tutorial includes an interactive app that runs in your web browser."
 tags:
   - r
   - causal

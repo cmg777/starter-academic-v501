@@ -58,7 +58,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Estimating the causal effect of a job training program on earnings using DoWhy's four-step causal inference framework with the Lalonde dataset
+summary: "Did a job training program raise the earnings of disadvantaged workers? This Python tutorial applies a four-step approach to cause and effect (state your assumptions, decide what to compare, estimate the effect and stress-test it) to the classic LaLonde job training data. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

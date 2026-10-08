@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "El método del control sintético en Stata: ¿la Proposición 99 de California redujo el tabaquismo?"
-summary: "Estime el efecto causal del programa de control del tabaco de la Proposición 99 de California sobre las ventas de cigarrillos usando el método del control sintético en Stata, con pruebas de robustez de placebo en el espacio, placebo en el tiempo y de exclusión de una unidad a la vez."
+summary: "¿El impuesto al tabaco y la campaña contra el tabaquismo de 1988 en California redujeron la venta de cigarrillos? En Stata, usamos el método del control sintético, que construye una California parecida a partir de una mezcla de otros estados, y encontramos que las ventas cayeron unos 19 paquetes por persona al año. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-04-26T00:00:00Z"
 categories:
   - Stata

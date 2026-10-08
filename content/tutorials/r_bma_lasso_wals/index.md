@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_bma_lasso_wals/index.md
 slides:
-summary: Three principled approaches to variable selection---BMA, LASSO, and WALS---applied to synthetic cross-country CO2 emissions data with known ground truth, demonstrating methodological triangulation for robust inference.
+summary: "When many factors could explain carbon emissions, which ones truly matter? Using simulated data for 120 fictional countries where the right answer is known, this R tutorial compares three methods for choosing which factors to keep and shows that factors flagged by all three are the safest bets. It comes with an interactive app that runs in your web browser."
 tags:
   - r
   - econometrics

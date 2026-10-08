@@ -34,7 +34,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_did/index.md
 slides:
-summary: A guide to Difference-in-Differences with staggered treatment --- from TWFE pitfalls through Callaway-Sant'Anna group-time ATTs, doubly robust estimation, and HonestDiD sensitivity analysis --- applied to minimum wage effects on teen employment.
+summary: "Did raising the minimum wage cost teenagers their jobs? Using American states that raised their wage floors at different times, we compare states before and after each increase and show why the classic shortcut can mislead when policies start on different dates. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

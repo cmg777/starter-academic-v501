@@ -1,7 +1,7 @@
 ---
 title: "夜間光（VIIRS相当）の地域別年次時系列（1992–2024年）"
 date: "2026-01-18T00:00:00Z"
-summary: "インタラクティブな Google Earth Engine アプリ。"
+summary: "地域全体の夜の明るさは、年ごとにどう変わってきたでしょうか？国や州などの行政区域を選ぶと、1992年までさかのぼって再構築された、より新しく詳細な夜間光データから、1992年から2024年までの年ごとの夜間光の推移を表示します。Google Earth Engine 上でウェブブラウザから利用できます。"
 app_url: "https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region"
 platform: gee
 region: global

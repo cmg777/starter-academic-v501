@@ -43,7 +43,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_iv/index.md
 slides:
-summary: "Replicate Acemoglu, Johnson and Robinson (2001) in Python with pyfixest and linearmodels: instrument modern institutions with settler mortality across 64 ex-colonies and learn how IV recovers a causal effect that OLS understates by 80 percent."
+summary: "Do good institutions make countries richer? This Python tutorial revisits the 2001 study by Acemoglu, Johnson and Robinson, which uses death rates of early European settlers in 64 former colonies to isolate the effect of institutions, and shows that a simple comparison understates that effect. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - pyfixest

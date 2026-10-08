@@ -43,7 +43,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_fe_kuznets/index.md
 slides:
-summary: Replicating the N-shaped Kuznets curve with panel data fixed effects in Python using PyFixest, from pooled OLS through two-way FE, turning point analysis, and determinants of regional inequality across 180 countries
+summary: "As countries grow richer, do the gaps between their regions first widen and then narrow, or do they widen again at the top? This Python tutorial uses satellite images of night lights for about 180 countries and compares each country with itself over time, finding an N-shaped pattern. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - econometrics

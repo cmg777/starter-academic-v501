@@ -1,7 +1,7 @@
 ---
 title: "日本における地域間格差の探究：一人当たりGDPのマルチスケール比較（1990–2022年）"
 date: "2026-01-18T00:00:00Z"
-summary: "インタラクティブな Google Earth Engine アプリ。"
+summary: "日本の地域間の所得格差はどれほど大きく、1990年以降に縮まったのでしょうか？1990年から2022年までの1人当たり経済活動を、複数の地理的な単位で地域ごとに比べられます。Google Earth Engine 上でウェブブラウザから利用できます。"
 app_url: "https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities"
 platform: gee
 region: japan

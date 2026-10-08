@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Regresión con efectos fijos de alta dimensión: una introducción en Python"
-summary: "Estimación de modelos de regresión con efectos fijos de alta dimensión utilizando PyFixest, desde MCO simple hasta efectos fijos de dos vías, variables instrumentales, datos de panel y estudios de eventos."
+summary: "¿Qué parte del mayor salario de los trabajadores sindicalizados se debe al sindicato y qué parte a quiénes se afilian? Este tutorial de Python muestra cómo los efectos fijos, que comparan a cada trabajador solo consigo mismo a lo largo del tiempo, eliminan diferencias ocultas y reducen la ganancia salarial aparente del sindicato de alrededor de 18 a 8 por ciento. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-20T00:00:00Z"
 categories:
   - Python

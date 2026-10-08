@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "¿Quiénes son mis vecinos? Estimación bayesiana de matrices de pesos espaciales en R"
-summary: "La econometría espacial suele entregarle el mapa de vecindades antes de comenzar. Este tutorial lo estima a partir de los datos, con el paquete estimateW aplicado a 90 regiones NUTS-1 europeas, 2001-2019."
+summary: "¿Qué regiones europeas se influyen realmente entre sí? En lugar de suponer que solo importan las regiones que comparten frontera, dejamos que los datos de crecimiento de 90 regiones europeas entre 2001 y 2019 revelen quiénes son los verdaderos vecinos. Este tutorial en R incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-07-30T00:00:00Z"
 categories:
   - R

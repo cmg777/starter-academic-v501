@@ -35,7 +35,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_mgwr/index.md
 slides:
-summary: Applying Multiscale Geographically Weighted Regression (MGWR) to reveal how economic catching-up varies across Indonesia's 514 districts, with each variable operating at its own spatial scale
+summary: "Do poorer districts in Indonesia catch up with richer ones at the same pace everywhere? This Python tutorial uses a map-based regression that lets each relationship change from place to place, each at its own geographic scale, across 514 districts. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - spatial

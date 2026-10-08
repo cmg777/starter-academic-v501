@@ -85,7 +85,7 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_did101/index.md
-summary: "Learn Difference-in-Differences (DiD) in Python using PyFixest and Great Tables. Covers the 2x2 design, TWFE regression, inference comparison, publication-quality tables, event studies, and parallel trends testing based on Corral and Yang (2024)."
+summary: "Did an after-school tutoring program really raise student grades, or were grades rising everywhere? This Python tutorial compares 10 tutored high schools with 25 others, before and after the program, to separate its effect from the general upward trend. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Analyze app"
 date: "2026-06-18T00:00:00Z"
-summary: "Estimate fixed, random and correlated random effects, FWL, Hausman tests, event studies, convergence and Kuznets waves."
+summary: "How can we measure a relationship when we observe the same countries, firms or people over many years? Fit the standard models for this kind of data, compare them with formal tests, and study what happens before and after an event or whether poorer units catch up. It runs on Streamlit in your web browser."
 app_url: "https://expdpy-analyze.streamlit.app/"
 platform: streamlit
 topic: panel-fe

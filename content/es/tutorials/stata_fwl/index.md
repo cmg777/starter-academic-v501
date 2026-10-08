@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Cómo visualizar la regresión con el teorema FWL en Stata"
-summary: "Una guía práctica del paquete scatterfit en Stata --- desde la comprensión del teorema de Frisch-Waugh-Lovell mediante confusión simulada hasta la visualización de efectos fijos con datos de panel reales --- que muestra cómo se ve \"controlar por\" en forma de diagrama de dispersión."
+summary: "¿Qué significa realmente controlar por una variable en una regresión? En Stata, convertimos esa idea en una imagen: eliminamos la influencia de otros factores y graficamos lo que queda, con ejemplos sobre ventas de tiendas, vuelos comerciales y salarios. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-27T00:00:00Z"
 categories:
   - Stata

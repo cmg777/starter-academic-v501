@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Cómo identificar estructuras de grupos latentes en datos de panel: el comando classifylasso en Stata"
-summary: "Identifique estructuras de grupos latentes en datos de panel usando el método Classifier-LASSO (Su, Shi, Phillips 2016), que revela cómo el efecto agrupado de la democracia sobre el crecimiento de +1,055 oculta un efecto de +2,151 en 57 países y un efecto de -0,936 en 41 países."
+summary: "¿Responden todos los países de la misma manera a la democracia o a la inflación? En Stata, usamos un método que clasifica a los países en grupos ocultos con un comportamiento similar, y encontramos que la relación promedio entre democracia y crecimiento económico esconde un efecto positivo fuerte en 57 países y uno negativo en 41. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-04-04T00:00:00Z"
 categories:
   - Stata

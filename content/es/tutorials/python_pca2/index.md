@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "PCA agrupado para construir indicadores de desarrollo a lo largo del tiempo"
-summary: "Construcción de un Índice de Desarrollo Humano comparable a lo largo de dos periodos utilizando PCA agrupado (pooled) con datos subnacionales reales para 153 regiones sudamericanas, contrastándolo con el PCA por periodo para mostrar por qué la estandarización agrupada es esencial para las comparaciones temporales."
+summary: "¿Cómo saber si las regiones se desarrollan con el tiempo cuando la vara de medir debe permanecer igual? Con datos de educación, salud e ingreso de 153 regiones sudamericanas en 2013 y 2019, este tutorial de Python construye un solo índice de desarrollo con ambos años juntos para que los puntajes puedan compararse en el tiempo. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-21T00:00:00Z"
 categories:
   - Python

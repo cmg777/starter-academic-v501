@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Analizar app"
 date: "2026-06-18T00:00:00Z"
-summary: "Estime efectos fijos, aleatorios y aleatorios correlacionados, FWL, pruebas de Hausman, estudios de eventos, convergencia y ondas de Kuznets."
+summary: "¿Cómo medir una relación cuando se observa a los mismos países, empresas o personas durante muchos años? Estime los modelos habituales para este tipo de datos, compárelos con pruebas formales y estudie qué ocurre antes y después de un evento o si las unidades más pobres alcanzan a las demás. Funciona en Streamlit, en su navegador web."
 app_url: "https://expdpy-analyze.streamlit.app/"
 platform: streamlit
 topic: panel-fe

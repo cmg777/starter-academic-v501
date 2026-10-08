@@ -59,7 +59,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_did_covariates_lalonde/index.md
 slides:
-summary: Reproducing Scott Cunningham's LaLonde test in Python — covariates rescue a difference-in-differences ATT only when they enter the control group's counterfactual trend, recovering the $1,794 experimental benchmark from a naive $3,621.
+summary: "Can we still find the true effect of a job training program on earnings if we compare trainees with ordinary survey respondents instead of a randomized control group? This Python tutorial shows that adding background characteristics fixes the estimate only when they adjust the expected earnings trend of the comparison group. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

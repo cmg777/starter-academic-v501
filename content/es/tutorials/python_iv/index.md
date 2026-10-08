@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "¿Causan las instituciones la prosperidad? Un tutorial de IV en Python"
-summary: "Replique a Acemoglu, Johnson y Robinson (2001) en Python con pyfixest y linearmodels: instrumente las instituciones modernas con la mortalidad de los colonos en 64 ex colonias y aprenda cómo IV recupera un efecto causal que MCO subestima en un 80 por ciento."
+summary: "¿Las buenas instituciones hacen más ricos a los países? Este tutorial en Python revisa el estudio de 2001 de Acemoglu, Johnson y Robinson, que usa las tasas de mortalidad de los primeros colonos europeos en 64 ex colonias para aislar el efecto de las instituciones, y muestra que una comparación simple subestima ese efecto. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-09T00:00:00Z"
 categories:
   - Python

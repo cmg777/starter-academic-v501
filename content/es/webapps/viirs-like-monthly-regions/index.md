@@ -1,7 +1,7 @@
 ---
 title: "Series temporales mensuales regionales de luces nocturnas (tipo VIIRS) 1992-2024"
 date: "2026-01-18T00:00:00Z"
-summary: "Aplicación interactiva de Google Earth Engine."
+summary: "¿Cómo cambia la iluminación nocturna de un mes a otro en una región entera? Elija una región administrativa, como un país o una provincia, para ver su serie mensual de luces nocturnas entre 1992 y 2024, con una serie de luces nocturnas más reciente y detallada, reconstruida hasta 1992. Funciona en Google Earth Engine, en su navegador web."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly-regions"
 platform: gee
 region: global

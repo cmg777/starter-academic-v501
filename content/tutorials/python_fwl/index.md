@@ -78,7 +78,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_fwl/index.md
 slides:
-summary: Understanding the Frisch-Waugh-Lovell theorem to isolate causal relationships by partialling-out confounders in a simulated fast-food coupon promotion, with an appendix that extends FWL to panel data
+summary: "What does it really mean to control for another factor in a regression? This Python tutorial uses a simulated fast food coupon campaign to show that any such result can be rebuilt by first removing what the other factors explain and then plotting what is left in a simple two-variable chart. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

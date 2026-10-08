@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Learn app"
 date: "2026-06-18T00:00:00Z"
-summary: "Runnable concept sandboxes and plain-language explanations of panel-data methods."
+summary: "New to data that follow the same units over many years? Learn the main methods through plain-language explanations and small interactive examples that you can run and change yourself. It runs on Streamlit in your web browser."
 app_url: "https://expdpy-learn.streamlit.app/"
 platform: streamlit
 topic: panel-fe

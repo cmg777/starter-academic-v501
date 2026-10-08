@@ -1,7 +1,7 @@
 ---
 title: "夜間光の時空間動態：DMSP拡張データ"
 date: "2024-03-01T00:00:00Z"
-summary: "インタラクティブな Google Earth Engine アプリ。"
+summary: "世界のどこで、いつ夜が明るくなったのでしょうか？古い衛星の夜間光データをより最近の年まで延長したデータを使って、世界の夜間光の地図を時代ごとにたどれます。Google Earth Engine 上でウェブブラウザから利用できます。"
 app_url: "https://carlos-mendez.projects.earthengine.app/view/world-dmsp-extended"
 platform: gee
 region: global

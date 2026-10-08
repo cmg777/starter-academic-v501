@@ -1,7 +1,7 @@
 ---
 title: "expdpy — 分析アプリ"
 date: "2026-06-18T00:00:00Z"
-summary: "固定効果・変量効果・相関変量効果、FWL、ハウスマン検定、イベントスタディ、収束、クズネッツ波を推定します。"
+summary: "同じ国、企業、人を何年にもわたって観察するとき、関係をどう測ればよいでしょうか？この種のデータの標準的なモデルを推定して検定で比べ、出来事の前後の変化や、貧しい単位が追いつくかどうかを調べられます。Streamlit 上でウェブブラウザから利用できます。"
 app_url: "https://expdpy-analyze.streamlit.app/"
 platform: streamlit
 topic: panel-fe

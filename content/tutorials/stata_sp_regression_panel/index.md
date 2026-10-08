@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_sp_regression_panel/index.md
 slides:
-summary: Model spatial spillovers in panel data using the Spatial Durbin Model (SDM), Wald specification tests, and dynamic extensions with the xsmle package in Stata
+summary: "Do cigarette prices in one state change how much people smoke in neighboring states? Using data on 46 American states from 1963 to 1992 in Stata, we model cross-border shopping and smoking habits, and find that ignoring neighbors understates how much prices matter. It comes with an interactive app that runs in your web browser."
 tags:
 - stata
 - spatial

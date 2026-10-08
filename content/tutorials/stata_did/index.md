@@ -49,7 +49,7 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_did/index.md
-summary: "Learn Difference-in-Differences (DiD) in Stata using a case study of an after-school tutoring program. Covers the 2x2 design, TWFE regression, event studies, and parallel trends testing based on Corral and Yang (2024)."
+summary: "Did an after-school tutoring program raise the grades of low-income high school students? Using simulated data on 35 schools in Stata, we compare how grades changed in schools with and without the program, and we check whether both groups were on similar paths before it started. It comes with an interactive app that runs in your web browser."
 tags:
 - stata
 - causal

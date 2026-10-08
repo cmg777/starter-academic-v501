@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_honestdid/index.md
 slides:
-summary: Assess how robust difference-in-differences results are to violations of parallel trends using the honestdid package in Stata, progressing from a simple 2x2 DiD to multi-period event studies with relative magnitudes and smoothness restrictions
+summary: "Did expanding Medicaid in some American states raise health insurance coverage among low-income adults, and how much can we trust that answer? In Stata, we measure how far the states could drift apart before the estimated gain would disappear, turning a yes-or-no check into a clear measure of robustness. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_matching/index.md
 slides:
-summary: A beginner-friendly walk-through of six treatment-effects estimators in Stata --- regression adjustment, IPW, IPWRA, AIPW, nearest-neighbor matching, and propensity-score matching --- applied to the classic maternal-smoking and birth-weight case study.
+summary: "Does smoking during pregnancy lower the birth weight of babies? Using data on about 4,600 births in Stata, we compare six ways of making smokers and nonsmokers comparable, and most of them agree on a harm of roughly 230 grams. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

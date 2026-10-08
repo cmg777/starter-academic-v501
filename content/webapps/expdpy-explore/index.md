@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Explore app"
 date: "2026-06-18T00:00:00Z"
-summary: "Describe and visualize a panel: distributions, missing values, time trends, within/between variation and panel dynamics."
+summary: "What patterns hide in data that follow the same countries, firms or people over many years? Explore distributions, missing values, trends over time, and the differences between units and within each unit, with no coding needed. It runs on Streamlit in your web browser."
 app_url: "https://expdpy-explore.streamlit.app/"
 platform: streamlit
 topic: panel-fe

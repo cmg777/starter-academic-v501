@@ -39,7 +39,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_cate2/index.md
 slides:
-summary: Estimate heterogeneous causal effects of mining and mineral prices on economic development using Stata 19's cate command with multi-valued treatment via pairwise binary comparisons, applied to a simulated resource curse panel dataset
+summary: "Does mining make places richer or poorer, and does the answer depend on the quality of government? Using simulated data that mirrors a published study, we use machine learning in Stata to estimate how the effects of mining and mineral prices on development differ from place to place. The tutorial comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

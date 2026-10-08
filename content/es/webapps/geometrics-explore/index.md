@@ -1,7 +1,7 @@
 ---
 title: "geometrics — Explorar app"
 date: "2026-07-02T00:00:00Z"
-summary: "Mapee y describa regiones: coropletas, pesos espaciales, diagramas de Moran, mapas de clústeres LISA y vistas espacio-temporales."
+summary: "¿Dónde están las regiones más ricas y más pobres, y se agrupan las regiones parecidas en el mapa? Mapee datos regionales, vea cuánto se parecen las regiones vecinas y detecte grupos de valores altos y bajos a lo largo del tiempo. Funciona en Streamlit, en su navegador web."
 app_url: "https://geometrics-explore.streamlit.app/"
 platform: streamlit
 topic: spatial

@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "De diferencias en diferencias a diferencias en diferencias sintéticas: ¿cuánto le costó el Brexit al Reino Unido?"
-summary: "Un recorrido pedagógico por la escalera completa de estimadores de control sintético para una sola unidad tratada: diferencias en diferencias, control sintético, control sintético centrado (DSC), diferencias en diferencias sintéticas (SDID) en sus tres variantes, MASC y control sintético aumentado. Cada método se programa primero desde cero y después se ejecuta con su paquete, sobre el PIB real trimestral de 24 economías de la OCDE entre 1995 y 2020. Incluye hojas de referencia rápida en R, Stata y Python."
+summary: "¿Cuánto le costó a la economía del Reino Unido el voto del Brexit de 2016? Construimos un Reino Unido de comparación a partir de otros países ricos, paso a paso por una escalera de métodos cada vez más flexibles, y comparamos lo que dice cada paso. Este tutorial en R incluye guías rápidas para Stata y Python y una aplicación interactiva que funciona en su navegador web."
 date: "2026-07-31T00:00:00Z"
 categories:
   - R

@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Guía para principiantes sobre inferencia causal con DoWhy en Python"
-summary: "Una introducción accesible para principiantes a la inferencia causal mediante el marco de cuatro pasos de DoWhy con datos observacionales simulados sobre el trabajo desde casa y la productividad."
+summary: "¿Trabajar desde casa hace a los empleados más productivos, o las personas productivas simplemente eligen trabajar desde casa? Este tutorial de Python para principiantes usa datos simulados con una respuesta conocida para mostrar un enfoque de cuatro pasos sobre causa y efecto: plantear los supuestos, decidir qué comparar, estimar el efecto y ponerlo a prueba. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-05T00:00:00Z"
 categories:
   - Python

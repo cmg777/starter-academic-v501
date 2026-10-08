@@ -34,7 +34,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_pyfixest/index.md
 slides:
-summary: Estimating regression models with high-dimensional fixed effects using PyFixest, from simple OLS through two-way FE, instrumental variables, panel data, and event studies
+summary: "How much of the higher pay of union workers comes from the union itself, and how much from who joins? This Python tutorial shows how fixed effects, which compare each worker only with the same worker over time, remove hidden differences and cut the apparent union pay gain from about 18 to 8 percent. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - econometrics

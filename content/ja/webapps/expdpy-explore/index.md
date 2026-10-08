@@ -1,7 +1,7 @@
 ---
 title: "expdpy — 探索アプリ"
 date: "2026-06-18T00:00:00Z"
-summary: "パネルデータを記述・可視化します。分布、欠損値、時系列傾向、群内／群間変動、パネル動態。"
+summary: "同じ国、企業、人を何年にもわたって追ったデータには、どんなパターンが隠れているでしょうか？プログラミング不要で、分布、欠損値、時間の推移、そして単位間と各単位内の違いを探れます。Streamlit 上でウェブブラウザから利用できます。"
 app_url: "https://expdpy-explore.streamlit.app/"
 platform: streamlit
 topic: panel-fe

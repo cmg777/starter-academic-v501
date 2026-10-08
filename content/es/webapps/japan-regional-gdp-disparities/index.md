@@ -1,7 +1,7 @@
 ---
 title: "Explorando las disparidades regionales en Japón: comparación multiescala del PIB per cápita (1990–2022)"
 date: "2026-01-18T00:00:00Z"
-summary: "Aplicación interactiva de Google Earth Engine."
+summary: "¿Qué tan grandes son las brechas de ingreso entre las regiones de Japón y se han reducido desde 1990? Compare la actividad económica por habitante entre regiones japonesas en varias escalas geográficas, de 1990 a 2022. Funciona en Google Earth Engine, en su navegador web."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities"
 platform: gee
 region: japan

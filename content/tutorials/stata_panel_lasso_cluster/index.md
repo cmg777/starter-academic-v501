@@ -39,7 +39,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_panel_lasso_cluster/index.md
 slides:
-summary: Identify latent group structures in panel data using the Classifier-LASSO method (Su, Shi, Phillips 2016), revealing that the pooled democracy-growth effect of +1.055 masks a +2.151 effect in 57 countries and a -0.936 effect in 41 countries.
+summary: "Do all countries respond the same way to democracy or inflation? In Stata, we use a method that sorts countries into hidden groups that behave alike, and find that the average link between democracy and economic growth hides a strong positive effect in 57 countries and a negative one in 41. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - panel

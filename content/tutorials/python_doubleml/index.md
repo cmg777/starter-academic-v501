@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_doubleml/index.md
 slides:
-summary: Estimating the causal effect of a cash bonus on unemployment duration using Double Machine Learning with the Pennsylvania Bonus Experiment
+summary: "Does a cash bonus help unemployed workers find jobs faster? This Python tutorial uses double machine learning, which lets flexible prediction models strip out the influence of background characteristics, on data from a real experiment in Pennsylvania. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

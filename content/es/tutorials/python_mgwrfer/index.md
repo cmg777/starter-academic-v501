@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "MGWFER: coeficientes causales espacialmente variables mediante efectos fijos de panel"
-summary: "Un tutorial fiel en Python sobre Li y Fotheringham (2026) — utilizando un algoritmo MGWFER de dos etapas para eliminar los factores de confusión espaciales invariantes en el tiempo de la MGWR multiescala y recuperar tanto pendientes espacialmente variables insesgadas como efectos contextuales intrínsecos a partir de datos de panel simulados (225 unidades x 3 periodos)."
+summary: "Cuando medimos cómo cambia una relación de un lugar a otro, las características ocultas de cada lugar pueden distorsionar la respuesta. Este tutorial en Python sigue un estudio de 2026 de Li y Fotheringham y usa datos simulados de 225 lugares en tres períodos para mostrar cómo seguir a los mismos lugares a lo largo del tiempo elimina esa distorsión. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-03T00:00:00Z"
 categories:
   - Python

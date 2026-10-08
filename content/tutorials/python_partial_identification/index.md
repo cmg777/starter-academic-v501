@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_partial_identification/index.md
 slides:
-summary: Computing causal bounds under unmeasured confounding using Manski and Tian-Pearl bounds with the CausalBoundingEngine package in Python
+summary: "Does job training help people find work when an important factor, such as past work experience, was never measured? Using simulated workers in Python, we compute a range that the true effect must lie within instead of a single number, and see why more data alone cannot narrow it. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

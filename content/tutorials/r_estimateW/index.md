@@ -42,7 +42,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_estimateW/index.md
 slides:
-summary: "Spatial econometrics usually hands you the neighborhood map before you start. This tutorial estimates it from the data instead, using the estimateW package on 90 European NUTS-1 regions, 2001-2019."
+summary: "Which European regions actually influence each other? Instead of assuming that only bordering regions matter, we let growth data for 90 European regions from 2001 to 2019 reveal who the real neighbors are. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - spatial

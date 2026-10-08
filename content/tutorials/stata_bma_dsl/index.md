@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_bma_dsl/index.md
 slides:
-summary: Bayesian Model Averaging and Double-Selection LASSO applied to the Environmental Kuznets Curve using synthetic panel data with a known answer key, demonstrating how both methods recover the true predictors of CO2 emissions.
+summary: "Do carbon emissions first fall, then rise and then fall again as countries get richer? With 12 possible control variables there are thousands of possible models, so we use two data-driven methods that weigh or select the controls and test them on simulated data where we know the right answer. This Stata tutorial comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - panel

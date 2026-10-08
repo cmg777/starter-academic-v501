@@ -46,7 +46,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Six estimators in one tutorial --- naive pre-post, DiD, two flavours of ITS, RDD on time, Synthetic Control, and CausalImpact --- all applied to California's 1988 Proposition 99 cigarette tax to see how much (and where) they disagree.
+summary: "Did the 1988 California cigarette tax reduce cigarette sales, and do different methods agree on how much? This R tutorial applies six ways of evaluating a policy to the same data and finds that most point to a drop of roughly 13 to 20 packs per person each year. It comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

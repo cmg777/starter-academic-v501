@@ -34,7 +34,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_SDPDmod/index.md
 slides:
-summary: A hands-on guide to spatial panel data modeling using the SDPDmod package in R --- from Bayesian model comparison through static and dynamic SAR/SDM estimation with Lee-Yu bias correction to direct, indirect, and total effect decomposition --- applied to cigarette demand across 46 US states (1963--1992).
+summary: "When a state raises cigarette prices, do smokers simply buy in the state next door? Using cigarette demand in 46 American states from 1963 to 1992, we measure how prices and income affect smoking at home and in neighboring states, and how habits carry over from year to year. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - spatial

@@ -65,7 +65,7 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_sc101/index.md
-summary: "Learn the synthetic control method and the mlsynth library in Python with the Proposition 99 tobacco case. The tutorial builds a synthetic California from five donor states and reads its weights and predictor balance. It tests the result with in-space and in-time placebos and leave-one-out refits, replicates the Stata edition, and compares four mlsynth estimators."
+summary: "How much did Proposition 99, the 1989 California tobacco program, reduce cigarette sales? This beginner Python tutorial teaches the synthetic control method, which builds a look-alike California from other states, finds about 19 fewer packs sold per person each year, and then tries hard to break that result. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

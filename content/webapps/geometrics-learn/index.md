@@ -1,7 +1,7 @@
 ---
 title: "geometrics — Learn app"
 date: "2026-07-02T00:00:00Z"
-summary: "Runnable concept sandboxes and plain-language explanations of spatial convergence and inequality methods."
+summary: "New to the study of regional catching up and inequality? Learn the main ideas through plain-language explanations and small interactive examples that you can run and change yourself. It runs on Streamlit in your web browser."
 app_url: "https://geometrics-learn.streamlit.app/"
 platform: streamlit
 topic: spatial

@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Aprendizaje automático causal para la evaluación de políticas: del ATE al IATE hacia una mejor regla de asignación"
-summary: "Un recorrido accesible para principiantes por el aprendizaje automático causal —ATE, GATE, IATE y la asignación que maximiza el bienestar— usando DoubleML y EconML sobre una cohorte sintética estilo ALMP de Flandes con efectos verdaderos conocidos."
+summary: "Si un programa de capacitación laboral ayuda a las personas desempleadas a encontrar trabajo, ¿quién se beneficia más y a quién conviene ofrecerle un cupo primero? Este tutorial en Python usa aprendizaje automático causal con datos simulados de buscadores de empleo, cuyos efectos verdaderos se conocen, para pasar del efecto promedio a los efectos individuales y a una mejor forma de asignar la capacitación. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-01T00:00:00Z"
 categories:
   - Python

@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_sc/index.md
 slides:
-summary: Estimate the causal effect of Proposition 99, the California tobacco control program, on cigarette sales using the synthetic control method in Stata, with in-space placebo, in-time placebo, and leave-one-out robustness tests
+summary: "Did the 1988 tobacco tax and anti-smoking campaign in California cut cigarette sales? In Stata, we use the synthetic control method, which builds a look-alike California from a mix of other states, and find that sales fell by about 19 packs per person per year. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

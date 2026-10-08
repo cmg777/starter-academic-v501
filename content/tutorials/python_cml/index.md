@@ -47,7 +47,7 @@ links:
     name: "Data dictionary"
     url: data/index.html
 slides:
-summary: "A beginner-friendly walk-through of Causal Machine Learning — ATE, GATE, IATE, and welfare-maximising assignment — using DoubleML and EconML on a synthetic Flanders ALMP-style cohort with known true effects."
+summary: "If a job training program helps unemployed people find work, who gains the most, and who should be offered a place first? This Python tutorial uses causal machine learning on simulated jobseeker data with known true effects to move from the average effect to personal effects and a better way to assign training. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

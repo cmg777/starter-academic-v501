@@ -1,7 +1,7 @@
 ---
 title: "geometrics — 分析アプリ"
 date: "2026-07-02T00:00:00Z"
-summary: "β・σ・クラブ収束、空間計量経済モデル、マルコフ動態、ジニ／タイル不平等、(M)GWRを推定します。"
+summary: "貧しい地域は豊かな地域に追いついているのでしょうか、そして地域間格差は縮まっているのでしょうか？隣り合う地域の影響を考慮する手法で、追い上げの度合い、地域間格差、地域が所得グループの間をどう移るかを測れます。Streamlit 上でウェブブラウザから利用できます。"
 app_url: "https://geometrics-analyze.streamlit.app/"
 platform: streamlit
 topic: spatial

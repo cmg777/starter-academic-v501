@@ -43,7 +43,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: A beginner-friendly walkthrough of Double LASSO for causal inference, replicating Fitzgerald, Lattimore, Robinson and Zhu's (2026) analysis of the Donohue–Levitt abortion–crime question with 284 candidate controls and state-clustered standard errors.
+summary: "Did legal abortion lower crime in the United States, as a famous 2001 study claimed? Instead of hand-picking a few control variables, we let a data-driven method choose among 284 candidates and check whether the original finding holds up. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

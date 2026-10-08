@@ -75,7 +75,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_sc_dsc_sdid/index.md
 slides:
-summary: "A careful introduction to mlsynth, the Python library that puts the whole family of single-treated-unit synthetic control estimators behind one configuration interface. We climb the ladder from difference-in-differences to synthetic difference-in-differences with one mlsynth class per stage, showing what every option does and where the defaults will quietly hand you a different estimator. The case study is the 2016 Brexit referendum and what it cost UK GDP."
+summary: "How much did the 2016 Brexit vote cost the British economy? This Python tutorial builds a look-alike United Kingdom from other wealthy economies with six related methods, finds output about 3 percent lower by the end of 2018, and shows how default settings can quietly change the answer. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal inference

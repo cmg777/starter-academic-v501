@@ -38,7 +38,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Estimate how the effect of 401(k) eligibility on household assets varies across households using Stata 19's new cate command, with PO, AIPW, GATE, GATES, and nonparametric series estimators applied to the canonical assets3 dataset
+summary: "Does access to a workplace retirement savings plan help some households build more wealth than others? Instead of reporting one average effect, we use machine learning in Stata to estimate how the effect differs across households by income and other traits. The tutorial comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

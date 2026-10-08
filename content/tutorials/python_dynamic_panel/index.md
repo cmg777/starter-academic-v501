@@ -55,7 +55,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_dynamic_panel/index.md
 slides:
-summary: How persistent is firm employment? Pooled OLS, fixed effects, Anderson-Hsiao IV, Arellano-Bond difference GMM, and Blundell-Bond system GMM on the classic 140-firm UK panel — and how the AR(2), Hansen, and instrument-collapse diagnostics separate the one defensible estimate from four seductive wrong ones.
+summary: "When a firm gains or loses workers this year, how much of that change is still there next year? This Python tutorial uses data on 140 British firms to show why simple estimates of this persistence mislead and how more careful methods and checks reach a reliable answer. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - econometrics

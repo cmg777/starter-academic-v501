@@ -50,7 +50,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Manual demeaning vs two-way fixed effects --- showing that TWFE is just OLS on demeaned data through the Frisch-Waugh-Lovell theorem, with a hands-on proof using a Barro convergence panel of 150 countries.
+summary: "What does a regression that adjusts for country and year differences actually do to the data? Using simulated data for 150 countries in R, we show step by step that it equals subtracting country and year averages before a simple regression, and why the usual margins of error then need a fix. It comes with an interactive app that runs in your web browser."
 tags:
   - r
   - econometrics

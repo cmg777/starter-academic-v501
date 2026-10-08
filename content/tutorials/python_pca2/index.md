@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_pca2/index.md
 slides:
-summary: Building a comparable Human Development Index across two time periods using pooled PCA with real sub-national data for 153 South American regions, and contrasting with per-period PCA to show why pooled standardization is essential for temporal comparisons
+summary: "How can we tell whether regions are developing over time when the measuring stick itself must stay the same? Using education, health and income data for 153 South American regions in 2013 and 2019, this Python tutorial builds one development index from both years together so that scores can be compared across time. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - world

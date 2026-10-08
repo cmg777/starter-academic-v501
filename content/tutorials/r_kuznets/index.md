@@ -48,7 +48,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: A beginner-friendly R replication of Lessmann (2014) on the spatial Kuznets curve — building the weighted coefficient of variation from simulated regional data, then estimating the inverted-U with cross-section OLS, two-way fixed effects in fixest, and the Robinson and Baltagi–Li semiparametric estimators.
+summary: "Do gaps between rich and poor regions within a country first widen and then narrow as the country develops? Using simulated data for 56 countries that mirrors a published study, we measure regional inequality and trace how it rises and falls with income, from simple to more flexible methods. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - econometrics

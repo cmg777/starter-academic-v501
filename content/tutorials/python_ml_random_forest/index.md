@@ -46,7 +46,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_ml_random_forest/index.md
 slides:
-summary: A beginner-friendly, comprehensive introduction to Random Forest regression for continuous data, evaluated end-to-end with 5-fold cross-validation and out-of-fold predictions on Bolivian satellite imagery
+summary: "Can satellite images tell us how well each municipality in Bolivia is developing? This beginner-friendly Python tutorial trains a random forest, a machine learning model that averages many decision trees, tests it on places it never saw, and finds that the images hold real but limited information. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - spatial

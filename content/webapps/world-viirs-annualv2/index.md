@@ -1,7 +1,7 @@
 ---
 title: "Space-time dynamics of nighttime lights: VIIRS-annual data"
 date: "2024-04-01T00:00:00Z"
-summary: "Interactive Google Earth Engine application."
+summary: "Where in the world have nights become brighter in recent years? Browse yearly global maps of nighttime lights from the newer, more detailed satellite series, which covers recent years only. It runs on Google Earth Engine in your web browser."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/world-viirs-annualv2"
 platform: gee
 region: global

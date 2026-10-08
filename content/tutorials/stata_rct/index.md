@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_rct/index.md
 slides:
-summary: Evaluate the causal effect of a cash transfer program on household consumption using regression adjustment, inverse probability weighting, doubly robust, and difference-in-differences methods in Stata
+summary: "Does giving cash to poor households raise what they spend on everyday needs? Using a simulated randomized experiment with 2,000 households in Stata, we compare several ways of estimating the effect and see that all of them recover the true gain of about 12 percent. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

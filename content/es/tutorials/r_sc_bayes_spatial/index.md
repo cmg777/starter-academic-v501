@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Control sintético espacial bayesiano: la Proposición 99 de California en R"
-summary: "Replicando el estudio de caso del tabaco de California de Sakaguchi y Tagawa en R: tres estimadores, un ATT y un efecto de derrame (spillover) del tamaño de Nevada."
+summary: "¿Cuánto redujo las ventas de cigarrillos el impuesto al tabaco de California de 1988? Construimos una California de comparación a partir de otros estados y medimos también cómo la política se extendió a estados vecinos como Nevada, donde la gente cruza la frontera para comprar cigarrillos. Este tutorial en R incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-05-14T00:00:00Z"
 categories:
   - R

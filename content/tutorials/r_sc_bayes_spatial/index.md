@@ -43,7 +43,7 @@ links:
     name: "Data dictionary"
     url: data/index.html
 slides:
-summary: "Replicating the California tobacco case study from Sakaguchi & Tagawa in R: three estimators, one ATT, and a Nevada-sized spillover."
+summary: "How much did the 1988 California tobacco tax reduce cigarette sales? We build a look-alike California from other states and also measure how the policy spilled over to neighboring states such as Nevada, where people cross the border to buy cigarettes. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

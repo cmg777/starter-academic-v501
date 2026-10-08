@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Diseño de regresión discontinua (RDD) en Stata: cómo evaluar un programa de tutorías"
-summary: "Evalúe el efecto causal de un programa de tutorías escolares sobre las calificaciones del examen de salida de los estudiantes usando un diseño de regresión discontinua nítido con estimación paramétrica por MCO y no paramétrica con rdrobust en Stata."
+summary: "¿Las tutorías adicionales mejoran las calificaciones del examen final? En Stata, comparamos a estudiantes que obtuvieron puntajes justo por debajo y justo por encima del límite de 70 en un examen de ingreso que decidía quién recibía tutorías, y encontramos mejoras de unos 9 a 11 puntos. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-04-23T00:00:00Z"
 categories:
   - Stata

@@ -1,7 +1,7 @@
 ---
 title: "expdpy — Aprender app"
 date: "2026-06-18T00:00:00Z"
-summary: "Entornos de prueba ejecutables y explicaciones sencillas de los métodos de datos de panel."
+summary: "¿Es nuevo en los datos que siguen a las mismas unidades durante muchos años? Aprenda los métodos principales con explicaciones sencillas y pequeños ejemplos interactivos que usted mismo puede ejecutar y modificar. Funciona en Streamlit, en su navegador web."
 app_url: "https://expdpy-learn.streamlit.app/"
 platform: streamlit
 topic: panel-fe

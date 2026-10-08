@@ -48,7 +48,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_EconML/index.md
 slides:
-summary: Estimate heterogeneous causal effects of mining and mineral prices on economic development using EconML's CausalForestDML with Double Machine Learning, applied to simulated resource curse data
+summary: "Does mining wealth help or hurt local development, and do good local institutions make the difference? This Python tutorial uses causal machine learning on simulated district data with known true effects to measure how the impact of mining and mineral prices varies from place to place. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

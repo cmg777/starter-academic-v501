@@ -1,7 +1,7 @@
 ---
 title: "Series temporales anuales regionales de luces nocturnas (tipo DMSP) 1992-2025"
 date: "2026-01-18T00:00:00Z"
-summary: "Aplicación interactiva de Google Earth Engine."
+summary: "¿Cómo ha aumentado la iluminación nocturna de una región entera desde 1992? Elija una región administrativa, como un país o una provincia, para ver su serie anual de luces nocturnas hasta 2025, a partir de un registro satelital largo y armonizado que une satélites antiguos y recientes. Funciona en Google Earth Engine, en su navegador web."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-regional"
 platform: gee
 region: global

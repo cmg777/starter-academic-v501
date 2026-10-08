@@ -41,7 +41,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_convergence2/index.md
 slides:
-summary: Reproduce the key findings of Kremer, Willis, and You (2021) to understand why unconditional convergence emerged since 2000 and how the convergence of growth correlates explains this shift
+summary: "Why have poor countries grown faster than rich ones since around 2000, after decades of falling behind? We reproduce a 2021 study by Kremer, Willis and You showing that the policies, institutions and schooling that predict growth have themselves become more alike across countries. This Stata tutorial comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - convergence

@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "La escalera del control sintético en Python: una guía completa de la librería mlsynth con el caso del Brexit"
-summary: "Una introducción cuidadosa a mlsynth, la librería de Python que reúne toda la familia de estimadores de control sintético para una sola unidad tratada detrás de una única interfaz de configuración. Recorremos la escalera completa —diferencias en diferencias, control sintético, control sintético centrado, diferencias en diferencias sintéticas en sus tres variantes, MASC y control sintético aumentado— con una clase de mlsynth por peldaño, explicando qué hace cada opción y dónde los valores por defecto entregan silenciosamente un estimador distinto. El caso de estudio es el referéndum del Brexit de 2016 y su costo para el PIB del Reino Unido."
+summary: "¿Cuánto le costó a la economía británica la votación del Brexit de 2016? Este tutorial de Python construye un Reino Unido comparable a partir de otras economías ricas con seis métodos relacionados, encuentra una producción alrededor de 3 por ciento más baja a finales de 2018 y muestra cómo las opciones predeterminadas pueden cambiar la respuesta sin que usted lo note. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-08-02T00:00:00Z"
 categories:
   - Python

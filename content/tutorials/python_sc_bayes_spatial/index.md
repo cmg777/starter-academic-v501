@@ -62,7 +62,7 @@ links:
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_sc_bayes_spatial/index.md
-summary: "A ground-up introduction to synthetic control in Python, built on the California Proposition 99 case study and climbing three stages: the classical simplex of Abadie, Diamond and Hainmueller; a Bayesian horseshoe prior that lets the data rather than a constraint choose the donors; and the Bayesian spatial model of Sakaguchi and Tagawa, which drops SUTVA on the donor pool and asks who else was treated. Every equation is derived and mapped to the code that implements it, using the scspill and mlsynth libraries. The answer for California survives every relaxation. The claim that the donor pool was clean does not."
+summary: "Did the 1988 California tobacco law cut cigarette sales, and did it also affect neighboring states such as Nevada? This Python tutorial builds a look-alike California from other states in three steps, the last one letting nearby states be affected too, and finds that the drop in California holds up. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal inference

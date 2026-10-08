@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_spxtivdfreg/index.md
 slides:
-summary: Estimate spatial dynamic panel models with unobserved common factors using the spxtivdfreg package in Stata --- an IV approach that handles spatial lags, temporal persistence, endogenous regressors, and latent factors simultaneously
+summary: "How does credit risk spread across banks? Using quarterly data on 350 American banks from 2006 to 2014 in Stata, we model bad loans that spill over between similar banks, persist over time and respond to shared economic shocks, and show that ignoring those shocks gives misleading answers. It comes with an interactive app that runs in your web browser."
 tags:
 - stata
 - spatial

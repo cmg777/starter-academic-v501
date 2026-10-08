@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_fwlplot/index.md
 slides:
-summary: A hands-on guide to the fwlplot package in R --- from understanding the Frisch-Waugh-Lovell theorem through simulated confounding to visualizing fixed effects in real panel data --- showing what "controlling for" looks like as a scatter plot.
+summary: "What does it really mean to control for a variable in a regression? We use a classic result from statistics to turn that idea into simple scatter plots, first with simulated data and then with real data that follows the same people over time. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal

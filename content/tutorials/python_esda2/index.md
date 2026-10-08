@@ -39,7 +39,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_esda2/index.md
 slides:
-summary: An introduction to exploratory spatial data analysis using PySAL, covering choropleth maps, spatial weights, Moran's I, LISA clusters, space-time dynamics, and a Venezuela-Bolivia comparative analysis for 153 South American regions
+summary: "Do regions with high or low human development cluster together on the map of South America, and did those clusters shift between 2013 and 2019? This Python tutorial maps 153 regions and uses spatial statistics to test whether neighbors are more alike than chance would suggest. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - spatial

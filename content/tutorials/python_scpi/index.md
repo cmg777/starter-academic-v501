@@ -46,7 +46,7 @@ links:
   name: "Data dictionary"
   url: data/index.html
 slides:
-summary: Synthetic control with prediction intervals quantifies uncertainty in Germany's reunification GDP impact using the scpi package.
+summary: "Did German reunification in 1990 lower income in West Germany, and how sure can we be? This Python tutorial builds a look-alike West Germany from other wealthy countries and adds a range of likely values around the estimate, showing income per person about 11 percent below the comparison by 2003. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

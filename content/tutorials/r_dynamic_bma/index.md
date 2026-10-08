@@ -34,7 +34,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_dynamic_bma/index.md
 slides:
-summary: Dynamic panel Bayesian Model Averaging with the Bayesian Dynamic Systems Modeling (BDSM) R package, applied to cross-country economic growth determinants --- handling reverse causality through lagged dependent variables, fixed effects, and weak exogeneity.
+summary: "Which factors truly drive economic growth, such as investment, education or trade? Using 73 countries over four decades, we average across every possible combination of factors instead of betting on a single model, while allowing growth itself to shape those factors. This R tutorial comes with an interactive app that runs in your web browser."
 tags:
   - r
   - econometrics

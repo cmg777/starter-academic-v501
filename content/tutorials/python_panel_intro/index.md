@@ -78,7 +78,7 @@ links:
     name: "Data dictionary"
     url: data/index.html
 slides:
-summary: A beginner-friendly tour of seven panel-data estimators, from pooled OLS to correlated random effects (Mundlak), applied to a two-period worker wage panel. Predict-first checks, two short proofs, an interactive lab, and worked exercises show why the within estimators nearly triple the union wage premium.
+summary: "Does joining a union raise wages? Following the same workers over two years in Python, we compare seven ways to analyze repeated data and see that the estimated wage gain nearly triples once each worker is compared with the same worker at another time. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - econometrics

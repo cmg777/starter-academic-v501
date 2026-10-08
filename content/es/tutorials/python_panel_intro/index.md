@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Introducción a los métodos de datos de panel en Python"
-summary: "Un recorrido accesible para principiantes por siete estimadores de datos de panel, desde MCO agrupados hasta efectos aleatorios correlacionados (Mundlak), aplicados a un panel de salarios de trabajadores de dos periodos. Preguntas de predicción, dos demostraciones breves, un laboratorio interactivo y ejercicios resueltos muestran por qué los estimadores intra-individuo casi triplican la prima salarial sindical."
+summary: "¿Afiliarse a un sindicato aumenta el salario? Siguiendo a los mismos trabajadores durante dos años en Python, comparamos siete formas de analizar datos repetidos y vemos que la ganancia salarial estimada casi se triplica cuando cada trabajador se compara consigo mismo en otro momento. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-10-02T00:00:00Z"
 categories:
   - Python

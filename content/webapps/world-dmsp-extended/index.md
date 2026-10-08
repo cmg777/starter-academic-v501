@@ -1,7 +1,7 @@
 ---
 title: "Space-time dynamics of nighttime lights: DMSP-extended data"
 date: "2024-03-01T00:00:00Z"
-summary: "Interactive Google Earth Engine application."
+summary: "Where in the world did nights get brighter, and when? Browse global maps of nighttime lights over time, using the older satellite night-light series extended forward to more recent years. It runs on Google Earth Engine in your web browser."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/world-dmsp-extended"
 platform: gee
 region: global

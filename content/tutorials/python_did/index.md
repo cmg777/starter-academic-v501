@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_did/index.md
 slides:
-summary: Estimating causal treatment effects using Difference-in-Differences with the diff-diff package, from the classic 2x2 design through staggered adoption with Callaway-Sant'Anna and HonestDiD sensitivity analysis
+summary: "Did a new policy really change outcomes, or were things already improving? This Python tutorial introduces the difference-in-differences method, which compares changes over time between places that got the policy and places that did not, using simulated data, and checks how solid the answer is. It comes with an interactive app that runs in your web browser."
 tags:
 - python
 - causal

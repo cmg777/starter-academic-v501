@@ -1,7 +1,7 @@
 ---
 title: "Exploring regional disparities in Japan: Multi-scale comparison of GDP per capita (1990–2022)"
 date: "2026-01-18T00:00:00Z"
-summary: "Interactive Google Earth Engine application."
+summary: "How large are the income gaps between the regions of Japan, and have they narrowed since 1990? Compare economic output per person across Japanese regions at several geographic scales, from 1990 to 2022. It runs on Google Earth Engine in your web browser."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities"
 platform: gee
 region: japan

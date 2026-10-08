@@ -42,7 +42,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_panel_ses/index.md
 slides:
-summary: Comparing standard error estimators in panel data regressions using Python and linearmodels --- from conventional to clustered, Driscoll-Kraay, and fixed effects
+summary: "How sure can we be about an estimate when the same firms are observed year after year? Using simulated data for 100 firms in Python, we compare several ways of measuring the margin of error and show that no margin of error can fix an estimate that is biased to begin with. It includes an interactive app that runs in your web browser."
 tags:
   - python
   - econometrics

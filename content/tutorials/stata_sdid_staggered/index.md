@@ -47,7 +47,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_sdid_staggered/index.md
 slides:
-summary: Extend synthetic difference-in-differences to staggered adoption, where units adopt treatment at different times, and apply it in Stata to parliamentary gender quotas across 119 countries — deriving the per-cohort estimator, its aggregation into the overall ATT, the modern sdid_event event study, and bootstrap, jackknife, and placebo inference.
+summary: "Do gender quotas raise the share of women in national parliaments? In Stata, we compare 9 countries that adopted quotas in different years with look-alike groups built from 110 countries without quotas, and find an average gain of about 8 percentage points that varies a lot across countries. The tutorial includes an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

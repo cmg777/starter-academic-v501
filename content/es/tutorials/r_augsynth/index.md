@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "El método de control sintético aumentado: un tutorial para principiantes con los recortes de impuestos de Kansas"
-summary: "Un tutorial introductorio y centrado en la intuición sobre el método de control sintético aumentado (ASCM) para una sola unidad tratada: la estimación del efecto de los recortes de impuestos de Kansas de 2012 sobre el PIB per cápita con el paquete augsynth, del control sintético clásico a la aumentación por ridge, con un recorrido cuidadoso por cuatro formas de hacer inferencia."
+summary: "¿El gran recorte de impuestos de Kansas en 2012 impulsó la economía del estado o la achicó? Este tutorial de R para principiantes construye un Kansas comparable a partir de otros estados, corrige luego el desajuste restante y encuentra una producción por persona aproximadamente 3 a 4 por ciento más baja, aunque no se puede descartar del todo el azar. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-06-08T00:00:00Z"
 categories:
   - R

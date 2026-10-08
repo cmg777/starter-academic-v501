@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_sp_regression_cross_section/index.md
 slides:
-summary: Explore the full taxonomy of cross-sectional spatial models --- OLS, SAR, SEM, SLX, SDM, SDEM, SAC, and GNS --- using the Columbus crime dataset in Stata, following Elhorst (2014)
+summary: "Does crime spill over from one neighborhood to the next? Using data on 49 neighborhoods in Columbus, Ohio, in Stata, we compare models in which crime, income and housing values in nearby areas also matter, and find that higher income lowers crime both in a neighborhood and next door. It comes with an interactive app that runs in your web browser."
 tags:
 - stata
 - spatial

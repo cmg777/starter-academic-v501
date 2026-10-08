@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Análisis Exploratorio de Datos Espaciales: clústeres y dinámica espacial del desarrollo humano en Sudamérica"
-summary: "Una introducción al análisis exploratorio de datos espaciales usando PySAL, que abarca mapas coropléticos, pesos espaciales, la I de Moran, clústeres LISA, dinámica espacio-temporal y un análisis comparativo Venezuela-Bolivia para 153 regiones sudamericanas."
+summary: "¿Las regiones con alto o bajo desarrollo humano se agrupan en el mapa de América del Sur, y esos grupos cambiaron entre 2013 y 2019? Este tutorial en Python mapea 153 regiones y usa estadística espacial para comprobar si las regiones vecinas se parecen más de lo que cabría esperar por azar. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-22T00:00:00Z"
 categories:
   - Python

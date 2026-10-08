@@ -38,7 +38,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_iv_panel/index.md
 slides:
-summary: Replicate Hodler and Raschky (2014) to estimate the causal effect of economic shocks on civil conflict using 2SLS instrumental variables with panel data from 5,689 African regions
+summary: "Does an economic downturn make civil conflict more likely? Using yearly data on more than 5,000 African regions in Stata, we treat rainfall shocks as a natural experiment for local economic activity, measured by night lights seen from space, and find that economic decline raises the risk of conflict. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

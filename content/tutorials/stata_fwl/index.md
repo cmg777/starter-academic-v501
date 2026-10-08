@@ -34,7 +34,7 @@ links:
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/stata_fwl/index.md
 slides:
-summary: A hands-on guide to the scatterfit package in Stata --- from understanding the Frisch-Waugh-Lovell theorem through simulated confounding to visualizing fixed effects in real panel data --- showing what "controlling for" looks like as a scatter plot.
+summary: "What does it really mean to control for a variable in a regression? In Stata, we turn that idea into a picture: we strip out the influence of other factors and plot what is left, using examples on store sales, airline flights and worker wages. It comes with an interactive app that runs in your web browser."
 tags:
   - stata
   - causal

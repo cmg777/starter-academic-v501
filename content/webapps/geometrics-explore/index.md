@@ -1,7 +1,7 @@
 ---
 title: "geometrics — Explore app"
 date: "2026-07-02T00:00:00Z"
-summary: "Map and describe regions: choropleths, spatial weights, Moran scatterplots, LISA cluster maps and space-time views."
+summary: "Where are the richest and poorest regions, and do similar regions cluster together on the map? Map regional data, see how much neighboring regions resemble each other, and spot clusters of high and low values over time. It runs on Streamlit in your web browser."
 app_url: "https://geometrics-explore.streamlit.app/"
 platform: streamlit
 topic: spatial

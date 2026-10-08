@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Diferencias en diferencias para la evaluación de políticas: un tutorial usando R"
-summary: "Una guía sobre Diferencias en Diferencias con tratamiento escalonado --- desde las limitaciones de TWFE hasta los ATT por grupo-tiempo de Callaway-Sant'Anna, la estimación doblemente robusta y el análisis de sensibilidad HonestDiD --- aplicada a los efectos del salario mínimo sobre el empleo juvenil."
+summary: "¿Aumentar el salario mínimo les costó el empleo a los adolescentes? Con estados de Estados Unidos que elevaron su salario mínimo en distintos momentos, comparamos los estados antes y después de cada aumento y mostramos por qué el atajo clásico puede engañar cuando las políticas comienzan en fechas distintas. Este tutorial en R incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-26T00:00:00Z"
 categories:
   - R

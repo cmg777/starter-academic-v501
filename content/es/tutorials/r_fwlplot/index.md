@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Visualizando la regresión con el teorema FWL en R"
-summary: "Una guía práctica sobre el paquete fwlplot en R --- desde la comprensión del teorema de Frisch-Waugh-Lovell, pasando por la confusión simulada, hasta la visualización de efectos fijos en datos de panel reales --- mostrando cómo se ve \"controlar por\" como un diagrama de dispersión."
+summary: "¿Qué significa realmente controlar por una variable en una regresión? Usamos un resultado clásico de la estadística para convertir esa idea en gráficos de dispersión sencillos, primero con datos simulados y luego con datos reales que siguen a las mismas personas a lo largo del tiempo. Este tutorial en R incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-27T00:00:00Z"
 categories:
   - R

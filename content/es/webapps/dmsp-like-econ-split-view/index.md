@@ -1,7 +1,7 @@
 ---
 title: "Vista dividida de las luces nocturnas (tipo DMSP) en todo el mundo 1992-2025"
 date: "2026-01-18T00:00:00Z"
-summary: "Aplicación interactiva de Google Earth Engine."
+summary: "¿Cómo ha cambiado el mundo de noche entre dos años? Elija dos años cualesquiera entre 1992 y 2025 y compare sus mapas de luces nocturnas lado a lado en una pantalla dividida, con un registro satelital largo y armonizado que une satélites antiguos y recientes. Funciona en Google Earth Engine, en su navegador web."
 app_url: "https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-split-view"
 platform: gee
 region: global

@@ -47,7 +47,7 @@ links:
     name: "Data dictionary"
     url: data/index.html
 slides:
-summary: "Synthetic Control and IV in Python — replicating Andersson (2019) on Sweden's carbon tax and CO2 emissions with pysyncon and pyfixest."
+summary: "Did the carbon tax that Sweden introduced in 1991 cut carbon emissions from transport, and did it hurt the economy? This Python tutorial builds a look-alike Sweden from other wealthy countries and finds transport emissions about 11 percent lower each year, with no sign of slower economic growth. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal

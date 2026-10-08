@@ -3,7 +3,7 @@
 # home en español con título/resumen traducidos, pero la tarjeta enlaza al
 # tutorial original en inglés (card_url). El cuerpo no se traduce.
 title: "Cómo evaluar un programa de transferencias monetarias (RCT) con datos de panel en Stata"
-summary: "Evalúe el efecto causal de un programa de transferencias monetarias sobre el consumo de los hogares usando ajuste por regresión, ponderación por probabilidad inversa, métodos doblemente robustos y diferencias en diferencias en Stata."
+summary: "¿Entregar dinero a hogares pobres aumenta lo que gastan en sus necesidades diarias? Con un experimento aleatorio simulado de 2.000 hogares en Stata, comparamos varias formas de estimar el efecto y vemos que todas recuperan la ganancia verdadera de alrededor del 12 por ciento. Incluye una aplicación interactiva que funciona en su navegador web."
 date: "2026-03-24T00:00:00Z"
 categories:
   - Stata

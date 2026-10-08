@@ -47,7 +47,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/r_augsynth/index.md
 slides:
-summary: "A beginner-friendly, intuition-first tutorial on the Augmented Synthetic Control Method (ASCM) for a single treated unit — estimating the effect of the 2012 Kansas tax cuts on GDP per capita with the augsynth package, from classic SCM to ridge augmentation, with a careful tour of four ways to do inference."
+summary: "Did the large 2012 Kansas tax cut boost the state economy, or shrink it? This beginner R tutorial builds a look-alike Kansas from other states, then corrects the remaining mismatch, and finds output per person roughly 3 to 4 percent lower, although chance cannot be fully ruled out. It comes with an interactive app that runs in your web browser."
 tags:
   - r
   - causal inference
