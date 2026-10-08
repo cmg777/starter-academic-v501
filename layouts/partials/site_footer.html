@@ -1,9 +1,13 @@
+{{/* Content-page footer. Text comes from data/orbital.json (same strings as the
+     homepage) so it follows the page language; the menu is split 6/6 into two
+     columns. */}}
+{{ $t := index site.Data.orbital site.Language.Lang }}
 <footer class="site-footer cz-footer">
 
   <div class="cz-footer-inner">
     <div class="cz-footer-brand">
       <p class="cz-brand">Carlos Mendez</p>
-      <p class="cz-tag">On the geography of development.</p>
+      <p class="cz-tag">{{ $t.footerTag }}</p>
       <div class="cz-footer-social">
         <a href="https://orcid.org/0000-0001-7978-2815" target="_blank" rel="noopener" aria-label="ORCID"><i class="ai ai-orcid"></i></a>
         <a href="https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&amp;hl=en" target="_blank" rel="noopener" aria-label="Google Scholar"><i class="ai ai-google-scholar"></i></a>
@@ -14,9 +18,9 @@
 
     {{ $home := site.Home.RelPermalink }}
     <div class="cz-footer-col">
-      <h5>Explore</h5>
+      <h5>{{ $t.footerExplore }}</h5>
       <ul>
-        {{ range $i, $e := site.Menus.main }}{{ if lt $i 5 }}
+        {{ range $i, $e := site.Menus.main }}{{ if lt $i 6 }}
           {{ $u := .URL }}
           {{ if hasPrefix $u "#" }}{{ $u = printf "%s%s" $home $u }}{{ else if not (hasPrefix $u "http") }}{{ $u = $u | relLangURL }}{{ end }}
           <li><a href="{{ $u }}">{{ .Name }}</a></li>
@@ -25,9 +29,9 @@
     </div>
 
     <div class="cz-footer-col">
-      <h5>Connect</h5>
+      <h5>{{ $t.footerResources }}</h5>
       <ul>
-        {{ range $i, $e := site.Menus.main }}{{ if ge $i 5 }}
+        {{ range $i, $e := site.Menus.main }}{{ if ge $i 6 }}
           {{ $u := .URL }}
           {{ if hasPrefix $u "#" }}{{ $u = printf "%s%s" $home $u }}{{ else if not (hasPrefix $u "http") }}{{ $u = $u | relLangURL }}{{ end }}
           <li><a href="{{ $u }}"{{ if hasPrefix $u "http" }} target="_blank" rel="noopener"{{ end }}>{{ .Name }}</a></li>
@@ -38,7 +42,7 @@
 
   <div class="cz-footer-copy">
     <span>{{ with site.Copyright }}{{ replace . "{year}" now.Year }}{{ end }}</span>
-    <span>Graduate School of International Development &middot; Nagoya University, Japan</span>
+    <span>{{ $t.footer }}</span>
   </div>
 
   {{/* Optional copyright license (renders only if enabled in params). */}}

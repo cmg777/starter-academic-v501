@@ -78,3 +78,8 @@ scope.
   Its `web_app/` is published, but its "back to tutorial" link has no target.
 - The script-driven `#podcast-player`, `#video-player` and web-app tab hashes are
   intentional; their scripts read the hash.
+
+## Follow-up: docs refresh and reusable audit tools
+- **Audit tools:** the audit is now re-runnable. `scripts/audit-site.py` checks links, anchors, language links and redirects (`--old-ref <commit>` adds an old-build comparison), and `scripts/audit-nav.cjs` checks the menu and overflow at six widths with Playwright. Procedure: `.claude/docs/site-audit.md`.
+- **Docs:** CLAUDE.md was rewritten lean (about 140 lines). New references: `.claude/docs/design-system.md` (which takes the homepage architecture and the thumbnail standard), `theme-overrides.md` and `site-audit.md`. The README was rewritten as a guide for the owner and collaborators.
+- **Footer fix found while writing the docs:** the content-page footer was English on ES/JA pages. Its tagline, column headings and affiliation now come from `data/orbital.json`, and the 12-item menu is split 6/6 under Explore / Resources. Dates in `li_compact.html` and `event_card.html` now use the localized `time.Format`.

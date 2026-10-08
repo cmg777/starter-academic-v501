@@ -16,7 +16,7 @@
     {{ end }}
   </div>
   <span class="tg-card-caption">
-    <span class="tg-card-cap-meta">{{ $p.Date.Format "Jan 2006" }}{{ with $p.Params.location }} &middot; {{ . }}{{ end }}</span>
+    <span class="tg-card-cap-meta">{{ $p.Date | time.Format "Jan 2006" }}{{ with $p.Params.location }} &middot; {{ . }}{{ end }}</span>
     <span class="tg-card-cap-title">{{ $p.Title }}</span>
   </span>
 </a>

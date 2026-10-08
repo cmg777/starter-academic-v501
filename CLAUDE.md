@@ -1,248 +1,143 @@
 # Project Overview
 
-Academic portfolio website for Carlos Mendez (carlos-mendez.org). Built with Hugo + Wowchemy v5 theme, deployed on Netlify.
-
-See `README.md` for human-facing docs (directory structure, tech stack, content conventions). Detailed operational recipes live in `.claude/docs/` (loaded on demand). Project history lives in `logs/`.
-
-# Tech Stack
-
-- Hugo Extended — static site generator (version pin: see **Hugo Version Constraints**)
-- Wowchemy v5 theme (via Hugo Modules, pinned to commit 20210324 in go.mod)
-- Goldmark markdown renderer with `unsafe: true` (inline HTML allowed)
-- Mermaid diagrams supported (add `diagram: true` to front matter)
-- SCSS for custom styles (`assets/scss/custom.scss`)
-- Netlify for deployment (auto-deploy on push to master)
+Academic portfolio website for Carlos Mendez (carlos-mendez.org): Hugo + Wowchemy v5 (Hugo module pinned to commit 20210324 in `go.mod`), Goldmark with `unsafe: true`, deployed on Netlify (push to `master` = deploy). Trilingual EN/ES/JA. **Docs map:**
+- `README.md`: human guide.
+- `.claude/docs/`: recipes and references, loaded on demand; index in `.claude/docs/README.md`.
+- `logs/`: dated history. Add or update a log entry for significant changes.
 
 # Key Commands
 
-- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo"` (v0.111.3 Extended — matches the `netlify.toml` pin)
-- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender`
-- Build site: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --gc --minify`
-- **Do not use the 0.84.2 or 0.89.4 binaries also present under that directory.** Both predate the ≥0.96 floor and fail on `layouts/section/presentations.html` with `function "continue" not defined` before rendering any content. See **Hugo Version Constraints**.
-- `./update_wowchemy.sh` — update Wowchemy modules and sync Hugo version in netlify.toml
+- Hugo: `H="$HOME/Library/Application Support/Hugo/0.111.3/hugo"` (v0.111.3 extended = the `netlify.toml` pin). **Never use the 0.84.2 / 0.89.4 binaries in the same folder:** they fail on `continue` (Hugo ≥0.96 required).
+- Dev server: `"$H" server --disableFastRender`. Production build: `"$H" --gc --minify --buildFuture`.
+- Tests: `node --test tests/*.cjs` (globe lifecycle; sc-lab data). Translations: `bash scripts/i18n-parity.sh` (must report 0 missing).
+- Audit after structural changes: `python3 scripts/audit-site.py [--old-ref <commit>]` (links, anchors, language links, redirects) and `node scripts/audit-nav.cjs` (menu and overflow at six widths). See `.claude/docs/site-audit.md`.
+- `./update_wowchemy.sh` updates the theme; then re-check every fork in `.claude/docs/theme-overrides.md`.
 
-# Content Conventions
+# Site Map (menu → folder)
 
-> Adding or editing any content type below also requires creating its Spanish (`content/es/…`) and Japanese (`content/ja/…`) counterpart in the same change — see **Internationalization (i18n)**.
+| Menu (EN) | Folder | URL / list page |
+|---|---|---|
+| AboutMe, ResearchLab, Contact | homepage sections (`data/orbital.json`, `content/home/`, `content/authors/admin/`) | `#about`, `#researchLab`, `#contact` |
+| Articles | `content/articles/` (type `publication`) | homepage `#featured`; `/articles/` (search, type, year) |
+| Books | `content/books/` | `/books/` (format, year) |
+| Courses | `content/courses/` | `/courses/` |
+| Presentations | `content/presentations/` (type `event`) | homepage `#talks`; `/presentations/` (search, year) |
+| Software | `content/software/` | `/software/` (topic) |
+| WebApps | `content/webapps/` + every tutorial `web_app/index.html` (auto-listed) | `/webapps/` (platform, region, topic) |
+| Data | `content/data/` | `/data/` (type, region) |
+| Tutorials | `content/tutorials/` (type `post`) | homepage `#posts`; `/tutorials/` (topic strips) |
+| Events | external | `https://lu.ma/cmg` |
 
-## Nav item → content folder
+- **Menus:** `config/_default/menus.yaml` (EN), `config/_default/languages.yaml` (ES/JA, URLs prefixed `/es/`, `/ja/`). Twelve items, so keep labels short (see Design).
+- **Types:** folder names differ from Wowchemy types. Each section `_index.md` sets the type with `cascade: [{_target: {kind: page}, type: publication|event|post}]`. Permalinks are `/articles/<slug>/`, `/presentations/<slug>/`, `/tutorials/<slug>/`.
+- **Retired:** `content/projects/` (only the hidden `ds4ds`, `_build: {render: never, list: never, publishResources: false}`). `static/tutorials/` holds legacy static files.
+- **Redirects:**
+  - Moved items carry `aliases:`. Wowchemy writes them to `_redirects`, which **takes precedence over** the `netlify.toml` rules.
+  - `netlify.toml` 301s: `/post/*`, `/publication/*`, `/event/*`, `/talk/*` → new sections; `/projects/` → `/software/`; `/projects/ds4ds/*` → `/data/`; old book publication URLs → `/books/…`. Same for `/es/` and `/ja/`.
+  - Specific rules must come before the splat rules.
 
-| Nav item | Where to add files |
-|----------|--------------------|
-| Articles | `content/articles/` (homepage `#featured`; list at `/articles/`) |
-| Books | `content/books/` |
-| Courses | `content/courses/` |
-| Presentations | `content/presentations/` (homepage `#talks`; list at `/presentations/`) |
-| Software | `content/software/` |
-| WebApps | `content/webapps/` (standalone apps) plus any tutorial `web_app/` folder (auto-listed) |
-| Data | `content/data/` |
-| Tutorials | `content/tutorials/` (homepage `#posts`; list at `/tutorials/`) |
-| AboutMe / ResearchLab / Contact | homepage sections — `data/orbital.json`, `content/home/`, `content/authors/admin/` |
-| Events | external (`https://lu.ma/cmg`) |
+# Content Rules
 
-The nav lives in `config/_default/menus.yaml` (EN) and `config/_default/languages.yaml` (ES/JA). `content/projects/` is retired: only the hidden `ds4ds` bundle remains (`_build: {render: never, list: never}`), and `netlify.toml` redirects `/projects/` → `/software/` and `/post/*`, `/publication/*`, `/event/*`, `/talk/*` (plus `/es/`, `/ja/`) to the new sections. Moved items carry `aliases:`.
+- **Naming:**
+  - Articles: `content/articles/YYYYMMDD-abbreviation/index.md`.
+  - Presentations: `content/presentations/YYYYMMDD-abbreviation/index.md`.
+  - Tutorials: `content/tutorials/descriptive-slug/index.md`.
+  - Books, Software, Data, WebApps: `content/{books,software,data,webapps}/<slug>/index.md`.
+  - Authors: `content/authors/firstname-lastname/_index.md`.
+  - **Folder names must not contain spaces or trailing spaces.**
+- **Front matter:** YAML everywhere.
+  - Articles require title, authors, date, `publication_types` (0=Uncategorized, 1=Conference paper, 2=Journal article, 3=Preprint, 4=Report, 5=Book, 6=Book section, 7=Thesis, 8=Patent), publication, abstract, tags.
+  - `admin` = Carlos Mendez.
+  - `featured: true` is legacy only; the homepage picks papers by date.
+  - Data science posts use `image.placement: 3`; Colab/script/notebook buttons go in `links:` front matter, not the body.
+  - Mermaid diagrams: add `diagram: true`.
+- **Presentations:** `date:` (the talk date) is required, and future dates are allowed (builds use `--buildFuture`). Keep `publishDate:` at now or earlier; a future `publishDate` hides the event.
+- **Catalog sections:** listed by `layouts/section/<name>.html` through `partials/catalog.html`. Dropdowns come from `filters:` (plus an optional `year_filter`) in each section `_index.md`, and **a new filter value needs its option in all three `_index.md` files**.
+  - Books: `book_format: print|online`; former type-5 publications keep `type: publication`. Book chapters (type 6) stay in Articles.
+  - Data: `data_type: repository|portal`, `region`.
+  - WebApps: `app_url`, `platform: gee|streamlit`, `region`, `topic` (an id from `data/tutorial_topics.yaml`), `_build: {render: never, list: always}` (the card opens the app). GEE source URLs go only in a front-matter comment, never as a public link. Recipe: `.claude/docs/webapps.md`.
+- **Style:**
+  - No emojis in front matter or config.
+  - Abstracts are single-line YAML strings.
+  - Use em dashes (—), not `--`.
+  - Every iframe gets `loading="lazy"`.
+  - Output blocks use ```` ```text ````.
+  - Prefer `.webp` for images in `assets/media/`.
+  - Icons: `icon_pack` `fas` / `fab` / `ai` (https://fontawesome.com/search).
+- **Math and currency:** in math-enabled posts write `\\$` for a literal `$` (MathJax `processEscapes: true` via `assets/js/mathjax-config.js`); notebooks use `\$`; `&#36;` does not work. Causal posts state the estimand (ATE/ATT) for each method and distinguish randomized from observational framing.
 
-## Naming
+# Internationalization (REQUIRED)
 
-- Articles (publications): `content/articles/YYYYMMDD-abbreviation/index.md`
-- Presentations (events/talks): `content/presentations/YYYYMMDD-abbreviation/index.md`
-- Tutorials (posts): `content/tutorials/descriptive-slug/index.md`
-- Books / Software / Data / WebApps: `content/{books,software,data,webapps}/<slug>/index.md`
-- Authors: `content/authors/firstname-lastname/_index.md`
+EN at `/` (`content/`), ES at `/es/` (`content/es/`, neutral Latin American Spanish, formal *usted*), JA at `/ja/` (`content/ja/`, です・ます). There is no English fallback, so untranslated items do not appear. **The same change that adds or materially edits content must also update its ES + JA counterparts:**
+- **Full translation:** articles, presentations, books, software, data, webapps, authors, every section `_index.md` (filter labels, `ui:`), and standalone pages (courses, alumni, slides, privacy, terms).
+- **Stub card only (tutorials):** translated `title` + `summary`, `card_url: "/tutorials/<slug>/"`, `_build: {render: never, list: always}`, empty body. Stubs never render, so translated pages link to the English tutorial.
+- **UI text:** must exist in all three languages (`data/orbital.json`, `i18n/{es,ja}.yaml`, section `_index.md` params, per-language `copyright`). Use `time.Format` for dates.
+- **Tools:** `/project:translate-content <slug> --lang all` (glossary + assets); `scripts/i18n-parity.sh`. Details: `.claude/docs/i18n.md`.
 
-Folder names differ from the Wowchemy content types, which are set by a `cascade` (`_target: {kind: page}`) in each section `_index.md`: `articles/` pages are type `publication`, `presentations/` pages are type `event`, `tutorials/` pages are type `post`. Section templates are `layouts/section/{articles,presentations,tutorials}.html`. Permalinks: `/articles/<slug>/`, `/presentations/<slug>/` (the old `/talk/<slug>/` is gone), `/tutorials/<slug>/`.
+# Design (summary — full reference: `.claude/docs/design-system.md`)
 
-## Catalog sections (Books, Software, Data, WebApps)
+- **Two page systems, one palette:**
+  - The homepage is the standalone `layouts/index.html` (copy in `data/orbital.json`; CSS `orbital*.css` inlined; JS `orbital*.js` deferred).
+  - Content pages are Wowchemy plus `custom_head.html` → `orbital-palette.css` + `orbital-subpages.css`, with components in `assets/scss/custom.scss`.
+- **Tokens:** bg `#050a12`, panel `#0a121d`, ink `#edf2f6`, muted `#9baaba`, line `#22303e`, blue `#88b9de`, gold `#e9c184`; system font stack.
+- **Dark mode:** dark only, rendered on the server (`day_night: false`). Keep `data/themes/nightlights.toml` in sync with the tokens.
+- **Own palettes:** standalone apps, slide decks, figures and syntax highlighting keep theirs.
+- **Homepage guardrails:**
+  - Opening under about 0.6 s; never hide content already on screen.
+  - WebGL starts after the first paint; never preload the globe textures.
+  - Every cinematic effect has a still fallback.
+  - Run `node --test tests/orbital.test.cjs` after globe changes.
+- **Homepage sections:**
+  - Recent research = the 3 newest articles of types 1–3 dated ≤ now.
+  - The Software block (anchor `#projects`) = the 3 most recently **committed** `software` bundles (`.ByLastmod`). Committing a package change moves it to the front.
+- **Menu:** collapses below **1200px** on both systems. The homepage uses `orbital.css`; content pages use the forked `navbar-expand-xl` (`custom.scss` §7/§7a). From 1200px up it is one `nowrap` row, with only about 13–25px of spare room at 1200px. **Re-run `audit-nav.cjs` after any menu or label change.**
+- **No horizontal page scroll** at 360–1440px. Wide math and code scroll inside their own boxes.
+- **Thumbnails:** they are product imagery. Use dedicated 16:9 `featured.*` files (≥1280×720) with the `orbital-thumbnail.html` / `orbital-card.html` WebP sizes. Never use blur, overlays, tilt or zoom on thumbnails. Full standard in `design-system.md` §5.
 
-- Listed by `layouts/section/{books,software,data,webapps}.html` through the shared `layouts/partials/catalog.html` (search box + one dropdown per `filters:` entry in the section `_index.md`, plus an optional `year_filter`). A new filter value needs an option in all three language `_index.md` files.
-- **Books** — `book_format: print|online`; former type-5 publications keep `type: publication` + `publication_types`.
-- **Data** — `data_type: repository|portal`, `region`.
-- **WebApps** — one bundle per standalone app (`app_url`, `platform: gee|streamlit`, `region`, `topic` id from `data/tutorial_topics.yaml`, `_build: {render: never, list: always}` so the card opens the app, `links:`, `featured.jpg` from `scripts/capture-dashboard-screenshots.cjs`). Tutorials with `web_app/index.html` are listed automatically. See `.claude/docs/webapps.md`.
+# Components and Recipes
 
-## Front Matter
+- **WebApps:** "Add web app: `<App URL>` — `<English title>`" → `.claude/docs/webapps.md` (bundle + ES/JA + `scripts/capture-dashboard-screenshots.cjs`).
+- **AI Podcast Player:** "Add AI Podcast to `<post slug>`" → `.claude/docs/ai-podcast-player.md`.
+- **Post resource buttons** (Slides PDF/HTML, tutorial `.zip`; relative vs absolute URL rules) → `.claude/docs/post-resource-buttons.md`.
+- **AhaSlides deck:** "Make an AhaSlides deck for `<post slug>`". Content slides are **images of the real slides** (never API text types or `content-v2`). → `.claude/docs/ahaslides.md`.
+- **Learning components and labs** (`.learn-card` in `custom.scss` §24; `fwl-lab`, `panel-lab`, `did-lab`, `sc-lab` shortcodes + JS/CSS; `node --test tests/sc-lab.test.cjs`): "Add learning components to `<post slug>`" → `.claude/docs/learning-components.md`.
+- **Other components:**
+  - `layouts/partials/page_header.html` (image above the title).
+  - The `fullwidth-iframe` shortcode. If a new page type does not break out of the margins, add its container to the overflow reset in `custom.scss`.
+- **CV (English only):**
+  - `content/cv/main.tex` (moderncv) is excluded from the build. Compile it with `cd content/cv && latexmk -pdf main.tex`, then copy the PDF to `static/media/CV.pdf`.
+  - `/project:update-cv` syncs it additively.
+  - Commented-out items (such as Bolivia112) are kept as references only.
 
-- All content uses YAML front matter.
-- Articles (type `publication`) require: title, authors, date, publication_types (0-8), publication, abstract, tags.
-- The `admin` author refers to Carlos Mendez (`content/authors/admin/`).
-- `featured: true` is retained for legacy publication widgets; the current homepage selects recent papers automatically by publication date.
-- Data science posts use `image.placement: 3` for full-width featured images above the title.
-- Presentations (type `event`) appear on the live site automatically via `content/presentations/<slug>/index.md`. `date:` is required (the talk date); future dates are allowed — production builds use `--buildFuture`. Leave `publishDate:` at "now" or earlier; a future `publishDate` hides the event in production.
+# Skills (`.claude/skills/<name>/SKILL.md`; legacy in `.claude/skills/legacy/`)
 
-## Publication Types
-
-0=Uncategorized, 1=Conference paper, 2=Journal article, 3=Preprint, 4=Report, 5=Book, 6=Book section, 7=Thesis, 8=Patent
-
-## Icons
-
-Font Awesome icons in link buttons. Common `icon_pack` values: `fas` (solid), `fab` (brands), `ai` (academicons). Reference: https://fontawesome.com/search
-
-# Homepage Architecture
-
-The landing page uses the standalone `layouts/index.html` template. Its English,
-Spanish, and Japanese copy is in `data/orbital.json`; its dedicated design and
-interactive NASA Earth-at-night globe are in `assets/css/orbital.css` and
-`assets/js/orbital.js`. See README's **Cinematic landing page** section and
-`logs/2026-10-03-orbital-landing.md`. The browser has no 3D-library dependency.
-The homepage CSS is inlined in `<head>` and its four scripts ship as one deferred
-bundle; the globe textures live in `assets/media/orbital/` and are served as
-same-size WebP. Keep the hero opening sequence under about 0.6 s and do not hide
-content that is already on screen. Keep WebGL setup in `orbital.js` deferred until
-after the first paint, and do not preload the globe textures; see
-`logs/2026-10-06-homepage-performance.md`.
-
-Both page systems share `assets/css/orbital-palette.css`. Content pages load the
-palette plus `assets/css/orbital-subpages.css` after Wowchemy, via `custom_head.html`.
-Keep the build-time colors in `data/themes/nightlights.toml` synchronized with the
-palette. The site uses server-rendered dark mode (`light = false`, `day_night: false`)
-to keep colors consistent across navigation. Standalone teaching apps and slide
-decks are explicitly outside this website-only theme change.
-
-The old `content/home/` widget files are retained for reference; their weights
-and hero text no longer control the landing page. The localized `people.md`
-student-group configuration still supplies the visible student photo cards.
-The original gallery photos supply a native scrolling carousel, with behavior
-in `assets/js/orbital-gallery.js`. Both desktop and mobile navigation read the
-existing localized `site.Menus.main` configuration.
-The new template reads articles/presentations/software/tutorials and author images
-from existing Hugo content. Keep all three `data/orbital.json` locales synchronized. Run
-`node --test tests/orbital.test.cjs` after changing globe behavior.
-
-The cinematic layer (starfield, 3D orbits, network arcs, reveals, tilt cards,
-coverflow, earthrise) lives in `assets/css/orbital-cinema.css` and
-`assets/js/orbital-cinema.js`; see `logs/2026-10-04-cinematic-landing.md`. Every
-effect must keep a still fallback (reduced motion, touch, print, no JS). The hero
-headline markup (`.kicker`, `<em>` keywords) is in `data/orbital.json`.
-
-The homepage's **Recent research** section automatically lists the three newest
-academic papers by publication `date`, using publication types 1, 2, and 3
-(conference papers, journal articles, and preprints). Books and future-dated papers
-are excluded. It reads each language's publication content and does not use
-`featured` flags or Git modification dates.
-
-Research and presentation rows use their own page bundle's `*featured*` image for
-small thumbnails, generated by `layouts/partials/orbital-thumbnail.html`. Keep
-the full image visible with `object-fit: contain` so figures and slide titles are
-not cropped. Their titles share responsive typography in `orbital.css`.
-
-## Homepage Thumbnail Quality Standard
-
-Treat presentation, research-paper, tutorial, and software thumbnails as product
-imagery: they must look crisp, colorful, and immediately legible on first view.
-
-- Add a dedicated `featured.webp`, `featured.png`, or `featured.jpg` to each page
-  bundle. Prefer a 16:9 source at 1920×1080 or larger; 1280×720 is the minimum.
-  Start from the original export rather than enlarging a small or compressed image.
-- Keep titles, charts, diagrams, and logos large enough to remain readable at card
-  size. Presentation and publication artwork must keep important content away from
-  the edges because the entire image is shown with `object-fit: contain`. Software
-  and tutorial artwork uses `object-fit: cover`, so keep essential content inside
-  a generous central safe area.
-- Paper and presentation rows must use `layouts/partials/orbital-thumbnail.html`:
-  a 320×180 WebP at quality 88 plus a 640×360 WebP at quality 92, exposed through
-  `srcset` with `sizes="160px"`. Do not reduce these dimensions or quality values.
-- Software and tutorial cards must use `layouts/partials/orbital-card.html`: a
-  480×293 WebP at quality 86 plus a 960×586 WebP at quality 92, exposed through
-  `srcset` with the existing responsive `sizes` rule. Do not revert to a single
-  low-quality 720×440 thumbnail.
-- Product thumbnails must remain on the pixel grid. Do not apply CSS blur,
-  desaturation, reduced opacity, dark image overlays, perspective tilt, moving
-  glare, or hover zoom to `.item-thumbnail` or `.card-image img`. The cinematic
-  reveal may animate position and opacity, but its product-card override must keep
-  `filter: none` so images never resolve from a blur.
-- Preserve `loading="lazy"` and `decoding="async"`. These improve loading without
-  lowering visual quality.
-- After changing thumbnail markup or styles, run the production Hugo build and
-  inspect all four homepage groups at desktop and mobile widths. Confirm that the
-  browser selects a responsive WebP, computed `filter` and `transform` are `none`,
-  text inside the artwork is legible, and no overlay washes out the colors.
-
-**Software ordering:** the homepage block formerly called Projects (anchor `#projects` kept) now shows the three most recently updated **Software** packages, headed "Software" and linking to `/software/`. It and the legacy `showcase` shortcode (`layouts/shortcodes/showcase.html`, which maps type `project` → section `software` and `event` → `presentations`) sort the `software` section by `.ByLastmod.Reverse` (git commit date of each package's `index.md`; `enableGitInfo: true`). **Convention: committing any change under `content/software/<slug>/` (plus its ES/JA counterparts) automatically surfaces that package FIRST — no manual `date`/`weight` bump.** The Talks widget uses the same shortcode but keeps `date`-descending order (the lastmod sort is guarded by `if eq $section "software"`).
-
-# Custom Components
-
-- **`fullwidth-iframe` shortcode** (`layouts/shortcodes/fullwidth-iframe.html`) — full-viewport-width iframe with responsive height + lazy loading. Usage: `{{</* fullwidth-iframe src="…" height="800px" */>}}`. If a new page type using it doesn't break out of margins, add its container class to the overflow reset in `custom.scss`.
-- **Page header override** (`layouts/partials/page_header.html`) — renders the featured image **above** the title (image-first). Data science posts use `image.placement: 3` (2560x2560 Fit); Colab/script/notebook buttons come from `links:` front matter, not the body; the image wrapper uses `mb-4`.
-- **Custom CSS** (`assets/scss/custom.scss`) — hero fix, iframe breakout, dashboard gallery grid (legacy, unused), notebook-style post styling, Python syntax highlighting, left-side ToC. See `README.md` for the section breakdown.
-- **WebApps** (`/webapps/`) — one `content/webapps/<slug>/` bundle per standalone GEE/Streamlit app (card opens the app directly), plus auto-listed tutorial `web_app/` folders. Trigger: **"Add web app: `<App URL>` — `<English title>`"**. See `.claude/docs/webapps.md`. (The old dashboards gallery page and its `dashboard-gallery`/`dashboard-card` shortcodes are retired; the shortcodes remain but are unused.)
-- **AI Podcast Player** — inline audio-player block appended to a post (raw audio file), or a Spotify embed above the Abstract (Spotify-hosted episode). Trigger: **"Add AI Podcast to `<post slug>`"**. See `.claude/docs/ai-podcast-player.md`.
-- **Post resource buttons** — the **Slides (PDF)**, **Slides (HTML)**, and tutorial **`.zip` bundle** `links:` entries (each has a specific relative-vs-absolute URL rule). Triggers: "Add slides to `<post>`" / a new `slides/` deck / a Quarto bundle. See `.claude/docs/post-resource-buttons.md`.
-- **AhaSlides interactive deck** — an existing Quarto reveal.js deck re-published on AhaSlides. **Content slides are images of the real slides** (render `slides.qmd` to PDF, import through the editor UI); AhaSlides supplies only the live audience layer via MCP (quizzes, polls, word clouds, scales, Q&A, spinners, leaderboards and marketplace types; the paid-plan reference is `content/tutorials/python_fwl/ahaslides/activities.py`; a Canva/PDF source split into several lectures, with playable YouTube slides, is `content/courses/slides/ahaslides/`; the self-paced, three-language hero keynote captured from the Canva view is `content/keynote/ahaslides/`). Never build content slides with the API's own text types or `content-v2` — see the doc for why. Trigger: **"Make an AhaSlides deck for `<post slug>`"**. See `.claude/docs/ahaslides.md`.
-- **Learning components** — predict-then-reveal checks, worked exercise solutions, common-misconception cards and collapsible proofs (`.learn-card` + `predict-card`/`solution-card`/`misconception-card`/`proof-card`; `custom.scss` §24; pure HTML `<details>`, no JS), plus the interactive shortcodes `fwl-lab` (`layouts/shortcodes/fwl-lab.html` + `assets/js/fwl-lab.js` + `assets/css/fwl-lab.css`) `panel-lab` (same three-file layout; two tabs: selection lab and demeaning lab; used in `python_panel_intro`) `did-lab` (same layout; two tabs: 2×2 parallel-trends lab and event-study lab, both on the post's real data; used in `python_did101`) and `sc-lab` (same layout; four tabs: weight mixer, placebo cutoff, in-time placebo and leave-one-out, all on the Proposition 99 data; used in `python_sc101`; test with `node --test tests/sc-lab.test.cjs`). Trigger: **"Add learning components to `<post slug>`"**. See `.claude/docs/learning-components.md`.
-
-# Curriculum Vitae (CV)
-
-Hand-written **moderncv LaTeX** project at `content/cv/` (`main.tex` + `.cls`/`.sty` + `avatar.png` + `certificates/`). Compiles to `static/media/CV.pdf` (served at `/media/CV.pdf`, linked from each author profile). **English-only** — i18n rules do not apply.
-
-- **`content/cv/` is excluded from the Hugo build** via `excludeFiles: '{es,ja,cv}/**'` in `config/_default/config.yaml`; the only public artifact is `static/media/CV.pdf`. Sources (`.tex`/`.cls`/`.sty`/`avatar.png`/`certificates/`) are committed; LaTeX build artifacts are gitignored.
-- **Compile manually:** `cd content/cv && latexmk -pdf main.tex`, then copy `content/cv/main.pdf` to `static/media/CV.pdf`.
-- **Sync from website content:** the `update-cv` skill (`/project:update-cv`) additively adds missing publications/talks/software (looks up coauthors via Crossref by DOI), compiles, and copies the PDF — leaving changes uncommitted for review. Never touches the hand-maintained sections. See `.claude/skills/update-cv/SKILL.md`.
-
-# Claude Code Skills
-
-Eighteen skills, each with full docs in its own `SKILL.md` (loaded when invoked). Twelve are Write/Review pairs across six artifact stages; six are standalone. Skills are independent but compose into a pipeline (script → results report → blog post → infographic → web app). All follow: (1) confirm scope, (2) execute, (3) offer follow-ups. Legacy skills preserved at `.claude/skills/legacy/`.
-
-## Pipeline overview
+Pipeline: script → results report → post → infographic → web app. Each skill follows the same steps: confirm scope, execute, offer follow-ups.
 
 | Stage | Write | Review |
-|-------|-------|--------|
-| Script | `/project:write-script` | `/project:review-script` |
-| Results report | `/project:write-results-report` | `/project:review-results-report` |
-| Blog post | `/project:write-post` | `/project:review-post` |
-| Infographic | `/project:write-infographic` | `/project:review-infographic` |
-| Interactive web app (static HTML/CSS/JS, D3) | `/project:write-app` | `/project:review-app` |
-| Quarto notebook (R/Python/Stata, lighter) | `/project:write-quarto-notebook` | — |
-| Quarto notebook (Python, friction-free bundle) | `/project:write-quarto-notebook-python` | — |
-| Slide deck (Quarto reveal.js) | `/project:write-slides` | `/project:review-slides` |
-| Data dictionary (interactive HTML + Stata pipeline) | `/project:write-data-dictionary` | — |
+|---|---|---|
+| Script / Results report / Blog post | `write-script` / `write-results-report` / `write-post` | `review-script` / `review-results-report` / `review-post` |
+| Infographic / Web app (static D3) / Slides (Quarto reveal.js) | `write-infographic` / `write-app` / `write-slides` | `review-infographic` / `review-app` / `review-slides` |
+| Quarto notebook (R/Py/Stata; Python bundle) / Data dictionary | `write-quarto-notebook`, `write-quarto-notebook-python` / `write-data-dictionary` | — |
 
-Standalone companions: `write-quarto-notebook`, `write-quarto-notebook-python`, `write-data-dictionary`, `translate-content`, `update-author-profile`, `update-cv`. Each skill's `name`/`description`/invocation lives in its own `.claude/skills/<name>/SKILL.md`.
+- **Standalone skills:** `translate-content`, `update-author-profile`, `update-cv`, `write-paper-infographic` (paper infographic brief), `draw-sketchy-diagram`.
+- **Reference posts:**
+  - Python: `python_ml_random_forest`, `python_dowhy`, `python_fwl` (dark figures, learning components, lab), `python_pyfixest`, `python_esda2`, `python_mgwr`.
+  - Stata: `stata_rct`.
+- **Large PDFs:** delegate to Explore agents and extract only the relevant 5–15 pages.
 
-## Shared conventions
+# Gotchas (learned the hard way)
 
-- Website color palette: background `#050a12`, panels `#0a121d`, text `#edf2f6`, secondary text `#9baaba`, borders `#22303e`, blue `#88b9de`, gold `#e9c184` (shared CSS tokens).
-- Standalone teaching apps, slides, figures, and syntax highlighting retain their established palettes and semantic color distinctions.
-- Currency dollar signs: `\\$` in `index.md` (MathJax-enabled), `\$` in notebook
-- Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
-- Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
-- PDF reference handling: delegate large PDFs to Explore agents; extract only relevant pages (5–15); clean up before committing
-- Reference posts (Python): `python_ml_random_forest` (ML), `python_dowhy` (causal inference), `python_fwl` (dark-theme figures, simulated data, learning components, interactive lab), `python_pyfixest` (panel/fixed effects), `python_esda2` (ESDA/LISA), `python_mgwr` (MGWR)
-- Reference posts (Stata): `stata_rct` (RCT panel data, RA/IPW/DR/DiD/DRDID, Mermaid diagrams, equations with analogies)
-
-# Internationalization (i18n)
-
-The site is trilingual: **English at `/`** (`content/`), **Spanish at `/es/`** (`content/es/`, neutral Latin American Spanish, formal `usted`), **Japanese at `/ja/`** (`content/ja/`, です・ます). There is no English fallback — untranslated content simply won't appear on `/es/` or `/ja/`.
-
-**Translate new content (REQUIRED):** whenever qualifying content is added or materially edited under `content/<section>/<slug>/`, the SAME change MUST create/update its ES + JA counterparts:
-- `articles`, `presentations`, `books`, `software`, `data`, `webapps`, `authors`, each section `_index.md` (translated `filters:` labels), and standalone pages (courses/alumni/slides/privacy/terms) → **full translation**.
-- `tutorials` (type `post`) → **stub card only** (translated `title`+`summary`, `card_url: "/tutorials/<slug>/"`, `_build: {render: never, list: always}`, empty body). Tutorials are the ONLY stub exception.
-
-**Mechanism:** `/project:translate-content <slug> --lang all` (see `.claude/skills/translate-content/SKILL.md`) applies the glossary and copies assets. `scripts/i18n-parity.sh` reports EN items lacking an ES/JA counterpart. Full field-by-field rules, config/layout, geolocation, and the "add another language" recipe are in **`.claude/docs/i18n.md`**.
+- **Hugo HTML escaping:** an attribute *name* built in a template from a value such as `type` becomes `data-zgotmplz`. Emit generated attributes with `printf … | safeHTMLAttr` (see `catalog.html`).
+- **Theme lookups by section name** (`site.GetPage "section" "publication"`) break after folder renames; `.Type` lookups survive. Grep new theme templates and see `.claude/docs/theme-overrides.md`.
+- **`_build: {render: never}` still publishes bundle resources;** add `publishResources: false` to keep them out.
+- **Folder renames:** also rename the paths in `.gitignore` (it has no extension, so search-and-replace tools skip it). Otherwise `git add -A` stages ignored PDFs, venvs and nested repos. Check `git ls-files -ci --exclude-standard` before committing.
+- **Hugo dev server:** it can panic when many files change while it serves (screenshot scripts, mass moves). Restart it, and trust the production build.
+- **Width tests:** at non-100% zoom or with display scaling, resizing the window does not give an exact viewport. Use Playwright viewports or fixed-width iframes.
+- **Section titles:** keep each section `_index.md` `title` equal to its menu label (Articles, Tutorials, …).
 
 # Hugo Version Constraints
 
-- The site requires Hugo **≥ 0.96** (`layouts/section/presentations.html` uses the `continue` keyword). `netlify.toml` pins `HUGO_VERSION = 0.111.3`. There is **no Netlify UI env override** — the `netlify.toml` pin is the actual build version. Keep the pin in the 0.96–0.119 window; do not revert it.
-- **Local install matches the pin:** `$HOME/Library/Application Support/Hugo/0.111.3/hugo` (extended, darwin). Installed from the [v0.111.3 release](https://github.com/gohugoio/hugo/releases/tag/v0.111.3) — `hugo_extended_0.111.3_darwin-universal.tar.gz`. Use the same `<version>/hugo` layout when adding a version, and update **Key Commands** when the working version changes.
-- Tested/safe window: **0.96–0.119** extended (verified on 0.111.3). Lower bound = `continue`; upper bound ≈ `site.GoogleAnalytics` removal (~0.120) and `paginate` removal (0.128). Goldmark (not Blackfriday) is used, so the 0.100 Blackfriday removal is irrelevant. Re-verify Wowchemy v5 compatibility before moving outside this window.
-- Theme minimum: 0.78 (theme.toml).
-- Hugo 0.91+ requires a security policy for `WC_POST_CSS` — already configured in `config/_default/config.yaml` under `security.funcs.getenv`.
-- Wowchemy modules are pinned to commit 20210324 in go.mod; updating them is a separate decision from updating Hugo.
-
-# Deployment
-
-- Push to `master` triggers Netlify auto-deploy.
-- Build command: `hugo --gc --minify -b $URL`.
-- Deploy previews use `--buildFuture` to include future-dated content.
-- Netlify cache plugin is enabled for faster rebuilds.
-
-# Logs Directory
-
-The `logs/` directory documents the current status and evolution of the site (dated `YYYY-MM-DD-slug.md` entries). Check it to understand recent changes and ongoing work. When making significant changes, add or update a log entry.
-
-# Style Guidelines
-
-- Do not add emojis to front matter or config files.
-- Keep abstracts as single-line strings in YAML (no line breaks).
-- Use em dashes (—) not double hyphens (--) in text content.
-- Background images for homepage widgets are in `assets/media/` (prefer .webp over .jpg).
-- All iframes should include `loading="lazy"` for performance.
-- In posts with math enabled, use `\\$` for literal currency dollar signs (e.g., `\\$1,736`). The site overrides MathJax with `processEscapes: true` (`assets/js/mathjax-config.js`), so `\$` renders as a literal `$`. Do NOT use `&#36;` — it does not work.
+- Pin `HUGO_VERSION = 0.111.3` in `netlify.toml`. There is no Netlify UI override, so this pin is the build. Keep it in the **0.96–0.119** window: `continue` in `section/presentations.html` needs ≥0.96; `site.GoogleAnalytics` disappears around 0.120 and `paginate` in 0.128.
+- The local binary at `$HOME/Library/Application Support/Hugo/<version>/hugo` matches the pin. Update **Key Commands** if it changes.
+- The theme minimum is 0.78. `WC_POST_CSS` needs the `security.funcs.getenv` policy, which is set in `config.yaml`. Updating Wowchemy is a separate decision from updating Hugo.
+- **Netlify:** builds run `hugo --gc --minify --buildFuture -b $URL`, with the cache plugin on. `netlify/edge-functions/geo-lang.ts` sends a first visit to `/` from Spanish-speaking countries or Japan (302) to `/es/` or `/ja/`.

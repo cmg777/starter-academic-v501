@@ -47,7 +47,7 @@
     </div>
 
     <div class="post-card-meta">
-      <span class="post-card-date">{{ $item.Date.Format "Jan 2, 2006" }}</span>
+      <span class="post-card-date">{{ $item.Date | time.Format ":date_medium" }}</span>
     </div>
 
     {{ with $summary }}
