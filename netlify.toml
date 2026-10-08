@@ -59,6 +59,97 @@
 
 # Navigation restructure (2026-10-08): old section URLs. Per-item moves are
 # covered by `aliases` (Wowchemy writes them to _redirects, which wins over these).
+# Books that moved out of /publication/ (must precede the /publication/* rule).
+[[redirects]]
+  from = "/publication/20150727bookessaysphd/*"
+  to = "/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/publication/20150727BOOKessaysPHD/*"
+  to = "/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/publication/20201117-book-mendez2020/*"
+  to = "/books/convergence-clubs/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/publication/20260126-metricsai/*"
+  to = "/books/metricsai/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/publication/20260126-metricsAI/*"
+  to = "/books/metricsai/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/20150727bookessaysphd/*"
+  to = "/es/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/20150727BOOKessaysPHD/*"
+  to = "/es/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/20201117-book-mendez2020/*"
+  to = "/es/books/convergence-clubs/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/20260126-metricsai/*"
+  to = "/es/books/metricsai/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/publication/20260126-metricsAI/*"
+  to = "/es/books/metricsai/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/20150727bookessaysphd/*"
+  to = "/ja/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/20150727BOOKessaysPHD/*"
+  to = "/ja/books/essays-productivity/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/20201117-book-mendez2020/*"
+  to = "/ja/books/convergence-clubs/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/20260126-metricsai/*"
+  to = "/ja/books/metricsai/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/publication/20260126-metricsAI/*"
+  to = "/ja/books/metricsai/"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/projects/"
   to = "/software/"
