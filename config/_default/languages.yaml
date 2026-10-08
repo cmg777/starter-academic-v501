@@ -19,6 +19,7 @@ es:
   languageCode: es-es
   languageName: Español
   weight: 2
+  copyright: '© 2018–{year} Carlos Mendez. Todos los derechos reservados.'
   params:
     description: 'Carlos Mendez — Profesor Asociado de Economía del Desarrollo en la Universidad de Nagoya (Japón). Investigación sobre desarrollo regional, ciencia de datos espaciales y econometría aplicada.'
   menu:
@@ -68,6 +69,7 @@ ja:
   languageCode: ja-jp
   languageName: 日本語
   weight: 3
+  copyright: '© 2018–{year} Carlos Mendez. 無断転載を禁じます。'
   params:
     description: 'カルロス・メンデス — 名古屋大学（日本）開発経済学准教授。地域開発、空間データサイエンス、応用計量経済学を研究しています。'
   menu:

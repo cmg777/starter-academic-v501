@@ -7,8 +7,6 @@ filters:
   - key: tag
     label: "トピック"
     options:
-      - value: python
-        label: "Python"
       - value: spatial
         label: "空間"
       - value: regional

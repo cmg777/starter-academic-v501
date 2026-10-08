@@ -69,7 +69,7 @@
       {{ $target := cond .external "target=\"_blank\" rel=\"noopener\"" "" }}
       <article class="cz-showcase-item" data-search="{{ lower (printf "%s %s" .title (.summary | default "" | plainify)) }}"
         {{- with .year }} data-year="{{ . }}"{{ end }}
-        {{- range $k, $v := .attrs }} data-{{ $k }}="{{ $v }}"{{ end }}>
+        {{- range $k, $v := .attrs }} {{ printf "data-%s=%q" $k $v | safeHTMLAttr }}{{ end }}>
         <a class="cz-showcase-media" href="{{ .href }}" {{ $target | safeHTMLAttr }} aria-label="{{ .title }}">
           {{ with .img }}
             {{ $thumb := .Fit "1200x900" }}

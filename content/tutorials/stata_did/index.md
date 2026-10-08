@@ -24,7 +24,7 @@ links:
 - icon: file-code
   icon_pack: fas
   name: Stata do-file
-  url: post/stata_did/analysis.do
+  url: tutorials/stata_did/analysis.do
 - icon: database
   icon_pack: fas
   name: Dataset (2x2)
@@ -36,7 +36,7 @@ links:
 - icon: file-alt
   icon_pack: fas
   name: Stata log
-  url: post/stata_did/analysis.log
+  url: tutorials/stata_did/analysis.log
 - icon: podcast
   icon_pack: fas
   name: AI Podcast

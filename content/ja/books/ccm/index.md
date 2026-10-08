@@ -76,4 +76,4 @@ RとQuartoで実装・レンダリングされた現代的な因果推論の手�
 
 ## 関連プロジェクト
 
-補完リソース：[因果メトリクスをマスターする](/project/intro2causal/) — Angrist & Pischke の *Mastering 'Metrics* に基づく、AIを活用したPythonの学習ガイドです。
+補完リソース：[因果メトリクスをマスターする](/ja/books/intro2causal/) — Angrist & Pischke の *Mastering 'Metrics* に基づく、AIを活用したPythonの学習ガイドです。

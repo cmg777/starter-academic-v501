@@ -124,6 +124,14 @@ disableAliases: true
 outputs:
   home: [HTML, RSS, JSON, WebAppManifest, headers, redirects]
   section: [HTML, RSS]
+# Wowchemy's <head> links the manifest as `index.webmanifest` (and index.headers
+# types that path), but Hugo >= 0.9x names this output `manifest.webmanifest`
+# by default, so the link 404'd. Pin the base name to match.
+outputFormats:
+  WebAppManifest:
+    mediaType: application/manifest+json
+    rel: manifest
+    baseName: index
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:

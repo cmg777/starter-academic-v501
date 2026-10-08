@@ -12,7 +12,7 @@ _build:
   list: always
 links:
   - name: "Tutorial"
-    url: "/es/tutorials/gee_ntl_viirs_annual/"
+    url: "/tutorials/gee_ntl_viirs_annual/"
     icon_pack: fas
     icon: book-open
 ---

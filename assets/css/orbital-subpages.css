@@ -218,14 +218,15 @@ body.page-wrapper.dark .cz-footer a { color: var(--orbital-muted); }
 body.page-wrapper.dark .cz-footer a:hover { color: var(--orbital-gold); }
 body.page-wrapper.dark .cz-footer-copy { color: var(--orbital-muted); border-color: var(--orbital-line); }
 
-@media (min-width: 992px) {
-  body.page-wrapper #navbar-main .main-menu-item .nav-link { font-size: 0.72rem; padding-right: 0.45rem; padding-left: 0.45rem; }
+/* The navbar collapses below 1200px (navbar-expand-xl); above it the 12 items
+   stay on one row, so labels must not wrap. */
+@media (min-width: 1200px) {
+  body.page-wrapper #navbar-main .main-menu-item .nav-link { font-size: 0.72rem; padding-right: 0.4rem; padding-left: 0.4rem; white-space: nowrap; }
 }
-@media (min-width: 992px) and (max-width: 1199.98px) {
-  body.page-wrapper #navbar-main .main-menu-item .nav-link { font-size: 0.7rem; padding-right: 0.25rem; padding-left: 0.25rem; }
-  body.page-wrapper #navbar-main .i18n-dropdown .dropdown-toggle span { display: none !important; }
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  body.page-wrapper #navbar-main .main-menu-item .nav-link { padding-right: 0.28rem; padding-left: 0.28rem; }
 }
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   body.page-wrapper #navbar-main .navbar-collapse { background: var(--orbital-bg); border-color: var(--orbital-line); }
 }
 @media (max-width: 360px) {
@@ -282,3 +283,16 @@ body.page-wrapper.dark :is(.card-simple, .course-card, .dashboard-card, .tg-card
 body.page-wrapper.dark .article-title {
   text-shadow: 0 0 40px rgba(136, 185, 222, .18);
 }
+
+/* Phones: .universal-wrapper pads ~14px but a Bootstrap .row inside it pulls
+   out by -15px, leaving ~1px of horizontal page scroll on /articles/ and the
+   catalog pages (books/software/data/webapps). Cancel both; net alignment
+   is unchanged. Seen at 360-768px. (2026-10-08 site audit) */
+@media (max-width: 991.98px) {
+  .universal-wrapper > .row { margin-left: 0; margin-right: 0; }
+  .universal-wrapper > .row > [class*="col-"] { padding-left: 0; padding-right: 0; }
+}
+
+/* Wide display equations scroll inside their own box instead of widening the
+   whole page on phones (e.g. /tutorials/python_did101/ was 584px wide at 360px). */
+.article-style mjx-container[display="true"] { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; }

@@ -1,0 +1,70 @@
+{{/* Forked from wowchemy-hugo-modules @ fda9f39d872e:wowchemy/layouts/publication/single.html.
+     Change: the "Publication type" link went to `site.GetPage "section" "publication"`,
+     which no longer exists since the section became `articles` (2026-10-08). It now
+     links to the publication-type taxonomy page, which lists every paper of that type. */}}
+{{- define "main" -}}
+{{ $pub_types := partial "functions/get_pub_types" $ }}
+{{ $pub_type_param := .Params.publication_types | default (slice 0) }}
+
+{{/* Convert string in form `"0"` to int (`0`) */}}
+{{ $pub_type := (int (index $pub_type_param 0)) | default 0 }}
+
+{{/* Validate Pub Type if defined */}}
+{{ if gt $pub_type (sub (len $pub_types) 1) }}
+  {{ warnf "Unknown publication type in %s" .Path }}
+  {{ $pub_type = 0 }}
+{{ end }}
+
+<div class="pub">
+
+  {{ partial "page_header.html" . }}
+
+  <div class="article-container">
+
+    {{ if .Params.abstract }}
+    <h3>{{ i18n "abstract" }}</h3>
+    <p class="pub-abstract">{{ .Params.abstract | markdownify }}</p>
+    {{ end }}
+
+    {{/* If the type is Uncategorized, hide the type. */}}
+    {{ if ne $pub_type 0 }}
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        <div class="row">
+          <div class="col-12 col-md-3 pub-row-heading">{{ i18n "publication_type" }}</div>
+          <div class="col-12 col-md-9">
+            <a href="{{ with site.GetPage (printf "/publication_types/%d" $pub_type) }}{{ .RelPermalink }}{{ else }}{{ (site.GetPage "section" "articles").RelPermalink }}{{ end }}">
+              {{ index $pub_types $pub_type }}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <div class="d-md-none space-below"></div>
+    {{ end }}
+
+    {{ if .Params.publication }}
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        <div class="row">
+          <div class="col-12 col-md-3 pub-row-heading">{{ i18n "publication" }}</div>
+          <div class="col-12 col-md-9">{{ .Params.publication | markdownify }}</div>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <div class="d-md-none space-below"></div>
+    {{ end }}
+
+    <div class="space-below"></div>
+
+    <div class="article-style">{{ .Content }}</div>
+
+    {{ partial "page_footer" . }}
+
+  </div>
+</div>
+{{- end -}}

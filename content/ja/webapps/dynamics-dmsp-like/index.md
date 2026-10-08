@@ -12,7 +12,7 @@ _build:
   list: always
 links:
   - name: "チュートリアル"
-    url: "/ja/tutorials/gee_dmsp-like_dynamics/"
+    url: "/tutorials/gee_dmsp-like_dynamics/"
     icon_pack: fas
     icon: book-open
 ---

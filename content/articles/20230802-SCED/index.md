@@ -1,5 +1,7 @@
 ---
 title: "Convergence clubs and spatial structural change in the European Union"
+aliases:
+  - "/articles/20230802-sced-/"
 authors:
 - Eleonora Cutrini
 - admin

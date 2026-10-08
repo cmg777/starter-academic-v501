@@ -68,3 +68,11 @@ sections, plus their `/es/` and `/ja/` variants.
 GitHub file paths changed (`content/post/…` → `content/tutorials/…`). Any Colab badge
 or link outside this repo that points at the old GitHub path will 404 until it is
 updated; links inside the repo were rewritten.
+
+## Follow-up: three untranslated articles
+
+`20220808-ARC`, `20230502-APJRS` and `20230802-SCED` had a trailing space in their
+folder names, which made their URLs end in `-/` and kept them out of the ES/JA trees.
+The folders were renamed without the space (EN `aliases` redirect the old `…-/` URLs)
+and full ES/JA translations were added: title, abstract, summary, image alt text and
+the SCED body heading. `/articles/` now lists 40 papers in all three languages.

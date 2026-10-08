@@ -55,7 +55,7 @@ links:
   - icon: podcast
     icon_pack: fas
     name: AIポッドキャスト
-    url: "/articles/20260528-em/#podcast-player"
+    url: "/ja/articles/20260528-em/#podcast-player"
 url_poster: ''
 url_project: ''
 

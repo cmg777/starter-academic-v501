@@ -1,5 +1,5 @@
 ---
-title: "Measuring and understanding regional inequality through the lens of the Indonesian experience"
+title: "インドネシアの経験から見る地域格差の測定と理解"
 authors:
 - admin
 date: "2023-05-02T00:00:00Z"
@@ -18,10 +18,10 @@ publication_types: ["2"]
 publication: "*Asia-Pacific Journal of Regional Science*"
 publication_short: ""
 
-abstract: "This article reviews the book by Akita and Kataoka (Regional inequality and development: Measurement and applications in Indonesia, 2022). The book first provides an overview of various measurement methods of regional inequality. Next, it presents four case studies that deepen our understanding of regional inequality in the context of the development challenges of Indonesia: decentralization, premature deindustrialization, financial crisis, low labor productivity, among others. Overall, this book provides an excellent introduction and application of inequality decomposition methods in the context of regional disparities and structural change."
+abstract: "本稿は、秋田・片岡の著書（Regional inequality and development: Measurement and applications in Indonesia, 2022）を書評します。同書はまず、地域格差のさまざまな測定方法を概観します。続いて、地方分権、早すぎる脱工業化、金融危機、低い労働生産性など、インドネシアの開発課題の文脈で地域格差への理解を深める4つの事例研究を示します。全体として、同書は地域格差と構造変化の文脈における格差分解手法について、優れた入門と応用を提供しています。"
 
 # Summary. An optional shortened abstract.
-summary: "This article reviews the book by Akita and Kataoka (Regional inequality and development: Measurement and applications in Indonesia, 2022)"
+summary: "本稿は、秋田・片岡の著書（Regional inequality and development: Measurement and applications in Indonesia, 2022）を書評します。"
 
 tags:
 - Indonesia
@@ -43,7 +43,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  alt_text: "Where does regional inequality come from? This methods diagram summarizes the nested Theil decomposition described in Carlos Mendez’s 2023 book review: overall income inequality separates into between-region, between-province within-region, and within-province components. Look within and between. The three equal boxes are conceptual categories, not measured shares or original empirical estimates. The review discusses Akita and Kataoka’s Regional Inequality and Development (2022) in the Indonesian context."
+  alt_text: "地域格差はどこから生じるのでしょうか。この手法図は、カルロス・メンデスによる2023年の書評で説明された入れ子型のタイル分解をまとめたものです。所得格差全体は、地域間、地域内の州間、州内の3つの要素に分かれます。内側と間の両方を見ます。同じ大きさの3つの箱は概念上の区分であり、計測された比率や独自の実証推定値ではありません。この書評は、インドネシアの文脈で秋田・片岡の Regional Inequality and Development（2022）を論じています。"
   caption: ''
   focal_point: ""
   preview_only: false

@@ -6,13 +6,17 @@
   Multi-bucket: a post appears in EVERY topic whose category_matches overlaps
   its categories: list. `foundations` is a residual catch-all — only tutorials
   matching no other topic land there. Announcements go to the bottom strip.
+  UI text and topic labels are localized from the section _index.md
+  (`ui:` and `topic_labels:` maps per language); English is the fallback.
 */}}
 {{ define "main" }}
+{{ $ui := .Params.ui | default dict }}
+{{ $topicLabels := .Params.topic_labels | default dict }}
 
 <div class="universal-wrapper pt-3">
   <h1 class="tg-page-title">{{ .Title }}</h1>
   <p class="tg-page-lead">
-    Hands-on econometric tutorials grouped by method — search, filter by language, or jump to a topic.
+    {{ index $ui "lead" | default "Hands-on econometric tutorials grouped by method — search, filter by language, or jump to a topic." }}
   </p>
 </div>
 
@@ -56,35 +60,35 @@
 {{ end }}
 
 {{/* --- Sticky control bar --- */}}
-<nav class="tutorial-gallery-nav" aria-label="Tutorial gallery controls">
+<nav class="tutorial-gallery-nav" aria-label="{{ index $ui "controls" | default "Tutorial gallery controls" }}">
   <div class="universal-wrapper tg-nav-inner">
     <div class="tg-nav-row tg-nav-controls">
       <div class="tg-search-wrap">
         <i class="fas fa-search tg-search-icon" aria-hidden="true"></i>
         <input id="tg-search" class="tg-search" type="search"
-               placeholder="Search tutorials…"
+               placeholder="{{ index $ui "search" | default "Search tutorials…" }}"
                autocomplete="off" autocorrect="off" spellcheck="false"
-               aria-label="Search tutorials">
+               aria-label="{{ index $ui "search" | default "Search tutorials…" }}">
       </div>
-      <div class="tg-chips" role="group" aria-label="Filter by language">
-        <button type="button" class="tg-chip active" data-language="*">All</button>
+      <div class="tg-chips" role="group" aria-label="{{ index $ui "filter_language" | default "Filter by language" }}">
+        <button type="button" class="tg-chip active" data-language="*">{{ index $ui "all" | default "All" }}</button>
         <button type="button" class="tg-chip" data-language="python">Python</button>
         <button type="button" class="tg-chip" data-language="r">R</button>
         <button type="button" class="tg-chip" data-language="stata">Stata</button>
         <button type="button" class="tg-chip" data-language="gee">GEE</button>
       </div>
       <label class="tg-sort-wrap" for="tg-sort">
-        <span class="sr-only">Sort</span>
+        <span class="sr-only">{{ index $ui "sort" | default "Sort" }}</span>
         <select id="tg-sort" class="tg-sort">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
+          <option value="newest">{{ index $ui "newest" | default "Newest" }}</option>
+          <option value="oldest">{{ index $ui "oldest" | default "Oldest" }}</option>
           <option value="az">A–Z</option>
         </select>
       </label>
     </div>
-    <div class="tg-nav-row tg-topic-nav" role="navigation" aria-label="Jump to topic">
+    <div class="tg-nav-row tg-topic-nav" role="navigation" aria-label="{{ index $ui "jump" | default "Jump to topic" }}">
       {{ range $topics }}
-        <a href="#topic-{{ .id }}" data-topic-link="{{ .id }}">{{ .label }}</a>
+        <a href="#topic-{{ .id }}" data-topic-link="{{ .id }}">{{ index $topicLabels .id | default .label }}</a>
       {{ end }}
     </div>
   </div>
@@ -113,7 +117,7 @@
           {{ $cards = $cards | append (dict
                 "page" $p
                 "topicId" $t.id
-                "topicLabel" $t.label
+                "topicLabel" (index $topicLabels $t.id | default $t.label)
                 "topicAccent" $t.accent
                 "topicIcon" $t.icon
                 "languageKey" $lang
@@ -123,13 +127,13 @@
       {{ end }}
     {{ end }}
     {{ if $cards }}
-      {{ partial "tutorial_topic_row.html" (dict "topic" $t "cards" $cards) }}
+      {{ partial "tutorial_topic_row.html" (dict "topic" (merge $t (dict "label" (index $topicLabels $t.id | default $t.label))) "cards" $cards "scroll" (index $ui "scroll" | default "scroll")) }}
     {{ end }}
   {{ end }}
 
   {{/* Empty-state message shown by JS when filters hide everything */}}
   <div id="tg-empty-state" class="tg-empty-state" hidden>
-    <p>No tutorials match your filters. <button type="button" id="tg-reset" class="tg-reset-link">Clear filters</button></p>
+    <p>{{ index $ui "empty" | default "No tutorials match your filters." }} <button type="button" id="tg-reset" class="tg-reset-link">{{ index $ui "clear" | default "Clear filters" }}</button></p>
   </div>
 
   {{/* --- Announcements strip --- */}}
@@ -140,15 +144,15 @@
     {{ end }}
   {{ end }}
   {{ if $announcements }}
-    <section class="tg-announcements" aria-label="News and announcements">
+    <section class="tg-announcements" aria-label="{{ index $ui "news" | default "News & Announcements" }}">
       <header class="tg-announcements-header">
-        <h2><i class="fas fa-bullhorn" aria-hidden="true"></i> News &amp; Announcements</h2>
+        <h2><i class="fas fa-bullhorn" aria-hidden="true"></i> {{ index $ui "news" | default "News & Announcements" }}</h2>
       </header>
       <ul class="tg-announcements-list">
         {{ range $announcements }}
           <li>
             <a href="{{ .RelPermalink }}">
-              <span class="tg-announcement-date">{{ dateFormat "Jan 2, 2006" .Date }}</span>
+              <span class="tg-announcement-date">{{ .Date | time.Format ":date_medium" }}</span>
               <span class="tg-announcement-title">{{ .Title }}</span>
             </a>
           </li>

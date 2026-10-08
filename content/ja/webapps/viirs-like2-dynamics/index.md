@@ -12,7 +12,7 @@ _build:
   list: always
 links:
   - name: "チュートリアル"
-    url: "/ja/tutorials/gee_viirs-like2_dynamics/"
+    url: "/tutorials/gee_viirs-like2_dynamics/"
     icon_pack: fas
     icon: book-open
 ---

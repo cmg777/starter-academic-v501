@@ -1,5 +1,7 @@
 ---
 title: "Regional income convergence and conditioning factors in Turkey: Revisiting the role of spatial dependence and neighbor effects"
+aliases:
+  - "/articles/20220808-arc-/"
 authors:
 - Ugur Ursavas
 - admin

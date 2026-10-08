@@ -81,8 +81,31 @@ body {
   }
 }
 
-/* --- 7. Navbar brand/search overlap fix on small screens --- */
-@media (max-width: 991.98px) {
+/* --- 7a. Collapsed navbar between 992px and 1199.98px. Wowchemy's own
+   collapsed-header rules (components/_nav.scss, media-breakpoint-down(md))
+   stop at 991.98px, but the navbar now collapses below xl, so repeat them
+   here for the extra range. The bar keeps its 70px height in this range. --- */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .navbar-brand-mobile-wrapper { position: absolute; left: 0; right: 0; }
+  .navbar-brand { margin: 0 auto; }
+  .navbar-toggler { border-color: transparent; }
+  .i18n-dropdown .nav-link::after { content: none; }
+  #navbar-main .main-menu-item { text-align: left !important; padding-left: 0; }
+  #navbar-main .navbar-collapse {
+    z-index: 1031 !important;
+    position: absolute;
+    left: 0;
+    top: 70px;
+    width: 100%;
+    text-align: center !important;
+  }
+  #navbar-main .main-menu-item .nav-item { padding: 10px 15px !important; }
+  #navbar-main .main-menu-item .nav-item .nav-link { padding: 5px 15px !important; }
+}
+
+/* --- 7. Navbar brand/search overlap fix while collapsed (below xl; the
+   navbar collapses at 1199.98px, see layouts/partials/navbar.html) --- */
+@media (max-width: 1199.98px) {
   /* Lock icons to the right edge so they don't flow into brand space */
   ul.nav-icons {
     position: absolute;
@@ -102,14 +125,6 @@ body {
     text-overflow: ellipsis;
     max-width: 100%;
     display: block;
-  }
-}
-/* Small desktops: shrink menu font so items + brand + search fit */
-@media (min-width: 992px) and (max-width: 1199.98px) {
-  #navbar-main .main-menu-item .nav-link {
-    font-size: 0.85rem;
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
   }
 }
 

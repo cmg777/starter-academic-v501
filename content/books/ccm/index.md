@@ -76,4 +76,4 @@ Contribute and provide feedback at [https://github.com/quarcs-lab/ccm](https://g
 
 ## Related project
 
-Companion resource: [Mastering Causal Metrics](/project/intro2causal/) — an AI-powered Python study guide based on Angrist & Pischke's *Mastering 'Metrics*.
+Companion resource: [Mastering Causal Metrics](/books/intro2causal/) — an AI-powered Python study guide based on Angrist & Pischke's *Mastering 'Metrics*.

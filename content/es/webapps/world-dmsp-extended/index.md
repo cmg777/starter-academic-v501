@@ -12,7 +12,7 @@ _build:
   list: always
 links:
   - name: "Tutorial"
-    url: "/es/tutorials/gee_ntl_dmsp_extended/"
+    url: "/tutorials/gee_ntl_dmsp_extended/"
     icon_pack: fas
     icon: book-open
 ---

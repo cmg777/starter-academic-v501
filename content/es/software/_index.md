@@ -7,8 +7,6 @@ filters:
   - key: tag
     label: "Tema"
     options:
-      - value: python
-        label: "Python"
       - value: spatial
         label: "Espacial"
       - value: regional

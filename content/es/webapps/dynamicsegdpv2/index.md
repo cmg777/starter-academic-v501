@@ -12,7 +12,7 @@ _build:
   list: always
 links:
   - name: "Tutorial"
-    url: "/es/tutorials/gee_egdp_dynamics/"
+    url: "/tutorials/gee_egdp_dynamics/"
     icon_pack: fas
     icon: book-open
 ---

@@ -150,6 +150,25 @@
   status = 301
   force = true
 
+# The hidden ds4ds project (content/projects/ds4ds) is not rendered; send old links to Data.
+[[redirects]]
+  from = "/projects/ds4ds/*"
+  to = "/data/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/es/projects/ds4ds/*"
+  to = "/es/data/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ja/projects/ds4ds/*"
+  to = "/ja/data/"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/projects/"
   to = "/software/"

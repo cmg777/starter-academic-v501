@@ -1,0 +1,6 @@
+# Overrides for strings the Wowchemy theme (fda9f39d872e) left in English in
+# its es.yaml. Hugo merges these over the theme file by id.
+- id: contact_email
+  translation: Correo electrónico
+- id: posts
+  translation: Tutoriales

@@ -708,7 +708,7 @@ Pooled covariance matrix (3x3):
   [0.6808  0.6303  1.0000]
 ```
 
-The off-diagonals range from 0.44 (Education-Health) to 0.68 (Education-Income). These are substantially lower than the 0.93--0.95 values in the [simulated data from the previous tutorial](/tutorials/python_pca/#8-step-3-the-covariance-matrix----mapping-the-overlap), reflecting the genuine complexity of human development. Education and Health are only moderately correlated because they measure different dimensions --- a region can have high literacy but mediocre life expectancy (or vice versa). This means PC1 will capture less total variance, and the eigenvector weights will be more unequal.
+The off-diagonals range from 0.44 (Education-Health) to 0.68 (Education-Income). These are substantially lower than the 0.93--0.95 values in the [simulated data from the previous tutorial](/tutorials/python_pca/#8-step-3-the-covariance-matrix-----mapping-the-overlap), reflecting the genuine complexity of human development. Education and Health are only moderately correlated because they measure different dimensions --- a region can have high literacy but mediocre life expectancy (or vice versa). This means PC1 will capture less total variance, and the eigenvector weights will be more unequal.
 
 ## 10. Pooled Step 4: Eigen-decomposition
 
@@ -752,7 +752,7 @@ Variance explained:
   PC3: 8.81%
 ```
 
-PC1 captures 72.42% of all variance --- substantially less than the 96% in the simulated tutorial, but still a strong majority. The eigenvector weights are $[0.5642, 0.5448, 0.6204]$, revealing that **Income carries the highest weight** (0.620), followed by Education (0.564), with Health contributing least (0.545). This unequal weighting reflects the real-world correlation structure: Income is more strongly correlated with the other two indicators, so it contributes more unique information to the composite index. Unlike the two-variable case from the [previous tutorial](/tutorials/python_pca/#9-step-4-eigen-decomposition----finding-the-optimal-direction) where equal weights were a mathematical certainty, three variables allow PCA to discover data-driven weights. Crucially, these weights are **fixed** --- the same weights apply to 2013 and 2019 because they were computed from the pooled data.
+PC1 captures 72.42% of all variance --- substantially less than the 96% in the simulated tutorial, but still a strong majority. The eigenvector weights are $[0.5642, 0.5448, 0.6204]$, revealing that **Income carries the highest weight** (0.620), followed by Education (0.564), with Health contributing least (0.545). This unequal weighting reflects the real-world correlation structure: Income is more strongly correlated with the other two indicators, so it contributes more unique information to the composite index. Unlike the two-variable case from the [previous tutorial](/tutorials/python_pca/#9-step-4-eigen-decomposition-----finding-the-optimal-direction) where equal weights were a mathematical certainty, three variables allow PCA to discover data-driven weights. Crucially, these weights are **fixed** --- the same weights apply to 2013 and 2019 because they were computed from the pooled data.
 
 ![Bar chart showing PC1 captures 72.4%, PC2 captures 18.8%, and PC3 captures 8.8%.](pca2_pooled_variance_explained.png)
 
