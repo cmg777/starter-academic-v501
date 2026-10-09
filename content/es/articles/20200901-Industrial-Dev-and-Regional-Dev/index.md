@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Una sola vía hacia la convergencia regional? El Gini regional de productividad laboral de Japón cambió −14,4% en 1909–1925 y −19,5% en 1970–1990. Los componentes dentro de los sectores, de cambio estructural y residual fueron −18,1%, +4,7% y −1,0% en el primer período; +10,0%, −25,9% y −3,6% en el segundo. Los valores negativos indican menor desigualdad. La convergencia tuvo motores distintos: mejoras dentro de los sectores primero y cambio estructural después. Descomposición descriptiva de la prueba de autor de Mendez (2020), tabla 18.1; no se reportan intervalos de incertidumbre."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Growing together? For Indonesian provincial GDP growth, global Moran’s I changes from +0.181 over 2015Q1–2019Q4 to −0.285 over 2015Q1–2020Q2, which includes early COVID. The pattern reversed from positive to negative spatial association using inverse-distance weights. Both reported p-values are 0.010; no uncertainty intervals are reported. The periods overlap and the comparison does not establish causation. Aginta, Miranti and Mendez (2021), Table 2, page 45."
   caption: ''
   focal_point: ""
   preview_only: false

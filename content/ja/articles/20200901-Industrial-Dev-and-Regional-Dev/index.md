@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "地域間収束への道筋は一つでしょうか。日本の地域別労働生産性のジニ係数は、1909～1925年に14.4%、1970～1990年に19.5%低下しました。産業内変化、構造変化、残差の寄与は、前期が−18.1%、+4.7%、−1.0%、後期が+10.0%、−25.9%、−3.6%です。負の値は地域格差の縮小を示します。前期は産業内変化、後期は構造変化が収束を主導しました。Mendez（2020）の著者校正刷りの表18.1に基づく記述的な要因分解で、不確実性区間は報告されていません。"
   caption: ''
   focal_point: ""
   preview_only: false

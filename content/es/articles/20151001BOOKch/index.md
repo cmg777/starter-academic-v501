@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Qué reduce la brecha de producción? En una prueba de autor de 2015, la contabilidad del desarrollo para el país mediano de la muestra latinoamericana en 2010 sitúa la producción por trabajador en el 19% del nivel estadounidense; hipotéticamente, sería el 34% al cerrar las brechas de insumos y el 57% al cerrar la brecha de productividad total de los factores. Los insumos son la relación capital-producto y el capital humano. Son escenarios contables separados, no estimaciones causales; no se presentan intervalos de incertidumbre. La productividad tiene mayor peso en esta descomposición."
   caption: ''
   focal_point: ""
   preview_only: false

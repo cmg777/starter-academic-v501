@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Crecen juntas las provincias? Para el crecimiento del PIB provincial de Indonesia, la I global de Moran pasa de +0,181 en 2015T1–2019T4 a −0,285 en 2015T1–2020T2, período que incluye el inicio de la COVID. El patrón cambió de asociación espacial positiva a negativa, con ponderaciones de distancia inversa. Ambos valores p reportados son 0,010; no se reportan intervalos de incertidumbre. Los períodos se superponen y la comparación no establece causalidad. Aginta, Miranti y Mendez (2021), tabla 2, página 45."
   caption: ''
   focal_point: ""
   preview_only: false

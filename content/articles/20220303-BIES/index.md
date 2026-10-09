@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Does catch-up happen alone? Neighbours matter. A qualitative association schematic for 514 Indonesian districts, 2010–2018, connects higher initial HDI and GDP per capita in neighbouring districts with faster growth of the corresponding local indicator. The equal-size boxes encode no effect magnitudes or uncertainty intervals, and the links make no causal claim. Based on author manuscript version 20210623, sections 4.2.5–5, corroborated by the published abstract."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -51,7 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  alt_text: "¿Es uniforme el cambio estructural en el espacio? En las regiones europeas durante 2003–2015, la participación de la manufactura en el empleo disminuye mientras su dependencia espacial aumenta. Los servicios intensivos en conocimiento muestran lo contrario: su participación en el empleo aumenta mientras su dependencia espacial disminuye. Este diagrama direccional resume la Figura 5 del manuscrito de los autores del 9 de diciembre de 2022 de Convergence clubs and spatial structural change in the European Union. Las flechas indican solo la dirección, no magnitudes ni significancia estadística. Trayectorias espaciales opuestas; tendencias descriptivas, no efectos causales."
+  alt_text: "¿Es espacialmente uniforme el cambio estructural? En las regiones europeas durante 2003–2015, la participación del empleo manufacturero disminuye mientras aumenta su dependencia espacial. Los servicios intensivos en conocimiento presentan el patrón opuesto: aumenta su participación en el empleo y disminuye su dependencia espacial. Este diagrama de direcciones resume la Figura 5 del manuscrito de los autores fechado el 9 de diciembre de 2022 de Convergence clubs and spatial structural change in the European Union. Las flechas indican únicamente la dirección, no magnitudes ni significación estadística. No. Tendencias opuestas. Los sectores se mueven en direcciones opuestas; el diagrama no afirma que sus niveles se alejen entre sí. Son tendencias descriptivas, no efectos causales."
   caption: ''
   focal_point: ""
   preview_only: false

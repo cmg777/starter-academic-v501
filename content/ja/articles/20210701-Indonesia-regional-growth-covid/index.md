@@ -46,6 +46,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "各州は一緒に成長しているのでしょうか。インドネシアの州別GDP成長率について、グローバル・モランのIは2015年第1四半期～2019年第4四半期の+0.181から、感染拡大初期を含む2015年第1四半期～2020年第2四半期の−0.285へ変化しました。距離の逆数を重みとする空間的関連は、正から負へ転じました。報告されたp値は両方とも0.010で、不確実性区間は報告されていません。期間は重複しており、因果関係を示す比較ではありません。Aginta、Miranti、Mendez（2021）、45ページの表2に基づきます。"
   caption: ''
   focal_point: ""
   preview_only: false

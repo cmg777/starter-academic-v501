@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Converge la productividad? Las 106 industrias de Japón forman dos comunidades de red. En seis transiciones de cuatro años, desde 2003–2007 hasta 2008–2012, la comunidad centrada en servicios tiene coeficientes beta de 0,012; 0; −0,022; −0,009; −0,026 y −0,027; solo el último es significativo al 5% (p=0,011). La comunidad centrada en alta tecnología tiene 0,046; 0,056; 0,019; 0,052; 0,022 y 0,012; el primero, segundo y cuarto son significativos (p=0,024; 0,003; 0,025). Una beta negativa indica convergencia. Los puntos llenos indican p<0,05 y los vacíos p≥0,05. No se reportan intervalos de confianza. Dos trayectorias contrastantes; son asociaciones, no efectos causales."
   caption: ''
   focal_point: ""
   preview_only: false

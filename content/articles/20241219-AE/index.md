@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Do nightlights show convergence? For Chinese provinces in 2000–2020, a qualitative comparison of per-capita measures shows declining regional inequality in GDP and the same broad decline in harmonized VIIRS luminosity. Harmonized DMSP does not sustain that pattern. Down arrows indicate direction only; the not-equal sign marks DMSP’s different pattern, without implying a uniformly rising or flat path. The sensor matters. This synthesis uses the 2023 author manuscript’s inequality section and figures, corroborated by the published abstract. It shows no magnitudes, fitted trajectories, statistical significance or causal effects."
   caption: ''
   focal_point: ""
   preview_only: false

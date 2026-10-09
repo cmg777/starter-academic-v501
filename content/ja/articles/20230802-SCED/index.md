@@ -51,7 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  alt_text: "構造変化は空間的に一様でしょうか。2003～2015年の欧州の地域では、製造業の雇用シェアが低下する一方で、その空間的依存性は高まっています。知識集約型サービスは逆で、雇用シェアが上昇する一方、空間的依存性は低下しています。この方向図は、Convergence clubs and spatial structural change in the European Union に関する著者らの2022年12月9日付の原稿の図5をまとめたものです。矢印は方向のみを示し、大きさや統計的有意性は示しません。空間的な経路は逆向きで、記述的な傾向であり、因果効果ではありません。"
+  alt_text: "構造変化は空間的に一様なのでしょうか。2003～2015年の欧州地域では、製造業の雇用比率が低下する一方、空間依存性が高まっています。知識集約型サービスでは逆に、雇用比率が上昇し、空間依存性が低下しています。この方向を示す図は、Convergence clubs and spatial structural change in the European Unionの2022年12月9日付著者原稿の図5を要約しています。矢印は変化の方向のみを示し、大きさや統計的有意性を示すものではありません。いいえ、変化の方向は対照的です。各部門は逆方向に変化していますが、この図は水準の差が拡大することを示すものではありません。これは記述的傾向であり、因果効果ではありません。"
   caption: ''
   focal_point: ""
   preview_only: false

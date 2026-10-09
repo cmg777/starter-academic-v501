@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "追いつく過程は地域単独で進むのでしょうか。近隣地域も関係しています。2010～2018年のインドネシアの514県・市について、近隣地域の初期の人間開発指数（HDI）や1人当たりGDPが高いことと、対応する自地域の指標の成長が速いことの関連を模式図で示しています。同じ大きさの枠は効果の大きさや不確実性の区間を表さず、線は因果関係を示しません。著者原稿の20210623版の4.2.5～5節に基づき、刊行版の要旨とも照合しています。"
   caption: ''
   focal_point: ""
   preview_only: false

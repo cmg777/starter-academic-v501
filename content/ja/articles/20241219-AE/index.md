@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "夜間光は地域間の収束を示すのでしょうか。中国の省を対象とした2000～2020年の1人当たり指標の定性的な比較では、GDPの地域格差は縮小し、調整済みVIIRS光量にも同じ大まかな縮小傾向が見られます。調整済みDMSPではこの傾向が持続しません。下向きの矢印は方向のみを表し、不等号はDMSPの異なる傾向を示します。DMSPが一貫して上昇または横ばいであることを意味しません。センサーの選択が重要です。2023年の著者原稿の格差分析と図に基づき、出版論文の要旨でも確認した定性的な要約です。数量、推定軌道、統計的有意性、因果効果は示していません。"
   caption: ''
   focal_point: ""
   preview_only: false

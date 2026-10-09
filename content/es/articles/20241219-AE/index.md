@@ -78,6 +78,7 @@ url_project: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿Las luces nocturnas muestran convergencia? Para las provincias chinas en 2000–2020, la comparación cualitativa de medidas per cápita muestra una disminución de la desigualdad regional del PIB y la misma tendencia general en la luminosidad VIIRS armonizada. DMSP armonizado no mantiene ese patrón. Las flechas indican solo la dirección; el signo de desigualdad señala el patrón distinto de DMSP, sin representar una trayectoria siempre ascendente ni plana. El sensor importa. La síntesis se basa en la sección y las figuras de desigualdad del manuscrito de los autores de 2023, corroboradas por el resumen del artículo publicado. No representa magnitudes, trayectorias estimadas, significación estadística ni efectos causales."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -47,6 +47,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "One route to regional convergence? Japan’s regional labor-productivity Gini changed by −14.4% in 1909–1925 and −19.5% in 1970–1990. Within-sector, structural-change and residual contributions were −18.1%, +4.7%, −1.0% in the first period, and +10.0%, −25.9%, −3.6% in the second. Negative values mean less inequality. Different engines: within-sector gains led the earlier convergence; structural change led the later convergence. Descriptive decomposition from Mendez’s 2020 author proof, Table 18.1; no uncertainty intervals reported."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "¿La convergencia ocurre de forma aislada? Los vecinos importan. Un esquema cualitativo para 514 distritos de Indonesia, 2010–2018, vincula niveles iniciales más altos del IDH y del PIB per cápita en los distritos vecinos con un crecimiento más rápido del indicador local correspondiente. Las cajas de igual tamaño no representan magnitudes ni intervalos de incertidumbre, y los vínculos no afirman causalidad. Fuente: manuscrito de los autores, versión 20210623, secciones 4.2.5–5, corroborado por el resumen publicado."
   caption: ''
   focal_point: ""
   preview_only: false

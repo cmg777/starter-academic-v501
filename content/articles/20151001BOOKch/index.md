@@ -42,6 +42,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "What closes the output gap? In a 2015 author proof, development accounting for the median sampled Latin American country in 2010 puts output per worker at 19% of the U.S. level, hypothetically 34% with the input gaps closed and 57% with the total factor productivity gap closed. The input gaps concern the capital-output ratio and human capital. These are separate accounting scenarios, not causal estimates; no uncertainty intervals are reported. Productivity matters more in this decomposition."
   caption: ''
   focal_point: ""
   preview_only: false

@@ -51,6 +51,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
+  alt_text: "Productivity converging? Japan’s 106 industries form two network communities. For six four-year transitions from 2003–2007 through 2008–2012, the services-centered community has beta estimates 0.012, 0, −0.022, −0.009, −0.026 and −0.027; only the last is significant at 5% (p=0.011). The high-tech-centered community has 0.046, 0.056, 0.019, 0.052, 0.022 and 0.012; the first, second and fourth are significant (p=0.024, 0.003, 0.025). Negative beta indicates catch-up. Filled dots mark p<0.05, open dots p≥0.05. Confidence intervals are not reported. Two contrasting paths; these are associations, not causal effects."
   caption: ''
   focal_point: ""
   preview_only: false
