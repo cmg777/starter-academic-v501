@@ -40,7 +40,7 @@ Academic portfolio website for Carlos Mendez (carlos-mendez.org): Hugo + Wowchem
 
 - **Naming:**
   - Articles: `content/articles/YYYYMMDD-abbreviation/index.md`.
-  - Presentations: `content/presentations/YYYYMMDD-abbreviation/index.md`.
+  - Presentations: `content/presentations/YYYYMMDDABBR/index.md` (event acronym, no hyphen; URL = folder lowercased unless `slug:` is set).
   - Tutorials: `content/tutorials/descriptive-slug/index.md`.
   - Books, Software, Data, WebApps: `content/{books,software,data,webapps}/<slug>/index.md`.
   - Authors: `content/authors/firstname-lastname/_index.md`.
@@ -96,6 +96,7 @@ EN at `/` (`content/`), ES at `/es/` (`content/es/`, neutral Latin American Span
 
 # Components and Recipes
 
+- **New items from files** ("here is the PDF of my new paper", "here are my slides"): skills `add-publication` and `add-presentation` build the trilingual entry, buttons, plain summary and CV line. Every other item type is in `.claude/docs/adding-content.md`.
 - **WebApps:** "Add web app: `<App URL>` — `<English title>`" → `.claude/docs/webapps.md` (bundle + ES/JA + `scripts/capture-dashboard-screenshots.cjs`).
 - **AI Podcast Player:** "Add AI Podcast to `<post slug>`" → `.claude/docs/ai-podcast-player.md`.
 - **Post resource buttons** (Slides PDF/HTML, tutorial `.zip`; relative vs absolute URL rules) → `.claude/docs/post-resource-buttons.md`.
@@ -119,7 +120,7 @@ Pipeline: script → results report → post → infographic → web app. Each s
 | Infographic / Web app (static D3) / Slides (Quarto reveal.js) | `write-infographic` / `write-app` / `write-slides` | `review-infographic` / `review-app` / `review-slides` |
 | Quarto notebook (R/Py/Stata; Python bundle) / Data dictionary | `write-quarto-notebook`, `write-quarto-notebook-python` / `write-data-dictionary` | — |
 
-- **Standalone skills:** `translate-content`, `update-author-profile`, `update-cv`, `write-paper-infographic` (paper infographic brief), `draw-sketchy-diagram`.
+- **Standalone skills:** `add-publication` (paper PDF → entry), `add-presentation` (slides → entry), `translate-content`, `update-author-profile`, `update-cv`, `write-paper-infographic` (paper infographic brief), `draw-sketchy-diagram`.
 - **Reference posts:**
   - Python: `python_ml_random_forest`, `python_dowhy`, `python_fwl` (dark figures, learning components, lab), `python_pyfixest`, `python_esda2`, `python_mgwr`.
   - Stata: `stata_rct`.

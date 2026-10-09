@@ -11,3 +11,4 @@ Agent-facing operational recipes that `CLAUDE.md` points to but does not inline,
 - [post-resource-buttons.md](post-resource-buttons.md) — Slides (PDF) / Slides (HTML) `links:` buttons + tutorial `.zip` bundle convention.
 - [ahaslides.md](ahaslides.md) — "Make an AhaSlides deck for `<post>`" recipe: render the Quarto deck to PDF, import it as full-bleed slide images, add native interactive slides via the MCP.
 - [i18n.md](i18n.md) — detailed trilingual (ES/JA) mechanics, per-section field rules, geolocation, and the "add another language" recipe.
+- [adding-content.md](adding-content.md) — intake guide: what the user hands over (paper PDF, slides, app URL, package, data portal) → which skill or recipe → what a finished trilingual entry contains; software and data recipes.

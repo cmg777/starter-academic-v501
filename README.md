@@ -114,13 +114,19 @@ Style: Spanish is neutral Latin American with formal *usted*; Japanese uses で�
 
 ## Adding content
 
-Every new item needs its ES and JA copies (see above). Copy the front matter of an existing item in the same folder as a starting point.
+Every new item needs its ES and JA copies (see above). The quickest route is to hand Claude Code the source file:
+
+- **New paper:** "Add this publication: `<path/to/paper.pdf>`" (skill `add-publication`). Claude reads the PDF, checks Crossref, and proposes the folder, buttons, plain-language summary, homepage placement and CV line for your approval. It then writes the EN/ES/JA entries, `cite.bib` and the CV, and builds and verifies the site.
+- **New talk:** "Add this presentation: `<slides.pdf or link>`" (skill `add-presentation`). This adds a Slides button or embedded deck, a cover from the first slide, the ES/JA entries and the CV line.
+- **Anything else:** see [`.claude/docs/adding-content.md`](.claude/docs/adding-content.md).
+
+To do it by hand, copy the front matter of an existing item in the same folder as a starting point.
 
 | To add… | Do this |
 |---|---|
-| **Article** | `content/articles/YYYYMMDD-abbreviation/index.md` with title, authors, date, `publication_types`, publication, abstract (one line), tags, DOI/links, plus a 16:9 `featured.*` (and `cite.bib`). Publication types: 1 conference paper, 2 journal article, 3 preprint, 4 report, 6 book chapter, 7 thesis. Books (type 5) go in `content/books/`. The 3 newest papers of types 1–3 appear on the homepage automatically. |
+| **Article** | `content/articles/YYYYMMDD-abbreviation/index.md` with title, authors, date, `publication_types`, publication, abstract (one line), tags, DOI/links, plus a 16:9 `featured.*` (and `cite.bib`). Publication types: 1 conference paper, 2 journal article, 3 preprint, 4 report, 6 book chapter, 7 thesis. Books (type 5) go in `content/books/`. On the homepage, papers marked `featured: true` fill the 3 slots first, and the newest of the other type 1–3 papers fill any free slots. |
 | **Book** | `content/books/<slug>/index.md` with `book_format: print` or `online` (a published book can keep `type: publication` and its citation fields). |
-| **Presentation** | `content/presentations/YYYYMMDD-abbreviation/index.md`. `date:` is the talk date (future dates are fine); keep `publishDate` at today or earlier. |
+| **Presentation** | `content/presentations/YYYYMMDDABBR/index.md` (e.g. `20260827ISEE`). `date:` is the talk date (future dates are fine); keep `publishDate` at today or earlier. |
 | **Software package** | `content/software/<slug>/index.md` + `featured.*`. The homepage Software block shows the 3 most recently *committed* packages, so committing an update moves a package to the front. |
 | **Data resource** | `content/data/<slug>/index.md` with `data_type: repository` or `portal` and `region`. |
 | **Web app** | `content/webapps/<slug>/index.md` (`app_url`, `platform`, `region`, `topic`, `_build: {render: never, list: always}`), then add the slug to `APPS` in `scripts/capture-dashboard-screenshots.cjs` and run `node scripts/capture-dashboard-screenshots.cjs --slug <slug>` for the card image. Recipe: [`.claude/docs/webapps.md`](.claude/docs/webapps.md). Tutorial apps (`content/tutorials/<slug>/web_app/index.html`) need no entry. |
@@ -183,7 +189,7 @@ node scripts/audit-nav.cjs                    # menu + horizontal overflow at 36
 
 ## Claude Code skills
 
-There are 20 skills in `.claude/skills/<name>/SKILL.md` (older ones in `.claude/skills/legacy/`). They compose into a pipeline: **script → results report → blog post → infographic → web app / slides**. Each skill confirms the scope first, then does the work, then offers follow-ups.
+There are 22 skills in `.claude/skills/<name>/SKILL.md` (older ones in `.claude/skills/legacy/`). They compose into a pipeline: **script → results report → blog post → infographic → web app / slides**. Each skill confirms the scope first, then does the work, then offers follow-ups.
 
 | Stage | Write | Review (read-only) |
 |---|---|---|
@@ -198,6 +204,8 @@ There are 20 skills in `.claude/skills/<name>/SKILL.md` (older ones in `.claude/
 | Data dictionary (HTML + Stata pipeline) | `/project:write-data-dictionary <slug>` | — |
 
 Standalone skills:
+- `add-publication`: a paper PDF becomes a full trilingual article entry with its CV line.
+- `add-presentation`: slides become a full trilingual talk entry with its CV line.
 - `translate-content`: ES/JA translation.
 - `update-author-profile`: trilingual author profiles.
 - `update-cv`: CV sync.
