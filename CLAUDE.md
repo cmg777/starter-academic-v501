@@ -55,7 +55,7 @@ Academic portfolio website for Carlos Mendez (carlos-mendez.org): Hugo + Wowchem
 - **Catalog sections:** listed by `layouts/section/<name>.html` through `partials/catalog.html`. Dropdowns come from `filters:` (plus an optional `year_filter`) in each section `_index.md`, and **a new filter value needs its option in all three `_index.md` files**.
   - Books: `book_format: print|online`; former type-5 publications keep `type: publication`. Book chapters (type 6) stay in Articles.
   - Data: `data_type: repository|portal`, `region`.
-  - WebApps: `app_url`, `platform: gee|streamlit`, `region`, `topic` (an id from `data/tutorial_topics.yaml`), `_build: {render: never, list: always}` (the card opens the app). GEE source URLs go only in a front-matter comment, never as a public link. Recipe: `.claude/docs/webapps.md`.
+  - WebApps: `app_url`, `platform: gee|streamlit`, `region`, `topic` (an id from `data/tutorial_topics.yaml`), `_build: {render: never, list: always}` (the card opens the app). App card text (the bundle `summary`, or the tutorial `summary` for tutorial apps) is plain language: at most three sentences, no acronyms, platform named. GEE source URLs go only in a front-matter comment, never as a public link. Recipe: `.claude/docs/webapps.md`.
 - **Style:**
   - No emojis in front matter or config.
   - Abstracts are single-line YAML strings.
