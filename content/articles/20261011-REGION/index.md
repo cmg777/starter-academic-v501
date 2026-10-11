@@ -21,10 +21,6 @@ tags:
 - India
 featured: true
 links:
-- name: "Slides (PDF)"
-  url: "https://carlos-mendez.org/articles/20261011-region/slides.pdf"
-  icon_pack: fas
-  icon: file-pdf
 - name: "Published article (Open Access)"
   url: "https://doi.org/10.18335/region.v13i2.676"
   icon_pack: fas
