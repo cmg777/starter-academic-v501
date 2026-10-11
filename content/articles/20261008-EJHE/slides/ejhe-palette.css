@@ -1,0 +1,64 @@
+.reveal-viewport { background: #050a12; }
+.reveal { color: #edf2f6; }
+.reveal .slides section h2 { border-bottom-color: #e9c184; }
+.reveal .slides section h3 { border-bottom-color: #88b9de; }
+.reveal h1, .reveal h2, .reveal h3 { color: #edf2f6; }
+.reveal a, .reveal strong { color: #88b9de; }
+.reveal a:hover, .reveal .key, .reveal .objection { color: #e9c184; }
+.reveal .rebuttal { color: #88b9de; }
+.reveal .takeaway { background: rgba(233,193,132,.10); border-left-color: #e9c184; box-shadow: none; color: #edf2f6; }
+.reveal .comment, .reveal .figure-caption, .reveal figcaption { color: #9baaba; }
+.reveal #title-slide .title::after { background: #e9c184; }
+.reveal #title-slide .title { font-size: 1.9em; }
+.reveal #title-slide .subtitle { font-size: .95em; color: #edf2f6; max-width: 32em; margin: .4em auto; }
+.reveal #title-slide .author { font-size: .84em; }
+.reveal .title-result-strip .kr:nth-of-type(1) .kr-num { color: #e9c184; }
+.reveal .title-result-strip .kr:nth-of-type(2) .kr-num { color: #88b9de; }
+.reveal .title-result-strip .kr:nth-of-type(3) .kr-num { color: #edf2f6; }
+.reveal .title-result-strip .kr-num { font-size: 1.55em; }
+.reveal .title-result-strip .kr-cap { font-size: .46em; color: #9baaba; }
+.reveal table { font-size: .83em; }
+.reveal table thead th { border-bottom-color: #88b9de; }
+.reveal .controls, .reveal .progress { color: #e9c184; }
+.reveal .slide-number { font-size: 16px; background: #0a121d; color: #edf2f6; }
+.reveal .footer { font-size: 15px; color: #9baaba; }
+.reveal .big-line { display:block; margin: 1em 0; color:#e9c184; font-size:1.2em; font-weight:600; }
+.reveal section.divider h1 { font-size:1.7em; text-wrap:balance; }
+.reveal section.divider .act { color:#e9c184; letter-spacing:.18em; }
+.reveal .slides section img { object-fit:contain; }
+.reveal .slide-menu-button a { color:#88b9de; }
+
+/* Readable phone scroll view: retain the deck while allowing text to reflow. */
+@media screen and (max-width: 600px) {
+  .reveal-scroll .reveal { font-size: 20px; }
+  .reveal-scroll .reveal .scroll-page { height: auto !important; min-height: 100svh; padding: 0 !important; }
+  .reveal-scroll .reveal .scroll-page-sticky { position: relative !important; height: auto !important; min-height: 100svh; }
+  .reveal-scroll .reveal .scroll-page-content { position: relative !important; overflow: visible; height: auto !important; min-height: 100svh; display: flex !important; align-items: center; }
+  .reveal-scroll .reveal .scroll-page-content > section {
+    position: relative !important; top: auto !important; left: auto !important;
+    transform: none !important; width: calc(100% - 40px) !important;
+    box-sizing: border-box; margin: 0 20px !important; padding: 55px 0 75px !important;
+    height: auto !important; max-height: none !important; font-size: 20px;
+  }
+  .reveal-scroll .reveal .slides section h2 { font-size: 1.35em; line-height: 1.15; }
+  .reveal-scroll .reveal section.divider h1 { font-size: 1.7em; }
+  .reveal-scroll .reveal .fragment { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .reveal-scroll .reveal .columns { display: block; }
+  .reveal-scroll .reveal .column { width: 100% !important; }
+  .reveal-scroll .reveal .takeaway { width: auto; max-width: none; font-size: .9em; }
+  .reveal-scroll .reveal table { font-size: .72em; width: 100%; }
+  .reveal-scroll .reveal table th, .reveal-scroll .reveal table td { padding: .3em .2em; }
+  .reveal-scroll .reveal .math.display { display: block; overflow-x: auto; overflow-y: hidden; font-size: .8em; }
+  .reveal-scroll .reveal figure { margin: .8em 0; }
+  .reveal-scroll .reveal figure > p { overflow-x: auto; scrollbar-color: #88b9de #0a121d; }
+  .reveal-scroll .reveal figure img { width: 680px; max-width: none; height: auto; max-height: none; }
+  .reveal-scroll .reveal figcaption { font-size: .7em; }
+  .reveal-scroll .reveal figcaption::after { content: "Swipe graphic horizontally →"; display: block; color: #e9c184; margin-top: .4em; }
+  .reveal-scroll .reveal .comment { font-size: .7em; }
+  .reveal-scroll .reveal #title-slide .title { font-size: 1.8em; }
+  .reveal-scroll .reveal #title-slide .subtitle { font-size: 1em; }
+  .reveal-scroll .reveal .title-result-strip { flex-wrap: wrap; gap: 1.2em; }
+  .reveal-scroll .reveal .title-result-strip .kr-num { font-size: 1.6em; }
+  .reveal-scroll .reveal .title-result-strip .kr-cap { font-size: .6em; }
+  .reveal-scroll .reveal .footer { font-size: 11px; left: 70px; width: calc(100% - 90px); bottom: 15px; }
+}
