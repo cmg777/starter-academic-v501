@@ -21,51 +21,27 @@ tags:
 - India
 featured: true
 links:
+- name: "Slides (PDF)"
+  url: "https://carlos-mendez.org/articles/20261011-region/slides.pdf"
+  icon_pack: fas
+  icon: file-pdf
 - name: "Published article (Open Access)"
   url: "https://doi.org/10.18335/region.v13i2.676"
   icon_pack: fas
   icon: university
-- name: "Learn by Coding"
-  url: "https://quarcs-lab.github.io/project2025s-py/"
-  icon_pack: fas
-  icon: laptop-code
 - name: "Interactive luminosity map"
   url: "https://carlos-mendez.projects.earthengine.app/view/rc-dmsp-ntl"
   icon_pack: fas
   icon: globe
-- name: "Online article"
+- name: "Online article & notebooks"
   url: "https://quarcs-lab.github.io/project2025s-py/index-preview.html"
   icon_pack: fas
   icon: book-open
-- name: "N1: View from outer space"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c01_view_from_space-preview.html"
-  icon_pack: fas
-  icon: laptop-code
-- name: "N2: Regional convergence"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c02_regional_convergence_sc-preview.html"
-  icon_pack: fas
-  icon: laptop-code
-- name: "N3: Spatial dependence"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c03_spatial_dependence_lisa-preview.html"
-  icon_pack: fas
-  icon: laptop-code
-- name: "N4: Spillover modeling"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c04_spillover_modeling_6nn-preview.html"
-  icon_pack: fas
-  icon: laptop-code
-- name: "N5: Robustness"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c07_alternative_w_matrices-preview.html"
-  icon_pack: fas
-  icon: laptop-code
-- name: "N6: Spatial culture"
-  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c06_spatial_culture-preview.html"
-  icon_pack: fas
-  icon: laptop-code
 url_pdf: "https://openjournals.wu.ac.at/ojs/index.php/region/article/download/676/542"
 url_code: "https://github.com/quarcs-lab/project2025s-py"
 url_dataset: ""
 url_preprint: ""
-url_slides: ""
+url_slides: "https://carlos-mendez.org/articles/20261011-region/slides/index.html"
 url_video: ""
 url_poster: ""
 url_project: ""
