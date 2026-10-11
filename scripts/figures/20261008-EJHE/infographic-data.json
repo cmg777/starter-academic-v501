@@ -1,0 +1,18 @@
+{
+  "doi": "10.1007/s10198-026-01998-1",
+  "source_version": "Version of record, published 2026-10-08",
+  "source_table": "Table 2, PDF page 5, columns 1 and 2",
+  "outcome": "Age-standardized adult obesity prevalence, percent",
+  "countries": 84,
+  "period": [2000, 2020],
+  "observations": 1195,
+  "gdp_per_capita_range": [620.560, 84611.100],
+  "range_source": "Table 7, PDF page 13; GDP per capita minimum and maximum, constant 2015 USD",
+  "reference_income": 10000,
+  "transformation": "sum b_i * (ln(GDPpc)^i - ln(10000)^i), i = 1,2,3. Constant centering only; no changes to derivatives or turning points.",
+  "uncertainty": "Posterior means only. A band cannot be reconstructed from marginal standard deviations without the joint posterior or coefficient covariance.",
+  "models": [
+    {"label": "Fixed prior (UIP)", "coefficients": [-189.358, 21.620, -0.804], "pip": [1, 1, 1]},
+    {"label": "Robust prior", "coefficients": [-187.464, 21.405, -0.796], "pip": [1, 1, 1]}
+  ]
+}
