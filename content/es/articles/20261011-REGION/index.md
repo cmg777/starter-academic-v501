@@ -33,6 +33,34 @@ links:
   url: "https://carlos-mendez.projects.earthengine.app/view/rc-dmsp-ntl"
   icon_pack: fas
   icon: globe
+- name: "Artículo en línea"
+  url: "https://quarcs-lab.github.io/project2025s-py/index-preview.html"
+  icon_pack: fas
+  icon: book-open
+- name: "N1: Vista desde el espacio"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c01_view_from_space-preview.html"
+  icon_pack: fas
+  icon: laptop-code
+- name: "N2: Convergencia regional"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c02_regional_convergence_sc-preview.html"
+  icon_pack: fas
+  icon: laptop-code
+- name: "N3: Dependencia espacial"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c03_spatial_dependence_lisa-preview.html"
+  icon_pack: fas
+  icon: laptop-code
+- name: "N4: Modelación de desbordamientos"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c04_spillover_modeling_6nn-preview.html"
+  icon_pack: fas
+  icon: laptop-code
+- name: "N5: Robustez"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c07_alternative_w_matrices-preview.html"
+  icon_pack: fas
+  icon: laptop-code
+- name: "N6: Cultura espacial"
+  url: "https://quarcs-lab.github.io/project2025s-py/notebooks/c06_spatial_culture-preview.html"
+  icon_pack: fas
+  icon: laptop-code
 url_pdf: "https://openjournals.wu.ac.at/ojs/index.php/region/article/download/676/542"
 url_code: "https://github.com/quarcs-lab/project2025s-py"
 url_dataset: ""

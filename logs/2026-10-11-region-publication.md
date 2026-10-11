@@ -35,3 +35,9 @@ Scope: the newly published paper by Carlos Mendez, Sujana Kabiraj and Jiaqi Li; 
 - Library preview saved as `REGION-2026-India-convergence-infographic.png` (`libfile_7bc78b0aa1588191ab6eead9d294b44c`), native image, 1920×1080, 479,722 bytes.
 
 Build outputs, downloaded sources, browser screenshots, verification script and machine-readable receipts remain in the task workspace rather than the website repository. Commit and exact-commit deployment receipts are delivered in the task response after publication.
+
+## Homepage resource refinement
+
+At Carlos's request, added seven resource buttons to each locale's existing article front matter: the exact Online article URL (`index-preview.html`) and six separate, descriptively labeled N1–N6 notebooks in the paper's learning order. The homepage and article header use the existing resource-button templates. Journal, DOI, PDF, repository, and map links remain available. No template, styling, CV, slide, or NotebookLM asset was changed.
+
+Validation: pinned production build passed; i18n parity reports zero missing, stale, or asset warnings; all seven destination URLs occur on each generated homepage. Browser checks at 360 and 1440 CSS pixels confirm seven distinct links and no horizontal overflow in EN/ES/JA. Mobile buttons wrap within the existing style. The exact online article destination returned HTTP 200 and its title matches the published paper. Six notebook destinations were verified against the publisher's learning sequence and the earlier source inspection.
