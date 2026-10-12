@@ -1,0 +1,17 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	Gini	Gini	Gini
+				
+log_GDPpc	Ln GDPpc	-0.003	0.056**	0.293***
+		(0.003)	(0.023)	(0.078)
+log_GDPpc2	Ln GDPpc2		-0.003***	-0.032***
+			(0.001)	(0.009)
+log_GDPpc3	Ln GDPpc3			0.001***
+				(0.000)
+Constant	Constant	0.095***	-0.150	-0.799***
+		(0.025)	(0.099)	(0.225)
+				
+Observations		880	880	880
+R-squared		0.126	0.201	0.244
+Number of iso_code_n		180	180	180
+Country FE		YES	YES	YES
+Year FE		YES	YES	YES

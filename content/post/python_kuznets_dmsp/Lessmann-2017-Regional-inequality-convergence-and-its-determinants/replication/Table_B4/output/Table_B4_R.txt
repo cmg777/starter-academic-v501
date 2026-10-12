@@ -1,0 +1,9 @@
+Table B.4 (R) - Conley spatial-HAC robustness of lights -> GDP
+
+log_Light_ppix_Region point estimate: 0.190
+N (estimation sample): 5216
+
+Conley spatial-HAC standard errors (Bartlett kernel):
+  r:1000 km : SE = 0.026
+  r:2500 km : SE = 0.034
+  r:5000 km : SE = 0.037

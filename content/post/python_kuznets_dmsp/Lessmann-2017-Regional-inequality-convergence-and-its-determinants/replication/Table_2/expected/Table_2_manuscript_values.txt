@@ -1,0 +1,19 @@
+Table 2 (Lessmann & Seidel 2017, manuscript p.117)
+Correlation between observed, predicted, and light-weighted inequality measures,
+cross-section mean of the period 2001-2012.  # Countries = 78.
+
+Inequality measure | corr. with PREDICTED income | corr. with LIGHT density
+-------------------+-----------------------------+-------------------------
+GINIW (Gini)       |            0.50             |          0.21
+GEW(-1)            |            0.40             |          0.11
+MLDW  = GE(0)      |            0.45             |          0.21
+THEILW = GE(1)     |            0.50             |          0.30
+CVW                |            0.52             |          0.29
+
+There is no committed Stata text output for Table 2 (the original only displayed
+the pwcorr matrices on screen). These manuscript values are the comparison
+target. Running Table_2.do writes the five pwcorr matrices to
+output/Table_2.txt; the predicted-vs-observed and light-vs-observed off-diagonal
+entries should match the columns above. The R and Python cross-checks reproduce
+all five measures (Gini, GE(-1), MLD, Theil, CV) to the manuscript values --
+see ../_verification/VERIFICATION_REPORT.md.

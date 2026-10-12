@@ -1,0 +1,9 @@
+variable,label,stata_type
+Country_ISO,Country code ISO 3166-1,string
+year,Year,numeric
+pred_GDP_pc_Region,,numeric
+GDP_pc_Region,"GDP per capita Region, PPP (constant 2005 US$)",numeric
+Light_Region,Regional total lights,numeric
+Light_Country,Country total light,numeric
+Pop_Region,Regional total population,numeric
+Pop_Country,Country total population,numeric

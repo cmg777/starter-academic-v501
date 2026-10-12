@@ -1,0 +1,304 @@
+---
+title: "Explore Regions Data"
+subtitle: "Subtitle"
+author: "Author"
+output: 
+  html_notebook:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 4
+    number_sections: true
+    code_folding: "hide"
+    theme: "cosmo"
+    highlight: "monochrome"
+    df_print: "kable"
+  github_document: default
+---
+
+<style>
+
+h1.title { 
+  font-size: 18pt; 
+  color: DarkBlue; 
+} 
+
+body, h1, h2, h3, h4 {
+    font-family: "Palatino", serif;
+}
+
+body {
+    font-size: 12pt;
+}
+
+/* Headers */
+h1,h2,h3,h4,h5,h6{
+  font-size: 14pt;
+  color: #00008B;
+}
+
+body {
+    color: #333333;
+}
+a, a:hover {
+    color: #8B3A62;
+}
+pre {
+    font-size: 12px;
+}
+</style>
+
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(htmlwidgets)   # interactive documents
+library(leaflet)       # interactive maps
+library(dygraphs)      # interactive time series
+library(plotly)        # interactive figures
+library(WVPlots)       # Common Plots for Analysis
+library(DT)            # interative tables
+library(kableExtra)    # html tables 
+library(pdfCluster)    # density based clusters
+library(hdrcde)        # conditional density estimation 
+library(easyalluvial)   # intradistribution dynamics 
+library(markovchain)   # discrete time markov chains
+library(diagram)       # drawing markov chains
+library(ConvergenceClubs) # convergence clubs
+library(REAT)          # regional and economic analysis toolbox
+library(ExPanDaR)      # basic panel data analysis
+library(panelView)     # Visualizing Panel Data
+library(ggpubr)        # ggplot2 Based Publication Ready Plots
+library(ggforce)       # Accelerating 'ggplot2'
+library(descriptr)     # Generate descriptive statistics
+library(summarytools)  # tools to neatly and quickly summarize data  
+library(basetheme)
+basetheme("minimal")
+library(ggforce)
+library(ggrepel)
+library(haven)
+library(gglabeller)
+library(pwt9)
+library(tmap)
+library(tmaptools)
+library(sf)
+
+# Change the presentation of decimal numbers to 4 and avoid scientific notation
+options(prompt="R> ", digits=2, scipen=999)
+```
+
+
+
+# References
+
+
+# Import and transform
+
+## Regional inequality data
+
+```{r}
+regions<- read_dta("regions-data.dta")
+head(regions)
+```
+
+```{r}
+summary(regions) # Can we redo this by year?
+```
+
+
+- It is a unbalanced plong panel format covering years 1992-2012
+- In the year 2012, there are 3,124 regions
+- In the year 2002, there are 3,136 regions
+- In the year 1992, there are 2,969 regions
+
+- The authors claim that their final dataset is based on 180 countries and 3166 regions 
+- From the shape file, the GADM data has 3610 observation at level 1
+
+
+```{r}
+ine<- read_dta("Data/Main_Data.dta") %>% 
+  mutate(iso_a3 = Country_ISO) # useful for merging datasets
+head(ine)
+```
+
+
+```{r}
+ine1992 <- ine %>% 
+  filter(year == 1992)
+ine1992
+```
+
+
+
+```{r}
+ine2012 <- ine %>% 
+  filter(year == 2012)
+ine2012
+```
+
+
+```{r}
+ine1992_2012 <- ine %>% 
+  group_by(iso_a3) %>% 
+  summarise(mean_gini =mean(GINIW_pred_GDP_pc))
+ine1992_2012
+```
+
+
+```{r}
+ine1992_2001 <- ine %>% 
+  filter(year < 2002) %>% 
+  group_by(iso_a3) %>% 
+  summarise(mean_gini_1992_2001 =mean(GINIW_pred_GDP_pc))
+ine1992_2001
+```
+
+
+```{r}
+ine2002_2012 <- ine %>% 
+  filter(year > 2001) %>% 
+  group_by(iso_a3) %>% 
+  summarise(mean_gini_2002_2012 =mean(GINIW_pred_GDP_pc))
+ine2002_2012
+```
+
+
+```{r}
+convergence <- inner_join(ine1992_2001, ine2002_2012, by = "iso_a3" ) %>% 
+  mutate(gini_difference = mean_gini_1992_2001 - mean_gini_2002_2012 ) # So, a + sings means convergence
+convergence 
+```
+ 
+ 
+
+
+
+## SF (Shapefile) of the world
+
+```{r}
+data(World) # from the tmap package
+map <- World
+map
+```
+
+
+# Merge datasets
+
+```{r}
+map_and_ine1992 <- inner_join(map, ine1992, by = "iso_a3")
+map_and_ine2012 <- inner_join(map, ine2012, by = "iso_a3")
+map_and_ine1992_2012 <- inner_join(map, ine1992_2012, by = "iso_a3")
+map_and_convergence <- inner_join(map, convergence, by = "iso_a3")
+```
+
+
+# Regional inequality
+
+From the paper
+
+![](Figures/Figure_2.jpg)
+
+- The figure shows the population-weighted gini coeffient for the  period 1992-2012. This is a multiyear average
+- Darker colors represent higher levels of inequality
+
+
+```{r}
+summary(map_and_ine1992_2012$mean_gini)
+```
+
+
+```{r}
+tm_shape(map_and_ine1992_2012) +
+  tm_polygons("mean_gini",
+              breaks = c(0.011, 0.037, 0.62, 0.85, 0.148),   # ERROR: These breaks are not working
+              title = "Regional Gini \n 1992-2012",
+              style = "pretty",   
+              palette = "Reds", 
+              id = "name", 
+              popup.var= TRUE,
+              colorNA = NULL) +
+  tm_text("iso_a3", 
+          size = "AREA") +
+  tm_layout(frame = FALSE)
+```
+
+
+
+```{r}
+summary(map_and_ine1992$GINIW_pred_GDP_pc)
+```
+
+
+
+```{r}
+tm_shape(map_and_ine1992) +
+  tm_polygons("GINIW_pred_GDP_pc",
+              breaks = c(-Inf, 0.003, 0.037, 0.62, 0.85, 0.148, Inf),   # ERROR: These breaks are not working
+              title = "Regional Gini 1992",
+              style = "pretty",   
+              palette = "Reds", 
+              id = "name", 
+              popup.var= TRUE,
+              colorNA = NULL) +
+  tm_text("iso_a3", 
+          size = "AREA") +
+  tm_layout(frame = FALSE)
+```
+
+
+```{r}
+tm_shape(map_and_ine2012) +
+  tm_polygons("GINIW_pred_GDP_pc",
+              breaks = fromThePaper,   # ERROR: These breaks are not working
+              title = "Regional Gini 2012",
+              style = "pretty",   
+              palette = "Reds", 
+              id = "name", 
+              popup.var= TRUE,
+              colorNA = NULL) +
+  tm_text("iso_a3", 
+          size = "AREA") +
+  tm_layout(frame = FALSE)
+```
+
+
+# Regional convergence
+
+
+- Countries displayed in green experienced convergence and countries displayed in red experienced an increase in inequality. The darker the color, the larger the change.
+
+- At least one-quarter of the countries experience divergence
+
+
+![](Figures/Figure_3.jpg)
+
+
+```{r}
+#fromThePaper <- c(0.003, 0.037, 0.62, 0.85, 0.148)
+
+tm_shape(map_and_convergence) +
+  tm_polygons("gini_difference",
+              title = "Convergence \n 1992-2012",
+              style = "pretty",   
+              palette = "RdYlGn", 
+              id = "name", 
+              popup.var= TRUE,
+              colorNA = NULL) +
+  tm_text("iso_a3", 
+          size = "AREA") +
+  tm_layout(frame = FALSE)
+```
+
+
+
+END
+
+```{r}
+Sys.info()
+```
+

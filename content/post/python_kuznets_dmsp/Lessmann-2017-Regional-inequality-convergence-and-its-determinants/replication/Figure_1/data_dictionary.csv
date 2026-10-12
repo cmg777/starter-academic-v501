@@ -1,0 +1,6 @@
+variable,label,stata_type
+Region_ISO,Regions code,string
+year,Year,numeric
+ssa,Sub-Saharan Africa,numeric
+pred_GDP_pc_Region,,numeric
+pred_GDP_pc_Country,,numeric

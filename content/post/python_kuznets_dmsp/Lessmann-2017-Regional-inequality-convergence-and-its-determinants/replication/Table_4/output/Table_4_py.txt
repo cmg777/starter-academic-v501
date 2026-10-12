@@ -1,0 +1,43 @@
+Table 4 (Python / linearmodels PanelOLS) - regional inequality with controls
+5 reproducible columns = published columns 1, 2, 3, 5, 6.
+Published column 4 (icrg_bureaucratic_qualitiy) is NOT reproducible - skipped.
+
+=== (1) resources + farming ===
+log_GDP_pc_Country              0.349769
+log_GDP_pc_Country_2           -0.038003
+log_GDP_pc_Country_3            0.001327
+Resources_rents_share_of_GDP    0.018289
+Arable_land                    -0.052873
+N=857
+
+=== (2) openness ===
+log_GDP_pc_Country      0.205396
+log_GDP_pc_Country_2   -0.022212
+log_GDP_pc_Country_3    0.000766
+Trade_GDP_share         0.005085
+FDI_share_of_GDP        0.009407
+N=817
+
+=== (3) geography + transport ===
+log_GDP_pc_Country       0.171090
+log_GDP_pc_Country_2    -0.018642
+log_GDP_pc_Country_3     0.000655
+price_gasoline           0.000575
+Area_X_price_gasoline    0.006005
+N=676
+
+=== (4=pub5) aid + schooling ===
+log_GDP_pc_Country             0.226367
+log_GDP_pc_Country_2          -0.023223
+log_GDP_pc_Country_3           0.000745
+aid_GDP                        0.015243
+School_enrollment_secondary   -0.014065
+N=591
+
+=== (5=pub6) ethnic inequality ===
+log_GDP_pc_Country      0.149243
+log_GDP_pc_Country_2   -0.015263
+log_GDP_pc_Country_3    0.000497
+GINIW_Eth_light         0.070898
+N=845
+

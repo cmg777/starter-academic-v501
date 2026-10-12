@@ -1,0 +1,77 @@
+file,variable,label,stata_type
+Prediction_Data.csv,Region_NAME,Region name,string
+Prediction_Data.csv,Country_NAME,Country name,string
+Prediction_Data.csv,Country_ISO,Country code ISO 3166-1,string
+Prediction_Data.csv,id_t_j,Code country year,string
+Prediction_Data.csv,code_Coutry_Region,Code region coutry,numeric
+Prediction_Data.csv,year,Year,numeric
+Prediction_Data.csv,Pop_Region,Regional total population,numeric
+Prediction_Data.csv,Pop_Country,Country total population,numeric
+Prediction_Data.csv,GDP_pc_Region,"GDP per capita Region, PPP (constant 2005 US$)",numeric
+Prediction_Data.csv,log_GDP_pc_Region,log GDP per capita region,numeric
+Prediction_Data.csv,log_Light_ppix_Region,log Average nighttime light per pixel region,numeric
+Prediction_Data.csv,log_GDP_pc_Country,log GDP per capita country,numeric
+Prediction_Data.csv,log_N_pix_top_cod_1_ppix,log number of top-coded pixels,numeric
+Prediction_Data.csv,log_N_pix_low_cod_1_ppix,log number of low-coded pixels,numeric
+Prediction_Data.csv,log_area,log area,numeric
+Prediction_Data.csv,log_region,log Number of subnational regions of a country,numeric
+Prediction_Data.csv,log_region_X_log_area,,numeric
+Prediction_Data.csv,eap,East Asia and the Pacific,numeric
+Prediction_Data.csv,eca,Europe and Central Asia,numeric
+Prediction_Data.csv,lac,Latin America and the Caribbean,numeric
+Prediction_Data.csv,mena,Middle East and North Africa,numeric
+Prediction_Data.csv,sa,South Asia,numeric
+Prediction_Data.csv,ssa,Sub-Saharan Africa,numeric
+Prediction_Data.csv,satyear_1,,numeric
+Prediction_Data.csv,satyear_2,,numeric
+Prediction_Data.csv,satyear_3,,numeric
+Prediction_Data.csv,satyear_4,,numeric
+Prediction_Data.csv,satyear_5,,numeric
+Prediction_Data.csv,satyear_6,,numeric
+Prediction_Data.csv,satyear_7,,numeric
+Regional_Data_SL.csv,Country_ISO,Country code ISO 3166-1,string
+Regional_Data_SL.csv,Country_NAME,Country name,string
+Regional_Data_SL.csv,Region_ISO,Regions code,string
+Regional_Data_SL.csv,year,Year,numeric
+Regional_Data_SL.csv,Pop_Region,Regional total population,numeric
+Regional_Data_SL.csv,id_t_j,Code country year,string
+Regional_Data_SL.csv,n_Region,Number of subnational regions of a country,numeric
+Regional_Data_SL.csv,Pop_Country,Country total population,numeric
+Regional_Data_SL.csv,Pix_Country,Area of a country measured by the number of pixel,numeric
+Regional_Data_SL.csv,eap,East Asia and the Pacific,numeric
+Regional_Data_SL.csv,eca,Europe and Central Asia,numeric
+Regional_Data_SL.csv,lac,Latin America and the Caribbean,numeric
+Regional_Data_SL.csv,mena,Middle East and North Africa,numeric
+Regional_Data_SL.csv,na,North America,numeric
+Regional_Data_SL.csv,sa,South Asia,numeric
+Regional_Data_SL.csv,ssa,Sub-Saharan Africa,numeric
+Regional_Data_SL.csv,satyear_1,,numeric
+Regional_Data_SL.csv,satyear_2,,numeric
+Regional_Data_SL.csv,satyear_3,,numeric
+Regional_Data_SL.csv,satyear_4,,numeric
+Regional_Data_SL.csv,satyear_5,,numeric
+Regional_Data_SL.csv,satyear_6,,numeric
+Regional_Data_SL.csv,satyear_7,,numeric
+Regional_Data_SL.csv,log_Light_ppix_Region,log Average nighttime light per pixel region,numeric
+Regional_Data_SL.csv,log_GDP_pc_Country,log GDP per capita country,numeric
+Regional_Data_SL.csv,log_region,log n region,numeric
+Regional_Data_SL.csv,log_area,log area,numeric
+Regional_Data_SL.csv,log_N_pix_top_cod_1_ppix,log number of top-coded pixels,numeric
+Regional_Data_SL.csv,log_N_pix_low_cod_1_ppix,log number of top-coded pixels,numeric
+Regional_Data_SL.csv,log_region_log_area,,numeric
+Country_DATA.csv,Country_NAME,Country_NAME,string
+Country_DATA.csv,Country_ISO,Country Codes ISO 3166-1,string
+Country_DATA.csv,year,,numeric
+Country_DATA.csv,fedelupd2,Federal state dummy,numeric
+Country_DATA.csv,GINIW_Eth_light,Ethnic inequality (population-weighted light Gini coefficient),numeric
+Country_DATA.csv,Giniall,Income Gini,numeric
+Country_DATA.csv,price_gasoline,"Pump price for gasoline, PPP (constant 2005 US$ per liter)",numeric
+Country_DATA.csv,Trade_GDP_share,Trade (shere of GDP),numeric
+Country_DATA.csv,Arable_land,Arable land (shere of land area),numeric
+Country_DATA.csv,Resources_rents_share_of_GDP,Total natural resources rents (% of GDP),numeric
+Country_DATA.csv,School_enrollment_secondary,"School enrollment, secondary (% gross)",numeric
+Country_DATA.csv,Aid,Aid flows  (constant 2011 US$),numeric
+Country_DATA.csv,FDI_share_of_GDP,"Foreign direct investment, net inflows (shere of GDP)",numeric
+Country_DATA.csv,GDP_pc_Country,"GDP per capita, PPP (constant 2005 US$)",numeric
+Country_DATA.csv,area,Area sq. km,numeric
+Country_DATA.csv,Polity2,Polity IV Annual Time-Series Polity2 Index -1 bis +1,numeric

@@ -1,0 +1,14 @@
+	(1)	(2)	(3)
+VARIABLES	r:1000 km	r:2500 km	r:5000 km
+			
+log_Light_ppix_Region	0.190***	0.190***	0.190***
+	(0.020)	(0.025)	(0.027)
+			
+Observations	5,258	5,258	5,258
+R-squared	1.000	1.000	1.000
+Region FE	YES	YES	YES
+Country FE	NO	NO	NO
+Country Group FE	No	No	No
+Satlite FE	YES	YES	YES
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

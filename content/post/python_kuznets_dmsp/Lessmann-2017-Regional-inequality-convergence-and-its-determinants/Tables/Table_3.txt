@@ -1,0 +1,19 @@
+	(1)	(2)	(3)	(4)	(5)	(6)	(7)
+VARIABLES	GINIW_pred_GDP_pc	GINIW_pred_GDP_pc	GINIW_pred_GDP_pc	COVW_pred_GDP_pc	GE_1W_pred_GDP_pc	GE_0W_pred_GDP_pc	GE_m1W_pred_GDP_pc
+							
+log_GDP_pc_Country	-0.003	0.056**	0.293***	0.402***	0.066***	0.063***	0.061***
+	(0.003)	(0.023)	(0.078)	(0.144)	(0.023)	(0.020)	(0.019)
+log_GDP_pc_Country_2		-0.003***	-0.032***	-0.044***	-0.008***	-0.007***	-0.007***
+		(0.001)	(0.009)	(0.016)	(0.003)	(0.002)	(0.002)
+log_GDP_pc_Country_3			0.001***	0.002**	0.000***	0.000***	0.000***
+			(0.000)	(0.001)	(0.000)	(0.000)	(0.000)
+Constant	0.095***	-0.150	-0.799***	-1.013**	-0.171***	-0.166***	-0.162***
+	(0.025)	(0.099)	(0.225)	(0.418)	(0.066)	(0.059)	(0.055)
+							
+Observations	880	880	880	880	880	880	880
+R-squared	0.126	0.201	0.244	0.264	0.210	0.205	0.196
+Number of Country_ISO_long	180	180	180	180	180	180	180
+Country FE	YES	YES	YES	YES	YES	YES	YES
+Year FE	YES	YES	YES	YES	YES	YES	YES
+Robust standard errors in parentheses							
+*** p<0.01, ** p<0.05, * p<0.1							

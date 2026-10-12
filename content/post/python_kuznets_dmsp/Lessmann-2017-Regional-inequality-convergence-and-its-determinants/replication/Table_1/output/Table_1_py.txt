@@ -1,0 +1,7 @@
+Table 1 (Python / linearmodels RE + PanelOLS) - lights predict GDP
+
+log_Light_ppix_Region by column (1)-(7):
+  0.399 / 0.190 / 0.153 / 0.123 / 0.232 / 0.104 / 0.102
+
+col(7) log_GDP_pc_Country: 0.889
+N = 5258 region-years ; 1504 regions

@@ -1,0 +1,2299 @@
+--------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/00DS/hello-papers/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/tab01
+> /tab01logFILE.txt
+  log type:  text
+ opened on:   5 Jul 2022, 13:34:20
+
+. 
+. ** 3. Install modules
+. *ssc install estout, replace
+. *ssc install outreg2, replace
+. *net install tsg_schemes, from("https://raw.githubusercontent.com/asjadnaqvi/Stata-schemes/main/schemes/") replace
+. *set scheme white_tableau, permanently
+. 
+. ** 4. Import data
+. use "Prediction_Data.dta", clear
+
+. 
+. describe
+
+Contains data from Prediction_Data.dta
+ Observations:         5,258                  
+    Variables:           119                  30 Nov 2016 13:45
+                                              (_dta has notes)
+--------------------------------------------------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+--------------------------------------------------------------------------------------------------------------------------------------------
+Region_NAME     str51   %51s                  Region name
+Country_NAME    str36   %36s                  Country name
+Longitude       double  %10.0g                Longitude
+Latitude        double  %10.0g                Latitude
+year            int     %10.0g                Year
+Pix_Region      long    %10.0g                Area of a region measured by the number of pixel
+Light_Region    double  %10.0g                Regional total lights
+Pop_Region      float   %9.0g                 Regional total population
+Country_ISO     str22   %22s                  Country code ISO 3166-1
+eap             byte    %8.0g                 East Asia and the Pacific
+eca             byte    %8.0g                 Europe and Central Asia
+lac             byte    %8.0g                 Latin America and the Caribbean
+mena            byte    %8.0g                 Middle East and North Africa
+sa              byte    %8.0g                 South Asia
+ssa             byte    %8.0g                 Sub-Saharan Africa
+GDP_pc_Country  float   %9.0g                 GDP per capita, PPP (constant 2005 US$)
+id_t_j          str7    %9s                   Code country year
+Pop_Country     float   %9.0g                 Country total population
+GDP_pc_Region   float   %9.0g                 GDP per capita Region, PPP (constant 2005 US$)
+Light_Country   float   %9.0g                 Country total light
+code_Coutry_R~n long    %56.0g     code_Coutry_Region
+                                              Code region coutry
+Country_ISO_l~g long    %8.0g      Country_ISO_long
+                                              
+country_dum1    byte    %8.0g                 Country_ISO_long==ALB
+country_dum2    byte    %8.0g                 Country_ISO_long==ARE
+country_dum3    byte    %8.0g                 Country_ISO_long==ARG
+country_dum4    byte    %8.0g                 Country_ISO_long==AUS
+country_dum5    byte    %8.0g                 Country_ISO_long==AUT
+country_dum6    byte    %8.0g                 Country_ISO_long==BEL
+country_dum7    byte    %8.0g                 Country_ISO_long==BEN
+country_dum8    byte    %8.0g                 Country_ISO_long==BGD
+country_dum9    byte    %8.0g                 Country_ISO_long==BGR
+country_dum10   byte    %8.0g                 Country_ISO_long==BIH
+country_dum11   byte    %8.0g                 Country_ISO_long==BOL
+country_dum12   byte    %8.0g                 Country_ISO_long==BRA
+country_dum13   byte    %8.0g                 Country_ISO_long==CAN
+country_dum14   byte    %8.0g                 Country_ISO_long==CHE
+country_dum15   byte    %8.0g                 Country_ISO_long==CHL
+country_dum16   byte    %8.0g                 Country_ISO_long==CHN
+country_dum17   byte    %8.0g                 Country_ISO_long==COL
+country_dum18   byte    %8.0g                 Country_ISO_long==CZE
+country_dum19   byte    %8.0g                 Country_ISO_long==DEU
+country_dum20   byte    %8.0g                 Country_ISO_long==DNK
+country_dum21   byte    %8.0g                 Country_ISO_long==ECU
+country_dum22   byte    %8.0g                 Country_ISO_long==EGY
+country_dum23   byte    %8.0g                 Country_ISO_long==ESP
+country_dum24   byte    %8.0g                 Country_ISO_long==EST
+country_dum25   byte    %8.0g                 Country_ISO_long==FIN
+country_dum26   byte    %8.0g                 Country_ISO_long==FRA
+country_dum27   byte    %8.0g                 Country_ISO_long==GBR
+country_dum28   byte    %8.0g                 Country_ISO_long==GRC
+country_dum29   byte    %8.0g                 Country_ISO_long==GTM
+country_dum30   byte    %8.0g                 Country_ISO_long==HND
+country_dum31   byte    %8.0g                 Country_ISO_long==HRV
+country_dum32   byte    %8.0g                 Country_ISO_long==HUN
+country_dum33   byte    %8.0g                 Country_ISO_long==IDN
+country_dum34   byte    %8.0g                 Country_ISO_long==IND
+country_dum35   byte    %8.0g                 Country_ISO_long==IRL
+country_dum36   byte    %8.0g                 Country_ISO_long==IRN
+country_dum37   byte    %8.0g                 Country_ISO_long==ITA
+country_dum38   byte    %8.0g                 Country_ISO_long==JOR
+country_dum39   byte    %8.0g                 Country_ISO_long==JPN
+country_dum40   byte    %8.0g                 Country_ISO_long==KAZ
+country_dum41   byte    %8.0g                 Country_ISO_long==KEN
+country_dum42   byte    %8.0g                 Country_ISO_long==KGZ
+country_dum43   byte    %8.0g                 Country_ISO_long==KOR
+country_dum44   byte    %8.0g                 Country_ISO_long==LKA
+country_dum45   byte    %8.0g                 Country_ISO_long==LSO
+country_dum46   byte    %8.0g                 Country_ISO_long==LTU
+country_dum47   byte    %8.0g                 Country_ISO_long==LVA
+country_dum48   byte    %8.0g                 Country_ISO_long==MAR
+country_dum49   byte    %8.0g                 Country_ISO_long==MEX
+country_dum50   byte    %8.0g                 Country_ISO_long==MKD
+country_dum51   byte    %8.0g                 Country_ISO_long==MNG
+country_dum52   byte    %8.0g                 Country_ISO_long==MOZ
+country_dum53   byte    %8.0g                 Country_ISO_long==MYS
+country_dum54   byte    %8.0g                 Country_ISO_long==NGA
+country_dum55   byte    %8.0g                 Country_ISO_long==NIC
+country_dum56   byte    %8.0g                 Country_ISO_long==NLD
+country_dum57   byte    %8.0g                 Country_ISO_long==NOR
+country_dum58   byte    %8.0g                 Country_ISO_long==NPL
+country_dum59   byte    %8.0g                 Country_ISO_long==PAK
+country_dum60   byte    %8.0g                 Country_ISO_long==PAN
+country_dum61   byte    %8.0g                 Country_ISO_long==PER
+country_dum62   byte    %8.0g                 Country_ISO_long==PHL
+country_dum63   byte    %8.0g                 Country_ISO_long==POL
+country_dum64   byte    %8.0g                 Country_ISO_long==PRT
+country_dum65   byte    %8.0g                 Country_ISO_long==PRY
+country_dum66   byte    %8.0g                 Country_ISO_long==ROU
+country_dum67   byte    %8.0g                 Country_ISO_long==RUS
+country_dum68   byte    %8.0g                 Country_ISO_long==SLV
+country_dum69   byte    %8.0g                 Country_ISO_long==SRB
+country_dum70   byte    %8.0g                 Country_ISO_long==SVK
+country_dum71   byte    %8.0g                 Country_ISO_long==SVN
+country_dum72   byte    %8.0g                 Country_ISO_long==SWE
+country_dum73   byte    %8.0g                 Country_ISO_long==THA
+country_dum74   byte    %8.0g                 Country_ISO_long==TUR
+country_dum75   byte    %8.0g                 Country_ISO_long==TZA
+country_dum76   byte    %8.0g                 Country_ISO_long==UKR
+country_dum77   byte    %8.0g                 Country_ISO_long==URY
+country_dum78   byte    %8.0g                 Country_ISO_long==USA
+country_dum79   byte    %8.0g                 Country_ISO_long==UZB
+country_dum80   byte    %8.0g                 Country_ISO_long==VNM
+country_dum81   byte    %8.0g                 Country_ISO_long==ZAF
+_satyear_1      float   %9.0g                 
+_satyear_2      float   %9.0g                 
+_satyear_3      float   %9.0g                 
+_satyear_4      float   %9.0g                 
+_satyear_5      float   %9.0g                 
+_satyear_6      float   %9.0g                 
+_satyear_7      float   %9.0g                 
+log_Light_ppi~n float   %9.0g                 log Average nighttime light per pixel region
+log_GDP_pc_Re~n float   %9.0g                 log GDP per capita region
+log_GDP_pc_Co~y float   %9.0g                 log GDP per capita country
+log_region      float   %9.0g                 log Number of subnational regions of a country
+log_area        float   %9.0g                 log area
+log_N_pix_top~x float   %9.0g                 log number of top-coded pixels
+log_N_pix_low~x float   %9.0g                 log number of low-coded pixels
+log_region_X_~a float   %9.0g                 
+RPP             float   %8.0g                 Regional Price Parities USA
+--------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by: 
+
+. summarize
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+ Region_NAME |          0
+Country_NAME |          0
+   Longitude |      5,258    22.45382    67.31461  -156.3526   163.0076
+    Latitude |      5,258    29.80854     24.3334  -54.32978    69.9544
+        year |      5,258    2002.242    5.506335       1992       2010
+-------------+---------------------------------------------------------
+  Pix_Region |      5,258    120679.3    513021.2         41   1.02e+07
+Light_Region |      5,258    213455.5    465243.3         44    7904552
+  Pop_Region |      5,258     3705986    1.17e+07   928.4245   2.00e+08
+ Country_ISO |          0
+         eap |      5,258     .201027    .4008063          0          1
+-------------+---------------------------------------------------------
+         eca |      5,258    .4676683     .499001          0          1
+         lac |      5,258    .1654622    .3716325          0          1
+        mena |      5,258    .0410803    .1984947          0          1
+          sa |      5,258    .0435527     .204117          0          1
+         ssa |      5,258    .0340434    .1813578          0          1
+-------------+---------------------------------------------------------
+GDP_pc_Cou~y |      5,258    15513.98    12806.88   431.3235   94251.02
+      id_t_j |          0
+ Pop_Country |      5,258    1.04e+08    2.28e+08    1193269   1.33e+09
+GDP_pc_Reg~n |      5,258    14370.89    13450.19   226.3402   150767.7
+Light_Coun~y |      5,258     7477449    1.48e+07      12106   8.33e+07
+-------------+---------------------------------------------------------
+code_Coutr~n |      5,258    751.5806    427.0545          1       1504
+Country_IS~g |      5,258     44.9148    23.99318          1         81
+country_dum1 |      5,258    .0045645    .0674129          0          1
+country_dum2 |      5,258    .0039939    .0630771          0          1
+country_dum3 |      5,258    .0136934     .116226          0          1
+-------------+---------------------------------------------------------
+country_dum4 |      5,258     .006086    .0777822          0          1
+country_dum5 |      5,258    .0068467    .0824689          0          1
+country_dum6 |      5,258    .0068467    .0824689          0          1
+country_dum7 |      5,258    .0034234    .0584148          0          1
+country_dum8 |      5,258    .0114112     .106222          0          1
+-------------+---------------------------------------------------------
+country_dum9 |      5,258    .0213009    .1443991          0          1
+country_d~10 |      5,258    .0022822    .0477228          0          1
+country_d~11 |      5,258    .0068467    .0824689          0          1
+country_d~12 |      5,258    .0152149    .1224184          0          1
+country_d~13 |      5,258    .0083682     .091103          0          1
+-------------+---------------------------------------------------------
+country_d~14 |      5,258    .0182579    .1338953          0          1
+country_d~15 |      5,258    .0074173    .0858117          0          1
+country_d~16 |      5,258    .0205401    .1418522          0          1
+country_d~17 |      5,258    .0190186    .1366034          0          1
+country_d~18 |      5,258    .0106504    .1026597          0          1
+-------------+---------------------------------------------------------
+country_d~19 |      5,258    .0121719    .1096634          0          1
+country_d~20 |      5,258    .0038037    .0615628          0          1
+country_d~21 |      5,258    .0119817    .1088137          0          1
+country_d~22 |      5,258    .0119817    .1088137          0          1
+country_d~23 |      5,258    .0380373    .1913045          0          1
+-------------+---------------------------------------------------------
+country_d~24 |      5,258    .0114112     .106222          0          1
+country_d~25 |      5,258    .0038037    .0615628          0          1
+country_d~26 |      5,258    .0159757    .1253931          0          1
+country_d~27 |      5,258    .0076075    .0868966          0          1
+country_d~28 |      5,258     .006086    .0777822          0          1
+-------------+---------------------------------------------------------
+country_d~29 |      5,258    .0125523    .1113423          0          1
+country_d~30 |      5,258    .0091289    .0951175          0          1
+country_d~31 |      5,258    .0119817    .1088137          0          1
+country_d~32 |      5,258    .0114112     .106222          0          1
+country_d~33 |      5,258    .0148345    .1209018          0          1
+-------------+---------------------------------------------------------
+country_d~34 |      5,258    .0211107     .143767          0          1
+country_d~35 |      5,258    .0053252    .0727865          0          1
+country_d~36 |      5,258     .014264    .1185883          0          1
+country_d~37 |      5,258    .0152149    .1224184          0          1
+country_d~38 |      5,258    .0068467    .0824689          0          1
+-------------+---------------------------------------------------------
+country_d~39 |      5,258    .0355649    .1852202          0          1
+country_d~40 |      5,258    .0106504    .1026597          0          1
+country_d~41 |      5,258    .0009509    .0308254          0          1
+country_d~42 |      5,258    .0039939    .0630771          0          1
+country_d~43 |      5,258    .0098897    .0989634          0          1
+-------------+---------------------------------------------------------
+country_d~44 |      5,258    .0068467    .0824689          0          1
+country_d~45 |      5,258    .0022822    .0477228          0          1
+country_d~46 |      5,258    .0076075    .0868966          0          1
+country_d~47 |      5,258    .0148345    .1209018          0          1
+country_d~48 |      5,258    .0039939    .0630771          0          1
+-------------+---------------------------------------------------------
+country_d~49 |      5,258    .0243439     .154129          0          1
+country_d~50 |      5,258    .0045645    .0674129          0          1
+country_d~51 |      5,258    .0152149    .1224184          0          1
+country_d~52 |      5,258    .0076075    .0868966          0          1
+country_d~53 |      5,258    .0091289    .0951175          0          1
+-------------+---------------------------------------------------------
+country_d~54 |      5,258    .0015215    .0389803          0          1
+country_d~55 |      5,258    .0026626    .0515366          0          1
+country_d~56 |      5,258    .0091289    .0951175          0          1
+country_d~57 |      5,258    .0144542    .1193648          0          1
+country_d~58 |      5,258    .0019019     .043573          0          1
+-------------+---------------------------------------------------------
+country_d~59 |      5,258    .0022822    .0477228          0          1
+country_d~60 |      5,258    .0068467    .0824689          0          1
+country_d~61 |      5,258    .0174971    .1311269          0          1
+country_d~62 |      5,258    .0053252    .0727865          0          1
+country_d~63 |      5,258    .0114112     .106222          0          1
+-------------+---------------------------------------------------------
+country_d~64 |      5,258    .0038037    .0615628          0          1
+country_d~65 |      5,258    .0102701    .1008292          0          1
+country_d~66 |      5,258    .0319513    .1758872          0          1
+country_d~67 |      5,258    .0585774    .2348544          0          1
+country_d~68 |      5,258    .0079878    .0890254          0          1
+-------------+---------------------------------------------------------
+country_d~69 |      5,258    .0047547    .0687965          0          1
+country_d~70 |      5,258     .006086    .0777822          0          1
+country_d~71 |      5,258    .0091289    .0951175          0          1
+country_d~72 |      5,258    .0159757    .1253931          0          1
+country_d~73 |      5,258    .0547737    .2275596          0          1
+-------------+---------------------------------------------------------
+country_d~74 |      5,258    .0232027    .1505612          0          1
+country_d~75 |      5,258    .0152149    .1224184          0          1
+country_d~76 |      5,258    .0098897    .0989634          0          1
+country_d~77 |      5,258    .0072271    .0847126          0          1
+country_d~78 |      5,258     .038798    .1931316          0          1
+-------------+---------------------------------------------------------
+country_d~79 |      5,258    .0068467    .0824689          0          1
+country_d~80 |      5,258    .0296691    .1696888          0          1
+country_d~81 |      5,258     .003043    .0550845          0          1
+  _satyear_1 |      5,258    .0157855    .1246565          0          1
+  _satyear_2 |      5,258    .0038037    .0615628          0          1
+-------------+---------------------------------------------------------
+  _satyear_3 |      5,258     .229555    .4205866          0          1
+  _satyear_4 |      5,258    .0218714    .1462776          0          1
+  _satyear_5 |      5,258    .2514264    .4338744          0          1
+  _satyear_6 |      5,258    .2457208    .4305547          0          1
+  _satyear_7 |      5,258    .0319513    .1758872          0          1
+-------------+---------------------------------------------------------
+log_Light_~n |      5,258    .9573142     1.77094   -4.60517   4.143135
+log_GDP_pc~n |      5,258    9.097033     1.05707    5.42204    11.9235
+log_GDP_pc~y |      5,258    9.275671    .9389157   6.066858   11.45372
+  log_region |      5,258    3.189776    .6978755   1.386294   4.343805
+    log_area |      5,258    13.16569    1.738232   9.910463   16.61158
+-------------+---------------------------------------------------------
+l~top_cod_~x |      5,258   -10.52645    4.314367  -20.74683    .000042
+l~low_cod_~x |      5,258   -1.547571    2.830592  -15.16098  -.0000834
+log_region~a |      5,258    42.57468    12.97613   17.14954   72.15746
+         RPP |         52    97.46731    8.562222       86.7      118.2
+
+. 
+. ** Set panel dataset
+. xtset code_Coutry_Region year
+
+Panel variable: code_Coutry_Region (unbalanced)
+ Time variable: year, 1992 to 2010, but with gaps
+         Delta: 1 unit
+
+. 
+. ** Generate year fixed effects
+. xi i.year
+i.year            _Iyear_1992-2010    (naturally coded; _Iyear_1992 omitted)
+
+. 
+. ** Generate country-group (supra-national) fixed effects
+. xi i.code_Coutry_Region
+i.code_Coutry~n   _Icode_Cout_1-1504  (naturally coded; _Icode_Cout_1 omitted)
+
+. 
+. ** Generate table 1
+.         * Random effects Model (1): Use only ONE predictor (Lights per pixel) wit NO fixed effects (Note: Stata estimate a random effects 
+> model by defult)
+. xtreg log_GDP_pc_Region log_Light_ppix_Region, robust cluster(Country_ISO)
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.3268                                         min =          1
+     Between = 0.3493                                         avg =        3.5
+     Overall = 0.3611                                         max =          4
+
+                                                Wald chi2(1)      =     251.71
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =     0.0000
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .3985798   .0251227    15.87   0.000     .3493403    .4478194
+                _cons |   8.674217   .0974775    88.99   0.000     8.483165     8.86527
+----------------------+----------------------------------------------------------------
+              sigma_u |  .80397328
+              sigma_e |  .22986975
+                  rho |  .92442919   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) replace keep(log_Light_ppix_Region  log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_C
+> ountry   log_region log_area  log_region_X_log_area  ) addtext(Region FE, NO, Country FE, NO, Country Group FE, NO, Satlite FE, NO) dec(3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Pooled Model (2): Use only ONE predictor (Lights per pixel) with TWO fixed effects: Region FE and Satellite FE
+. reg log_GDP_pc_Region log_Light_ppix_Region    _Icode_Cout_2-_Icode_Cout_1504 _satyear_1-_satyear_7 , robust cluster(Country_ISO)
+
+Linear regression                               Number of obs     =      5,258
+                                                F(6, 80)          =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9789
+                                                Root MSE          =     .18172
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .1899312   .0481685     3.94   0.000     .0940729    .2857896
+        _Icode_Cout_2 |  -.1225914   .0351464    -3.49   0.001    -.1925349    -.052648
+        _Icode_Cout_3 |  -.2297329   .0688652    -3.34   0.001    -.3667789   -.0926868
+        _Icode_Cout_4 |  -.1551329   .0041587   -37.30   0.000    -.1634091   -.1468568
+        _Icode_Cout_5 |  -.2453276     .05064    -4.84   0.000    -.3461045   -.1445508
+        _Icode_Cout_6 |   .1891201   .0332011     5.70   0.000     .1230478    .2551924
+        _Icode_Cout_7 |  -.0834457   .0228545    -3.65   0.000    -.1289277   -.0379637
+        _Icode_Cout_8 |   .0943354   .0661748     1.43   0.158    -.0373567    .2260275
+        _Icode_Cout_9 |  -.0639235   .0035454   -18.03   0.000    -.0709791   -.0568678
+       _Icode_Cout_10 |  -.0433952   .0251407    -1.73   0.088    -.0934268    .0066365
+       _Icode_Cout_11 |   .1539923   .0708514     2.17   0.033     .0129936    .2949909
+       _Icode_Cout_12 |   .0518616   .0059657     8.69   0.000     .0399896    .0637337
+       _Icode_Cout_13 |   .7929197   .0618751    12.81   0.000     .6697844     .916055
+       _Icode_Cout_14 |   1.149726   .1156237     9.94   0.000     .9196275    1.379825
+       _Icode_Cout_15 |   .3774679   .0818197     4.61   0.000     .2146416    .5402943
+       _Icode_Cout_16 |   1.674366   .1264315    13.24   0.000     1.422759    1.925972
+       _Icode_Cout_17 |   1.332919   .1875637     7.11   0.000     .9596557    1.706183
+       _Icode_Cout_18 |   .4591692   .0857981     5.35   0.000     .2884255    .6299129
+       _Icode_Cout_19 |   .9273126   .0648861    14.29   0.000     .7981852     1.05644
+       _Icode_Cout_20 |   .5862657   .0640744     9.15   0.000     .4587536    .7137778
+       _Icode_Cout_21 |   .3462477   .0975843     3.55   0.001     .1520488    .5404466
+       _Icode_Cout_22 |   .4599479   .0836851     5.50   0.000     .2934093    .6264866
+       _Icode_Cout_23 |   1.388138   .1189145    11.67   0.000     1.151491    1.624786
+       _Icode_Cout_24 |   .8497376   .1136766     7.48   0.000      .623514    1.075961
+       _Icode_Cout_25 |   1.047752      .0817    12.82   0.000     .8851641    1.210341
+       _Icode_Cout_26 |   .2795237    .063948     4.37   0.000     .1522631    .4067843
+       _Icode_Cout_27 |   1.696421   .0832135    20.39   0.000      1.53082    1.862021
+       _Icode_Cout_28 |   1.190945   .1084956    10.98   0.000     .9750322    1.406858
+       _Icode_Cout_29 |    .558433   .0970933     5.75   0.000     .3652112    .7516548
+       _Icode_Cout_30 |   .6118905   .0918372     6.66   0.000     .4291286    .7946524
+       _Icode_Cout_31 |   1.208505   .0936327    12.91   0.000      1.02217     1.39484
+       _Icode_Cout_32 |   2.238845   .1268705    17.65   0.000     1.986365    2.491325
+       _Icode_Cout_33 |   .8793999   .0618237    14.22   0.000     .7563668    1.002433
+       _Icode_Cout_34 |   .3929147    .114285     3.44   0.001     .1654802    .6203492
+       _Icode_Cout_35 |   1.981972   .0758232    26.14   0.000     1.831079    2.132864
+       _Icode_Cout_36 |   .1915393   .0638251     3.00   0.004     .0645233    .3185553
+       _Icode_Cout_37 |   1.608588   .1032468    15.58   0.000     1.403121    1.814056
+       _Icode_Cout_38 |   1.890414   .0916969    20.62   0.000     1.707931    2.072896
+       _Icode_Cout_39 |   2.626294   .2269202    11.57   0.000     2.174708     3.07788
+       _Icode_Cout_40 |   1.986749   .1270953    15.63   0.000     1.733822    2.239677
+       _Icode_Cout_41 |     2.0125   .1483769    13.56   0.000      1.71722    2.307779
+       _Icode_Cout_42 |   1.645062   .0916579    17.95   0.000     1.462657    1.827467
+       _Icode_Cout_43 |   1.642618   .0684284    24.00   0.000     1.506441    1.778795
+       _Icode_Cout_44 |   2.469156   .1614074    15.30   0.000     2.147945    2.790367
+       _Icode_Cout_45 |   1.026478   .0958836    10.71   0.000      .835664    1.217293
+       _Icode_Cout_46 |   1.369564   .0790671    17.32   0.000     1.212215    1.526912
+       _Icode_Cout_47 |   1.218361    .099979    12.19   0.000     1.019396    1.417325
+       _Icode_Cout_48 |   1.410316   .0960756    14.68   0.000      1.21912    1.601513
+       _Icode_Cout_49 |   1.631714   .0862216    18.92   0.000     1.460128    1.803301
+       _Icode_Cout_50 |   1.348179   .0851456    15.83   0.000     1.178734    1.517624
+       _Icode_Cout_51 |   1.527909   .0860665    17.75   0.000     1.356631    1.699187
+       _Icode_Cout_52 |   1.453763    .102206    14.22   0.000     1.250367     1.65716
+       _Icode_Cout_53 |   1.432249   .1685357     8.50   0.000     1.096852    1.767645
+       _Icode_Cout_54 |  -1.503045   .0661362   -22.73   0.000     -1.63466   -1.371429
+       _Icode_Cout_55 |  -1.629087   .0671489   -24.26   0.000    -1.762718   -1.495456
+       _Icode_Cout_56 |  -1.186849    .077086   -15.40   0.000    -1.340255   -1.033443
+       _Icode_Cout_57 |  -1.101952   .1085219   -10.15   0.000    -1.317918   -.8859869
+       _Icode_Cout_58 |  -1.747479   .0721667   -24.21   0.000    -1.891096   -1.603863
+       _Icode_Cout_59 |  -1.090725   .0978475   -11.15   0.000    -1.285448   -.8960025
+       _Icode_Cout_60 |   -1.50437   .0634285   -23.72   0.000    -1.630596   -1.378143
+       _Icode_Cout_61 |  -1.590763   .0663828   -23.96   0.000    -1.722869   -1.458657
+       _Icode_Cout_62 |   -1.47921   .0662212   -22.34   0.000    -1.610995   -1.347426
+       _Icode_Cout_63 |  -1.416271   .0643857   -22.00   0.000    -1.544403   -1.288139
+       _Icode_Cout_64 |  -1.179536   .0671311   -17.57   0.000    -1.313132   -1.045941
+       _Icode_Cout_65 |  -1.587107   .0677134   -23.44   0.000    -1.721861   -1.452353
+       _Icode_Cout_66 |  -1.471536   .0679784   -21.65   0.000    -1.606817   -1.336254
+       _Icode_Cout_67 |  -1.673347    .064958   -25.76   0.000    -1.802617   -1.544076
+       _Icode_Cout_68 |  -1.525245   .0662437   -23.02   0.000    -1.657075   -1.393416
+       _Icode_Cout_69 |  -1.146066   .0881552   -13.00   0.000    -1.321501   -.9706318
+       _Icode_Cout_70 |  -1.476521   .0634294   -23.28   0.000     -1.60275   -1.350292
+       _Icode_Cout_71 |  -1.617047   .0636482   -25.41   0.000     -1.74371   -1.490383
+       _Icode_Cout_72 |  -1.574898   .0634226   -24.83   0.000    -1.701113   -1.448683
+       _Icode_Cout_73 |  -1.662117   .0641822   -25.90   0.000    -1.789844   -1.534391
+       _Icode_Cout_74 |   1.238417    .160069     7.74   0.000     .9198694    1.556964
+       _Icode_Cout_75 |   1.437725   .1582877     9.08   0.000     1.122723    1.752728
+       _Icode_Cout_76 |   .7338179   .1450283     5.06   0.000     .4452024    1.022433
+       _Icode_Cout_77 |   .9212248   .1539214     5.99   0.000     .6149113    1.227538
+       _Icode_Cout_78 |   .8911597    .138421     6.44   0.000     .6156932    1.166626
+       _Icode_Cout_79 |   .9554707      .1073     8.90   0.000     .7419368    1.169004
+       _Icode_Cout_80 |   .8881532   .1215403     7.31   0.000     .6462804    1.130026
+       _Icode_Cout_81 |   .9542519   .1600502     5.96   0.000     .6357418    1.272762
+       _Icode_Cout_82 |    1.05564   .1503936     7.02   0.000      .756347    1.354933
+       _Icode_Cout_83 |  -.7512959   .2235612    -3.36   0.001    -1.196197    -.306395
+       _Icode_Cout_84 |  -1.324939    .084039   -15.77   0.000    -1.492182   -1.157696
+       _Icode_Cout_85 |  -.7076655   .1982299    -3.57   0.001    -1.102156   -.3131756
+       _Icode_Cout_86 |  -1.042955   .1169272    -8.92   0.000    -1.275648    -.810263
+       _Icode_Cout_87 |  -1.240167   .0821631   -15.09   0.000    -1.403676   -1.076657
+       _Icode_Cout_88 |  -1.212289   .1523429    -7.96   0.000    -1.515461   -.9091172
+       _Icode_Cout_89 |   .2309086   .2159574     1.07   0.288    -.1988604    .6606775
+       _Icode_Cout_90 |  -.1549639   .1385276    -1.12   0.267    -.4306427    .1207148
+       _Icode_Cout_91 |  -.2345857   .0803342    -2.92   0.005     -.394456   -.0747155
+       _Icode_Cout_92 |  -.1303359   .1216281    -1.07   0.287    -.3723835    .1117117
+       _Icode_Cout_93 |   .2941987   .1429131     2.06   0.043     .0097926    .5786049
+       _Icode_Cout_94 |   .7541323   .2327214     3.24   0.002     .2910019    1.217263
+       _Icode_Cout_95 |   -.174201   .1802472    -0.97   0.337    -.5329043    .1845023
+       _Icode_Cout_96 |   .2156571   .1308952     1.65   0.103    -.0448325    .4761468
+       _Icode_Cout_97 |   .3754954   .1143496     3.28   0.002     .1479325    .6030584
+       _Icode_Cout_98 |   .1917849   .0918826     2.09   0.040     .0089327     .374637
+       _Icode_Cout_99 |  -.1320841   .1106928    -1.19   0.236    -.3523697    .0882016
+      _Icode_Cout_100 |   .0244322   .0981441     0.25   0.804    -.1708807    .2197452
+      _Icode_Cout_101 |   .2213407   .0810387     2.73   0.008     .0600686    .3826127
+      _Icode_Cout_102 |  -.3647571   .1000214    -3.65   0.000    -.5638061   -.1657082
+      _Icode_Cout_103 |   -.066251      .0811    -0.82   0.416    -.2276452    .0951432
+      _Icode_Cout_104 |   .5936597   .0971622     6.11   0.000     .4003008    .7870187
+      _Icode_Cout_105 |  -.2925496   .0821058    -3.56   0.001    -.4559454   -.1291537
+      _Icode_Cout_106 |  -.4202892   .0956847    -4.39   0.000    -.6107079   -.2298705
+      _Icode_Cout_107 |   -.387689   .0810611    -4.78   0.000    -.5490057   -.2263723
+      _Icode_Cout_108 |  -.2303199   .0882986    -2.61   0.011    -.4060396   -.0546001
+      _Icode_Cout_109 |  -.1818129   .0849733    -2.14   0.035    -.3509151   -.0127107
+      _Icode_Cout_110 |   .4736668   .1463777     3.24   0.002     .1823659    .7649677
+      _Icode_Cout_111 |  -.5735021   .0756829    -7.58   0.000     -.724116   -.4228883
+      _Icode_Cout_112 |   .9155745   .1482866     6.17   0.000     .6204748    1.210674
+      _Icode_Cout_113 |   .0880045   .0786722     1.12   0.267    -.0685582    .2445673
+      _Icode_Cout_114 |  -.2460657   .0643801    -3.82   0.000    -.3741863   -.1179452
+      _Icode_Cout_115 |   .5189452   .0690062     7.52   0.000     .3816184    .6562719
+      _Icode_Cout_116 |   .9625193    .084497    11.39   0.000      .794365    1.130674
+      _Icode_Cout_117 |  -.3567896   .0994498    -3.59   0.001    -.5547009   -.1588783
+      _Icode_Cout_118 |   .4832712   .0680493     7.10   0.000     .3478487    .6186937
+      _Icode_Cout_119 |   .5741049   .0638058     9.00   0.000     .4471274    .7010824
+      _Icode_Cout_120 |  -.4853062   .0683665    -7.10   0.000      -.62136   -.3492525
+      _Icode_Cout_121 |    .799734   .1501496     5.33   0.000     .5009268    1.098541
+      _Icode_Cout_122 |  -.1872876    .066631    -2.81   0.006    -.3198875   -.0546877
+      _Icode_Cout_123 |  -.2872124   .1079429    -2.66   0.009    -.5020255   -.0723992
+      _Icode_Cout_124 |  -.2409159   .0648031    -3.72   0.000    -.3698781   -.1119536
+      _Icode_Cout_125 |   .7803509   .0653556    11.94   0.000     .6502892    .9104127
+      _Icode_Cout_126 |   .5261982   .0995286     5.29   0.000     .3281299    .7242664
+      _Icode_Cout_127 |   .6357057   .0663997     9.57   0.000      .503566    .7678454
+      _Icode_Cout_128 |  -.1937161   .0725394    -2.67   0.009    -.3380741   -.0493581
+      _Icode_Cout_129 |   .7972958   .0815526     9.78   0.000      .635001    .9595906
+      _Icode_Cout_130 |   .0901101   .0649297     1.39   0.169    -.0391042    .2193244
+      _Icode_Cout_131 |   .4039515   .0665866     6.07   0.000     .2714399    .5364632
+      _Icode_Cout_132 |   .1706883   .0666256     2.56   0.012     .0380991    .3032774
+      _Icode_Cout_133 |    .111933    .078588     1.42   0.158     -.044462    .2683281
+      _Icode_Cout_134 |  -.0552857   .0680954    -0.81   0.419    -.1907998    .0802285
+      _Icode_Cout_135 |  -.0462567   .0650679    -0.71   0.479     -.175746    .0832325
+      _Icode_Cout_136 |   .1379684   .0655288     2.11   0.038     .0075619    .2683749
+      _Icode_Cout_137 |    .119435   .0659039     1.81   0.074     -.011718    .2505879
+      _Icode_Cout_138 |  -.0039006   .0641169    -0.06   0.952    -.1314972    .1236961
+      _Icode_Cout_139 |  -.0668859   .0706294    -0.95   0.346    -.2074428    .0736711
+      _Icode_Cout_140 |  -.0083584   .0744747    -0.11   0.911    -.1565679     .139851
+      _Icode_Cout_141 |   -.023858   .0727473    -0.33   0.744    -.1686299    .1209138
+      _Icode_Cout_142 |   .0635506   .0803643     0.79   0.431    -.0963795    .2234807
+      _Icode_Cout_143 |    -.10164   .0754686    -1.35   0.182    -.2518272    .0485472
+      _Icode_Cout_144 |   .0635632   .0776086     0.82   0.415    -.0908828    .2180092
+      _Icode_Cout_145 |  -.0610236   .0724902    -0.84   0.402    -.2052838    .0832366
+      _Icode_Cout_146 |  -.1083605   .0693495    -1.56   0.122    -.2463704    .0296494
+      _Icode_Cout_147 |  -.1484601   .0714158    -2.08   0.041    -.2905821   -.0063381
+      _Icode_Cout_148 |   .0643836   .0681367     0.94   0.348    -.0712128      .19998
+      _Icode_Cout_149 |   .2530627   .0690606     3.66   0.000     .1156277    .3904977
+      _Icode_Cout_150 |   .5739065   .1338686     4.29   0.000     .3074996    .8403134
+      _Icode_Cout_151 |   .3067166   .0768345     3.99   0.000     .1538111    .4596221
+      _Icode_Cout_152 |  -.1112918   .0728997    -1.53   0.131    -.2563667    .0337832
+      _Icode_Cout_153 |   .3329998    .082688     4.03   0.000     .1684453    .4975542
+      _Icode_Cout_154 |  -.0011882   .0789488    -0.02   0.988    -.1583014     .155925
+      _Icode_Cout_155 |   .0460836   .0649347     0.71   0.480    -.0831405    .1753077
+      _Icode_Cout_156 |   .3075514   .0671874     4.58   0.000     .1738442    .4412587
+      _Icode_Cout_157 |  -.0039172   .0648511    -0.06   0.952    -.1329751    .1251406
+      _Icode_Cout_158 |   1.963104   .0641303    30.61   0.000      1.83548    2.090727
+      _Icode_Cout_159 |   1.885269   .0887268    21.25   0.000     1.708697    2.061841
+      _Icode_Cout_160 |   1.728148   .0779886    22.16   0.000     1.572946    1.883351
+      _Icode_Cout_161 |   1.279966   .0735283    17.41   0.000      1.13364    1.426292
+      _Icode_Cout_162 |    1.81605   .1059567    17.14   0.000      1.60519    2.026911
+      _Icode_Cout_163 |   1.287864   .0735287    17.52   0.000     1.141537     1.43419
+      _Icode_Cout_164 |   1.806563   .0648865    27.84   0.000     1.677435    1.935691
+      _Icode_Cout_165 |    1.12431   .0914942    12.29   0.000     .9422304    1.306389
+      _Icode_Cout_166 |   1.667588   .0705338    23.64   0.000     1.527221    1.807954
+      _Icode_Cout_167 |   1.797059   .0689875    26.05   0.000      1.65977    1.934349
+      _Icode_Cout_168 |   2.962366   .2495594    11.87   0.000     2.465727    3.459005
+      _Icode_Cout_169 |   1.260643   .2160705     5.83   0.000      .830649    1.690637
+      _Icode_Cout_170 |   1.902574    .104982    18.12   0.000     1.693653    2.111495
+      _Icode_Cout_171 |   .0393727   .0784851     0.50   0.617    -.1168177    .1955631
+      _Icode_Cout_172 |   1.261103   .1168652    10.79   0.000     1.028534    1.493672
+      _Icode_Cout_173 |   .4022961   .0663898     6.06   0.000     .2701762     .534416
+      _Icode_Cout_174 |   .4375632   .0820454     5.33   0.000     .2742875    .6008388
+      _Icode_Cout_175 |   .4778213   .0654069     7.31   0.000     .3476574    .6079852
+      _Icode_Cout_176 |   .4482436   .0966396     4.64   0.000     .2559247    .6405624
+      _Icode_Cout_177 |   1.359846    .145327     9.36   0.000     1.070636    1.649055
+      _Icode_Cout_178 |   .2816034   .0702111     4.01   0.000     .1418787     .421328
+      _Icode_Cout_179 |   .6204629   .0883054     7.03   0.000     .4447296    .7961961
+      _Icode_Cout_180 |   1.282625   .1092474    11.74   0.000     1.065216    1.500034
+      _Icode_Cout_181 |   .4123977   .0708726     5.82   0.000     .2713567    .5534387
+      _Icode_Cout_182 |  -.9347696   .0666114   -14.03   0.000     -1.06733   -.8022087
+      _Icode_Cout_183 |   .1657459   .1171764     1.41   0.161    -.0674425    .3989344
+      _Icode_Cout_184 |  -.1885227   .0661536    -2.85   0.006    -.3201726   -.0568727
+      _Icode_Cout_185 |  -.3777652   .0981565    -3.85   0.000    -.5731028   -.1824276
+      _Icode_Cout_186 |   -.875415   .0825554   -10.60   0.000    -1.039706   -.7111246
+      _Icode_Cout_187 |  -.7729914   .0682663   -11.32   0.000    -.9088456   -.6371372
+      _Icode_Cout_188 |  -1.191822   .0765932   -15.56   0.000    -1.344247   -1.039397
+      _Icode_Cout_189 |   -.634804   .0781879    -8.12   0.000    -.7904028   -.4792052
+      _Icode_Cout_190 |  -.3400713   .0652774    -5.21   0.000    -.4699776   -.2101651
+      _Icode_Cout_191 |  -.8624384   .0763957   -11.29   0.000    -1.014471   -.7104062
+      _Icode_Cout_192 |  -.5931169   .0638113    -9.29   0.000    -.7201055   -.4661283
+      _Icode_Cout_193 |  -.6255636   .0676383    -9.25   0.000     -.760168   -.4909591
+      _Icode_Cout_194 |   -.241096   .0992784    -2.43   0.017    -.4386662   -.0435257
+      _Icode_Cout_195 |  -.7556177   .0690192   -10.95   0.000    -.8929703    -.618265
+      _Icode_Cout_196 |  -.4662149   .0638094    -7.31   0.000    -.5931997   -.3392301
+      _Icode_Cout_197 |   -.231756   .0730438    -3.17   0.002    -.3771177   -.0863942
+      _Icode_Cout_198 |  -.1309392   .1712426    -0.76   0.447    -.4717227    .2098444
+      _Icode_Cout_199 |  -.7535929   .0638106   -11.81   0.000      -.88058   -.6266058
+      _Icode_Cout_200 |  -.4463132   .0928883    -4.80   0.000    -.6311668   -.2614595
+      _Icode_Cout_201 |   .2012665   .1522334     1.32   0.190    -.1016877    .5042206
+      _Icode_Cout_202 |  -.7848598   .0727174   -10.79   0.000     -.929572   -.6401477
+      _Icode_Cout_203 |   .0614928   .0771373     0.80   0.428    -.0920153    .2150009
+      _Icode_Cout_204 |  -.0406871   .1238675    -0.33   0.743    -.2871913    .2058171
+      _Icode_Cout_205 |  -.0873175   .2420941    -0.36   0.719    -.5691001    .3944651
+      _Icode_Cout_206 |   -.128888   .1193727    -1.08   0.284    -.3664472    .1086713
+      _Icode_Cout_207 |  -.8249119   .0745172   -11.07   0.000    -.9732059   -.6766179
+      _Icode_Cout_208 |  -.1050558   .0832059    -1.26   0.210    -.2706409    .0605292
+      _Icode_Cout_209 |   .3833931   .0638016     6.01   0.000     .2564239    .5103623
+      _Icode_Cout_210 |  -.2172689   .1074418    -2.02   0.046     -.431085   -.0034528
+      _Icode_Cout_211 |    .305119   .1298917     2.35   0.021     .0466262    .5636117
+      _Icode_Cout_212 |    .159817   .0645676     2.48   0.015     .0313233    .2883107
+      _Icode_Cout_213 |   .1562057   .0638717     2.45   0.017     .0290969    .2833144
+      _Icode_Cout_214 |   .0169151   .0709854     0.24   0.812    -.1243503    .1581805
+      _Icode_Cout_215 |   .4714703   .1864971     2.53   0.013     .1003293    .8426113
+      _Icode_Cout_216 |  -.2176785   .0723887    -3.01   0.004    -.3617366   -.0736204
+      _Icode_Cout_217 |    .131065   .0644604     2.03   0.045     .0027847    .2593454
+      _Icode_Cout_218 |   .0461226   .1833777     0.25   0.802    -.3188106    .4110558
+      _Icode_Cout_219 |  -.2390371   .0638134    -3.75   0.000    -.3660298   -.1120445
+      _Icode_Cout_220 |    .206535   .0809475     2.55   0.013     .0454444    .3676256
+      _Icode_Cout_221 |   .0408705   .0638416     0.64   0.524    -.0861783    .1679194
+      _Icode_Cout_222 |   .2026954   .0671089     3.02   0.003     .0691445    .3362463
+      _Icode_Cout_223 |  -.2807376   .0642341    -4.37   0.000    -.4085676   -.1529076
+      _Icode_Cout_224 |   .9311805   .1039252     8.96   0.000     .7243627    1.137998
+      _Icode_Cout_225 |  -.3597126    .077617    -4.63   0.000    -.5141753   -.2052499
+      _Icode_Cout_226 |  -.1904593   .0650826    -2.93   0.004    -.3199778   -.0609408
+      _Icode_Cout_227 |   1.351425   .1539876     8.78   0.000      1.04498     1.65787
+      _Icode_Cout_228 |  -.2357262     .09759    -2.42   0.018    -.4299366   -.0415159
+      _Icode_Cout_229 |  -.1123484   .0830304    -1.35   0.180    -.2775841    .0528873
+      _Icode_Cout_230 |   .5783935   .0638121     9.06   0.000     .4514034    .7053836
+      _Icode_Cout_231 |  -.6218234   .0660178    -9.42   0.000    -.7532031   -.4904438
+      _Icode_Cout_232 |   .0349494   .0640829     0.55   0.587    -.0925796    .1624784
+      _Icode_Cout_233 |   .2643585    .079792     3.31   0.001     .1055673    .4231496
+      _Icode_Cout_234 |   .5528659   .0749423     7.38   0.000      .403726    .7020057
+      _Icode_Cout_235 |   .1915383   .0942738     2.03   0.046     .0039275    .3791491
+      _Icode_Cout_236 |   1.014533   .1580751     6.42   0.000     .6999538    1.329113
+      _Icode_Cout_237 |   .7839567   .0825074     9.50   0.000     .6197617    .9481518
+      _Icode_Cout_238 |    1.01587    .094721    10.72   0.000     .8273691    1.204371
+      _Icode_Cout_239 |   .5646383   .0801831     7.04   0.000     .4050688    .7242078
+      _Icode_Cout_240 |    .646918   .0963321     6.72   0.000     .4552111    .8386249
+      _Icode_Cout_241 |   .3276015   .1080493     3.03   0.003     .1125765    .5426264
+      _Icode_Cout_242 |   .8822436   .0644827    13.68   0.000      .753919    1.010568
+      _Icode_Cout_243 |   .4496465   .1087642     4.13   0.000     .2331989    .6660941
+      _Icode_Cout_244 |   .5141877   .0898096     5.73   0.000      .335461    .6929144
+      _Icode_Cout_245 |   .4746264    .076949     6.17   0.000      .321493    .6277598
+      _Icode_Cout_246 |   1.022456   .0842472    12.14   0.000     .8547991    1.190114
+      _Icode_Cout_247 |   .6893694   .0783602     8.80   0.000     .5334278    .8453111
+      _Icode_Cout_248 |     .56052   .0866154     6.47   0.000     .3881499    .7328902
+      _Icode_Cout_249 |   .4954394    .115177     4.30   0.000     .2662298     .724649
+      _Icode_Cout_250 |   .4798844   .0751327     6.39   0.000     .3303656    .6294032
+      _Icode_Cout_251 |   .1887533   .0995599     1.90   0.062    -.0093771    .3868838
+      _Icode_Cout_252 |   .6740472   .0715497     9.42   0.000     .5316587    .8164357
+      _Icode_Cout_253 |   .3756751   .1176397     3.19   0.002     .1415646    .6097856
+      _Icode_Cout_254 |   .6034413   .0755786     7.98   0.000      .453035    .7538475
+      _Icode_Cout_255 |   .8479765   .0952526     8.90   0.000     .6584177    1.037535
+      _Icode_Cout_256 |   .7911327   .1103842     7.17   0.000     .5714611    1.010804
+      _Icode_Cout_257 |   .7047979   .1054871     6.68   0.000     .4948719    .9147239
+      _Icode_Cout_258 |   .7248646   .1014271     7.15   0.000     .5230182     .926711
+      _Icode_Cout_259 |   .7399548   .1161501     6.37   0.000     .5088087    .9711009
+      _Icode_Cout_260 |   .6629623   .1187228     5.58   0.000     .4266964    .8992282
+      _Icode_Cout_261 |   .6326421   .1223005     5.17   0.000     .3892564    .8760278
+      _Icode_Cout_262 |   .6195748   .1118632     5.54   0.000       .39696    .8421896
+      _Icode_Cout_263 |   .6879828   .1122651     6.13   0.000      .464568    .9113975
+      _Icode_Cout_264 |   .8710418    .095149     9.15   0.000     .6816893    1.060394
+      _Icode_Cout_265 |    1.27164   .1709617     7.44   0.000     .9314155    1.611865
+      _Icode_Cout_266 |   .7704554   .1098244     7.02   0.000     .5518979    .9890129
+      _Icode_Cout_267 |     .66491    .114382     5.81   0.000     .4372825    .8925375
+      _Icode_Cout_268 |   .6764525   .1168985     5.79   0.000     .4438172    .9090879
+      _Icode_Cout_269 |   .9684487    .079545    12.17   0.000     .8101491    1.126748
+      _Icode_Cout_270 |   1.664707   .1442618    11.54   0.000     1.377617    1.951797
+      _Icode_Cout_271 |   1.688956   .1123382    15.03   0.000     1.465396    1.912516
+      _Icode_Cout_272 |   .9888073   .1009141     9.80   0.000     .7879818    1.189633
+      _Icode_Cout_273 |   .9647119   .1027092     9.39   0.000     .7603141     1.16911
+      _Icode_Cout_274 |   .2515854    .067729     3.71   0.000     .1168004    .3863703
+      _Icode_Cout_275 |  -.4066299   .0679701    -5.98   0.000    -.5418946   -.2713652
+      _Icode_Cout_276 |   .0141377   .0647395     0.22   0.828    -.1146981    .1429734
+      _Icode_Cout_277 |   -.397807   .0649387    -6.13   0.000    -.5270391   -.2685749
+      _Icode_Cout_278 |  -.5636477   .0638043    -8.83   0.000    -.6906222   -.4366732
+      _Icode_Cout_279 |  -.1223058   .0634488    -1.93   0.057    -.2485729    .0039613
+      _Icode_Cout_280 |  -.0840394   .0715786    -1.17   0.244    -.2264854    .0584066
+      _Icode_Cout_281 |   .5510889   .0798945     6.90   0.000     .3920939    .7100839
+      _Icode_Cout_282 |   2.215424   .1403479    15.79   0.000     1.936122    2.494725
+      _Icode_Cout_283 |   .0596098   .0806392     0.74   0.462    -.1008672    .2200869
+      _Icode_Cout_284 |  -.2818551   .0653131    -4.32   0.000    -.4118322   -.1518779
+      _Icode_Cout_285 |  -.4145589   .0746753    -5.55   0.000    -.5631675   -.2659502
+      _Icode_Cout_286 |  -.4019184   .0740763    -5.43   0.000    -.5493349   -.2545018
+      _Icode_Cout_287 |  -.2169637   .0653359    -3.32   0.001    -.3469863    -.086941
+      _Icode_Cout_288 |    .183824   .1543475     1.19   0.237    -.1233373    .4909853
+      _Icode_Cout_289 |   1.978984   .0754896    26.22   0.000     1.828755    2.129213
+      _Icode_Cout_290 |    1.24107   .1675074     7.41   0.000     .9077197     1.57442
+      _Icode_Cout_291 |   .1104452   .0789418     1.40   0.166     -.046654    .2675445
+      _Icode_Cout_292 |   2.128226   .0645691    32.96   0.000     1.999729    2.256723
+      _Icode_Cout_293 |  -.2436261   .0757682    -3.22   0.002    -.3944097   -.0928425
+      _Icode_Cout_294 |   .2639349   .1362827     1.94   0.056    -.0072764    .5351462
+      _Icode_Cout_295 |   -.086025   .1491953    -0.58   0.566     -.382933    .2108831
+      _Icode_Cout_296 |  -.6533071   .1624095    -4.02   0.000    -.9765123    -.330102
+      _Icode_Cout_297 |  -.0775899   .0873646    -0.89   0.377    -.2514509    .0962711
+      _Icode_Cout_298 |  -.2602311   .1247835    -2.09   0.040    -.5085583    -.011904
+      _Icode_Cout_299 |  -.3608301    .122151    -2.95   0.004    -.6039183    -.117742
+      _Icode_Cout_300 |   .0016773   .1494869     0.01   0.991     -.295811    .2991657
+      _Icode_Cout_301 |  -.1713209   .1542442    -1.11   0.270    -.4782767    .1356349
+      _Icode_Cout_302 |  -.1700882   .1631263    -1.04   0.300    -.4947199    .1545434
+      _Icode_Cout_303 |  -.3518951   .1193311    -2.95   0.004    -.5893715   -.1144187
+      _Icode_Cout_304 |  -.3460311   .1682469    -2.06   0.043    -.6808532    -.011209
+      _Icode_Cout_305 |   .1535924   .0858932     1.79   0.078    -.0173405    .3245253
+      _Icode_Cout_306 |  -.0500566   .1228221    -0.41   0.685    -.2944804    .1943672
+      _Icode_Cout_307 |  -.1343846   .1347859    -1.00   0.322    -.4026171    .1338478
+      _Icode_Cout_308 |  -.5702377   .1901914    -3.00   0.004    -.9487308   -.1917447
+      _Icode_Cout_309 |  -.1660018   .0971268    -1.71   0.091    -.3592902    .0272867
+      _Icode_Cout_310 |  -.5211129   .1801141    -2.89   0.005    -.8795514   -.1626744
+      _Icode_Cout_311 |   .7131351   .0822215     8.67   0.000     .5495091     .876761
+      _Icode_Cout_312 |  -.5543402   .1586812    -3.49   0.001    -.8701258   -.2385545
+      _Icode_Cout_313 |  -.3877718   .1561554    -2.48   0.015    -.6985309   -.0770126
+      _Icode_Cout_314 |   .2682162   .0901141     2.98   0.004     .0888835    .4475489
+      _Icode_Cout_315 |  -.6192182   .1640899    -3.77   0.000    -.9457676   -.2926689
+      _Icode_Cout_316 |   -.670915   .0757616    -8.86   0.000    -.8216853   -.5201447
+      _Icode_Cout_317 |  -.6644706   .0675095    -9.84   0.000    -.7988189   -.5301224
+      _Icode_Cout_318 |   -.561768   .0675189    -8.32   0.000    -.6961348   -.4274011
+      _Icode_Cout_319 |   -.558747   .0856495    -6.52   0.000    -.7291949   -.3882991
+      _Icode_Cout_320 |  -.1620936   .1023463    -1.58   0.117    -.3657693    .0415821
+      _Icode_Cout_321 |  -.5954211   .0885105    -6.73   0.000    -.7715626   -.4192797
+      _Icode_Cout_322 |  -.5763691   .0674989    -8.54   0.000    -.7106963    -.442042
+      _Icode_Cout_323 |  -.5955077   .0696252    -8.55   0.000    -.7340663   -.4569491
+      _Icode_Cout_324 |  -.3300627   .0746811    -4.42   0.000    -.4786828   -.1814426
+      _Icode_Cout_325 |  -.1568524   .1316432    -1.19   0.237    -.4188308     .105126
+      _Icode_Cout_326 |  -.5353831   .0687058    -7.79   0.000     -.672112   -.3986542
+      _Icode_Cout_327 |  -.3928352   .0824298    -4.77   0.000    -.5568757   -.2287946
+      _Icode_Cout_328 |  -.5139728   .0871746    -5.90   0.000    -.6874557   -.3404899
+      _Icode_Cout_329 |  -.4941007   .0696955    -7.09   0.000    -.6327993   -.3554022
+      _Icode_Cout_330 |   .8793285   .0954802     9.21   0.000     .6893168     1.06934
+      _Icode_Cout_331 |   .7413794   .0939953     7.89   0.000     .5543228    .9284361
+      _Icode_Cout_332 |   .1620958   .0859089     1.89   0.063    -.0088685      .33306
+      _Icode_Cout_333 |    .212023   .0671845     3.16   0.002     .0783217    .3457244
+      _Icode_Cout_334 |   .1204509   .0639681     1.88   0.063    -.0068498    .2477516
+      _Icode_Cout_335 |   .5435933   .0734696     7.40   0.000     .3973841    .6898024
+      _Icode_Cout_336 |   .3248422   .0718577     4.52   0.000     .1818408    .4678435
+      _Icode_Cout_337 |   .5631314   .0649015     8.68   0.000     .4339732    .6922896
+      _Icode_Cout_338 |   .1193431   .0645303     1.85   0.068    -.0090763    .2477625
+      _Icode_Cout_339 |    .310294   .0639998     4.85   0.000     .1829303    .4376576
+      _Icode_Cout_340 |   .7050627    .094232     7.48   0.000      .517535    .8925904
+      _Icode_Cout_341 |   .4239821    .079943     5.30   0.000     .2648905    .5830737
+      _Icode_Cout_342 |   .1425438   .0641492     2.22   0.029     .0148828    .2702049
+      _Icode_Cout_343 |   .3083774   .0638052     4.83   0.000     .1814011    .4353538
+      _Icode_Cout_344 |   .1735819   .0647683     2.68   0.009     .0446889    .3024749
+      _Icode_Cout_345 |   1.694274   .0719808    23.54   0.000     1.551027     1.83752
+      _Icode_Cout_346 |   1.409019   .1050763    13.41   0.000      1.19991    1.618127
+      _Icode_Cout_347 |   1.223369    .066981    18.26   0.000     1.090072    1.356665
+      _Icode_Cout_348 |   1.450397   .0638048    22.73   0.000     1.323421    1.577373
+      _Icode_Cout_349 |   1.227784   .0895334    13.71   0.000     1.049606    1.405961
+      _Icode_Cout_350 |   1.081202   .1282945     8.43   0.000     .8258875    1.336516
+      _Icode_Cout_351 |   1.185116   .0906269    13.08   0.000     1.004763    1.365469
+      _Icode_Cout_352 |    1.12055   .0864319    12.96   0.000     .9485452    1.292555
+      _Icode_Cout_353 |   1.070895   .0957068    11.19   0.000     .8804327    1.261358
+      _Icode_Cout_354 |   1.173869   .0861251    13.63   0.000     1.002475    1.345263
+      _Icode_Cout_355 |   1.080938   .1007398    10.73   0.000     .8804595    1.281417
+      _Icode_Cout_356 |   1.179449   .0879045    13.42   0.000     1.004514    1.354385
+      _Icode_Cout_357 |   1.222142   .0853337    14.32   0.000     1.052323    1.391962
+      _Icode_Cout_358 |   1.108969   .0966886    11.47   0.000     .9165524    1.301385
+      _Icode_Cout_359 |   1.099654   .1152035     9.55   0.000     .8703918    1.328916
+      _Icode_Cout_360 |   .9929737   .1006516     9.87   0.000     .7926707    1.193277
+      _Icode_Cout_361 |   1.158883   .0757107    15.31   0.000     1.008214    1.309552
+      _Icode_Cout_362 |    1.01212   .1065612     9.50   0.000     .8000567    1.224184
+      _Icode_Cout_363 |   1.189181   .0861519    13.80   0.000     1.017734    1.360629
+      _Icode_Cout_364 |   .8667103   .1340324     6.47   0.000     .5999773    1.133443
+      _Icode_Cout_365 |   1.134516   .1001286    11.33   0.000     .9352542    1.333779
+      _Icode_Cout_366 |   .9871166   .1071144     9.22   0.000     .7739521    1.200281
+      _Icode_Cout_367 |   1.090387   .0912619    11.95   0.000     .9087701    1.272004
+      _Icode_Cout_368 |   1.155518   .1014454    11.39   0.000     .9536354    1.357401
+      _Icode_Cout_369 |   1.182587   .1139144    10.38   0.000     .9558906    1.409284
+      _Icode_Cout_370 |   1.538079   .1414771    10.87   0.000      1.25653    1.819627
+      _Icode_Cout_371 |   1.179623   .0954634    12.36   0.000     .9896445    1.369601
+      _Icode_Cout_372 |     1.2083   .0876687    13.78   0.000     1.033834    1.382767
+      _Icode_Cout_373 |   1.071084   .1219168     8.79   0.000     .8284618    1.313706
+      _Icode_Cout_374 |   1.125007   .1013827    11.10   0.000     .9232495    1.326765
+      _Icode_Cout_375 |   1.099872   .1062878    10.35   0.000     .8883524    1.311391
+      _Icode_Cout_376 |   1.324571   .1199088    11.05   0.000     1.085945    1.563197
+      _Icode_Cout_377 |   1.425756   .1068825    13.34   0.000     1.213053    1.638459
+      _Icode_Cout_378 |   .9106066   .1715955     5.31   0.000     .5691206    1.252093
+      _Icode_Cout_379 |   1.313267   .1667906     7.87   0.000     .9813429    1.645191
+      _Icode_Cout_380 |   1.516597   .1685429     9.00   0.000     1.181186    1.852008
+      _Icode_Cout_381 |   1.433277   .1147582    12.49   0.000     1.204901    1.661653
+      _Icode_Cout_382 |   1.172778   .1071131    10.95   0.000     .9596159    1.385939
+      _Icode_Cout_383 |   1.162411    .133925     8.68   0.000     .8958916     1.42893
+      _Icode_Cout_384 |   1.145644   .1118686    10.24   0.000     .9230185     1.36827
+      _Icode_Cout_385 |   1.132156    .128986     8.78   0.000      .875466    1.388846
+      _Icode_Cout_386 |   1.177496   .1086826    10.83   0.000     .9612107    1.393781
+      _Icode_Cout_387 |   .8779611   .0780582    11.25   0.000     .7226205    1.033302
+      _Icode_Cout_388 |   1.002698   .0719765    13.93   0.000     .8594603    1.145936
+      _Icode_Cout_389 |    .950692   .0905756    10.50   0.000     .7704408    1.130943
+      _Icode_Cout_390 |   1.103206   .0791877    13.93   0.000     .9456172    1.260794
+      _Icode_Cout_391 |    1.17379   .0790729    14.84   0.000      1.01643     1.33115
+      _Icode_Cout_392 |   .9478783   .0758244    12.50   0.000     .7969828    1.098774
+      _Icode_Cout_393 |   1.191084   .0963131    12.37   0.000     .9994144    1.382753
+      _Icode_Cout_394 |   .9368057   .0797148    11.75   0.000     .7781682    1.095443
+      _Icode_Cout_395 |  -.8171113   .0824828    -9.91   0.000    -.9812574   -.6529652
+      _Icode_Cout_396 |  -.7095082   .0609361   -11.64   0.000     -.830775   -.5882415
+      _Icode_Cout_397 |  -1.112116   .0347402   -32.01   0.000    -1.181251   -1.042981
+      _Icode_Cout_398 |  -.3290261   .0260904   -12.61   0.000    -.3809476   -.2771046
+      _Icode_Cout_399 |  -.4269307   .1312882    -3.25   0.002    -.6882026   -.1656589
+      _Icode_Cout_400 |   -.259438   .0236456   -10.97   0.000    -.3064944   -.2123817
+      _Icode_Cout_401 |  -.4343031   .0362845   -11.97   0.000    -.5065116   -.3620947
+      _Icode_Cout_402 |   .4924668   .1119116     4.40   0.000     .2697555    .7151781
+      _Icode_Cout_403 |    -1.2549   .0464789   -27.00   0.000    -1.347396   -1.162404
+      _Icode_Cout_404 |   .1032915   .0649467     1.59   0.116    -.0259564    .2325395
+      _Icode_Cout_405 |   -1.09217   .0308953   -35.35   0.000    -1.153653   -1.030686
+      _Icode_Cout_406 |  -1.276609    .024501   -52.10   0.000    -1.325368   -1.227851
+      _Icode_Cout_407 |  -.7994419   .0513616   -15.56   0.000    -.9016547   -.6972291
+      _Icode_Cout_408 |   -1.09543   .0541354   -20.24   0.000    -1.203163   -.9876971
+      _Icode_Cout_409 |  -.2612924   .0235526   -11.09   0.000    -.3081636   -.2144212
+      _Icode_Cout_410 |  -.6173322   .0917212    -6.73   0.000    -.7998633   -.4348012
+      _Icode_Cout_411 |  -1.365992   .0299722   -45.58   0.000    -1.425639   -1.306346
+      _Icode_Cout_412 |  -.6033554   .0256331   -23.54   0.000    -.6543669   -.5523439
+      _Icode_Cout_413 |  -1.172969   .0423163   -27.72   0.000    -1.257181   -1.088757
+      _Icode_Cout_414 |  -.4162025   .0269788   -15.43   0.000     -.469892   -.3625129
+      _Icode_Cout_415 |  -1.370912   .0450796   -30.41   0.000    -1.460623   -1.281201
+      _Icode_Cout_416 |  -.2951727   .0242129   -12.19   0.000    -.3433579   -.2469875
+      _Icode_Cout_417 |  -.4210655   .0626906    -6.72   0.000    -.5458239   -.2963072
+      _Icode_Cout_418 |  -.8101989   .0647584   -12.51   0.000    -.9390723   -.6813255
+      _Icode_Cout_419 |  -.4810584   .0774908    -6.21   0.000    -.6352701   -.3268468
+      _Icode_Cout_420 |  -.4176431   .0629951    -6.63   0.000    -.5430074   -.2922787
+      _Icode_Cout_421 |  -.6573533   .0707881    -9.29   0.000    -.7982261   -.5164806
+      _Icode_Cout_422 |  -.6210831   .1024932    -6.06   0.000    -.8250511   -.4171152
+      _Icode_Cout_423 |   -.571033   .0834976    -6.84   0.000    -.7371984   -.4048675
+      _Icode_Cout_424 |  -.1904255   .0650143    -2.93   0.004     -.319808   -.0610429
+      _Icode_Cout_425 |  -.5153031   .1213594    -4.25   0.000     -.756816   -.2737902
+      _Icode_Cout_426 |  -.3424711   .0888546    -3.85   0.000    -.5192974   -.1656447
+      _Icode_Cout_427 |  -.5711552   .1450506    -3.94   0.000    -.8598151   -.2824954
+      _Icode_Cout_428 |  -.7572005   .0812609    -9.32   0.000    -.9189148   -.5954863
+      _Icode_Cout_429 |  -.2342741   .1188605    -1.97   0.052    -.4708141    .0022659
+      _Icode_Cout_430 |  -.6396484   .0704316    -9.08   0.000    -.7798117   -.4994852
+      _Icode_Cout_431 |  -.7362923   .0643035   -11.45   0.000    -.8642603   -.6083244
+      _Icode_Cout_432 |  -.6545964   .0646367   -10.13   0.000    -.7832275   -.5259652
+      _Icode_Cout_433 |   .4430255    .076027     5.83   0.000     .2917269     .594324
+      _Icode_Cout_434 |    .291282   .0851903     3.42   0.001     .1217478    .4608162
+      _Icode_Cout_435 |   1.043895   .1728679     6.04   0.000     .6998769    1.387913
+      _Icode_Cout_436 |   .4043377   .0744876     5.43   0.000     .2561027    .5525727
+      _Icode_Cout_437 |   .3308783   .0710936     4.65   0.000     .1893976    .4723591
+      _Icode_Cout_438 |   .4720597   .0842289     5.60   0.000     .3044388    .6396807
+      _Icode_Cout_439 |    .675343   .0912546     7.40   0.000     .4937406    .8569455
+      _Icode_Cout_440 |   .8769289   .0895463     9.79   0.000     .6987261    1.055132
+      _Icode_Cout_441 |   .4585593    .078788     5.82   0.000     .3017662    .6153523
+      _Icode_Cout_442 |   .3640284   .0850789     4.28   0.000      .194716    .5333407
+      _Icode_Cout_443 |   .3321871   .0754286     4.40   0.000     .1820795    .4822948
+      _Icode_Cout_444 |   .6192354   .1015276     6.10   0.000      .417189    .8212818
+      _Icode_Cout_445 |   .2946622    .081709     3.61   0.001     .1320562    .4572683
+      _Icode_Cout_446 |   .4087688   .1104249     3.70   0.000     .1890163    .6285213
+      _Icode_Cout_447 |   .3993673   .0719293     5.55   0.000     .2562235    .5425112
+      _Icode_Cout_448 |     .12844   .0878385     1.46   0.148    -.0463643    .3032443
+      _Icode_Cout_449 |   .5233778   .0709783     7.37   0.000     .3821265     .664629
+      _Icode_Cout_450 |   .6984152   .0826291     8.45   0.000      .533978    .8628523
+      _Icode_Cout_451 |   .4842082    .081978     5.91   0.000     .3210668    .6473495
+      _Icode_Cout_452 |   .5824372   .0808834     7.20   0.000     .4214742    .7434002
+      _Icode_Cout_453 |  -.0744233   .0881579    -0.84   0.401    -.2498632    .1010165
+      _Icode_Cout_454 |  -.8891055   .0857764   -10.37   0.000    -1.059806    -.718405
+      _Icode_Cout_455 |  -.1234214   .1698828    -0.73   0.470     -.461499    .2146562
+      _Icode_Cout_456 |  -1.096101   .0715616   -15.32   0.000    -1.238513   -.9536886
+      _Icode_Cout_457 |  -1.554296   .0721461   -21.54   0.000    -1.697871    -1.41072
+      _Icode_Cout_458 |  -.2050659   .1720002    -1.19   0.237    -.5473572    .1372254
+      _Icode_Cout_459 |  -.4779331   .1768345    -2.70   0.008    -.8298449   -.1260213
+      _Icode_Cout_460 |  -.0585382   .1040717    -0.56   0.575    -.2656475    .1485712
+      _Icode_Cout_461 |  -.6462606   .0853389    -7.57   0.000    -.8160905   -.4764308
+      _Icode_Cout_462 |   -.644423    .110734    -5.82   0.000    -.8647907   -.4240552
+      _Icode_Cout_463 |  -.4614828   .0731424    -6.31   0.000    -.6070407   -.3159249
+      _Icode_Cout_464 |  -.7317932   .0886457    -8.26   0.000    -.9082038   -.5553826
+      _Icode_Cout_465 |  -.8457186   .0830604   -10.18   0.000    -1.011014   -.6804231
+      _Icode_Cout_466 |  -.8119247   .0957099    -8.48   0.000    -1.002393   -.6214559
+      _Icode_Cout_467 |   -1.12471   .0715462   -15.72   0.000    -1.267092    -.982329
+      _Icode_Cout_468 |  -.5139009   .0851453    -6.04   0.000    -.6833454   -.3444563
+      _Icode_Cout_469 |  -.8494481   .0931841    -9.12   0.000     -1.03489   -.6640057
+      _Icode_Cout_470 |  -.6963198   .0825393    -8.44   0.000    -.8605783   -.5320613
+      _Icode_Cout_471 |  -.4853566   .0963643    -5.04   0.000    -.6771277   -.2935854
+      _Icode_Cout_472 |  -1.078093   .0721102   -14.95   0.000    -1.221597   -.9345888
+      _Icode_Cout_473 |  -.5655134   .1280791    -4.42   0.000     -.820399   -.3106278
+      _Icode_Cout_474 |  -.6648821   .1137888    -5.84   0.000     -.891329   -.4384351
+      _Icode_Cout_475 |  -1.087517   .0742153   -14.65   0.000     -1.23521    -.939824
+      _Icode_Cout_476 |  -.3651961   .0922721    -3.96   0.000    -.5488235   -.1815687
+      _Icode_Cout_477 |  -.8213945   .0994047    -8.26   0.000    -1.019216   -.6235728
+      _Icode_Cout_478 |  -1.037427   .0736621   -14.08   0.000    -1.184019   -.8908344
+      _Icode_Cout_479 |  -1.321097   .0752956   -17.55   0.000     -1.47094   -1.171254
+      _Icode_Cout_480 |  -1.045972   .0852568   -12.27   0.000    -1.215639    -.876306
+      _Icode_Cout_481 |   .3940129   .0833837     4.73   0.000      .228074    .5599518
+      _Icode_Cout_482 |  -.3653568   .0832817    -4.39   0.000    -.5310926   -.1996209
+      _Icode_Cout_483 |  -.2472023   .1308644    -1.89   0.063    -.5076307    .0132262
+      _Icode_Cout_484 |  -.6681202   .0861666    -7.75   0.000    -.8395972   -.4966431
+      _Icode_Cout_485 |   .4932791    .177117     2.79   0.007      .140805    .8457532
+      _Icode_Cout_486 |  -.0220141   .1488401    -0.15   0.883    -.3182153    .2741871
+      _Icode_Cout_487 |  -.3108979   .0848266    -3.67   0.000    -.4797082   -.1420876
+      _Icode_Cout_488 |   1.766277   .0993819    17.77   0.000     1.568501    1.964053
+      _Icode_Cout_489 |  -.7093431   .1395512    -5.08   0.000    -.9870588   -.4316274
+      _Icode_Cout_490 |   .6425348    .172987     3.71   0.000     .2982798    .9867898
+      _Icode_Cout_491 |  -.1546649   .0859173    -1.80   0.076    -.3256458     .016316
+      _Icode_Cout_492 |  -.5074508   .0716944    -7.08   0.000    -.6501271   -.3647744
+      _Icode_Cout_493 |  -.4777799   .1626094    -2.94   0.004    -.8013829   -.1541769
+      _Icode_Cout_494 |  -.2598938   .0851003    -3.05   0.003    -.4292488   -.0905387
+      _Icode_Cout_495 |   .0335026   .0692364     0.48   0.630    -.1042822    .1712873
+      _Icode_Cout_496 |   .9905903   .1863494     5.32   0.000     .6197433    1.361437
+      _Icode_Cout_497 |   1.157544   .0752307    15.39   0.000      1.00783    1.307258
+      _Icode_Cout_498 |  -.0469796   .0797584    -0.59   0.558    -.2057039    .1117448
+      _Icode_Cout_499 |  -.2432967   .0926084    -2.63   0.010    -.4275932   -.0590002
+      _Icode_Cout_500 |    .100123   .0711624     1.41   0.163    -.0414947    .2417407
+      _Icode_Cout_501 |  -.0472593   .1430047    -0.33   0.742    -.3318477    .2373291
+      _Icode_Cout_502 |  -.4887989   .0924602    -5.29   0.000    -.6728006   -.3047972
+      _Icode_Cout_503 |   .1672028   .1550482     1.08   0.284    -.1413529    .4757585
+      _Icode_Cout_504 |  -.6526879   .0759193    -8.60   0.000    -.8037721   -.5016037
+      _Icode_Cout_505 |    .000153   .0902731     0.00   0.999    -.1794961    .1798021
+      _Icode_Cout_506 |  -.7508506   .0958365    -7.83   0.000    -.9415713   -.5601299
+      _Icode_Cout_507 |  -.1365547   .0693009    -1.97   0.052     -.274468    .0013586
+      _Icode_Cout_508 |   .6893355   .0853256     8.08   0.000     .5195321    .8591389
+      _Icode_Cout_509 |  -.2107603   .0720144    -2.93   0.004    -.3540736    -.067447
+      _Icode_Cout_510 |   .1085098   .0719668     1.51   0.136    -.0347086    .2517283
+      _Icode_Cout_511 |   .4959284   .0652672     7.60   0.000     .3660426    .6258142
+      _Icode_Cout_512 |    .074114   .0686911     1.08   0.284    -.0625856    .2108135
+      _Icode_Cout_513 |  -.0586795   .0852939    -0.69   0.493    -.2284199    .1110608
+      _Icode_Cout_514 |  -.1810245   .0806655    -2.24   0.028     -.341554    -.020495
+      _Icode_Cout_515 |   .4909331   .0647307     7.58   0.000     .3621149    .6197513
+      _Icode_Cout_516 |   .6104679   .0678779     8.99   0.000     .4753866    .7455492
+      _Icode_Cout_517 |   .3933147   .0686687     5.73   0.000     .2566596    .5299697
+      _Icode_Cout_518 |  -.1506434   .0728589    -2.07   0.042    -.2956373   -.0056495
+      _Icode_Cout_519 |   .2372588   .0680455     3.49   0.001      .101844    .3726736
+      _Icode_Cout_520 |   1.149813   .0977881    11.76   0.000     .9552083    1.344417
+      _Icode_Cout_521 |    1.77079   .0869902    20.36   0.000     1.597674    1.943906
+      _Icode_Cout_522 |  -.2442058   .0650164    -3.76   0.000    -.3735925   -.1148192
+      _Icode_Cout_523 |  -.2191839    .068562    -3.20   0.002    -.3556266   -.0827413
+      _Icode_Cout_524 |   .4804812   .0732443     6.56   0.000     .3347203     .626242
+      _Icode_Cout_525 |   .5671328   .0749852     7.56   0.000     .4179076     .716358
+      _Icode_Cout_526 |   .0200853   .0710511     0.28   0.778    -.1213109    .1614816
+      _Icode_Cout_527 |   .7435348   .0845469     8.79   0.000     .5752812    .9117884
+      _Icode_Cout_528 |  -.3377956   .0832017    -4.06   0.000    -.5033722   -.1722189
+      _Icode_Cout_529 |   .5233454   .1150396     4.55   0.000     .2944093    .7522815
+      _Icode_Cout_530 |  -.2475359   .0706568    -3.50   0.001    -.3881475   -.1069243
+      _Icode_Cout_531 |   .1844474    .073252     2.52   0.014     .0386714    .3302235
+      _Icode_Cout_532 |   1.118754   .0816174    13.71   0.000     .9563303    1.281178
+      _Icode_Cout_533 |   1.505388   .1154964    13.03   0.000     1.275543    1.735233
+      _Icode_Cout_534 |   1.372775   .0839474    16.35   0.000     1.205714    1.539836
+      _Icode_Cout_535 |    1.04788   .0843219    12.43   0.000     .8800742    1.215686
+      _Icode_Cout_536 |   1.194674   .0871687    13.71   0.000     1.021203    1.368146
+      _Icode_Cout_537 |   1.630626   .0812945    20.06   0.000     1.468845    1.792408
+      _Icode_Cout_538 |   1.296105   .0719326    18.02   0.000     1.152954    1.439255
+      _Icode_Cout_539 |    1.03604   .1158181     8.95   0.000      .805555    1.266526
+      _Icode_Cout_540 |    .946314   .0908432    10.42   0.000     .7655302    1.127098
+      _Icode_Cout_541 |    .778757   .1042676     7.47   0.000     .5712578    .9862562
+      _Icode_Cout_542 |   .6897894   .1288145     5.35   0.000     .4334404    .9461384
+      _Icode_Cout_543 |   1.370508   .1250229    10.96   0.000     1.121705    1.619311
+      _Icode_Cout_544 |   1.297246   .1215734    10.67   0.000     1.055307    1.539185
+      _Icode_Cout_545 |   1.294351   .1261766    10.26   0.000     1.043252    1.545451
+      _Icode_Cout_546 |    1.26455   .1143309    11.06   0.000     1.037024    1.492076
+      _Icode_Cout_547 |   1.362706   .1364669     9.99   0.000     1.091128    1.634284
+      _Icode_Cout_548 |   1.165895   .1232889     9.46   0.000     .9205426    1.411248
+      _Icode_Cout_549 |   .9821598   .1005039     9.77   0.000     .7821507    1.182169
+      _Icode_Cout_550 |   1.304638   .1150682    11.34   0.000     1.075645    1.533631
+      _Icode_Cout_551 |   .7602241   .1219454     6.23   0.000     .5175451    1.002903
+      _Icode_Cout_552 |   1.048399   .0900802    11.64   0.000     .8691338    1.227664
+      _Icode_Cout_553 |   .7804139   .1129603     6.91   0.000     .5556158    1.005212
+      _Icode_Cout_554 |   1.300508   .1106405    11.75   0.000     1.080326     1.52069
+      _Icode_Cout_555 |   1.537387   .0934655    16.45   0.000     1.351385    1.723389
+      _Icode_Cout_556 |   1.189233   .1059151    11.23   0.000     .9784552    1.400011
+      _Icode_Cout_557 |   1.563564    .092669    16.87   0.000     1.379147    1.747981
+      _Icode_Cout_558 |   1.254514   .1377637     9.11   0.000     .9803561    1.528673
+      _Icode_Cout_559 |   1.194872   .1498215     7.98   0.000      .896718    1.493027
+      _Icode_Cout_560 |   1.113323   .0806637    13.80   0.000      .952797    1.273849
+      _Icode_Cout_561 |    1.00006    .094177    10.62   0.000     .8126417    1.187478
+      _Icode_Cout_562 |   .8361433   .1443975     5.79   0.000      .548783    1.123504
+      _Icode_Cout_563 |   1.073744   .0900093    11.93   0.000     .8946194    1.252868
+      _Icode_Cout_564 |   1.235683    .098286    12.57   0.000     1.040087    1.431278
+      _Icode_Cout_565 |   .9526515   .1379943     6.90   0.000     .6780341    1.227269
+      _Icode_Cout_566 |    1.20215   .0884047    13.60   0.000     1.026219    1.378081
+      _Icode_Cout_567 |   1.084263   .0987041    10.98   0.000     .8878356    1.280691
+      _Icode_Cout_568 |   1.111465   .1147196     9.69   0.000     .8831654    1.339764
+      _Icode_Cout_569 |    1.21949   .1002769    12.16   0.000     1.019933    1.419047
+      _Icode_Cout_570 |   1.184267   .0786141    15.06   0.000      1.02782    1.340715
+      _Icode_Cout_571 |   1.020595   .1191928     8.56   0.000     .7833941    1.257796
+      _Icode_Cout_572 |   .9985956   .1379893     7.24   0.000     .7239881    1.273203
+      _Icode_Cout_573 |   1.181855   .1030521    11.47   0.000     .9767747    1.386935
+      _Icode_Cout_574 |   1.156933   .0741504    15.60   0.000     1.009368    1.304497
+      _Icode_Cout_575 |   1.017303   .1305553     7.79   0.000     .7574893    1.277116
+      _Icode_Cout_576 |   1.035889   .0780048    13.28   0.000     .8806546    1.191123
+      _Icode_Cout_577 |   .8823022   .1589338     5.55   0.000     .5660139     1.19859
+      _Icode_Cout_578 |   1.119987   .0565059    19.82   0.000     1.007537    1.232437
+      _Icode_Cout_579 |   .9980966   .0942623    10.59   0.000     .8105087    1.185685
+      _Icode_Cout_580 |    1.11561   .1116677     9.99   0.000     .8933841    1.337836
+      _Icode_Cout_581 |   1.136391   .1141276     9.96   0.000     .9092698    1.363512
+      _Icode_Cout_582 |   1.092088   .1093453     9.99   0.000     .8744841    1.309692
+      _Icode_Cout_583 |   1.071671   .0716175    14.96   0.000     .9291481    1.214195
+      _Icode_Cout_584 |    1.19044   .0957791    12.43   0.000     .9998336    1.381047
+      _Icode_Cout_585 |   .9086679   .1054907     8.61   0.000     .6987347    1.118601
+      _Icode_Cout_586 |   .7958973   .1005484     7.92   0.000     .5957996    .9959951
+      _Icode_Cout_587 |    1.19115   .0959443    12.42   0.000     1.000214    1.382085
+      _Icode_Cout_588 |   1.194504   .0835542    14.30   0.000     1.028226    1.360782
+      _Icode_Cout_589 |   1.155639   .1008977    11.45   0.000     .9548462    1.356432
+      _Icode_Cout_590 |   .7431891   .1086893     6.84   0.000     .5268906    .9594877
+      _Icode_Cout_591 |   1.072734    .163496     6.56   0.000      .747367    1.398102
+      _Icode_Cout_592 |   .9377134   .1247659     7.52   0.000     .6894214    1.186005
+      _Icode_Cout_593 |   .7000287   .1554164     4.50   0.000     .3907401    1.009317
+      _Icode_Cout_594 |   1.211228   .1227561     9.87   0.000     .9669353     1.45552
+      _Icode_Cout_595 |   1.164073   .0686448    16.96   0.000     1.027465     1.30068
+      _Icode_Cout_596 |   1.200372   .1183218    10.14   0.000     .9649045     1.43584
+      _Icode_Cout_597 |   1.162339   .1195114     9.73   0.000     .9245035    1.400174
+      _Icode_Cout_598 |    1.08274   .0884263    12.24   0.000     .9067657    1.258714
+      _Icode_Cout_599 |   1.545647   .1627522     9.50   0.000     1.221759    1.869534
+      _Icode_Cout_600 |   1.153506    .078798    14.64   0.000     .9966926    1.310319
+      _Icode_Cout_601 |    1.20521    .108599    11.10   0.000     .9890909    1.421329
+      _Icode_Cout_602 |   1.055267   .0879254    12.00   0.000     .8802903    1.230245
+      _Icode_Cout_603 |   1.079752   .0911905    11.84   0.000     .8982773    1.261227
+      _Icode_Cout_604 |   1.205657   .0938612    12.85   0.000     1.018868    1.392447
+      _Icode_Cout_605 |    1.12605   .1005166    11.20   0.000     .9260155    1.326084
+      _Icode_Cout_606 |  -.3393471   .1212575    -2.80   0.006    -.5806572    -.098037
+      _Icode_Cout_607 |   .3160424   .0848161     3.73   0.000      .147253    .4848318
+      _Icode_Cout_608 |   .1338999   .0655805     2.04   0.044     .0033906    .2644092
+      _Icode_Cout_609 |  -.2562487   .1313801    -1.95   0.055    -.5177035    .0052061
+      _Icode_Cout_610 |  -.4581762   .1257638    -3.64   0.000     -.708454   -.2078983
+      _Icode_Cout_611 |  -.4483939   .1131172    -3.96   0.000    -.6735042   -.2232836
+      _Icode_Cout_612 |   .1554732   .0794605     1.96   0.054    -.0026582    .3136046
+      _Icode_Cout_613 |   -.091517    .089852    -1.02   0.311    -.2703281    .0872941
+      _Icode_Cout_614 |  -.0986226    .079041    -1.25   0.216    -.2559191     .058674
+      _Icode_Cout_615 |   .2569155   .1023527     2.51   0.014     .0532272    .4606037
+      _Icode_Cout_616 |  -.0979471   .0684077    -1.43   0.156    -.2340829    .0381886
+      _Icode_Cout_617 |  -.2472074   .0734257    -3.37   0.001    -.3933291   -.1010856
+      _Icode_Cout_618 |   .8912165   .0854342    10.43   0.000      .721197    1.061236
+      _Icode_Cout_619 |   1.020978   .0978886    10.43   0.000     .8261734    1.215782
+      _Icode_Cout_620 |   .9678686     .10607     9.12   0.000     .7567825    1.178955
+      _Icode_Cout_621 |   2.061691   .0904462    22.79   0.000     1.881697    2.241685
+      _Icode_Cout_622 |   .8596587   .1094309     7.86   0.000     .6418843    1.077433
+      _Icode_Cout_623 |   1.042314   .1103712     9.44   0.000     .8226685     1.26196
+      _Icode_Cout_624 |   .7872483   .1002012     7.86   0.000     .5878415     .986655
+      _Icode_Cout_625 |    .938071   .1328255     7.06   0.000     .6737397    1.202402
+      _Icode_Cout_626 |   1.662173   .1083156    15.35   0.000     1.446618    1.877728
+      _Icode_Cout_627 |   .5129082   .0930491     5.51   0.000     .3277345    .6980818
+      _Icode_Cout_628 |   .8966575   .0787847    11.38   0.000      .739871    1.053444
+      _Icode_Cout_629 |  -.1031214   .0945248    -1.09   0.279    -.2912318     .084989
+      _Icode_Cout_630 |    1.13095   .1207819     9.36   0.000     .8905863    1.371313
+      _Icode_Cout_631 |  -.0611219   .1270079    -0.48   0.632    -.3138756    .1916318
+      _Icode_Cout_632 |  -1.086011   .0649118   -16.73   0.000     -1.21519   -.9568325
+      _Icode_Cout_633 |  -.2692528   .1362813    -1.98   0.052    -.5404613    .0019557
+      _Icode_Cout_634 |  -.3235913   .1377785    -2.35   0.021    -.5977794   -.0494033
+      _Icode_Cout_635 |  -1.010929   .1823675    -5.54   0.000    -1.373852   -.6480057
+      _Icode_Cout_636 |  -1.301623   .1264227   -10.30   0.000    -1.553212   -1.050033
+      _Icode_Cout_637 |   .3292837   .1756721     1.87   0.065    -.0203148    .6788823
+      _Icode_Cout_638 |   .9312061   .1159184     8.03   0.000     .7005212    1.161891
+      _Icode_Cout_639 |   .9175291    .126615     7.25   0.000     .6655572    1.169501
+      _Icode_Cout_640 |      .2488    .168824     1.47   0.144    -.0871704    .5847704
+      _Icode_Cout_641 |   .8463606   .0975391     8.68   0.000     .6522516     1.04047
+      _Icode_Cout_642 |   1.096693   .1114272     9.84   0.000     .8749459     1.31844
+      _Icode_Cout_643 |   .6710317   .1515151     4.43   0.000     .3695071    .9725564
+      _Icode_Cout_644 |   .9944429   .1281044     7.76   0.000     .7395071    1.249379
+      _Icode_Cout_645 |   .5189939   .1777308     2.92   0.005     .1652983    .8726894
+      _Icode_Cout_646 |   .7398019   .1103174     6.71   0.000     .5202633    .9593405
+      _Icode_Cout_647 |   .9095221   .1155211     7.87   0.000     .6796278    1.139417
+      _Icode_Cout_648 |   .6611995   .1175712     5.62   0.000     .4272254    .8951737
+      _Icode_Cout_649 |   .7795616   .1775644     4.39   0.000     .4261971    1.132926
+      _Icode_Cout_650 |  -.8603216   .1359626    -6.33   0.000    -1.130896   -.5897474
+      _Icode_Cout_651 |  -.7532875   .0620723   -12.14   0.000    -.8768153   -.6297598
+      _Icode_Cout_652 |  -.3939272   .1175455    -3.35   0.001    -.6278502   -.1600042
+      _Icode_Cout_653 |  -1.359054   .0665606   -20.42   0.000    -1.491514   -1.226594
+      _Icode_Cout_654 |   -.780296   .1612266    -4.84   0.000    -1.101147   -.4594448
+      _Icode_Cout_655 |  -1.629799   .0729818   -22.33   0.000    -1.775037   -1.484561
+      _Icode_Cout_656 |  -.8882284   .0928163    -9.57   0.000    -1.072939   -.7035181
+      _Icode_Cout_657 |   .1903693   .0689769     2.76   0.007      .053101    .3276377
+      _Icode_Cout_658 |   .0961378   .0886958     1.08   0.282    -.0803725     .272648
+      _Icode_Cout_659 |  -.0860216   .0957325    -0.90   0.372    -.2765353    .1044922
+      _Icode_Cout_660 |   .0681825   .0622807     1.09   0.277    -.0557601    .1921251
+      _Icode_Cout_661 |   .1198052    .062817     1.91   0.060    -.0052046    .2448149
+      _Icode_Cout_662 |   .0896418   .0637157     1.41   0.163    -.0371565    .2164401
+      _Icode_Cout_663 |   .1614807   .0670082     2.41   0.018     .0281301    .2948314
+      _Icode_Cout_664 |   .0486487   .0804886     0.60   0.547    -.1115286    .2088261
+      _Icode_Cout_665 |    .030365   .0660729     0.46   0.647    -.1011242    .1618543
+      _Icode_Cout_666 |   .0458279   .0668227     0.69   0.495    -.0871535    .1788093
+      _Icode_Cout_667 |  -.2310934   .0866152    -2.67   0.009    -.4034631   -.0587237
+      _Icode_Cout_668 |   .1065674   .0880734     1.21   0.230    -.0687042     .281839
+      _Icode_Cout_669 |   .3908728   .0679088     5.76   0.000     .2557299    .5260156
+      _Icode_Cout_670 |   .1990852   .0780673     2.55   0.013     .0437262    .3544441
+      _Icode_Cout_671 |  -.2044854   .0770421    -2.65   0.010    -.3578042   -.0511667
+      _Icode_Cout_672 |  -.0056309   .0740273    -0.08   0.940      -.15295    .1416882
+      _Icode_Cout_673 |  -.0066179   .0618121    -0.11   0.915    -.1296278    .1163921
+      _Icode_Cout_674 |  -.1011797   .0793723    -1.27   0.206    -.2591357    .0567763
+      _Icode_Cout_675 |  -.0364654   .0638377    -0.57   0.569    -.1635065    .0905757
+      _Icode_Cout_676 |   .5703472   .1095655     5.21   0.000     .3523049    .7883895
+      _Icode_Cout_677 |    .310131   .0708193     4.38   0.000     .1691961    .4510659
+      _Icode_Cout_678 |   .2150417   .0762041     2.82   0.006     .0633907    .3666928
+      _Icode_Cout_679 |   .1455222   .0659486     2.21   0.030     .0142804    .2767641
+      _Icode_Cout_680 |   .2019189   .0666545     3.03   0.003     .0692722    .3345657
+      _Icode_Cout_681 |   .2003877   .0618152     3.24   0.002     .0773715    .3234039
+      _Icode_Cout_682 |   1.339161   .0654353    20.47   0.000     1.208941    1.469381
+      _Icode_Cout_683 |  -1.033232   .0727625   -14.20   0.000    -1.178034   -.8884304
+      _Icode_Cout_684 |  -1.478397   .0896471   -16.49   0.000      -1.6568   -1.299994
+      _Icode_Cout_685 |  -.8482261   .0963679    -8.80   0.000    -1.040004   -.6564477
+      _Icode_Cout_686 |  -.9983167   .1275606    -7.83   0.000     -1.25217   -.7444629
+      _Icode_Cout_687 |  -.9960693   .1607608    -6.20   0.000    -1.315993   -.6761451
+      _Icode_Cout_688 |   -.724974   .2321502    -3.12   0.002    -1.186968   -.2629804
+      _Icode_Cout_689 |   .3997404   .0640494     6.24   0.000      .272278    .5272027
+      _Icode_Cout_690 |   .4534242   .0766999     5.91   0.000     .3007864    .6060619
+      _Icode_Cout_691 |   .6384845   .0701134     9.11   0.000     .4989543    .7780146
+      _Icode_Cout_692 |   .2574069   .0646894     3.98   0.000     .1286708    .3861429
+      _Icode_Cout_693 |   .4857038   .0641087     7.58   0.000     .3581235    .6132841
+      _Icode_Cout_694 |   .3627638   .0653834     5.55   0.000     .2326468    .4928809
+      _Icode_Cout_695 |    .183077   .0664395     2.76   0.007     .0508582    .3152958
+      _Icode_Cout_696 |   .4617369   .0649449     7.11   0.000     .3324924    .5909814
+      _Icode_Cout_697 |    .556836   .0642062     8.67   0.000     .4290615    .6846105
+      _Icode_Cout_698 |   .8439434   .0739213    11.42   0.000     .6968354    .9910513
+      _Icode_Cout_699 |   -.013589   .0649643    -0.21   0.835    -.1428722    .1156941
+      _Icode_Cout_700 |  -.4811512   .0699335    -6.88   0.000    -.6203234   -.3419791
+      _Icode_Cout_701 |   .2167659    .068051     3.19   0.002       .08134    .3521917
+      _Icode_Cout_702 |   -.724159   .0851018    -8.51   0.000    -.8935169   -.5548011
+      _Icode_Cout_703 |   .3446357   .1045607     3.30   0.001     .1365532    .5527181
+      _Icode_Cout_704 |   .0617927   .0695128     0.89   0.377    -.0765423    .2001277
+      _Icode_Cout_705 |  -.1970648   .0701489    -2.81   0.006    -.3366656    -.057464
+      _Icode_Cout_706 |   .1597823   .0645526     2.48   0.015     .0313186     .288246
+      _Icode_Cout_707 |   .5633291   .0887128     6.35   0.000     .3867849    .7398732
+      _Icode_Cout_708 |   .1279858   .0884198     1.45   0.152    -.0479753    .3039469
+      _Icode_Cout_709 |  -.1171172   .0643307    -1.82   0.072    -.2451395     .010905
+      _Icode_Cout_710 |   .5134973    .128367     4.00   0.000     .2580389    .7689557
+      _Icode_Cout_711 |   .5966745   .0933277     6.39   0.000     .4109464    .7824027
+      _Icode_Cout_712 |   .6700185   .0639655    10.47   0.000     .5427232    .7973139
+      _Icode_Cout_713 |   .5049836   .0743701     6.79   0.000     .3569823    .6529848
+      _Icode_Cout_714 |   .8173928   .1476865     5.53   0.000     .5234873    1.111298
+      _Icode_Cout_715 |   .6426507    .088196     7.29   0.000      .467135    .8181664
+      _Icode_Cout_716 |   1.194645    .095755    12.48   0.000     1.004086    1.385203
+      _Icode_Cout_717 |   .8492051   .1309072     6.49   0.000     .5886915    1.109719
+      _Icode_Cout_718 |   .8690865   .0704098    12.34   0.000     .7289665    1.009206
+      _Icode_Cout_719 |   .4778321    .098523     4.85   0.000      .281765    .6738992
+      _Icode_Cout_720 |   .8862473    .065517    13.53   0.000     .7558643     1.01663
+      _Icode_Cout_721 |   1.111325   .0915684    12.14   0.000     .9290983    1.293552
+      _Icode_Cout_722 |   1.634575   .0706941    23.12   0.000      1.49389    1.775261
+      _Icode_Cout_723 |  -.2495919   .0658512    -3.79   0.000      -.38064   -.1185438
+      _Icode_Cout_724 |   1.102363   .0831451    13.26   0.000     .9368989    1.267827
+      _Icode_Cout_725 |   1.076777   .0745375    14.45   0.000     .9284423    1.225111
+      _Icode_Cout_726 |   .4431921   .0831655     5.33   0.000     .2776876    .6086967
+      _Icode_Cout_727 |     .95611   .1639438     5.83   0.000     .6298515    1.282368
+      _Icode_Cout_728 |    .686037   .0789407     8.69   0.000       .52894    .8431339
+      _Icode_Cout_729 |   .0661243    .093854     0.70   0.483    -.1206512    .2528998
+      _Icode_Cout_730 |   .0052219   .0641638     0.08   0.935    -.1224682    .1329119
+      _Icode_Cout_731 |  -.0757703   .0887473    -0.85   0.396     -.252383    .1008424
+      _Icode_Cout_732 |   .5125406   .0700616     7.32   0.000     .3731136    .6519676
+      _Icode_Cout_733 |  -.0472704   .1220723    -0.39   0.700     -.290202    .1956612
+      _Icode_Cout_734 |   .0273933   .0678226     0.40   0.687     -.107578    .1623647
+      _Icode_Cout_735 |   .0662462   .1224504     0.54   0.590    -.1774379    .3099304
+      _Icode_Cout_736 |   .1504865   .0638042     2.36   0.021      .023512     .277461
+      _Icode_Cout_737 |   1.192042   .0643146    18.53   0.000     1.064051    1.320032
+      _Icode_Cout_738 |  -.1182078   .0640973    -1.84   0.069    -.2457655    .0093499
+      _Icode_Cout_739 |   .0032701    .087526     0.04   0.970    -.1709123    .1774525
+      _Icode_Cout_740 |    .548141   .0888564     6.17   0.000     .3713112    .7249708
+      _Icode_Cout_741 |   1.140106   .0696917    16.36   0.000     1.001415    1.278796
+      _Icode_Cout_742 |   .3949313   .0638239     6.19   0.000     .2679177    .5219449
+      _Icode_Cout_743 |   .4082028     .06486     6.29   0.000     .2791273    .5372784
+      _Icode_Cout_744 |   .9764985    .076007    12.85   0.000     .8252399    1.127757
+      _Icode_Cout_745 |   .2814773   .0833939     3.38   0.001     .1155182    .4474365
+      _Icode_Cout_746 |   .7357053   .0638011    11.53   0.000      .608737    .8626736
+      _Icode_Cout_747 |  -.3710814   .1186398    -3.13   0.002    -.6071822   -.1349806
+      _Icode_Cout_748 |   .0316382   .0765702     0.41   0.681    -.1207414    .1840177
+      _Icode_Cout_749 |    .354046   .0665259     5.32   0.000     .2216552    .4864367
+      _Icode_Cout_750 |   .1900425    .065295     2.91   0.005     .0601012    .3199838
+      _Icode_Cout_751 |   .0207062   .2561409     0.08   0.936    -.4890304    .5304428
+      _Icode_Cout_752 |  -.3990387   .2541226    -1.57   0.120    -.9047588    .1066814
+      _Icode_Cout_753 |   .0135206   .2631447     0.05   0.959    -.5101539    .5371951
+      _Icode_Cout_754 |   1.526389   .1564877     9.75   0.000     1.214969     1.83781
+      _Icode_Cout_755 |  -.5933708   .0741036    -8.01   0.000    -.7408417   -.4458999
+      _Icode_Cout_756 |  -.3931061   .2509376    -1.57   0.121    -.8924877    .1062756
+      _Icode_Cout_757 |  -.1333983   .2499179    -0.53   0.595    -.6307508    .3639541
+      _Icode_Cout_758 |    .246466   .2537121     0.97   0.334    -.2584371    .7513691
+      _Icode_Cout_759 |   .1401484   .2631447     0.53   0.596    -.3835261    .6638229
+      _Icode_Cout_760 |   .0294834   .2522755     0.12   0.907    -.4725608    .5315276
+      _Icode_Cout_761 |  -.0597045   .2631447    -0.23   0.821    -.5833791      .46397
+      _Icode_Cout_762 |  -.0621856   .2616723    -0.24   0.813    -.5829302     .458559
+      _Icode_Cout_763 |   .1447655   .1278948     1.13   0.261    -.1097533    .3992843
+      _Icode_Cout_764 |   .2962369   .2631447     1.13   0.264    -.2274377    .8199114
+      _Icode_Cout_765 |   .2427168   .1658197     1.46   0.147     -.087275    .5727085
+      _Icode_Cout_766 |  -.7894341   .1193512    -6.61   0.000    -1.026951   -.5519176
+      _Icode_Cout_767 |   .5567453   .2521942     2.21   0.030     .0548628    1.058628
+      _Icode_Cout_768 |  -.0176107   .2523026    -0.07   0.945    -.5197089    .4844875
+      _Icode_Cout_769 |  -.0182974   .2503611    -0.07   0.942    -.5165318    .4799371
+      _Icode_Cout_770 |  -.0285255   .2567523    -0.11   0.912    -.5394788    .4824279
+      _Icode_Cout_771 |  -.1338502   .0670934    -1.99   0.049    -.2673704     -.00033
+      _Icode_Cout_772 |  -.1805574    .075998    -2.38   0.020    -.3317983   -.0293164
+      _Icode_Cout_773 |  -.6575541   .0707449    -9.29   0.000    -.7983409   -.5167673
+      _Icode_Cout_774 |  -.3244593   .0676428    -4.80   0.000    -.4590728   -.1898459
+      _Icode_Cout_775 |  -.4319064   .0830817    -5.20   0.000    -.5972443   -.2665686
+      _Icode_Cout_776 |   .0475289   .0940559     0.51   0.615    -.1396483     .234706
+      _Icode_Cout_777 |  -.4899789   .0647023    -7.57   0.000    -.6187406   -.3612172
+      _Icode_Cout_778 |  -1.874423   .2472361    -7.58   0.000    -2.366438   -1.382407
+      _Icode_Cout_779 |  -1.884964   .1794942   -10.50   0.000    -2.242169   -1.527759
+      _Icode_Cout_780 |  -1.589411   .2042589    -7.78   0.000    -1.995899   -1.182923
+      _Icode_Cout_781 |  -1.894953   .1875187   -10.11   0.000    -2.268127   -1.521779
+      _Icode_Cout_782 |  -1.086367   .0494057   -21.99   0.000    -1.184687   -.9880464
+      _Icode_Cout_783 |  -1.996249   .1659783   -12.03   0.000    -2.326557   -1.665942
+      _Icode_Cout_784 |  -1.930451   .2504758    -7.71   0.000    -2.428914   -1.431988
+      _Icode_Cout_785 |  -1.321912   .1606304    -8.23   0.000    -1.641577   -1.002248
+      _Icode_Cout_786 |  -1.977308   .2048726    -9.65   0.000    -2.385018   -1.569599
+      _Icode_Cout_787 |  -2.087157   .2194561    -9.51   0.000    -2.523888   -1.650425
+      _Icode_Cout_788 |  -.9981216   .0719183   -13.88   0.000    -1.141244   -.8549996
+      _Icode_Cout_789 |  -1.215886   .0927166   -13.11   0.000    -1.400398   -1.031374
+      _Icode_Cout_790 |  -1.199399   .1613535    -7.43   0.000    -1.520502   -.8782951
+      _Icode_Cout_791 |  -1.059916    .181266    -5.85   0.000    -1.420647   -.6991857
+      _Icode_Cout_792 |  -1.173044    .112004   -10.47   0.000    -1.395939   -.9501489
+      _Icode_Cout_793 |   1.129349   .1191192     9.48   0.000     .8922945    1.366404
+      _Icode_Cout_794 |   1.022504   .1233793     8.29   0.000     .7769713    1.268037
+      _Icode_Cout_795 |   1.180797   .1136473    10.39   0.000     .9546317    1.406962
+      _Icode_Cout_796 |   1.099844   .1392993     7.90   0.000     .8226295    1.377058
+      _Icode_Cout_797 |   1.556845   .1215181    12.81   0.000     1.315016    1.798674
+      _Icode_Cout_798 |   1.107438   .1489077     7.44   0.000     .8111024    1.403774
+      _Icode_Cout_799 |   1.229348   .1487238     8.27   0.000     .9333785    1.525318
+      _Icode_Cout_800 |   1.347956   .1534923     8.78   0.000     1.042496    1.653415
+      _Icode_Cout_801 |   1.175296   .1294873     9.08   0.000     .9176084    1.432984
+      _Icode_Cout_802 |   1.378801   .1560548     8.84   0.000     1.068242     1.68936
+      _Icode_Cout_803 |   1.247895    .123583    10.10   0.000     1.001957    1.493833
+      _Icode_Cout_804 |   1.193219   .1598958     7.46   0.000     .8750161    1.511422
+      _Icode_Cout_805 |  -.3644602   .1878156    -1.94   0.056    -.7382251    .0093048
+      _Icode_Cout_806 |  -.5791305   .0975651    -5.94   0.000    -.7732912   -.3849698
+      _Icode_Cout_807 |  -.6148765   .0814036    -7.55   0.000    -.7768749   -.4528782
+      _Icode_Cout_808 |  -.3995306   .1277105    -3.13   0.002    -.6536827   -.1453786
+      _Icode_Cout_809 |  -.4844497   .0809323    -5.99   0.000    -.6455102   -.3233893
+      _Icode_Cout_810 |  -.6834138   .0628735   -10.87   0.000    -.8085362   -.5582915
+      _Icode_Cout_811 |  -.6401534   .0801035    -7.99   0.000    -.7995645   -.4807423
+      _Icode_Cout_812 |  -.4924361   .1341899    -3.67   0.000    -.7594826   -.2253896
+      _Icode_Cout_813 |  -.2602184   .1124383    -2.31   0.023    -.4839778    -.036459
+      _Icode_Cout_814 |  -.3359305   .0741061    -4.53   0.000    -.4834062   -.1884547
+      _Icode_Cout_815 |  -.5932921   .0935378    -6.34   0.000    -.7794381    -.407146
+      _Icode_Cout_816 |   1.415026   .1260657    11.22   0.000     1.164147    1.665904
+      _Icode_Cout_817 |   1.576953   .0677087    23.29   0.000     1.442208    1.711697
+      _Icode_Cout_818 |   1.598853    .078463    20.38   0.000     1.442706    1.754999
+      _Icode_Cout_819 |   1.852458   .0758955    24.41   0.000     1.701421    2.003495
+      _Icode_Cout_820 |   1.583156   .0654282    24.20   0.000      1.45295    1.713362
+      _Icode_Cout_821 |   1.728456     .07901    21.88   0.000     1.571221    1.885691
+      _Icode_Cout_822 |   1.659579   .0773207    21.46   0.000     1.505706    1.813452
+      _Icode_Cout_823 |   1.585307   .0645752    24.55   0.000     1.456798    1.713815
+      _Icode_Cout_824 |   1.682779   .0641682    26.22   0.000     1.555081    1.810478
+      _Icode_Cout_825 |    1.54204    .066782    23.09   0.000     1.409139     1.67494
+      _Icode_Cout_826 |   2.005707   .1534094    13.07   0.000     1.700412    2.311001
+      _Icode_Cout_827 |   1.792448   .0839377    21.35   0.000     1.625407     1.95949
+      _Icode_Cout_828 |   1.892123   .0646608    29.26   0.000     1.763443    2.020802
+      _Icode_Cout_829 |   1.705112   .0707716    24.09   0.000     1.564272    1.845952
+      _Icode_Cout_830 |   1.675204   .0662359    25.29   0.000     1.543391    1.807018
+      _Icode_Cout_831 |   1.642757   .0674796    24.34   0.000     1.508468    1.777045
+      _Icode_Cout_832 |   1.689882   .0723693    23.35   0.000     1.545862    1.833901
+      _Icode_Cout_833 |   1.240915   .1305548     9.50   0.000     .9811031    1.500728
+      _Icode_Cout_834 |   1.314056   .1093036    12.02   0.000     1.096535    1.531577
+      _Icode_Cout_835 |  -.2335482   .1029918    -2.27   0.026    -.4385084    -.028588
+      _Icode_Cout_836 |  -.8495017   .0674808   -12.59   0.000    -.9837927   -.7152106
+      _Icode_Cout_837 |  -.9018894   .0895654   -10.07   0.000     -1.08013   -.7236487
+      _Icode_Cout_838 |  -.5169515   .0713949    -7.24   0.000    -.6590319   -.3748711
+      _Icode_Cout_839 |    .239509    .122501     1.96   0.054    -.0042759    .4832938
+      _Icode_Cout_840 |  -.0801558   .0331126    -2.42   0.018     -.146052   -.0142596
+      _Icode_Cout_841 |  -.3485503   .0328305   -10.62   0.000    -.4138852   -.2832155
+      _Icode_Cout_842 |   1.077668   .0313999    34.32   0.000      1.01518    1.140156
+      _Icode_Cout_843 |   .2101111   .2227939     0.94   0.348    -.2332628     .653485
+      _Icode_Cout_844 |   -.243545   .0332974    -7.31   0.000    -.3098088   -.1772811
+      _Icode_Cout_845 |  -.0571346   .0494742    -1.15   0.252    -.1555914    .0413222
+      _Icode_Cout_846 |   .6258842   .0479844    13.04   0.000     .5303922    .7213762
+      _Icode_Cout_847 |  -.2643735   .0773165    -3.42   0.001    -.4182382   -.1105088
+      _Icode_Cout_848 |   1.130381    .245055     4.61   0.000      .642706    1.618056
+      _Icode_Cout_849 |    .104433   .0525394     1.99   0.050    -.0001236    .2089897
+      _Icode_Cout_850 |   .3226994    .104406     3.09   0.003     .1149249    .5304739
+      _Icode_Cout_851 |  -.0608034   .1850333    -0.33   0.743    -.4290313    .3074246
+      _Icode_Cout_852 |   1.158394   .2176388     5.32   0.000     .7252788    1.591509
+      _Icode_Cout_853 |   -.256221   .0721457    -3.55   0.001    -.3997955   -.1126465
+      _Icode_Cout_854 |   .2132858   .1413984     1.51   0.135     -.068106    .4946775
+      _Icode_Cout_855 |      .4635   .1254222     3.70   0.000      .213902    .7130981
+      _Icode_Cout_856 |  -.4084158   .1232323    -3.31   0.001    -.6536558   -.1631757
+      _Icode_Cout_857 |   .1223653   .1208249     1.01   0.314    -.1180839    .3628145
+      _Icode_Cout_858 |  -.3594722   .0521358    -6.89   0.000    -.4632257   -.2557187
+      _Icode_Cout_859 |  -.1156583   .0595695    -1.94   0.056    -.2342053    .0028887
+      _Icode_Cout_860 |   .0299781   .0626615     0.48   0.634    -.0947223    .1546785
+      _Icode_Cout_861 |   .1479203   .0805965     1.84   0.070    -.0124718    .3083124
+      _Icode_Cout_862 |  -.2515206    .072316    -3.48   0.001    -.3954339   -.1076072
+      _Icode_Cout_863 |   .8453932    .163173     5.18   0.000     .5206685    1.170118
+      _Icode_Cout_864 |  -.0359899   .1285472    -0.28   0.780    -.2918071    .2198272
+      _Icode_Cout_865 |   .2989779    .140421     2.13   0.036     .0195312    .5784245
+      _Icode_Cout_866 |  -.0307101   .1672656    -0.18   0.855    -.3635792    .3021591
+      _Icode_Cout_867 |   .1191006   .0836443     1.42   0.158    -.0473568    .2855579
+      _Icode_Cout_868 |  -.6401169    .135248    -4.73   0.000     -.909269   -.3709649
+      _Icode_Cout_869 |   .6678517   .0916894     7.28   0.000      .485384    .8503195
+      _Icode_Cout_870 |  -.2723292   .1466897    -1.86   0.067    -.5642509    .0195926
+      _Icode_Cout_871 |   -.143079   .1047157    -1.37   0.176    -.3514698    .0653118
+      _Icode_Cout_872 |  -.0008297   .1206346    -0.01   0.995    -.2409002    .2392407
+      _Icode_Cout_873 |  -.0463873   .1270622    -0.37   0.716    -.2992492    .2064746
+      _Icode_Cout_874 |  -.2707159   .1339492    -2.02   0.047    -.5372832   -.0041486
+      _Icode_Cout_875 |   .2616038   .0679332     3.85   0.000     .1264125    .3967951
+      _Icode_Cout_876 |   .1306977   .0863784     1.51   0.134    -.0412008    .3025962
+      _Icode_Cout_877 |   .0051787   .0672569     0.08   0.939    -.1286668    .1390243
+      _Icode_Cout_878 |  -.0682884   .0663887    -1.03   0.307    -.2004062    .0638293
+      _Icode_Cout_879 |   .4328661   .0671188     6.45   0.000     .2992955    .5664368
+      _Icode_Cout_880 |   .5488255    .187814     2.92   0.005     .1750638    .9225873
+      _Icode_Cout_881 |   .9494509   .2162826     4.39   0.000     .5190348    1.379867
+      _Icode_Cout_882 |   1.390609   .0884646    15.72   0.000     1.214559    1.566659
+      _Icode_Cout_883 |   .6400938   .1157395     5.53   0.000     .4097648    .8704228
+      _Icode_Cout_884 |  -.0932598   .0746776    -1.25   0.215     -.241873    .0553534
+      _Icode_Cout_885 |  -.2256448   .1261387    -1.79   0.077    -.4766688    .0253793
+      _Icode_Cout_886 |  -.1149481   .1320938    -0.87   0.387    -.3778232     .147927
+      _Icode_Cout_887 |   .6053187   .0810098     7.47   0.000      .444104    .7665334
+      _Icode_Cout_888 |   -.214204   .0657622    -3.26   0.002     -.345075   -.0833329
+      _Icode_Cout_889 |  -.9117034   .0853038   -10.69   0.000    -1.081463   -.7419434
+      _Icode_Cout_890 |  -.6065098   .0977312    -6.21   0.000    -.8010011   -.4120184
+      _Icode_Cout_891 |  -.3880076   .0758454    -5.12   0.000    -.5389449   -.2370704
+      _Icode_Cout_892 |  -.6491199   .1058006    -6.14   0.000    -.8596698   -.4385699
+      _Icode_Cout_893 |   .0006957    .181811     0.00   0.997    -.3611197    .3625111
+      _Icode_Cout_894 |  -.6811066   .0913598    -7.46   0.000    -.8629185   -.4992948
+      _Icode_Cout_895 |  -.3337815   .0760767    -4.39   0.000     -.485179   -.1823839
+      _Icode_Cout_896 |   .4927873    .104003     4.74   0.000     .2858147      .69976
+      _Icode_Cout_897 |   .3803497   .0950402     4.00   0.000     .1912137    .5694856
+      _Icode_Cout_898 |   .1542422   .0912915     1.69   0.095    -.0274337     .335918
+      _Icode_Cout_899 |    .453594   .0827942     5.48   0.000     .2888283    .6183597
+      _Icode_Cout_900 |   .3465637    .103295     3.36   0.001     .1410001    .5521273
+      _Icode_Cout_901 |   .2267644   .1157637     1.96   0.054    -.0036126    .4571415
+      _Icode_Cout_902 |   .8505654   .1009502     8.43   0.000      .649668    1.051463
+      _Icode_Cout_903 |   .2947736   .1013899     2.91   0.005     .0930013    .4965459
+      _Icode_Cout_904 |   .1019295   .1008111     1.01   0.315     -.098691      .30255
+      _Icode_Cout_905 |   .3170102   .0737721     4.30   0.000      .170199    .4638213
+      _Icode_Cout_906 |    .507102   .0855606     5.93   0.000     .3368309    .6773731
+      _Icode_Cout_907 |   .4007535   .1315448     3.05   0.003      .138971    .6625361
+      _Icode_Cout_908 |   .1652923   .1040169     1.59   0.116    -.0417079    .3722924
+      _Icode_Cout_909 |   .3430316   .0747054     4.59   0.000     .1943631    .4917001
+      _Icode_Cout_910 |   .5021621   .0983027     5.11   0.000     .3065335    .6977907
+      _Icode_Cout_911 |    .984685   .0734246    13.41   0.000     .8385653    1.130805
+      _Icode_Cout_912 |   .9623231   .1060365     9.08   0.000     .7513038    1.173342
+      _Icode_Cout_913 |   .7572579   .1021937     7.41   0.000     .5538859    .9606298
+      _Icode_Cout_914 |   1.010289   .1515904     6.66   0.000     .7086142    1.311963
+      _Icode_Cout_915 |   .6969636   .1086455     6.42   0.000     .4807522    .9131749
+      _Icode_Cout_916 |   .2617045       .067     3.91   0.000     .1283703    .3950388
+      _Icode_Cout_917 |   .3833592   .0664126     5.77   0.000     .2511939    .5155244
+      _Icode_Cout_918 |   .2898102   .0749758     3.87   0.000     .1406035    .4390169
+      _Icode_Cout_919 |   .0497588   .0744173     0.67   0.506    -.0983363     .197854
+      _Icode_Cout_920 |   .1496953   .0639578     2.34   0.022     .0224152    .2769755
+      _Icode_Cout_921 |   .2603753   .0676566     3.85   0.000     .1257343    .3950162
+      _Icode_Cout_922 |  -.3300786   .0722478    -4.57   0.000    -.4738563   -.1863008
+      _Icode_Cout_923 |   .0666931   .0658663     1.01   0.314    -.0643849    .1977711
+      _Icode_Cout_924 |   .4094486   .0809611     5.06   0.000     .2483309    .5705662
+      _Icode_Cout_925 |   .4969653   .1744566     2.85   0.006     .1497856     .844145
+      _Icode_Cout_926 |  -.0165434   .0653246    -0.25   0.801    -.1465435    .1134568
+      _Icode_Cout_927 |  -.1343351   .0681497    -1.97   0.052    -.2699573    .0012871
+      _Icode_Cout_928 |   .3258701   .0695851     4.68   0.000     .1873913     .464349
+      _Icode_Cout_929 |    .392566   .0746366     5.26   0.000     .2440344    .5410975
+      _Icode_Cout_930 |    .483081   .0719646     6.71   0.000     .3398668    .6262951
+      _Icode_Cout_931 |   .2303078   .0654459     3.52   0.001     .1000664    .3605493
+      _Icode_Cout_932 |  -.1129896   .0874534    -1.29   0.200    -.2870274    .0610482
+      _Icode_Cout_933 |   .0598373   .0661367     0.90   0.368    -.0717788    .1914535
+      _Icode_Cout_934 |   .1075956   .0742884     1.45   0.151    -.0402431    .2554343
+      _Icode_Cout_935 |  -.3102645   .0815024    -3.81   0.000    -.4724594   -.1480696
+      _Icode_Cout_936 |   .3897679   .0666388     5.85   0.000     .2571524    .5223833
+      _Icode_Cout_937 |   .2062725   .0643236     3.21   0.002     .0782644    .3342806
+      _Icode_Cout_938 |   .2419927   .0662958     3.65   0.000     .1100599    .3739256
+      _Icode_Cout_939 |   .1040651   .0676035     1.54   0.128    -.0304702    .2386004
+      _Icode_Cout_940 |   .0127046   .0798939     0.16   0.874    -.1462892    .1716985
+      _Icode_Cout_941 |   .2319636   .1217033     1.91   0.060    -.0102337    .4741608
+      _Icode_Cout_942 |  -.0401416   .0687717    -0.58   0.561    -.1770016    .0967183
+      _Icode_Cout_943 |    .049048   .0645711     0.76   0.450    -.0794525    .1775485
+      _Icode_Cout_944 |   .1311497   .0735737     1.78   0.078    -.0152667    .2775661
+      _Icode_Cout_945 |  -.1056451   .0739253    -1.43   0.157    -.2527611    .0414708
+      _Icode_Cout_946 |  -.1064373   .0706549    -1.51   0.136    -.2470451    .0341705
+      _Icode_Cout_947 |   .0953264   .0946846     1.01   0.317     -.093102    .2837547
+      _Icode_Cout_948 |   .1354274   .0638113     2.12   0.037     .0084389     .262416
+      _Icode_Cout_949 |    .075707   .0672642     1.13   0.264    -.0581529     .209567
+      _Icode_Cout_950 |   .3030861   .0707556     4.28   0.000      .162278    .4438943
+      _Icode_Cout_951 |  -.1458735   .0740864    -1.97   0.052      -.29331    .0015631
+      _Icode_Cout_952 |  -.0954988    .066574    -1.43   0.155    -.2279854    .0369877
+      _Icode_Cout_953 |   .5148543   .0702013     7.33   0.000     .3751493    .6545593
+      _Icode_Cout_954 |   .2034363   .0686988     2.96   0.004     .0667213    .3401513
+      _Icode_Cout_955 |   .2118137   .0655802     3.23   0.002     .0813049    .3423225
+      _Icode_Cout_956 |  -.3619227   .0661298    -5.47   0.000    -.4935252   -.2303202
+      _Icode_Cout_957 |   .0182972   .0680552     0.27   0.789    -.1171371    .1537314
+      _Icode_Cout_958 |   .2213373   .1639167     1.35   0.181    -.1048673    .5475418
+      _Icode_Cout_959 |  -.1751337   .0676864    -2.59   0.011    -.3098339   -.0404335
+      _Icode_Cout_960 |    .675832   .1229995     5.49   0.000     .4310552    .9206088
+      _Icode_Cout_961 |   .8960703    .102245     8.76   0.000     .6925963    1.099544
+      _Icode_Cout_962 |   .1096338   .0689793     1.59   0.116    -.0276393    .2469069
+      _Icode_Cout_963 |   .1357376   .0824056     1.65   0.103    -.0282548      .29973
+      _Icode_Cout_964 |  -.2551081   .0639277    -3.99   0.000    -.3823283    -.127888
+      _Icode_Cout_965 |   .1995154   .0705537     2.83   0.006     .0591091    .3399217
+      _Icode_Cout_966 |    2.11078   .2404772     8.78   0.000     1.632215    2.589345
+      _Icode_Cout_967 |  -.4279225   .0824093    -5.19   0.000    -.5919223   -.2639228
+      _Icode_Cout_968 |   .7931541   .0994981     7.97   0.000     .5951467    .9911616
+      _Icode_Cout_969 |  -.5727301   .0726272    -7.89   0.000    -.7172628   -.4281973
+      _Icode_Cout_970 |   .2572659   .0902004     2.85   0.006     .0777614    .4367704
+      _Icode_Cout_971 |  -.5474213    .064497    -8.49   0.000    -.6757745   -.4190682
+      _Icode_Cout_972 |   .0619776   .0655937     0.94   0.348     -.068558    .1925132
+      _Icode_Cout_973 |   .0271887   .0651775     0.42   0.678    -.1025186    .1568961
+      _Icode_Cout_974 |   1.455445   .1998724     7.28   0.000     1.057686    1.853204
+      _Icode_Cout_975 |  -.4958071   .0657874    -7.54   0.000    -.6267282   -.3648859
+      _Icode_Cout_976 |   .3197078   .0692685     4.62   0.000     .1818591    .4575566
+      _Icode_Cout_977 |   1.061858   .1488722     7.13   0.000     .7655928    1.358123
+      _Icode_Cout_978 |   .0474427   .0706532     0.67   0.504    -.0931616    .1880471
+      _Icode_Cout_979 |   .0718583   .0679601     1.06   0.294    -.0633865    .2071032
+      _Icode_Cout_980 |   .0001765   .0690115     0.00   0.998    -.1371607    .1375137
+      _Icode_Cout_981 |   1.312299   .1212788    10.82   0.000     1.070946    1.553651
+      _Icode_Cout_982 |  -.1227962   .0675111    -1.82   0.073    -.2571477    .0115552
+      _Icode_Cout_983 |   .0211732   .0655155     0.32   0.747    -.1092068    .1515531
+      _Icode_Cout_984 |   .4428598   .0731612     6.05   0.000     .2972643    .5884553
+      _Icode_Cout_985 |   .2947955   .0825788     3.57   0.001     .1304585    .4591326
+      _Icode_Cout_986 |   1.503024   .1746036     8.61   0.000     1.155552    1.850496
+      _Icode_Cout_987 |   .7654085   .1164836     6.57   0.000     .5335987    .9972183
+      _Icode_Cout_988 |    .942576   .0736622    12.80   0.000     .7959836    1.089168
+      _Icode_Cout_989 |   .1592704   .0707087     2.25   0.027     .0185555    .2999853
+      _Icode_Cout_990 |   .2399093   .0648612     3.70   0.000     .1108314    .3689871
+      _Icode_Cout_991 |   .3070045   .0682795     4.50   0.000     .1711241     .442885
+      _Icode_Cout_992 |   .3694842   .0702034     5.26   0.000     .2297751    .5091934
+      _Icode_Cout_993 |  -.0341717   .0638417    -0.54   0.594    -.1612206    .0928773
+      _Icode_Cout_994 |   .2919972    .065899     4.43   0.000      .160854    .4231403
+      _Icode_Cout_995 |  -.3137866   .0641091    -4.89   0.000    -.4413678   -.1862054
+      _Icode_Cout_996 |    .565942   .0638395     8.87   0.000     .4388974    .6929866
+      _Icode_Cout_997 |   .5189651   .0816762     6.35   0.000     .3564243    .6815058
+      _Icode_Cout_998 |  -.0095486   .0748924    -0.13   0.899    -.1585892     .139492
+      _Icode_Cout_999 |  -.6064733   .0689002    -8.80   0.000    -.7435892   -.4693575
+     _Icode_Cout_1000 |   .2603581   .0668664     3.89   0.000     .1272897    .3934265
+     _Icode_Cout_1001 |   .5117999   .1378275     3.71   0.000     .2375144    .7860853
+     _Icode_Cout_1002 |  -.7449045   .0668939   -11.14   0.000    -.8780275   -.6117815
+     _Icode_Cout_1003 |  -1.373153   .0751709   -18.27   0.000    -1.522748   -1.223558
+     _Icode_Cout_1004 |  -.1102845   .1327686    -0.83   0.409    -.3745024    .1539334
+     _Icode_Cout_1005 |   .6839752   .0891059     7.68   0.000     .5066487    .8613016
+     _Icode_Cout_1006 |   .3592314   .0724421     4.96   0.000     .2150671    .5033958
+     _Icode_Cout_1007 |   1.164881   .0872414    13.35   0.000     .9912649    1.338497
+     _Icode_Cout_1008 |  -.3656474   .0649036    -5.63   0.000    -.4948096   -.2364851
+     _Icode_Cout_1009 |  -.3426098   .0712773    -4.81   0.000    -.4844562   -.2007634
+     _Icode_Cout_1010 |  -.6298322   .0702978    -8.96   0.000    -.7697292   -.4899352
+     _Icode_Cout_1011 |   1.838816   .1952671     9.42   0.000     1.450223     2.22741
+     _Icode_Cout_1012 |   .3661013   .0871504     4.20   0.000     .1926666    .5395361
+     _Icode_Cout_1013 |    .118052   .1849967     0.64   0.525     -.250103    .4862071
+     _Icode_Cout_1014 |  -.1045899    .063909    -1.64   0.106    -.2317729    .0225932
+     _Icode_Cout_1015 |  -.0339414   .0669625    -0.51   0.614     -.167201    .0993182
+     _Icode_Cout_1016 |   1.332649   .0800738    16.64   0.000     1.173297    1.492001
+     _Icode_Cout_1017 |   .3813094   .0815148     4.68   0.000     .2190898     .543529
+     _Icode_Cout_1018 |   .0065957   .0639278     0.10   0.918    -.1206247    .1338161
+     _Icode_Cout_1019 |   .0625288   .0646663     0.97   0.336    -.0661612    .1912188
+     _Icode_Cout_1020 |  -.1630486   .0638216    -2.55   0.013    -.2900576   -.0360395
+     _Icode_Cout_1021 |   .4741499   .0640228     7.41   0.000     .3467406    .6015593
+     _Icode_Cout_1022 |  -.2526454   .0649603    -3.89   0.000    -.3819205   -.1233704
+     _Icode_Cout_1023 |   .8588817   .0854856    10.05   0.000       .68876    1.029003
+     _Icode_Cout_1024 |   .5101541   .1358624     3.75   0.000     .2397792     .780529
+     _Icode_Cout_1025 |  -.1399368   .0788341    -1.78   0.080    -.2968216     .016948
+     _Icode_Cout_1026 |   .0719033   .0643682     1.12   0.267    -.0561935          .2
+     _Icode_Cout_1027 |    2.09803    .071983    29.15   0.000      1.95478    2.241281
+     _Icode_Cout_1028 |   .1262061   .0700473     1.80   0.075    -.0131925    .2656046
+     _Icode_Cout_1029 |  -.1356047   .0671824    -2.02   0.047    -.2693018   -.0019075
+     _Icode_Cout_1030 |  -.2344255   .0777838    -3.01   0.003    -.3892202   -.0796309
+     _Icode_Cout_1031 |   .1634436   .0665023     2.46   0.016     .0310999    .2957874
+     _Icode_Cout_1032 |   .8220603    .071032    11.57   0.000     .6807021    .9634184
+     _Icode_Cout_1033 |  -.1757532     .06751    -2.60   0.011    -.3101024    -.041404
+     _Icode_Cout_1034 |   .2153421   .0692702     3.11   0.003       .07749    .3531943
+     _Icode_Cout_1035 |   .2077976   .0678085     3.06   0.003     .0728544    .3427407
+     _Icode_Cout_1036 |   .2780078   .0818141     3.40   0.001     .1151925    .4408231
+     _Icode_Cout_1037 |   .4341532   .1336804     3.25   0.002     .1681207    .7001857
+     _Icode_Cout_1038 |  -.2357294   .0751388    -3.14   0.002    -.3852604   -.0861984
+     _Icode_Cout_1039 |   -.547721   .1051146    -5.21   0.000    -.7569056   -.3385363
+     _Icode_Cout_1040 |   .4444113   .0949165     4.68   0.000     .2555216    .6333011
+     _Icode_Cout_1041 |   .0368075   .0872045     0.42   0.674    -.1367351    .2103501
+     _Icode_Cout_1042 |  -.0547396   .0907614    -0.60   0.548    -.2353604    .1258813
+     _Icode_Cout_1043 |   .2291159   .0839789     2.73   0.008     .0619927    .3962392
+     _Icode_Cout_1044 |   .2013346   .0978968     2.06   0.043     .0065136    .3961555
+     _Icode_Cout_1045 |  -.0433479   .0703713    -0.62   0.540    -.1833913    .0966954
+     _Icode_Cout_1046 |   .1902564   .0626817     3.04   0.003     .0655158    .3149971
+     _Icode_Cout_1047 |  -.2145256   .1143506    -1.88   0.064    -.4420905    .0130393
+     _Icode_Cout_1048 |   .0908435   .0960817     0.95   0.347    -.1003652    .2820521
+     _Icode_Cout_1049 |  -.0103413   .0914151    -0.11   0.910    -.1922631    .1715805
+     _Icode_Cout_1050 |   -.194648   .0761237    -2.56   0.012     -.346139    -.043157
+     _Icode_Cout_1051 |   .3958673    .097349     4.07   0.000     .2021367    .5895979
+     _Icode_Cout_1052 |   .4762283   .0837307     5.69   0.000      .309599    .6428577
+     _Icode_Cout_1053 |   .3731311   .0799954     4.66   0.000     .2139352    .5323271
+     _Icode_Cout_1054 |  -.0190434   .1072823    -0.18   0.860    -.2325419    .1944551
+     _Icode_Cout_1055 |   -1.17988   .1008922   -11.69   0.000    -1.380662   -.9790981
+     _Icode_Cout_1056 |  -.0619347   .0636676    -0.97   0.334    -.1886372    .0647678
+     _Icode_Cout_1057 |   .2165162   .0626203     3.46   0.001     .0918979    .3411346
+     _Icode_Cout_1058 |   .5848711   .0846167     6.91   0.000     .4164785    .7532636
+     _Icode_Cout_1059 |   .1317041   .0676299     1.95   0.055    -.0028837     .266292
+     _Icode_Cout_1060 |   .4502392   .0817328     5.51   0.000     .2875859    .6128926
+     _Icode_Cout_1061 |   1.316525   .1222989    10.76   0.000     1.073142    1.559907
+     _Icode_Cout_1062 |   .4937511   .0896361     5.51   0.000     .3153694    .6721327
+     _Icode_Cout_1063 |   .4387404   .1023916     4.28   0.000     .2349746    .6425061
+     _Icode_Cout_1064 |   .1660186   .0865078     1.92   0.059    -.0061375    .3381747
+     _Icode_Cout_1065 |   .4904985   .1029722     4.76   0.000     .2855773    .6954197
+     _Icode_Cout_1066 |   .6363777   .1087444     5.85   0.000     .4199694     .852786
+     _Icode_Cout_1067 |   .4342221   .0959258     4.53   0.000     .2433238    .6251204
+     _Icode_Cout_1068 |     .84324   .0945787     8.92   0.000     .6550223    1.031458
+     _Icode_Cout_1069 |   1.058533   .0756675    13.99   0.000     .9079501    1.209116
+     _Icode_Cout_1070 |   .9889954   .0790047    12.52   0.000      .831771     1.14622
+     _Icode_Cout_1071 |   .8127682   .0839316     9.68   0.000     .6457391    .9797973
+     _Icode_Cout_1072 |   .8380269   .0732328    11.44   0.000      .692289    .9837647
+     _Icode_Cout_1073 |   1.025303   .1008685    10.16   0.000     .8245684    1.226038
+     _Icode_Cout_1074 |   1.237773   .1100382    11.25   0.000      1.01879    1.456756
+     _Icode_Cout_1075 |    .715929    .109057     6.56   0.000     .4988986    .9329593
+     _Icode_Cout_1076 |   .6116763    .097269     6.29   0.000     .4181048    .8052478
+     _Icode_Cout_1077 |   .8627257   .0985452     8.75   0.000     .6666145    1.058837
+     _Icode_Cout_1078 |    .771951   .1030608     7.49   0.000     .5668536    .9770485
+     _Icode_Cout_1079 |   .6391292   .1054243     6.06   0.000     .4293282    .8489302
+     _Icode_Cout_1080 |   .5607086   .0881936     6.36   0.000     .3851978    .7362195
+     _Icode_Cout_1081 |   .0941653   .0652309     1.44   0.153    -.0356483    .2239789
+     _Icode_Cout_1082 |   .4094422   .0724579     5.65   0.000     .2652464    .5536381
+     _Icode_Cout_1083 |   .4857815    .066394     7.32   0.000     .3536533    .6179098
+     _Icode_Cout_1084 |   1.073864   .0659632    16.28   0.000     .9425932    1.205135
+     _Icode_Cout_1085 |   .7763341   .1380067     5.63   0.000      .501692    1.050976
+     _Icode_Cout_1086 |   1.052419   .0879181    11.97   0.000      .877456    1.227381
+     _Icode_Cout_1087 |   1.011692   .0956695    10.57   0.000     .8213033     1.20208
+     _Icode_Cout_1088 |   .8906492   .0686157    12.98   0.000     .7540996    1.027199
+     _Icode_Cout_1089 |   1.167694   .1181016     9.89   0.000     .9326642    1.402724
+     _Icode_Cout_1090 |   1.121526   .1367996     8.20   0.000     .8492858    1.393765
+     _Icode_Cout_1091 |   1.401311    .074337    18.85   0.000     1.253376    1.549247
+     _Icode_Cout_1092 |   1.034232   .1083495     9.55   0.000     .8186092    1.249854
+     _Icode_Cout_1093 |   1.194831   .0995407    12.00   0.000     .9967385    1.392923
+     _Icode_Cout_1094 |   .6435414   .1699047     3.79   0.000     .3054203    .9816625
+     _Icode_Cout_1095 |   1.082432   .0698255    15.50   0.000     .9434747    1.221389
+     _Icode_Cout_1096 |    .935323   .1088586     8.59   0.000     .7186875    1.151958
+     _Icode_Cout_1097 |   1.111117   .0656392    16.93   0.000     .9804907    1.241743
+     _Icode_Cout_1098 |   1.005278   .0643747    15.62   0.000     .8771681    1.133388
+     _Icode_Cout_1099 |   .8196936   .1032534     7.94   0.000     .6142128    1.025174
+     _Icode_Cout_1100 |   .8765634   .0782566    11.20   0.000     .7208279    1.032299
+     _Icode_Cout_1101 |   1.233156   .1136928    10.85   0.000       1.0069    1.459412
+     _Icode_Cout_1102 |   .8680877   .0800796    10.84   0.000     .7087243    1.027451
+     _Icode_Cout_1103 |   1.240356   .0678462    18.28   0.000     1.105338    1.375375
+     _Icode_Cout_1104 |   1.197105   .1343325     8.91   0.000     .9297748    1.464435
+     _Icode_Cout_1105 |   1.004827   .0802886    12.52   0.000     .8450478    1.164607
+     _Icode_Cout_1106 |   1.385536   .0666801    20.78   0.000     1.252838    1.518233
+     _Icode_Cout_1107 |   .8349574   .0796668    10.48   0.000     .6764154    .9934993
+     _Icode_Cout_1108 |   1.077122   .0801989    13.43   0.000     .9175215    1.236723
+     _Icode_Cout_1109 |   1.382074   .0828259    16.69   0.000     1.217245    1.546903
+     _Icode_Cout_1110 |   1.011449   .0773617    13.07   0.000      .857494    1.165403
+     _Icode_Cout_1111 |   1.199959   .1429089     8.40   0.000     .9155616    1.484357
+     _Icode_Cout_1112 |   .9008744   .1100794     8.18   0.000     .6818093    1.119939
+     _Icode_Cout_1113 |   .7977517   .1090868     7.31   0.000     .5806621    1.014841
+     _Icode_Cout_1114 |   1.384732   .0956401    14.48   0.000     1.194402    1.575062
+     _Icode_Cout_1115 |   .9218506   .0824668    11.18   0.000     .7577365    1.085965
+     _Icode_Cout_1116 |   1.243375    .071903    17.29   0.000     1.100283    1.386466
+     _Icode_Cout_1117 |   .9488356   .1170065     8.11   0.000     .7159853    1.181686
+     _Icode_Cout_1118 |   .8104412   .1202672     6.74   0.000      .571102    1.049781
+     _Icode_Cout_1119 |   1.259738   .0950954    13.25   0.000     1.070492    1.448984
+     _Icode_Cout_1120 |   1.119415   .0692024    16.18   0.000      .981698    1.257132
+     _Icode_Cout_1121 |   1.221981   .0816991    14.96   0.000     1.059395    1.384567
+     _Icode_Cout_1122 |    .882506   .0973057     9.07   0.000     .6888614    1.076151
+     _Icode_Cout_1123 |   1.435263   .0639277    22.45   0.000     1.308043    1.562484
+     _Icode_Cout_1124 |   1.270282   .1117068    11.37   0.000     1.047978    1.492586
+     _Icode_Cout_1125 |   1.452982   .0641375    22.65   0.000     1.325344     1.58062
+     _Icode_Cout_1126 |   .9477205   .0891639    10.63   0.000     .7702787    1.125162
+     _Icode_Cout_1127 |    .973459   .1159495     8.40   0.000     .7427122    1.204206
+     _Icode_Cout_1128 |   1.244807   .0876894    14.20   0.000       1.0703    1.419315
+     _Icode_Cout_1129 |   1.120879   .1387593     8.08   0.000     .8447394    1.397019
+     _Icode_Cout_1130 |   1.093389   .0648806    16.85   0.000     .9642723    1.222505
+     _Icode_Cout_1131 |   1.309668   .0814926    16.07   0.000     1.147492    1.471843
+     _Icode_Cout_1132 |   1.389201   .1114413    12.47   0.000     1.167425    1.610976
+     _Icode_Cout_1133 |   1.092057   .0705723    15.47   0.000     .9516132      1.2325
+     _Icode_Cout_1134 |  -.6968047   .0776639    -8.97   0.000    -.8513607   -.5422487
+     _Icode_Cout_1135 |  -.6702047   .0657823   -10.19   0.000    -.8011156   -.5392938
+     _Icode_Cout_1136 |  -.5027789   .0658975    -7.63   0.000    -.6339191   -.3716387
+     _Icode_Cout_1137 |   -.454725   .0773348    -5.88   0.000    -.6086262   -.3008238
+     _Icode_Cout_1138 |  -1.015422   .0762431   -13.32   0.000    -1.167151   -.8636937
+     _Icode_Cout_1139 |  -.8014828   .0791271   -10.13   0.000    -.9589508   -.6440148
+     _Icode_Cout_1140 |  -.7037203   .0823396    -8.55   0.000    -.8675813   -.5398593
+     _Icode_Cout_1141 |    -.58504   .0656241    -8.92   0.000    -.7156362   -.4544439
+     _Icode_Cout_1142 |   -.136703   .1223092    -1.12   0.267     -.380106       .1067
+     _Icode_Cout_1143 |    1.28364   .0957696    13.40   0.000     1.093052    1.474227
+     _Icode_Cout_1144 |   1.468087   .0717307    20.47   0.000     1.325339    1.610836
+     _Icode_Cout_1145 |   1.287071   .0783852    16.42   0.000      1.13108    1.443063
+     _Icode_Cout_1146 |   1.386444   .0790961    17.53   0.000     1.229037     1.54385
+     _Icode_Cout_1147 |   1.239573   .0997527    12.43   0.000     1.041059    1.438087
+     _Icode_Cout_1148 |   1.617341   .0642148    25.19   0.000      1.48955    1.745132
+     _Icode_Cout_1149 |   1.326346   .0921356    14.40   0.000      1.14299    1.509701
+     _Icode_Cout_1150 |   1.378627   .0765577    18.01   0.000     1.226272    1.530981
+     _Icode_Cout_1151 |   1.426087   .0793899    17.96   0.000     1.268096    1.584078
+     _Icode_Cout_1152 |   1.779711   .0686507    25.92   0.000     1.643091     1.91633
+     _Icode_Cout_1153 |   1.217282   .1136029    10.72   0.000     .9912046    1.443359
+     _Icode_Cout_1154 |   1.559642   .1306446    11.94   0.000     1.299651    1.819633
+     _Icode_Cout_1155 |   1.181279   .0991194    11.92   0.000     .9840256    1.378533
+     _Icode_Cout_1156 |   1.238257   .0971668    12.74   0.000     1.044889    1.431625
+     _Icode_Cout_1157 |   1.405337   .0694019    20.25   0.000     1.267223    1.543451
+     _Icode_Cout_1158 |   1.534577   .0639293    24.00   0.000     1.407354      1.6618
+     _Icode_Cout_1159 |   1.509912   .0751407    20.09   0.000     1.360377    1.659447
+     _Icode_Cout_1160 |   1.279265   .1022581    12.51   0.000     1.075765    1.482765
+     _Icode_Cout_1161 |   1.377823   .0971466    14.18   0.000     1.184495    1.571151
+     _Icode_Cout_1162 |   1.307915   .0903021    14.48   0.000     1.128208    1.487622
+     _Icode_Cout_1163 |   1.302528   .0886817    14.69   0.000     1.126045     1.47901
+     _Icode_Cout_1164 |   1.303982   .1443504     9.03   0.000     1.016716    1.591249
+     _Icode_Cout_1165 |   1.253381   .1209078    10.37   0.000     1.012766    1.493995
+     _Icode_Cout_1166 |   1.414842   .1356506    10.43   0.000     1.144888    1.684795
+     _Icode_Cout_1167 |   1.806258   .1738273    10.39   0.000     1.460331    2.152186
+     _Icode_Cout_1168 |     1.3905   .1057694    13.15   0.000     1.180012    1.600988
+     _Icode_Cout_1169 |   1.208954   .1188577    10.17   0.000     .9724199    1.445489
+     _Icode_Cout_1170 |   1.477452   .1653916     8.93   0.000     1.148313    1.806592
+     _Icode_Cout_1171 |   1.732395   .0872799    19.85   0.000     1.558702    1.906088
+     _Icode_Cout_1172 |   1.583962   .0753396    21.02   0.000     1.434031    1.733892
+     _Icode_Cout_1173 |   1.299397   .1204197    10.79   0.000     1.059754     1.53904
+     _Icode_Cout_1174 |   1.364069   .1189291    11.47   0.000     1.127393    1.600746
+     _Icode_Cout_1175 |   1.651617   .1027594    16.07   0.000     1.447119    1.856115
+     _Icode_Cout_1176 |   1.397805   .0836988    16.70   0.000     1.231239    1.564371
+     _Icode_Cout_1177 |   1.502405   .1192462    12.60   0.000     1.265098    1.739713
+     _Icode_Cout_1178 |    1.43837   .1081064    13.31   0.000     1.223232    1.653509
+     _Icode_Cout_1179 |   1.262068   .1355195     9.31   0.000     .9923761    1.531761
+     _Icode_Cout_1180 |   1.330201   .1225924    10.85   0.000     1.086235    1.574168
+     _Icode_Cout_1181 |   1.409355   .0971375    14.51   0.000     1.216045    1.602665
+     _Icode_Cout_1182 |   1.232022   .1330644     9.26   0.000     .9672154    1.496829
+     _Icode_Cout_1183 |   1.538094   .0714324    21.53   0.000     1.395939    1.680249
+     _Icode_Cout_1184 |   1.463052   .1164676    12.56   0.000     1.231274     1.69483
+     _Icode_Cout_1185 |   1.294215   .0926172    13.97   0.000     1.109901    1.478529
+     _Icode_Cout_1186 |    1.90091   .1429519    13.30   0.000     1.616427    2.185393
+     _Icode_Cout_1187 |   1.568248   .1529345    10.25   0.000     1.263899    1.872598
+     _Icode_Cout_1188 |  -.8379339   .1792724    -4.67   0.000    -1.194697   -.4811706
+     _Icode_Cout_1189 |  -1.203956   .1090283   -11.04   0.000    -1.420929   -.9869825
+     _Icode_Cout_1190 |  -1.530025    .181696    -8.42   0.000    -1.891611   -1.168438
+     _Icode_Cout_1191 |  -.8613316   .1992713    -4.32   0.000    -1.257894    -.464769
+     _Icode_Cout_1192 |  -1.331949   .2080904    -6.40   0.000    -1.746062   -.9178362
+     _Icode_Cout_1193 |  -1.368004   .2366028    -5.78   0.000    -1.838859   -.8971496
+     _Icode_Cout_1194 |   -1.47531   .1017833   -14.49   0.000    -1.677865   -1.272755
+     _Icode_Cout_1195 |  -1.004123   .2552994    -3.93   0.000    -1.512185   -.4960612
+     _Icode_Cout_1196 |  -1.194221   .1926055    -6.20   0.000    -1.577518    -.810924
+     _Icode_Cout_1197 |  -1.052705   .1928942    -5.46   0.000    -1.436576   -.6688331
+     _Icode_Cout_1198 |  -1.142355   .1786642    -6.39   0.000    -1.497908   -.7868019
+     _Icode_Cout_1199 |  -1.096249    .192884    -5.68   0.000    -1.480101   -.7123978
+     _Icode_Cout_1200 |  -1.237897   .1514138    -8.18   0.000     -1.53922   -.9365741
+     _Icode_Cout_1201 |  -1.590798   .1662335    -9.57   0.000    -1.921613   -1.259983
+     _Icode_Cout_1202 |  -.6946998   .2577124    -2.70   0.009    -1.207564   -.1818358
+     _Icode_Cout_1203 |  -.7404756   .2506383    -2.95   0.004    -1.239262   -.2416894
+     _Icode_Cout_1204 |  -1.253528   .1960928    -6.39   0.000    -1.643765   -.8632911
+     _Icode_Cout_1205 |  -1.166295    .235348    -4.96   0.000    -1.634652   -.6979373
+     _Icode_Cout_1206 |  -1.188666    .217053    -5.48   0.000    -1.620615   -.7567168
+     _Icode_Cout_1207 |  -1.232742   .1489541    -8.28   0.000     -1.52917   -.9363141
+     _Icode_Cout_1208 |  -.7868061   .0716283   -10.98   0.000    -.9293509   -.6442613
+     _Icode_Cout_1209 |  -.5295986   .0997367    -5.31   0.000     -.728081   -.3311162
+     _Icode_Cout_1210 |   .9487538   .1685755     5.63   0.000     .6132779     1.28423
+     _Icode_Cout_1211 |   -.879667   .0693447   -12.69   0.000    -1.017667   -.7416667
+     _Icode_Cout_1212 |   .7887152   .0874876     9.02   0.000     .6146093    .9628211
+     _Icode_Cout_1213 |  -.3192963    .069443    -4.60   0.000    -.4574923   -.1811004
+     _Icode_Cout_1214 |  -.8744777   .0684177   -12.78   0.000    -1.010633   -.7383221
+     _Icode_Cout_1215 |   .3596742   .0649787     5.54   0.000     .2303625    .4889859
+     _Icode_Cout_1216 |  -.1497209   .0640511    -2.34   0.022    -.2771866   -.0222551
+     _Icode_Cout_1217 |  -.6906267    .063901   -10.81   0.000    -.8177938   -.5634597
+     _Icode_Cout_1218 |   1.040677   .1179135     8.83   0.000     .8060219    1.275333
+     _Icode_Cout_1219 |   .0936366   .0673917     1.39   0.169    -.0404771    .2277502
+     _Icode_Cout_1220 |  -1.010453   .0638374   -15.83   0.000    -1.137493   -.8834123
+     _Icode_Cout_1221 |  -.1098075   .0642646    -1.71   0.091    -.2376982    .0180832
+     _Icode_Cout_1222 |   .0021506   .0643824     0.03   0.973    -.1259743    .1302756
+     _Icode_Cout_1223 |  -.4247866   .0686045    -6.19   0.000     -.561314   -.2882593
+     _Icode_Cout_1224 |   .1864446   .0660703     2.82   0.006     .0549606    .3179287
+     _Icode_Cout_1225 |  -.3269111   .0638088    -5.12   0.000    -.4538948   -.1999275
+     _Icode_Cout_1226 |   .2568911   .0655432     3.92   0.000      .126456    .3873262
+     _Icode_Cout_1227 |  -.6829145   .0772759    -8.84   0.000    -.8366985   -.5291305
+     _Icode_Cout_1228 |  -.1146397    .071934    -1.59   0.115     -.257793    .0285135
+     _Icode_Cout_1229 |  -.4283449   .1234404    -3.47   0.001    -.6739991   -.1826906
+     _Icode_Cout_1230 |  -.9825418   .0642196   -15.30   0.000    -1.110343   -.8547408
+     _Icode_Cout_1231 |  -.8435349   .0689617   -12.23   0.000    -.9807731   -.7062967
+     _Icode_Cout_1232 |  -.4856009   .0781911    -6.21   0.000    -.6412061   -.3299957
+     _Icode_Cout_1233 |   .3282624   .1245906     2.63   0.010     .0803193    .5762055
+     _Icode_Cout_1234 |  -.3508654   .0650366    -5.39   0.000    -.4802924   -.2214385
+     _Icode_Cout_1235 |  -.3525399   .0642821    -5.48   0.000    -.4804653   -.2246145
+     _Icode_Cout_1236 |  -.1949312   .0708019    -2.75   0.007    -.3358315   -.0540309
+     _Icode_Cout_1237 |  -.5301183   .0921771    -5.75   0.000    -.7135566     -.34668
+     _Icode_Cout_1238 |  -.5860091   .0661702    -8.86   0.000    -.7176921   -.4543262
+     _Icode_Cout_1239 |  -.7988993   .0638569   -12.51   0.000    -.9259785     -.67182
+     _Icode_Cout_1240 |  -.7922133   .0672963   -11.77   0.000    -.9261372   -.6582894
+     _Icode_Cout_1241 |  -.1150677   .1579503    -0.73   0.468    -.4293989    .1992635
+     _Icode_Cout_1242 |  -.3966696   .0838803    -4.73   0.000    -.5635967   -.2297425
+     _Icode_Cout_1243 |   .2435201    .071371     3.41   0.001     .1014874    .3855529
+     _Icode_Cout_1244 |   .3275425   .0644933     5.08   0.000     .1991968    .4558882
+     _Icode_Cout_1245 |  -.5770078   .0644921    -8.95   0.000    -.7053512   -.4486645
+     _Icode_Cout_1246 |  -.6239157   .0657724    -9.49   0.000    -.7548069   -.4930245
+     _Icode_Cout_1247 |  -.5809331   .0678865    -8.56   0.000    -.7160315   -.4458346
+     _Icode_Cout_1248 |   -.028953   .0694022    -0.42   0.678    -.1670677    .1091618
+     _Icode_Cout_1249 |  -.5926648   .0638168    -9.29   0.000    -.7196643   -.4656653
+     _Icode_Cout_1250 |   -.344148   .0641537    -5.36   0.000    -.4718181    -.216478
+     _Icode_Cout_1251 |   .8764234   .1202425     7.29   0.000     .6371332    1.115714
+     _Icode_Cout_1252 |  -.7681417   .0642514   -11.96   0.000    -.8960061   -.6402773
+     _Icode_Cout_1253 |   .3992153   .1392073     2.87   0.005     .1221839    .6762467
+     _Icode_Cout_1254 |   .3578104   .0651861     5.49   0.000      .228086    .4875348
+     _Icode_Cout_1255 |   .7577548   .1411674     5.37   0.000     .4768227    1.038687
+     _Icode_Cout_1256 |   .2902757   .0643351     4.51   0.000     .1622449    .4183066
+     _Icode_Cout_1257 |   .0958603   .0841091     1.14   0.258    -.0715221    .2632428
+     _Icode_Cout_1258 |   1.766082   .1085949    16.26   0.000     1.549971    1.982193
+     _Icode_Cout_1259 |  -.9248579   .0659165   -14.03   0.000    -1.056036   -.7936798
+     _Icode_Cout_1260 |  -.9279482    .067724   -13.70   0.000    -1.062723   -.7931732
+     _Icode_Cout_1261 |   .9300332   .1577958     5.89   0.000     .6160097    1.244057
+     _Icode_Cout_1262 |   1.142696   .1375335     8.31   0.000     .8689957    1.416397
+     _Icode_Cout_1263 |  -.5656018   .1145276    -4.94   0.000     -.793519   -.3376846
+     _Icode_Cout_1264 |   .5710421   .1042214     5.48   0.000     .3636349    .7784492
+     _Icode_Cout_1265 |   .1262603   .0663929     1.90   0.061    -.0058658    .2583864
+     _Icode_Cout_1266 |  -.9888105    .072766   -13.59   0.000    -1.133619   -.8440016
+     _Icode_Cout_1267 |   -.257444   .0994119    -2.59   0.011    -.4552799    -.059608
+     _Icode_Cout_1268 |   .1988083   .0771568     2.58   0.012     .0452614    .3523551
+     _Icode_Cout_1269 |  -.7460095     .06435   -11.59   0.000      -.87407   -.6179489
+     _Icode_Cout_1270 |  -.5838955   .0887165    -6.58   0.000     -.760447   -.4073439
+     _Icode_Cout_1271 |   .2623061   .0655089     4.00   0.000     .1319393     .392673
+     _Icode_Cout_1272 |  -.9085362   .0711286   -12.77   0.000    -1.050087   -.7669858
+     _Icode_Cout_1273 |  -.2304399   .0833318    -2.77   0.007    -.3962755   -.0646043
+     _Icode_Cout_1274 |  -.0333064   .0705636    -0.47   0.638    -.1737324    .1071195
+     _Icode_Cout_1275 |   .3104279    .064071     4.85   0.000     .1829225    .4379333
+     _Icode_Cout_1276 |  -.3267722   .0746063    -4.38   0.000    -.4752434   -.1783009
+     _Icode_Cout_1277 |  -.4854248   .0681895    -7.12   0.000    -.6211261   -.3497234
+     _Icode_Cout_1278 |  -.0228543   .0638102    -0.36   0.721    -.1498407    .1041321
+     _Icode_Cout_1279 |   -.972133   .0689522   -14.10   0.000    -1.109352   -.8349138
+     _Icode_Cout_1280 |   .3365427   .0665701     5.06   0.000      .204064    .4690214
+     _Icode_Cout_1281 |  -.3034536   .0635293    -4.78   0.000    -.4298809   -.1770264
+     _Icode_Cout_1282 |  -.1041462   .0638663    -1.63   0.107    -.2312441    .0229518
+     _Icode_Cout_1283 |  -.6904936   .0729364    -9.47   0.000    -.8356418   -.5453455
+     _Icode_Cout_1284 |    .086262     .06608     1.31   0.195    -.0452415    .2177654
+     _Icode_Cout_1285 |    .708489   .0756126     9.37   0.000     .5580151    .8589629
+     _Icode_Cout_1286 |   .5068238   .0649941     7.80   0.000     .3774814    .6361662
+     _Icode_Cout_1287 |   .6397277   .0788848     8.11   0.000      .482742    .7967134
+     _Icode_Cout_1288 |    .363319   .0750267     4.84   0.000     .2140111    .5126269
+     _Icode_Cout_1289 |   .4454954   .0643757     6.92   0.000     .3173837     .573607
+     _Icode_Cout_1290 |   .7213344   .0647049    11.15   0.000     .5925675    .8501013
+     _Icode_Cout_1291 |  -.4786071   .0686596    -6.97   0.000    -.6152442   -.3419701
+     _Icode_Cout_1292 |  -.5584567   .0767787    -7.27   0.000    -.7112513   -.4056621
+     _Icode_Cout_1293 |   .7775767   .0676821    11.49   0.000      .642885    .9122684
+     _Icode_Cout_1294 |   .4513822   .0648813     6.96   0.000     .3222643       .5805
+     _Icode_Cout_1295 |   .6305728   .1033133     6.10   0.000     .4249729    .8361728
+     _Icode_Cout_1296 |   .7361073   .0633749    11.62   0.000     .6099873    .8622273
+     _Icode_Cout_1297 |    .235758   .0650769     3.62   0.001     .1062508    .3652652
+     _Icode_Cout_1298 |    .344833    .065943     5.23   0.000     .2136024    .4760637
+     _Icode_Cout_1299 |   .3744615   .0648185     5.78   0.000     .2454686    .5034544
+     _Icode_Cout_1300 |   -.019506   .0634647    -0.31   0.759    -.1458047    .1067928
+     _Icode_Cout_1301 |   .4227509    .078299     5.40   0.000     .2669309    .5785709
+     _Icode_Cout_1302 |   .2054898     .06406     3.21   0.002     .0780064    .3329733
+     _Icode_Cout_1303 |  -.0323923   .0647225    -0.50   0.618    -.1611941    .0964095
+     _Icode_Cout_1304 |  -.1012374   .0691767    -1.46   0.147    -.2389034    .0364287
+     _Icode_Cout_1305 |    .593557   .0634307     9.36   0.000     .4673259    .7197882
+     _Icode_Cout_1306 |  -.0904843   .0645702    -1.40   0.165    -.2189832    .0380146
+     _Icode_Cout_1307 |  -.2504377   .0643924    -3.89   0.000    -.3785826   -.1222929
+     _Icode_Cout_1308 |  -.4172435   .0633871    -6.58   0.000    -.5433879    -.291099
+     _Icode_Cout_1309 |    .089079   .0871473     1.02   0.310    -.0843497    .2625078
+     _Icode_Cout_1310 |   .1127303   .0633925     1.78   0.079    -.0134249    .2388855
+     _Icode_Cout_1311 |   .6347982   .0926513     6.85   0.000     .4504162    .8191802
+     _Icode_Cout_1312 |   .1010428   .0634744     1.59   0.115    -.0252752    .2273609
+     _Icode_Cout_1313 |  -.3158893   .0702803    -4.49   0.000    -.4557515   -.1760271
+     _Icode_Cout_1314 |   .3271967    .066774     4.90   0.000     .1943122    .4600813
+     _Icode_Cout_1315 |   .1284323   .0682353     1.88   0.063    -.0073603    .2642249
+     _Icode_Cout_1316 |   .7349144   .0746846     9.84   0.000     .5862873    .8835416
+     _Icode_Cout_1317 |  -.0068444   .0653839    -0.10   0.917    -.1369624    .1232736
+     _Icode_Cout_1318 |     .23955   .0634173     3.78   0.000     .1133455    .3657545
+     _Icode_Cout_1319 |   .3312866   .0634655     5.22   0.000     .2049863    .4575868
+     _Icode_Cout_1320 |   .0895307   .0633822     1.41   0.162    -.0366039    .2156653
+     _Icode_Cout_1321 |   .5129016   .0664305     7.72   0.000     .3807007    .6451025
+     _Icode_Cout_1322 |   .5628391   .0663303     8.49   0.000     .4308376    .6948406
+     _Icode_Cout_1323 |   .7325041   .0696127    10.52   0.000     .5939704    .8710378
+     _Icode_Cout_1324 |  -.7838122   .0700322   -11.19   0.000    -.9231808   -.6444436
+     _Icode_Cout_1325 |   .2124231   .0844436     2.52   0.014      .044375    .3804713
+     _Icode_Cout_1326 |   .1996172   .0654675     3.05   0.003     .0693328    .3299017
+     _Icode_Cout_1327 |  -.4637813    .073978    -6.27   0.000    -.6110023   -.3165603
+     _Icode_Cout_1328 |   .1764045    .068679     2.57   0.012     .0397289    .3130801
+     _Icode_Cout_1329 |   .2355275   .0892676     2.64   0.010     .0578793    .4131756
+     _Icode_Cout_1330 |   .0940575   .0736555     1.28   0.205    -.0525215    .2406366
+     _Icode_Cout_1331 |  -.3454999   .0646908    -5.34   0.000    -.4742387   -.2167612
+     _Icode_Cout_1332 |   .1163685   .0698074     1.67   0.099    -.0225525    .2552896
+     _Icode_Cout_1333 |   .0543611   .0688619     0.79   0.432    -.0826785    .1914007
+     _Icode_Cout_1334 |   .4507362   .0872591     5.17   0.000      .277085    .6243874
+     _Icode_Cout_1335 |  -.0481683   .0644794    -0.75   0.457    -.1764864    .0801498
+     _Icode_Cout_1336 |  -.0191024   .0771148    -0.25   0.805    -.1725657     .134361
+     _Icode_Cout_1337 |   .0406772   .0649668     0.63   0.533    -.0886109    .1699654
+     _Icode_Cout_1338 |   .1591146   .0635097     2.51   0.014     .0327262     .285503
+     _Icode_Cout_1339 |  -.2844546   .0789256    -3.60   0.001    -.4415214   -.1273877
+     _Icode_Cout_1340 |    -.39521   .0668354    -5.91   0.000    -.5282167   -.2622033
+     _Icode_Cout_1341 |  -.4687008   .0717144    -6.54   0.000    -.6114171   -.3259846
+     _Icode_Cout_1342 |  -.4163632   .0726729    -5.73   0.000    -.5609868   -.2717395
+     _Icode_Cout_1343 |   -.997473    .080555   -12.38   0.000    -1.157783   -.8371634
+     _Icode_Cout_1344 |  -.4188643    .069471    -6.03   0.000    -.5571161   -.2806126
+     _Icode_Cout_1345 |   .0642663   .0792277     0.81   0.420    -.0934018    .2219343
+     _Icode_Cout_1346 |  -.0338847   .0868061    -0.39   0.697    -.2066343    .1388649
+     _Icode_Cout_1347 |  -.6033808    .074215    -8.13   0.000    -.7510734   -.4556882
+     _Icode_Cout_1348 |  -.1785913   .0729187    -2.45   0.017    -.3237041   -.0334785
+     _Icode_Cout_1349 |  -.4735316   .0751326    -6.30   0.000    -.6230503   -.3240128
+     _Icode_Cout_1350 |  -.6271146    .069574    -9.01   0.000    -.7655712   -.4886579
+     _Icode_Cout_1351 |  -.4650694   .0695316    -6.69   0.000    -.6034418    -.326697
+     _Icode_Cout_1352 |   .4727636   .1547588     3.05   0.003     .1647839    .7807433
+     _Icode_Cout_1353 |   -.203144   .0768997    -2.64   0.010    -.3561793   -.0501087
+     _Icode_Cout_1354 |  -.3204965    .072012    -4.45   0.000    -.4638049   -.1771881
+     _Icode_Cout_1355 |  -.5331549   .0732809    -7.28   0.000    -.6789884   -.3873213
+     _Icode_Cout_1356 |  -.2381217   .0697302    -3.41   0.001    -.3768893   -.0993541
+     _Icode_Cout_1357 |  -.1132796   .0695285    -1.63   0.107    -.2516457    .0250865
+     _Icode_Cout_1358 |   .0062322   .0742628     0.08   0.933    -.1415555    .1540199
+     _Icode_Cout_1359 |   -.468429   .0720789    -6.50   0.000    -.6118705   -.3249875
+     _Icode_Cout_1360 |  -.4941706   .0694807    -7.11   0.000    -.6324415   -.3558997
+     _Icode_Cout_1361 |  -.8443461   .0702781   -12.01   0.000     -.984204   -.7044882
+     _Icode_Cout_1362 |  -.4676705   .0695302    -6.73   0.000      -.60604   -.3293011
+     _Icode_Cout_1363 |  -.4764918   .0738438    -6.45   0.000    -.6234455    -.329538
+     _Icode_Cout_1364 |   -.734819   .0705025   -10.42   0.000    -.8751234   -.5945147
+     _Icode_Cout_1365 |  -.0244494   .0696605    -0.35   0.727    -.1630781    .1141794
+     _Icode_Cout_1366 |  -.4985583   .0732612    -6.81   0.000    -.6443527    -.352764
+     _Icode_Cout_1367 |   2.720595    .066045    41.19   0.000     2.589162    2.852029
+     _Icode_Cout_1368 |    .547525   .1491973     3.67   0.000     .2506129    .8444372
+     _Icode_Cout_1369 |   2.054003   .1271095    16.16   0.000     1.801048    2.306959
+     _Icode_Cout_1370 |   1.004725   .1147938     8.75   0.000     .7762778    1.233172
+     _Icode_Cout_1371 |   1.022828   .1106656     9.24   0.000     .8025959    1.243059
+     _Icode_Cout_1372 |   .8642879   .1262627     6.85   0.000     .6130171    1.115559
+     _Icode_Cout_1373 |   .5714443   .1126651     5.07   0.000     .3472336    .7956551
+     _Icode_Cout_1374 |   1.113245   .1279279     8.70   0.000     .8586604     1.36783
+     _Icode_Cout_1375 |   1.057024   .1298428     8.14   0.000     .7986283    1.315419
+     _Icode_Cout_1376 |     .97271   .1212957     8.02   0.000     .7313239    1.214096
+     _Icode_Cout_1377 |   1.027198   .1326404     7.74   0.000     .7632349    1.291161
+     _Icode_Cout_1378 |   1.041565   .1095365     9.51   0.000     .8235805     1.25955
+     _Icode_Cout_1379 |   1.396953   .0805881    17.33   0.000     1.236578    1.557328
+     _Icode_Cout_1380 |   1.406689   .1410345     9.97   0.000     1.126021    1.687357
+     _Icode_Cout_1381 |   1.166489   .1134542    10.28   0.000     .9407078     1.39227
+     _Icode_Cout_1382 |   1.050102    .102515    10.24   0.000     .8460904    1.254113
+     _Icode_Cout_1383 |    1.03227   .1282263     8.05   0.000     .7770914    1.287448
+     _Icode_Cout_1384 |   1.451574   .0930763    15.60   0.000     1.266346    1.636801
+     _Icode_Cout_1385 |   2.439997   .1349395    18.08   0.000     2.171459    2.708535
+     _Icode_Cout_1386 |   1.757913   .0639802    27.48   0.000     1.630588    1.885237
+     _Icode_Cout_1387 |   1.493593   .0771433    19.36   0.000     1.340073    1.647113
+     _Icode_Cout_1388 |   1.785839    .081094    22.02   0.000     1.624457    1.947221
+     _Icode_Cout_1389 |   1.955296   .0643198    30.40   0.000     1.827295    2.083296
+     _Icode_Cout_1390 |    1.69335   .1473334    11.49   0.000     1.400147    1.986553
+     _Icode_Cout_1391 |   1.470951   .1341122    10.97   0.000      1.20406    1.737843
+     _Icode_Cout_1392 |   1.658385   .1779253     9.32   0.000     1.304302    2.012467
+     _Icode_Cout_1393 |   1.523021   .1116679    13.64   0.000     1.300795    1.745247
+     _Icode_Cout_1394 |   1.513352   .1015901    14.90   0.000     1.311181    1.715522
+     _Icode_Cout_1395 |   1.764285   .0755953    23.34   0.000     1.613845    1.914724
+     _Icode_Cout_1396 |   1.762397   .0650127    27.11   0.000     1.633018    1.891777
+     _Icode_Cout_1397 |   1.630711    .108148    15.08   0.000     1.415489    1.845932
+     _Icode_Cout_1398 |   1.419177   .1142147    12.43   0.000     1.191883    1.646472
+     _Icode_Cout_1399 |   1.570618   .0898798    17.47   0.000     1.391751    1.749484
+     _Icode_Cout_1400 |   1.803905   .0650486    27.73   0.000     1.674454    1.933355
+     _Icode_Cout_1401 |    1.42434    .094535    15.07   0.000      1.23621    1.612471
+     _Icode_Cout_1402 |    1.47781   .0912695    16.19   0.000     1.296177    1.659442
+     _Icode_Cout_1403 |   1.669082   .0714303    23.37   0.000     1.526931    1.811233
+     _Icode_Cout_1404 |   1.606717   .1340534    11.99   0.000     1.339942    1.873491
+     _Icode_Cout_1405 |   1.610465   .1456379    11.06   0.000     1.320637    1.900294
+     _Icode_Cout_1406 |   1.519803   .1042521    14.58   0.000     1.312335    1.727271
+     _Icode_Cout_1407 |   1.742631   .0859412    20.28   0.000     1.571603    1.913659
+     _Icode_Cout_1408 |   1.388314   .0857221    16.20   0.000     1.217722    1.558906
+     _Icode_Cout_1409 |   1.606973   .0848301    18.94   0.000     1.438156     1.77579
+     _Icode_Cout_1410 |   1.872787   .0755907    24.78   0.000     1.722357    2.023218
+     _Icode_Cout_1411 |   1.843572    .064089    28.77   0.000     1.716031    1.971113
+     _Icode_Cout_1412 |   2.062929   .0725101    28.45   0.000     1.918629    2.207228
+     _Icode_Cout_1413 |   1.678571   .1030093    16.30   0.000     1.473576    1.883566
+     _Icode_Cout_1414 |   1.588398   .1536481    10.34   0.000     1.282629    1.894168
+     _Icode_Cout_1415 |   1.770788    .067632    26.18   0.000     1.636196     1.90538
+     _Icode_Cout_1416 |   1.710748   .1103537    15.50   0.000     1.491137    1.930358
+     _Icode_Cout_1417 |   1.452481   .1108503    13.10   0.000     1.231882     1.67308
+     _Icode_Cout_1418 |   1.784891   .0640253    27.88   0.000     1.657477    1.912305
+     _Icode_Cout_1419 |   1.429376   .1223281    11.68   0.000     1.185935    1.672817
+     _Icode_Cout_1420 |   1.576606   .0755158    20.88   0.000     1.426325    1.726887
+     _Icode_Cout_1421 |    1.86568   .0640881    29.11   0.000      1.73814    1.993219
+     _Icode_Cout_1422 |   1.511831   .1184034    12.77   0.000       1.2762    1.747461
+     _Icode_Cout_1423 |   1.392839   .1480769     9.41   0.000     1.098156    1.687521
+     _Icode_Cout_1424 |   1.363479    .109491    12.45   0.000     1.145585    1.581373
+     _Icode_Cout_1425 |   1.874869   .0657047    28.53   0.000     1.744113    2.005625
+     _Icode_Cout_1426 |   1.467761   .1037524    14.15   0.000     1.261287    1.674235
+     _Icode_Cout_1427 |   1.667296    .077072    21.63   0.000     1.513918    1.820674
+     _Icode_Cout_1428 |   1.729124   .0642054    26.93   0.000     1.601352    1.856897
+     _Icode_Cout_1429 |   1.621453   .0863615    18.78   0.000     1.449588    1.793318
+     _Icode_Cout_1430 |   1.662714   .1025659    16.21   0.000     1.458602    1.866827
+     _Icode_Cout_1431 |   1.808346    .073931    24.46   0.000     1.661218    1.955473
+     _Icode_Cout_1432 |   1.403971   .0866308    16.21   0.000      1.23157    1.576372
+     _Icode_Cout_1433 |   1.550578    .102064    15.19   0.000     1.347464    1.753692
+     _Icode_Cout_1434 |   2.076294   .0737403    28.16   0.000     1.929547    2.223042
+     _Icode_Cout_1435 |   .6173628   .1113681     5.54   0.000     .3957332    .8389924
+     _Icode_Cout_1436 |  -.1925629   .0972195    -1.98   0.051    -.3860359    .0009102
+     _Icode_Cout_1437 |   .7090734    .107216     6.61   0.000     .4957068      .92244
+     _Icode_Cout_1438 |    .789531     .06375    12.38   0.000     .6626644    .9163976
+     _Icode_Cout_1439 |   .8566025   .1096583     7.81   0.000     .6383756    1.074829
+     _Icode_Cout_1440 |    .933307    .106685     8.75   0.000     .7209972    1.145617
+     _Icode_Cout_1441 |    .871004   .0868621    10.03   0.000     .6981428    1.043865
+     _Icode_Cout_1442 |   .7136126   .1011194     7.06   0.000     .5123785    .9148467
+     _Icode_Cout_1443 |   .8021679   .0676838    11.85   0.000     .6674728    .9368629
+     _Icode_Cout_1444 |   .4938499   .1726686     2.86   0.005     .1502284    .8374713
+     _Icode_Cout_1445 |   .8554468   .0888744     9.63   0.000     .6785811    1.032312
+     _Icode_Cout_1446 |   .3146077   .0892775     3.52   0.001     .1369399    .4922756
+     _Icode_Cout_1447 |   .8269438   .0912901     9.06   0.000     .6452707    1.008617
+     _Icode_Cout_1448 |   .9140901   .1069272     8.55   0.000     .7012982    1.126882
+     _Icode_Cout_1449 |   .6678782   .0967241     6.90   0.000     .4753911    .8603654
+     _Icode_Cout_1450 |   .2928717   .0637995     4.59   0.000     .1659067    .4198367
+     _Icode_Cout_1451 |   .7439074   .0803793     9.25   0.000     .5839474    .9038674
+     _Icode_Cout_1452 |   .8417432   .1118908     7.52   0.000     .6190733    1.064413
+     _Icode_Cout_1453 |   .7814251   .1056037     7.40   0.000     .5712669    .9915832
+     _Icode_Cout_1454 |  -1.470694   .1177683   -12.49   0.000     -1.70506   -1.236327
+     _Icode_Cout_1455 |  -.4258502   .0712429    -5.98   0.000     -.567628   -.2840723
+     _Icode_Cout_1456 |  -1.124386   .1070155   -10.51   0.000    -1.337354   -.9114187
+     _Icode_Cout_1457 |  -.8739811   .1327965    -6.58   0.000    -1.138255   -.6097076
+     _Icode_Cout_1458 |  -1.158153   .0805317   -14.38   0.000    -1.318416   -.9978897
+     _Icode_Cout_1459 |  -1.172305   .0766826   -15.29   0.000    -1.324908   -1.019701
+     _Icode_Cout_1460 |  -1.512691   .0923064   -16.39   0.000    -1.696387   -1.328996
+     _Icode_Cout_1461 |  -1.246539   .0654233   -19.05   0.000    -1.376736   -1.116342
+     _Icode_Cout_1462 |  -1.304475   .0664006   -19.65   0.000    -1.436617   -1.172334
+     _Icode_Cout_1463 |  -.9724601    .090122   -10.79   0.000    -1.151809   -.7931115
+     _Icode_Cout_1464 |  -.9663088   .0910219   -10.62   0.000    -1.147448   -.7851695
+     _Icode_Cout_1465 |  -1.157548   .1829205    -6.33   0.000    -1.521571   -.7935245
+     _Icode_Cout_1466 |  -.9377181   .0329711   -28.44   0.000    -1.003333   -.8721035
+     _Icode_Cout_1467 |   -.705609    .050149   -14.07   0.000    -.8054086   -.6058094
+     _Icode_Cout_1468 |  -1.588615   .0536256   -29.62   0.000    -1.695333   -1.481896
+     _Icode_Cout_1469 |   -1.24432   .0412261   -30.18   0.000    -1.326363   -1.162278
+     _Icode_Cout_1470 |  -1.084569   .0320471   -33.84   0.000    -1.148345   -1.020794
+     _Icode_Cout_1471 |  -1.129644   .0398037   -28.38   0.000    -1.208856   -1.050432
+     _Icode_Cout_1472 |  -1.042436   .0322545   -32.32   0.000    -1.106625   -.9782475
+     _Icode_Cout_1473 |  -1.237408   .0328945   -37.62   0.000     -1.30287   -1.171946
+     _Icode_Cout_1474 |  -.9890555   .1401547    -7.06   0.000    -1.267972   -.7101388
+     _Icode_Cout_1475 |  -1.133922    .047592   -23.83   0.000    -1.228634   -1.039211
+     _Icode_Cout_1476 |  -.9390279   .0855639   -10.97   0.000    -1.109306   -.7687503
+     _Icode_Cout_1477 |   .1181517   .0607034     1.95   0.055    -.0026519    .2389554
+     _Icode_Cout_1478 |  -1.226021   .0337916   -36.28   0.000    -1.293268   -1.158773
+     _Icode_Cout_1479 |  -1.090545    .091448   -11.93   0.000    -1.272532   -.9085574
+     _Icode_Cout_1480 |  -1.198924   .0570374   -21.02   0.000    -1.312432   -1.085416
+     _Icode_Cout_1481 |  -1.356314   .0750986   -18.06   0.000    -1.505765   -1.206863
+     _Icode_Cout_1482 |  -.9601893   .0919227   -10.45   0.000    -1.143121   -.7772573
+     _Icode_Cout_1483 |  -.7665092   .0568223   -13.49   0.000    -.8795893   -.6534291
+     _Icode_Cout_1484 |  -.3635667   .1243353    -2.92   0.004    -.6110019   -.1161315
+     _Icode_Cout_1485 |  -.7125632   .0332089   -21.46   0.000     -.778651   -.6464753
+     _Icode_Cout_1486 |  -.6271186   .0510154   -12.29   0.000    -.7286425   -.5255948
+     _Icode_Cout_1487 |  -1.085962   .0447015   -24.29   0.000    -1.174921   -.9970032
+     _Icode_Cout_1488 |  -.9898481    .086663   -11.42   0.000    -1.162313   -.8173833
+     _Icode_Cout_1489 |  -.9804447   .0395311   -24.80   0.000    -1.059114   -.9017753
+     _Icode_Cout_1490 |  -1.185876   .0440138   -26.94   0.000    -1.273466   -1.098286
+     _Icode_Cout_1491 |  -1.047203   .0908634   -11.53   0.000    -1.228027   -.8663786
+     _Icode_Cout_1492 |   -1.23894   .0546969   -22.65   0.000     -1.34779    -1.13009
+     _Icode_Cout_1493 |  -.6907257   .0331284   -20.85   0.000    -.7566534    -.624798
+     _Icode_Cout_1494 |  -1.061787   .0707716   -15.00   0.000    -1.202627   -.9209465
+     _Icode_Cout_1495 |  -1.148735   .0330125   -34.80   0.000    -1.214432   -1.083038
+     _Icode_Cout_1496 |  -1.132268   .1341044    -8.44   0.000    -1.399144    -.865392
+     _Icode_Cout_1497 |  -.9654668   .0347575   -27.78   0.000    -1.034636   -.8962972
+     _Icode_Cout_1498 |  -1.541875   .0744725   -20.70   0.000     -1.69008    -1.39367
+     _Icode_Cout_1499 |  -1.320695   .0341295   -38.70   0.000    -1.388615   -1.252775
+     _Icode_Cout_1500 |  -1.068963   .0496665   -21.52   0.000    -1.167802   -.9701233
+     _Icode_Cout_1501 |  -1.147446   .0504702   -22.74   0.000    -1.247885   -1.047008
+     _Icode_Cout_1502 |  -1.069399   .0327034   -32.70   0.000    -1.134481   -1.004318
+     _Icode_Cout_1503 |  -1.138086   .0985047   -11.55   0.000    -1.334116   -.9420552
+     _Icode_Cout_1504 |  -1.117875   .1118007   -10.00   0.000    -1.340366   -.8953846
+           _satyear_1 |  -.3904171   .1700508    -2.30   0.024    -.7288289   -.0520053
+           _satyear_2 |  -.3744923   .0630469    -5.94   0.000    -.4999597    -.249025
+           _satyear_3 |  -.3724005   .0682469    -5.46   0.000    -.5082161   -.2365849
+           _satyear_4 |  -.2851288    .065709    -4.34   0.000    -.4158939   -.1543638
+           _satyear_5 |  -.2707088   .0752878    -3.60   0.001    -.4205362   -.1208814
+           _satyear_6 |  -.0749759   .0561136    -1.34   0.185    -.1866456    .0366937
+           _satyear_7 |  -.0171545   .1356108    -0.13   0.900    -.2870285    .2527195
+                _cons |   8.759568   .1047894    83.59   0.000      8.55103    8.968105
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_Co
+> untry    log_region log_area  log_region_X_log_area  ) addtext(Region FE, YES, Country FE, NO, Country Group FE, NO, Satlite FE, YES) dec(
+> 3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Random effects Model (3): Use only ONE predictor (Lights per pixel) with TWO fixed effects: Country FE and Satellite FE
+. xtreg log_GDP_pc_Region log_Light_ppix_Region    country_dum1-country_dum81  _satyear_1-_satyear_7, robust  cluster(Country_ISO)
+note: country_dum81 omitted because of collinearity.
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.5792                                         min =          1
+     Between = 0.8649                                         avg =        3.5
+     Overall = 0.8565                                         max =          4
+
+                                                Wald chi2(7)      =          .
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =          .
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .1528906   .0304121     5.03   0.000     .0932841    .2124972
+         country_dum1 |    -.41599   .0580842    -7.16   0.000     -.529833    -.302147
+         country_dum2 |   .9640404   .0956865    10.07   0.000     .7764983    1.151583
+         country_dum3 |   .5267361   .0210226    25.06   0.000     .4855326    .5679396
+         country_dum4 |   1.543956   .0440839    35.02   0.000     1.457553    1.630359
+         country_dum5 |   1.062157   .0573456    18.52   0.000     .9497618    1.174552
+         country_dum6 |     .73197     .09119     8.03   0.000     .5532409     .910699
+         country_dum7 |  -1.498336   .0733667   -20.42   0.000    -1.642132    -1.35454
+         country_dum8 |  -1.833087   .0163614  -112.04   0.000    -1.865155   -1.801019
+         country_dum9 |  -.2692068   .0295405    -9.11   0.000    -.3271052   -.2113084
+        country_dum10 |  -.4396247   .0326004   -13.49   0.000    -.5035204    -.375729
+        country_dum11 |  -.3481378   .0749731    -4.64   0.000    -.4950823   -.2011933
+        country_dum12 |  -.1418857   .0029475   -48.14   0.000    -.1476627   -.1361086
+        country_dum13 |   1.356008   .0104074   130.29   0.000     1.335609    1.376406
+        country_dum14 |   1.151032   .0719034    16.01   0.000     1.010104     1.29196
+        country_dum15 |   .3663082   .0251177    14.58   0.000     .3170783     .415538
+        country_dum16 |  -.8183093    .010182   -80.37   0.000    -.8382656   -.7983529
+        country_dum17 |  -.2704368   .0039892   -67.79   0.000    -.2782555    -.262618
+        country_dum18 |   .4590795   .0695583     6.60   0.000     .3227477    .5954114
+        country_dum19 |   .9161838   .0749661    12.22   0.000     .7692531    1.063115
+        country_dum20 |   .9455961    .064037    14.77   0.000     .8200859    1.071106
+        country_dum21 |  -.1105396     .01198    -9.23   0.000      -.13402   -.0870592
+        country_dum22 |  -.5028907   .0866853    -5.80   0.000    -.6727908   -.3329906
+        country_dum23 |   .7628391   .0503111    15.16   0.000     .6642311    .8614471
+        country_dum24 |   .0103305    .013016     0.79   0.427    -.0151804    .0358414
+        country_dum25 |   1.056478   .0353327    29.90   0.000     .9872268    1.125729
+        country_dum26 |   .8097735   .0591309    13.69   0.000      .693879     .925668
+        country_dum27 |   .8274054   .0726671    11.39   0.000     .6849805    .9698302
+        country_dum28 |    .685826   .0413283    16.59   0.000      .604824     .766828
+        country_dum29 |  -1.063864   .0398025   -26.73   0.000    -1.141875   -.9858525
+        country_dum30 |  -.9473641   .0190091   -49.84   0.000    -.9846211    -.910107
+        country_dum31 |    .267639   .0482827     5.54   0.000     .1730066    .3622715
+        country_dum32 |   .1593541   .0448456     3.55   0.000     .0714583    .2472499
+        country_dum33 |  -.4163471   .0212773   -19.57   0.000    -.4580498   -.3746443
+        country_dum34 |   -1.08496    .035759   -30.34   0.000    -1.155047   -1.014874
+        country_dum35 |   .9780248   .0460539    21.24   0.000     .8877608    1.068289
+        country_dum36 |  -.0867437   .0249919    -3.47   0.001    -.1357269   -.0377604
+        country_dum37 |    .842641   .0688082    12.25   0.000     .7077793    .9775026
+        country_dum38 |  -.4407768   .0359986   -12.24   0.000    -.5113327   -.3702208
+        country_dum39 |   .7888154   .0849866     9.28   0.000     .6222446    .9553861
+        country_dum40 |   .4627651    .041254    11.22   0.000     .3819088    .5436214
+        country_dum41 |  -1.220937   .0286202   -42.66   0.000    -1.277031   -1.164842
+        country_dum42 |  -1.358384   .0144788   -93.82   0.000    -1.386762   -1.330007
+        country_dum43 |   .4585852   .0855782     5.36   0.000     .2908549    .6263154
+        country_dum44 |  -.9692607   .0288076   -33.65   0.000    -1.025722   -.9127989
+        country_dum45 |  -1.476243   .0579389   -25.48   0.000    -1.589802   -1.362685
+        country_dum46 |   .0982564   .0176272     5.57   0.000     .0637078     .132805
+        country_dum47 |  -.2494966    .010425   -23.93   0.000    -.2699293   -.2290638
+        country_dum48 |  -.7032199   .0085856   -81.91   0.000    -.7200474   -.6863924
+        country_dum49 |   .0978521   .0240002     4.08   0.000     .0508126    .1448916
+        country_dum50 |  -.4307632   .0291586   -14.77   0.000     -.487913   -.3736133
+        country_dum51 |  -.4955471   .1183522    -4.19   0.000    -.7275132    -.263581
+        country_dum52 |   -2.28252   .1037626   -22.00   0.000    -2.485891   -2.079149
+        country_dum53 |   .2592735   .0362098     7.16   0.000     .1883036    .3302434
+        country_dum54 |  -.8231834   .0854853    -9.63   0.000    -.9907314   -.6556353
+        country_dum55 |  -.9665217   .0304163   -31.78   0.000    -1.026136   -.9069069
+        country_dum56 |    .939586   .0859384    10.93   0.000     .7711497    1.108022
+        country_dum57 |   1.296926   .0355105    36.52   0.000     1.227327    1.366525
+        country_dum58 |  -1.582972   .0568122   -27.86   0.000    -1.694322   -1.471623
+        country_dum59 |   -.995018   .0216385   -45.98   0.000    -1.037429   -.9526072
+        country_dum60 |  -.2860727   .0318388    -8.99   0.000    -.3484755   -.2236699
+        country_dum61 |  -.2813328    .042433    -6.63   0.000       -.3645   -.1981657
+        country_dum62 |  -.8886299   .0357784   -24.84   0.000    -.9587543   -.8185056
+        country_dum63 |   .0495677   .0558017     0.89   0.374    -.0598015     .158937
+        country_dum64 |   .5725096   .0638203     8.97   0.000     .4474241    .6975951
+        country_dum65 |  -.2454868    .065195    -3.77   0.000    -.3732666    -.117707
+        country_dum66 |  -.2303103   .0287512    -8.01   0.000    -.2866616    -.173959
+        country_dum67 |  -.1295976   .0040361   -32.11   0.000    -.1375082    -.121687
+        country_dum68 |  -.8311863   .0329872   -25.20   0.000    -.8958401   -.7665325
+        country_dum69 |   -.271763   .0516044    -5.27   0.000    -.3729058   -.1706202
+        country_dum70 |   .2353613    .057136     4.12   0.000     .1233768    .3473458
+        country_dum71 |   .5441788    .052984    10.27   0.000      .440332    .6480256
+        country_dum72 |   1.051082   .0431635    24.35   0.000     .9664834    1.135681
+        country_dum73 |  -.5335242   .0236461   -22.56   0.000    -.5798696   -.4871788
+        country_dum74 |  -.2207842   .0244321    -9.04   0.000    -.2686703   -.1728981
+        country_dum75 |   -1.66815   .1001516   -16.66   0.000    -1.864444   -1.471856
+        country_dum76 |  -.7287527   .0217643   -33.48   0.000      -.77141   -.6860954
+        country_dum77 |     .26338   .0207179    12.71   0.000     .2227737    .3039863
+        country_dum78 |   1.323179   .0440786    30.02   0.000     1.236786    1.409571
+        country_dum79 |  -1.458427   .0422925   -34.48   0.000    -1.541318   -1.375535
+        country_dum80 |  -1.418406   .0287137   -49.40   0.000    -1.474684   -1.362128
+        country_dum81 |          0  (omitted)
+           _satyear_1 |  -.4330673   .1354746    -3.20   0.001    -.6985926    -.167542
+           _satyear_2 |  -.4074599   .0471903    -8.63   0.000    -.4999513   -.3149685
+           _satyear_3 |  -.3964705   .0573641    -6.91   0.000     -.508902   -.2840389
+           _satyear_4 |  -.3096262   .0534624    -5.79   0.000    -.4144105   -.2048419
+           _satyear_5 |  -.2905084   .0613503    -4.74   0.000    -.4107528    -.170264
+           _satyear_6 |   -.097553   .0452903    -2.15   0.031    -.1863203   -.0087857
+           _satyear_7 |  -.0312615   .1194593    -0.26   0.794    -.2653974    .2028745
+                _cons |   9.177276   .0482595   190.17   0.000     9.082689    9.271863
+----------------------+----------------------------------------------------------------
+              sigma_u |  .36661833
+              sigma_e |  .18171673
+                  rho |  .80277743   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_Co
+> untry    log_region log_area  log_region_X_log_area  ) addtext(Region FE, NO, Country FE, YES, Country Group FE, NO, Satlite FE, YES) dec(
+> 3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Random effects Model (4): Use TWO predictors (Lights per pixel and country GDPpc) with TWO fixed effects: Country FE and Satelli
+> te FE
+. xtreg log_GDP_pc_Region log_Light_ppix_Region    log_GDP_pc_Country country_dum1-country_dum81  _satyear_1-_satyear_7, robust  cluster(Cou
+> ntry_ISO)
+note: country_dum81 omitted because of collinearity.
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.7598                                         min =          1
+     Between = 0.8652                                         avg =        3.5
+     Overall = 0.8659                                         max =          4
+
+                                                Wald chi2(8)      =          .
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =          .
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .1224184   .0264219     4.63   0.000     .0706324    .1742044
+   log_GDP_pc_Country |   .8643632   .0377527    22.90   0.000     .7903693     .938357
+         country_dum1 |  -.1480352   .0309773    -4.78   0.000    -.2087497   -.0873207
+         country_dum2 |  -.7895018   .0738155   -10.70   0.000    -.9341775   -.6448261
+         country_dum3 |   .0932723   .0329524     2.83   0.005     .0286867    .1578578
+         country_dum4 |   .4528063   .0714727     6.34   0.000     .3127224    .5928903
+         country_dum5 |   -.006025   .0522599    -0.12   0.908    -.1084525    .0964025
+         country_dum6 |  -.2601788   .0720932    -3.61   0.000    -.4014789   -.1188787
+         country_dum7 |   .0231292    .069289     0.33   0.739    -.1126748    .1589332
+         country_dum8 |  -.3046246   .0715128    -4.26   0.000     -.444787   -.1644621
+         country_dum9 |   -.226766   .0259179    -8.75   0.000    -.2775641   -.1759678
+        country_dum10 |  -.0622012   .0368182    -1.69   0.091    -.1343637    .0099612
+        country_dum11 |   .2790701   .0584383     4.78   0.000     .1645331     .393607
+        country_dum12 |  -.2710858   .0070329   -38.55   0.000    -.2848701   -.2573016
+        country_dum13 |   .2300669   .0533438     4.31   0.000     .1255149    .3346188
+        country_dum14 |  -.0502683   .0626109    -0.80   0.422    -.1729834    .0724468
+        country_dum15 |   .1063133   .0289586     3.67   0.000     .0495556    .1630711
+        country_dum16 |  -.1242519   .0347027    -3.58   0.000    -.1922679   -.0562359
+        country_dum17 |  -.1775319   .0062454   -28.43   0.000    -.1897726   -.1652911
+        country_dum18 |  -.1621318   .0542991    -2.99   0.003     -.268556   -.0557075
+        country_dum19 |  -.0779192   .0610774    -1.28   0.202    -.1976287    .0417903
+        country_dum20 |  -.1094258   .0554744    -1.97   0.049    -.2181536   -.0006981
+        country_dum21 |   .0213852   .0092318     2.32   0.021     .0032911    .0394792
+        country_dum22 |  -.2608312   .0715384    -3.65   0.000    -.4010438   -.1206186
+        country_dum23 |  -.0658137   .0435794    -1.51   0.131    -.1512277    .0196003
+        country_dum24 |  -.2856354   .0132262   -21.60   0.000    -.3115582   -.2597126
+        country_dum25 |   .0700503   .0414902     1.69   0.091     -.011269    .1513695
+        country_dum26 |  -.1380719   .0507316    -2.72   0.006     -.237504   -.0386398
+        country_dum27 |  -.1496185   .0593783    -2.52   0.012    -.2659979   -.0332391
+        country_dum28 |  -.0614025   .0371606    -1.65   0.098    -.1342359    .0114309
+        country_dum29 |  -.6708025   .0295919   -22.67   0.000    -.7288016   -.6128033
+        country_dum30 |   -.163796   .0315819    -5.19   0.000    -.2256954   -.1018966
+        country_dum31 |  -.0403217   .0399171    -1.01   0.312    -.1185578    .0379144
+        country_dum32 |   -.243019   .0369752    -6.57   0.000     -.315489   -.1705489
+        country_dum33 |  -.0549067   .0164452    -3.34   0.001    -.0871388   -.0226746
+        country_dum34 |    -.00502   .0605089    -0.08   0.934    -.1236152    .1135753
+        country_dum35 |  -.0843245    .047225    -1.79   0.074    -.1768838    .0082348
+        country_dum36 |  -.2009186   .0218138    -9.21   0.000    -.2436729   -.1581644
+        country_dum37 |  -.1017287   .0564842    -1.80   0.072    -.2124356    .0089783
+        country_dum38 |  -.2661008   .0358278    -7.43   0.000     -.336322   -.1958797
+        country_dum39 |  -.1828025   .0560446    -3.26   0.001    -.2926478   -.0729571
+        country_dum40 |   .2524188   .0396648     6.36   0.000     .1746772    .3301603
+        country_dum41 |   .1312489    .057065     2.30   0.021     .0194035    .2430943
+        country_dum42 |  -.0666787   .0529427    -1.26   0.208    -.1704445    .0370871
+        country_dum43 |  -.2083926   .0666713    -3.13   0.002     -.339066   -.0777193
+        country_dum44 |   -.390711   .0430813    -9.07   0.000    -.4751489   -.3062732
+        country_dum45 |  -.0729476   .0639572    -1.14   0.254    -.1983013    .0524062
+        country_dum46 |  -.1074773   .0140522    -7.65   0.000    -.1350191   -.0799355
+        country_dum47 |  -.3504845    .010698   -32.76   0.000    -.3714522   -.3295168
+        country_dum48 |  -.0783416   .0272075    -2.88   0.004    -.1316673    -.025016
+        country_dum49 |  -.0818312   .0187007    -4.38   0.000    -.1184839   -.0451785
+        country_dum50 |  -.2226387   .0319541    -6.97   0.000    -.2852676   -.1600099
+        country_dum51 |   .0846598   .0934148     0.91   0.365    -.0984298    .2677495
+        country_dum52 |   -.064137   .1087845    -0.59   0.555    -.2773508    .1490768
+        country_dum53 |  -.1350794   .0286297    -4.72   0.000    -.1911927   -.0789661
+        country_dum54 |  -.0419589   .0530801    -0.79   0.429    -.1459939    .0620761
+        country_dum55 |  -.1187668   .0379031    -3.13   0.002    -.1930555   -.0444782
+        country_dum56 |  -.1355132   .0692449    -1.96   0.050    -.2712308    .0002043
+        country_dum57 |   .0256912   .0514869     0.50   0.618    -.0752212    .1266036
+        country_dum58 |  -.0703635   .0666244    -1.06   0.291    -.2009448    .0602179
+        country_dum59 |  -.1130611   .0449557    -2.51   0.012    -.2011728   -.0249495
+        country_dum60 |  -.3959395   .0241209   -16.41   0.000    -.4432156   -.3486634
+        country_dum61 |  -.0408693   .0332942    -1.23   0.220    -.1061247    .0243861
+        country_dum62 |  -.2112564   .0372805    -5.67   0.000    -.2843249    -.138188
+        country_dum63 |  -.1974478   .0442448    -4.46   0.000     -.284166   -.1107296
+        country_dum64 |  -.0690655   .0501147    -1.38   0.168    -.1672884    .0291575
+        country_dum65 |     .07038   .0391781     1.80   0.072    -.0064077    .1471678
+        country_dum66 |  -.1683857    .025652    -6.56   0.000    -.2186626   -.1181088
+        country_dum67 |  -.2467429   .0072133   -34.21   0.000    -.2608807    -.232605
+        country_dum68 |  -.4086897   .0400207   -10.21   0.000    -.4871287   -.3302506
+        country_dum69 |  -.1328741   .0352229    -3.77   0.000    -.2019097   -.0638385
+        country_dum70 |  -.1250265   .0446688    -2.80   0.005    -.2125757   -.0374772
+        country_dum71 |  -.1236377   .0427479    -2.89   0.004    -.2074221   -.0398533
+        country_dum72 |   -.019079   .0464423    -0.41   0.681    -.1101042    .0719462
+        country_dum73 |  -.5206085   .0203397   -25.60   0.000    -.5604736   -.4807435
+        country_dum74 |  -.2779195   .0081509   -34.10   0.000    -.2938949   -.2619441
+        country_dum75 |   .1037857   .0879586     1.18   0.238    -.0686101    .2761814
+        country_dum76 |  -.2961958   .0343945    -8.61   0.000    -.3636078   -.2287838
+        country_dum77 |   -.035824   .0286883    -1.25   0.212    -.0920519     .020404
+        country_dum78 |   .0694967   .0525189     1.32   0.186    -.0334385    .1724319
+        country_dum79 |  -.3003245   .0689143    -4.36   0.000     -.435394   -.1652549
+        country_dum80 |  -.3979012   .0500069    -7.96   0.000    -.4959129   -.2998896
+        country_dum81 |          0  (omitted)
+           _satyear_1 |   .0267491   .0427119     0.63   0.531    -.0569648    .1104629
+           _satyear_2 |  -.0230115   .0216264    -1.06   0.287    -.0653986    .0193755
+           _satyear_3 |   .0225364   .0197317     1.14   0.253     -.016137    .0612098
+           _satyear_4 |   .0154532   .0233576     0.66   0.508    -.0303269    .0612333
+           _satyear_5 |   .0130085   .0160353     0.81   0.417    -.0184201    .0444371
+           _satyear_6 |   .0464708   .0178028     2.61   0.009     .0115779    .0813637
+           _satyear_7 |   .1088434   .0430876     2.53   0.012     .0243933    .1932934
+                _cons |   1.090905   .3448682     3.16   0.002     .4149756    1.766834
+----------------------+----------------------------------------------------------------
+              sigma_u |  .37261857
+              sigma_e |  .13741246
+                  rho |  .88028549   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix   log_GDP_pc_C
+> ountry    log_region log_area  log_region_X_log_area ) addtext(Region FE, NO, Country FE, YES, Country Group FE, NO, Satlite FE, YES) dec(
+> 3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Random effects Model (5): Use only ONE predictor (Lights per pixel) with TWO fixed effects: Satellite FE and Country group FE
+. xtreg log_GDP_pc_Region log_Light_ppix_Region     _satyear_1-_satyear_7 eap ssa  mena lac eca sa, robust cluster(Country_ISO)
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.5790                                         min =          1
+     Between = 0.5515                                         avg =        3.5
+     Overall = 0.5738                                         max =          4
+
+                                                Wald chi2(14)     =  386473.48
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =     0.0000
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .2315497    .030544     7.58   0.000     .1716846    .2914149
+           _satyear_1 |  -.3471639   .1380913    -2.51   0.012    -.6178179     -.07651
+           _satyear_2 |  -.3401539   .0466887    -7.29   0.000    -.4316621   -.2486458
+           _satyear_3 |  -.3461688    .056306    -6.15   0.000    -.4565265    -.235811
+           _satyear_4 |  -.2679693   .0509286    -5.26   0.000    -.3677874   -.1681512
+           _satyear_5 |  -.2496468   .0605894    -4.12   0.000    -.3683999   -.1308937
+           _satyear_6 |  -.0505866   .0423314    -1.20   0.232    -.1335545    .0323814
+           _satyear_7 |  -.0065947   .1011726    -0.07   0.948    -.2048893    .1916999
+                  eap |  -1.586643   .2670332    -5.94   0.000    -2.110018   -1.063267
+                  ssa |  -2.572351   .2058956   -12.49   0.000    -2.975899   -2.168803
+                 mena |  -1.576735   .1742079    -9.05   0.000    -1.918176   -1.235294
+                  lac |  -1.470388    .144101   -10.20   0.000     -1.75282   -1.187955
+                  eca |  -1.119427   .1060976   -10.55   0.000    -1.327375   -.9114798
+                   sa |  -2.599944   .1972405   -13.18   0.000    -2.986528    -2.21336
+                _cons |   10.35392   .0888925   116.48   0.000      10.1797    10.52815
+----------------------+----------------------------------------------------------------
+              sigma_u |  .65813847
+              sigma_e |  .18171673
+                  rho |  .92916497   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region  log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_C
+> ountry    log_region log_area  log_region_X_log_area  ) addtext(Region FE, NO, Country FE, NO, Country Group FE, YES, Satlite FE, YES) dec
+> (3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Random effects Model (6):  Use TWO predictors (Lights per pixel and country GDPpc) with TWO fixed effects: Satellite FE and Coun
+> try group FE
+. xtreg log_GDP_pc_Region log_Light_ppix_Region    log_GDP_pc_Country  _satyear_1-_satyear_7 eap ssa  mena lac eca sa, robust cluster(Countr
+> y_ISO)
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.7597                                         min =          1
+     Between = 0.8400                                         avg =        3.5
+     Overall = 0.8430                                         max =          4
+
+                                                Wald chi2(15)     =   1.09e+06
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =     0.0000
+
+                                    (Std. err. adjusted for 81 clusters in Country_ISO)
+---------------------------------------------------------------------------------------
+                      |               Robust
+    log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+log_Light_ppix_Region |   .1040934   .0191138     5.45   0.000     .0666311    .1415557
+   log_GDP_pc_Country |   .9010502   .0252698    35.66   0.000     .8515223    .9505781
+           _satyear_1 |    .030482   .0334419     0.91   0.362    -.0350629    .0960269
+           _satyear_2 |  -.0196886   .0120998    -1.63   0.104    -.0434038    .0040265
+           _satyear_3 |   .0277802   .0151451     1.83   0.067    -.0019038    .0574641
+           _satyear_4 |   .0164801    .021334     0.77   0.440    -.0253337    .0582939
+           _satyear_5 |    .016109   .0122603     1.31   0.189    -.0079207    .0401388
+           _satyear_6 |   .0412881   .0124882     3.31   0.001     .0168118    .0657645
+           _satyear_7 |   .1023616   .0409146     2.50   0.012     .0221705    .1825526
+                  eap |  -.3009443   .1015194    -2.96   0.003    -.4999188   -.1019699
+                  ssa |  -.0104358   .0712694    -0.15   0.884    -.1501213    .1292497
+                 mena |  -.3173281   .0809951    -3.92   0.000    -.4760756   -.1585806
+                  lac |  -.1954159   .0782191    -2.50   0.012    -.3487224   -.0421093
+                  eca |  -.2157617    .042781    -5.04   0.000    -.2996109   -.1319125
+                   sa |  -.1678723   .1147636    -1.46   0.144    -.3928048    .0570603
+                _cons |   .8273389   .2494863     3.32   0.001     .3383549    1.316323
+----------------------+----------------------------------------------------------------
+              sigma_u |  .39291747
+              sigma_e |  .13741246
+                  rho |  .89102219   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_Co
+> untry     log_region log_area  log_region_X_log_area  ) addtext(Region FE, NO, Country FE, NO, Country Group FE, YES, Satlite FE, YES) dec
+> (3)
+tab01.tex
+dir : seeout
+
+. 
+.         * Random effects Model (7): Use ALL predictors (Lights per pixel, country GDPpc, #TopCodPixels,  #LowCodPixels, country area, #reg
+> ions, #regionsXarea) with TWO fixed effects: Satellite FE and Country group FE
+. xtreg log_GDP_pc_Region log_Light_ppix_Region log_GDP_pc_Country log_N_pix_top_cod_1_ppix  log_N_pix_low_cod_1_ppix  log_area log_region l
+> og_region_X_log_area _satyear_1-_satyear_7  eap ssa  mena lac eca sa , robust cluster(Country_ISO)
+
+Random-effects GLS regression                   Number of obs     =      5,258
+Group variable: code_Coutr~n                    Number of groups  =      1,504
+
+R-squared:                                      Obs per group:
+     Within  = 0.7589                                         min =          1
+     Between = 0.8521                                         avg =        3.5
+     Overall = 0.8547                                         max =          4
+
+                                                Wald chi2(20)     =   1.19e+06
+corr(u_i, X) = 0 (assumed)                      Prob > chi2       =     0.0000
+
+                                       (Std. err. adjusted for 81 clusters in Country_ISO)
+------------------------------------------------------------------------------------------
+                         |               Robust
+       log_GDP_pc_Region | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------------------+----------------------------------------------------------------
+   log_Light_ppix_Region |   .1019119   .0220738     4.62   0.000      .058648    .1451757
+      log_GDP_pc_Country |   .8894808   .0259199    34.32   0.000     .8386788    .9402829
+log_N_pix_top_cod_1_ppix |   .0040942   .0014113     2.90   0.004     .0013281    .0068603
+log_N_pix_low_cod_1_ppix |  -.0071241   .0029672    -2.40   0.016    -.0129396   -.0013085
+                log_area |   .1825756   .0405151     4.51   0.000     .1031673    .2619838
+              log_region |   .3963706   .1262767     3.14   0.002     .1488728    .6438684
+   log_region_X_log_area |  -.0406563     .00978    -4.16   0.000    -.0598247   -.0214879
+              _satyear_1 |    .034403   .0372535     0.92   0.356    -.0386125    .1074186
+              _satyear_2 |  -.0182407   .0151904    -1.20   0.230    -.0480133    .0115319
+              _satyear_3 |   .0309626   .0146422     2.11   0.034     .0022644    .0596607
+              _satyear_4 |   .0229364   .0221962     1.03   0.301    -.0205674    .0664402
+              _satyear_5 |   .0194345    .013048     1.49   0.136    -.0061391    .0450081
+              _satyear_6 |   .0473906   .0141739     3.34   0.001     .0196102     .075171
+              _satyear_7 |   .1116252   .0412717     2.70   0.007     .0307343    .1925162
+                     eap |   -.242171   .0768695    -3.15   0.002    -.3928324   -.0915096
+                     ssa |   -.094451   .1094892    -0.86   0.388     -.309046    .1201439
+                    mena |   -.345644   .0880221    -3.93   0.000     -.518164   -.1731239
+                     lac |  -.1858247   .0864456    -2.15   0.032     -.355255   -.0163944
+                     eca |  -.1072072   .0635689    -1.69   0.092    -.2317999    .0173856
+                      sa |  -.1717889   .1043445    -1.65   0.100    -.3763004    .0327226
+                   _cons |  -1.029671    .508975    -2.02   0.043    -2.027244   -.0320981
+-------------------------+----------------------------------------------------------------
+                 sigma_u |   .3689251
+                 sigma_e |  .13724449
+                     rho |  .87843144   (fraction of variance due to u_i)
+------------------------------------------------------------------------------------------
+
+. outreg2 using tab01.tex, tex(fragment) append  keep(log_Light_ppix_Region log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix  log_GDP_pc_Co
+> untry      log_region log_area  log_region_X_log_area ) addtext(Region FE, NO, Country FE, NO, Country Group FE, YES, Satlite FE, YES) dec
+> (3)
+tab01.tex
+dir : seeout
+
+. 
+. 
+. 
+. ** 99. Close log file
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/00DS/hello-papers/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/tab01
+> /tab01logFILE.txt
+  log type:  text
+ closed on:   5 Jul 2022, 13:35:06
+--------------------------------------------------------------------------------------------------------------------------------------------

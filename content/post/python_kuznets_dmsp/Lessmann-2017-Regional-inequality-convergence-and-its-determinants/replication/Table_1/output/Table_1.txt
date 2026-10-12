@@ -1,0 +1,29 @@
+	(1)	(2)	(3)	(4)	(5)	(6)	(7)
+VARIABLES	log_GDP_pc_Region	log_GDP_pc_Region	log_GDP_pc_Region	log_GDP_pc_Region	log_GDP_pc_Region	log_GDP_pc_Region	log_GDP_pc_Region
+							
+log_Light_ppix_Region	0.399***	0.190***	0.153***	0.122***	0.232***	0.104***	0.102***
+	(0.025)	(0.048)	(0.030)	(0.026)	(0.031)	(0.019)	(0.022)
+log_GDP_pc_Country				0.864***		0.901***	0.889***
+				(0.038)		(0.025)	(0.026)
+log_N_pix_top_cod_1_ppix							0.004***
+							(0.001)
+log_N_pix_low_cod_1_ppix							-0.007**
+							(0.003)
+log_area							0.183***
+							(0.041)
+log_region							0.396***
+							(0.126)
+log_region_X_log_area							-0.041***
+							(0.010)
+Constant	8.674***	8.760***	9.177***	1.091***	10.354***	0.827***	-1.030**
+	(0.097)	(0.105)	(0.048)	(0.345)	(0.089)	(0.249)	(0.509)
+							
+Observations	5,258	5,258	5,258	5,258	5,258	5,258	5,258
+R-squared		0.979					
+Number of code_Coutry_Region	1,504		1,504	1,504	1,504	1,504	1,504
+Region FE	NO	YES	NO	NO	NO	NO	NO
+Country FE	NO	NO	YES	YES	NO	NO	NO
+Country Group FE	NO	NO	NO	NO	YES	YES	YES
+Satlite FE	NO	YES	YES	YES	YES	YES	YES
+Robust standard errors in parentheses							
+*** p<0.01, ** p<0.05, * p<0.1							

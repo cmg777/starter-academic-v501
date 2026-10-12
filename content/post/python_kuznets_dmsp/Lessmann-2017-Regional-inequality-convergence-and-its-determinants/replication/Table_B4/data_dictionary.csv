@@ -1,0 +1,15 @@
+variable,label,stata_type
+code_Coutry_Region,Code region coutry,numeric
+Country_ISO,Country code ISO 3166-1,string
+year,Year,numeric
+Latitude,Latitude,numeric
+Longitude,Longitude,numeric
+log_GDP_pc_Region,log GDP per capita region,numeric
+log_Light_ppix_Region,log Average nighttime light per pixel region,numeric
+satyear_1,,numeric
+satyear_2,,numeric
+satyear_3,,numeric
+satyear_4,,numeric
+satyear_5,,numeric
+satyear_6,,numeric
+satyear_7,,numeric

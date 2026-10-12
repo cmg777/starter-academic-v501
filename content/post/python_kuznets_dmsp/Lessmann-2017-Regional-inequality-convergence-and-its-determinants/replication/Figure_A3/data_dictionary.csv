@@ -1,0 +1,7 @@
+variable,label,stata_type
+Region_NAME,Region name,string
+Country_ISO,Country code ISO 3166-1,string
+year,Year,numeric
+log_GDP_pc_Region,log GDP per capita region,numeric
+pred_log_GDP_pc_Region,,numeric
+RPP,Regional Price Parities USA,numeric

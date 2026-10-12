@@ -1,0 +1,18 @@
+variable,label,stata_type
+Country_NAME,Country_NAME,string
+Country_ISO,Country Codes ISO 3166-1,string
+year,,numeric
+GINIW_pred_GDP_pc,Predicted regional inequality population-weighted Gini coefficient,numeric
+GDP_pc_Country,"GDP per capita, PPP (constant 2005 US$)",numeric
+Pop_Country,Country total population,numeric
+Resources_rents_share_of_GDP,Total natural resources rents (% of GDP),numeric
+Arable_land,Arable land (shere of land area),numeric
+Trade_GDP_share,Trade (shere of GDP),numeric
+FDI_share_of_GDP,"Foreign direct investment, net inflows (shere of GDP)",numeric
+area,Area sq. km,numeric
+price_gasoline,"Pump price for gasoline, PPP (constant 2005 US$ per liter)",numeric
+Aid,Aid flows  (constant 2011 US$),numeric
+School_enrollment_secondary,"School enrollment, secondary (% gross)",numeric
+GINIW_Eth_light,Ethnic inequality (population-weighted light Gini coefficient),numeric
+Polity2,Polity IV Annual Time-Series Polity2 Index -1 bis +1,numeric
+fedelupd2,Federal state dummy,numeric

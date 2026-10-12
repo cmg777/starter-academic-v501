@@ -1,0 +1,10 @@
+variable,label,stata_type
+Country_NAME,Country_NAME,string
+Country_ISO,Country Codes ISO 3166-1,string
+year,,numeric
+GDP_pc_Country,"GDP per capita, PPP (constant 2005 US$)",numeric
+GINIW_pred_GDP_pc,Predicted regional inequality population-weighted Gini coefficient,numeric
+COVW_pred_GDP_pc,Predicted regional inequality population-weighted coefficient of variation,numeric
+GE_1W_pred_GDP_pc,Predicted regional inequality population-weighted theil index,numeric
+GE_0W_pred_GDP_pc,Predicted regional inequality population-weighted mean mogarithmic deviation,numeric
+GE_m1W_pred_GDP_pc,Predicted regional inequality population-weighted generalized entropy a=-1,numeric

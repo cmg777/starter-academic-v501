@@ -1,0 +1,6 @@
+variable,label,stata_type
+Country_ISO,Country Codes ISO 3166-1,string
+Country_NAME,Country_NAME,string
+year,,numeric
+GINIW_pred_GDP_pc,Predicted regional inequality population-weighted Gini coefficient,numeric
+GDP_pc_Country,"GDP per capita, PPP (constant 2005 US$)",numeric

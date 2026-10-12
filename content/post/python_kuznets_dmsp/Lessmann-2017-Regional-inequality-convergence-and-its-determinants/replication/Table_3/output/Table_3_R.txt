@@ -1,0 +1,39 @@
+Table 3 (R / fixest) - Determinants of sigma-convergence
+
+                      model 1  model 2   model 3  model 4   model 5   model 6
+Dependent Var.:         GINIW    GINIW     GINIW     COVW     Theil       MLD
+                                                                             
+log_GDP_pc_Country    -0.003   0.056*   0.293***  0.402**  0.066**   0.063** 
+                      (0.003) (0.023)  (0.078)   (0.144)  (0.023)   (0.021)  
+log_GDP_pc_Country_2          -0.003** -0.032*** -0.044** -0.008**  -0.007** 
+                              (0.001)  (0.009)   (0.017)  (0.003)   (0.002)  
+log_GDP_pc_Country_3                    0.001**   0.002*   0.0003**  0.0003**
+                                       (0.0003)  (0.0006) (9.71e-5) (8.93e-5)
+Fixed-Effects:       -------- -------- --------- -------- --------- ---------
+Country_ISO               Yes      Yes       Yes      Yes       Yes       Yes
+p5                        Yes      Yes       Yes      Yes       Yes       Yes
+____________________ ________ ________ _________ ________ _________ _________
+S.E.: Clustered      by: Co.. by: Co.. by: Cou.. by: Co.. by: Cou.. by: Cou..
+Observations              879      879       879      879       879       879
+R2                    0.97159  0.97403   0.97540  0.97936   0.97038   0.97027
+Within R2             0.00940  0.09465   0.14245  0.11584   0.12213   0.11627
+
+                       model 7
+Dependent Var.:         GE(-1)
+                              
+log_GDP_pc_Country    0.061** 
+                     (0.019)  
+log_GDP_pc_Country_2 -0.007** 
+                     (0.002)  
+log_GDP_pc_Country_3  0.0002**
+                     (8.54e-5)
+Fixed-Effects:       ---------
+Country_ISO                Yes
+p5                         Yes
+____________________ _________
+S.E.: Clustered      by: Cou..
+Observations               879
+R2                     0.96958
+Within R2              0.10784
+---
+Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1

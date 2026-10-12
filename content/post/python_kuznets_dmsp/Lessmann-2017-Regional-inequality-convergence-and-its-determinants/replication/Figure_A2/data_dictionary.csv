@@ -1,0 +1,12 @@
+variable,label,stata_type
+code_Coutry_Region,Code region coutry,numeric
+Region_NAME,Region name,string
+Country_ISO,Country code ISO 3166-1,string
+year,Year,numeric
+GDP_pc_Country,"GDP per capita, PPP (constant 2005 US$)",numeric
+GDP_pc_Region,"GDP per capita Region, PPP (constant 2005 US$)",numeric
+log_GDP_pc_Region,log GDP per capita region,numeric
+pred_log_GDP_pc_Region,,numeric
+pred_GDP_pc_Region,,numeric
+Pix_Region,Area of a region measured by the number of pixel,numeric
+Pop_Region,Regional total population,numeric

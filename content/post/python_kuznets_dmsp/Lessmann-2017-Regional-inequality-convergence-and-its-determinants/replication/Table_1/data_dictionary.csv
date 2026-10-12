@@ -1,0 +1,106 @@
+variable,label,stata_type
+code_Coutry_Region,Code region coutry,numeric
+Country_ISO,Country code ISO 3166-1,string
+year,Year,numeric
+log_GDP_pc_Region,log GDP per capita region,numeric
+log_Light_ppix_Region,log Average nighttime light per pixel region,numeric
+log_GDP_pc_Country,log GDP per capita country,numeric
+log_N_pix_top_cod_1_ppix,log number of top-coded pixels,numeric
+log_N_pix_low_cod_1_ppix,log number of low-coded pixels,numeric
+log_area,log area,numeric
+log_region,log Number of subnational regions of a country,numeric
+log_region_X_log_area,,numeric
+eap,East Asia and the Pacific,numeric
+eca,Europe and Central Asia,numeric
+lac,Latin America and the Caribbean,numeric
+mena,Middle East and North Africa,numeric
+sa,South Asia,numeric
+ssa,Sub-Saharan Africa,numeric
+satyear_1,,numeric
+satyear_2,,numeric
+satyear_3,,numeric
+satyear_4,,numeric
+satyear_5,,numeric
+satyear_6,,numeric
+satyear_7,,numeric
+country_dum1,Country_ISO_long==ALB,numeric
+country_dum2,Country_ISO_long==ARE,numeric
+country_dum3,Country_ISO_long==ARG,numeric
+country_dum4,Country_ISO_long==AUS,numeric
+country_dum5,Country_ISO_long==AUT,numeric
+country_dum6,Country_ISO_long==BEL,numeric
+country_dum7,Country_ISO_long==BEN,numeric
+country_dum8,Country_ISO_long==BGD,numeric
+country_dum9,Country_ISO_long==BGR,numeric
+country_dum10,Country_ISO_long==BIH,numeric
+country_dum11,Country_ISO_long==BOL,numeric
+country_dum12,Country_ISO_long==BRA,numeric
+country_dum13,Country_ISO_long==CAN,numeric
+country_dum14,Country_ISO_long==CHE,numeric
+country_dum15,Country_ISO_long==CHL,numeric
+country_dum16,Country_ISO_long==CHN,numeric
+country_dum17,Country_ISO_long==COL,numeric
+country_dum18,Country_ISO_long==CZE,numeric
+country_dum19,Country_ISO_long==DEU,numeric
+country_dum20,Country_ISO_long==DNK,numeric
+country_dum21,Country_ISO_long==ECU,numeric
+country_dum22,Country_ISO_long==EGY,numeric
+country_dum23,Country_ISO_long==ESP,numeric
+country_dum24,Country_ISO_long==EST,numeric
+country_dum25,Country_ISO_long==FIN,numeric
+country_dum26,Country_ISO_long==FRA,numeric
+country_dum27,Country_ISO_long==GBR,numeric
+country_dum28,Country_ISO_long==GRC,numeric
+country_dum29,Country_ISO_long==GTM,numeric
+country_dum30,Country_ISO_long==HND,numeric
+country_dum31,Country_ISO_long==HRV,numeric
+country_dum32,Country_ISO_long==HUN,numeric
+country_dum33,Country_ISO_long==IDN,numeric
+country_dum34,Country_ISO_long==IND,numeric
+country_dum35,Country_ISO_long==IRL,numeric
+country_dum36,Country_ISO_long==IRN,numeric
+country_dum37,Country_ISO_long==ITA,numeric
+country_dum38,Country_ISO_long==JOR,numeric
+country_dum39,Country_ISO_long==JPN,numeric
+country_dum40,Country_ISO_long==KAZ,numeric
+country_dum41,Country_ISO_long==KEN,numeric
+country_dum42,Country_ISO_long==KGZ,numeric
+country_dum43,Country_ISO_long==KOR,numeric
+country_dum44,Country_ISO_long==LKA,numeric
+country_dum45,Country_ISO_long==LSO,numeric
+country_dum46,Country_ISO_long==LTU,numeric
+country_dum47,Country_ISO_long==LVA,numeric
+country_dum48,Country_ISO_long==MAR,numeric
+country_dum49,Country_ISO_long==MEX,numeric
+country_dum50,Country_ISO_long==MKD,numeric
+country_dum51,Country_ISO_long==MNG,numeric
+country_dum52,Country_ISO_long==MOZ,numeric
+country_dum53,Country_ISO_long==MYS,numeric
+country_dum54,Country_ISO_long==NGA,numeric
+country_dum55,Country_ISO_long==NIC,numeric
+country_dum56,Country_ISO_long==NLD,numeric
+country_dum57,Country_ISO_long==NOR,numeric
+country_dum58,Country_ISO_long==NPL,numeric
+country_dum59,Country_ISO_long==PAK,numeric
+country_dum60,Country_ISO_long==PAN,numeric
+country_dum61,Country_ISO_long==PER,numeric
+country_dum62,Country_ISO_long==PHL,numeric
+country_dum63,Country_ISO_long==POL,numeric
+country_dum64,Country_ISO_long==PRT,numeric
+country_dum65,Country_ISO_long==PRY,numeric
+country_dum66,Country_ISO_long==ROU,numeric
+country_dum67,Country_ISO_long==RUS,numeric
+country_dum68,Country_ISO_long==SLV,numeric
+country_dum69,Country_ISO_long==SRB,numeric
+country_dum70,Country_ISO_long==SVK,numeric
+country_dum71,Country_ISO_long==SVN,numeric
+country_dum72,Country_ISO_long==SWE,numeric
+country_dum73,Country_ISO_long==THA,numeric
+country_dum74,Country_ISO_long==TUR,numeric
+country_dum75,Country_ISO_long==TZA,numeric
+country_dum76,Country_ISO_long==UKR,numeric
+country_dum77,Country_ISO_long==URY,numeric
+country_dum78,Country_ISO_long==USA,numeric
+country_dum79,Country_ISO_long==UZB,numeric
+country_dum80,Country_ISO_long==VNM,numeric
+country_dum81,Country_ISO_long==ZAF,numeric

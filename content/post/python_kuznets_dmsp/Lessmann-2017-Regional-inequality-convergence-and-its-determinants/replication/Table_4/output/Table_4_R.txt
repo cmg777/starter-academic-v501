@@ -1,0 +1,113 @@
+Table 4 (R / fixest) - Determinants of regional inequality with controls
+5 reproducible columns = published columns 1, 2, 3, 5, 6.
+Published column 4 (icrg_bureaucratic_qualitiy) is NOT reproducible - skipped.
+
+                                       model 1           model 2
+Dependent Var.:              GINIW_pred_GDP_pc GINIW_pred_GDP_pc
+                                                                
+log_GDP_pc_Country                    0.350***           0.205* 
+                                     (0.075)            (0.081) 
+log_GDP_pc_Country_2                 -0.038***          -0.022* 
+                                     (0.009)            (0.009) 
+log_GDP_pc_Country_3                  0.001***           0.0008*
+                                     (0.0003)           (0.0004)
+Resources_rents_share_of_GDP          0.018**                   
+                                     (0.007)                    
+Arable_land                          -0.053***                  
+                                     (0.014)                    
+Trade_GDP_share                                          0.005**
+                                                        (0.002) 
+FDI_share_of_GDP                                         0.009  
+                                                        (0.007) 
+price_gasoline                                                  
+                                                                
+Area_X_price_gasoline                                           
+                                                                
+aid_GDP                                                         
+                                                                
+School_enrollment_secondary                                     
+                                                                
+GINIW_Eth_light                                                 
+                                                                
+Fixed-Effects:               ----------------- -----------------
+Country_ISO                                Yes               Yes
+p5                                         Yes               Yes
+____________________________ _________________ _________________
+S.E.: Clustered                by: Country_ISO   by: Country_ISO
+Observations                               857               817
+R2                                     0.97624           0.97582
+Within R2                              0.19317           0.13513
+
+                                       model 3           model 4
+Dependent Var.:              GINIW_pred_GDP_pc GINIW_pred_GDP_pc
+                                                                
+log_GDP_pc_Country                     0.171*            0.226* 
+                                      (0.078)           (0.110) 
+log_GDP_pc_Country_2                  -0.019*           -0.023  
+                                      (0.009)           (0.013) 
+log_GDP_pc_Country_3                   0.0007*           0.0007 
+                                      (0.0003)          (0.0006)
+Resources_rents_share_of_GDP                                    
+                                                                
+Arable_land                                                     
+                                                                
+Trade_GDP_share                                                 
+                                                                
+FDI_share_of_GDP                                                
+                                                                
+price_gasoline                         0.0006                   
+                                      (0.002)                   
+Area_X_price_gasoline                  0.006*                   
+                                      (0.003)                   
+aid_GDP                                                  0.015* 
+                                                        (0.007) 
+School_enrollment_secondary                             -0.014  
+                                                        (0.007) 
+GINIW_Eth_light                                                 
+                                                                
+Fixed-Effects:               ----------------- -----------------
+Country_ISO                                Yes               Yes
+p5                                         Yes               Yes
+____________________________ _________________ _________________
+S.E.: Clustered                by: Country_ISO   by: Country_ISO
+Observations                               672               585
+R2                                     0.98234           0.97561
+Within R2                              0.04482           0.16344
+
+                                       model 5
+Dependent Var.:              GINIW_pred_GDP_pc
+                                              
+log_GDP_pc_Country                    0.149*  
+                                     (0.059)  
+log_GDP_pc_Country_2                 -0.015*  
+                                     (0.007)  
+log_GDP_pc_Country_3                  0.0005  
+                                     (0.0003) 
+Resources_rents_share_of_GDP                  
+                                              
+Arable_land                                   
+                                              
+Trade_GDP_share                               
+                                              
+FDI_share_of_GDP                              
+                                              
+price_gasoline                                
+                                              
+Area_X_price_gasoline                         
+                                              
+aid_GDP                                       
+                                              
+School_enrollment_secondary                   
+                                              
+GINIW_Eth_light                       0.071***
+                                     (0.017)  
+Fixed-Effects:               -----------------
+Country_ISO                                Yes
+p5                                         Yes
+____________________________ _________________
+S.E.: Clustered                by: Country_ISO
+Observations                               844
+R2                                     0.98031
+Within R2                              0.28171
+---
+Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
