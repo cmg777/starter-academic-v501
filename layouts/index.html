@@ -167,7 +167,7 @@
 
 
     <section id="about" class="section shell about-grid" aria-labelledby="about-title">
-      <div class="portrait-wrap"><div class="portrait-frame">{{ with site.GetPage "authors/admin" }}{{ with .Resources.GetMatch "avatar*" }}{{ $portrait := .Fill "640x800 Center webp q85" }}<img src="{{ $portrait.RelPermalink }}" alt="Carlos Mendez" width="640" height="800" loading="lazy">{{ end }}{{ end }}<span class="portrait-corner" aria-hidden="true"></span></div><span class="portrait-coordinate">NAGOYA, JAPAN / 35° N</span></div>
+      <div class="portrait-wrap"><div class="portrait-frame">{{ with site.GetPage "authors/admin" }}{{ with .Resources.GetMatch "portrait*" }}{{ $portrait := .Fill "640x800 Center webp q85" }}<img src="{{ $portrait.RelPermalink }}" alt="Carlos Mendez" width="640" height="800" loading="lazy">{{ end }}{{ end }}<span class="portrait-corner" aria-hidden="true"></span></div><span class="portrait-coordinate">NAGOYA, JAPAN / 35° N</span></div>
       <div class="about-copy">
         <p class="eyebrow">{{ $t.aboutKicker }}</p>
         <h2 id="about-title">{{ replace $t.aboutTitle "\n" "<br>" | safeHTML }}</h2>
