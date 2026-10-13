@@ -21,6 +21,14 @@ tags:
 - India
 featured: true
 links:
+- name: "AI Video"
+  url: "https://youtu.be/9GmT_xPkaQQ"
+  icon_pack: fab
+  icon: youtube
+- name: "AI Podcast"
+  url: "https://open.spotify.com/episode/4tZtxdevtotJsNf7pjjfTW"
+  icon_pack: fas
+  icon: headphones
 - name: "Published article (Open Access)"
   url: "https://doi.org/10.18335/region.v13i2.676"
   icon_pack: fas
