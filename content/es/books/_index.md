@@ -1,6 +1,6 @@
 ---
 title: "Libros"
-subtitle: "Monografías y libros abiertos en línea sobre econometría, inferencia causal y desarrollo regional."
+subtitle: "Monografías y libros abiertos en línea sobre econometría, inferencia causal y macroeconomía."
 cms_exclude: true
 icon: book
 year_filter: "Año"
