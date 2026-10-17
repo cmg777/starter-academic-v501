@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Explore real economic data and operate macroeconomic models with interactive Python notebooks that run in your browser or Google Colab.
+summary: Use real economic data to discover patterns, then explore how macroeconomic models explain them. Interactive Python notebooks connect evidence and theory in your browser or Google Colab.
 tags:
 - python
 - macroeconomics
@@ -20,16 +20,12 @@ links:
     url: "https://quarcs-lab.github.io/macro102-site/"
     icon_pack: ai
     icon: open-data
-  - name: "GitHub"
-    url: "https://github.com/quarcs-lab/macro102-site"
-    icon_pack: fab
-    icon: github
 ---
 
-An open online book by **Carlos Mendez**, *Data Science and Macroeconomic Models: A Python Companion to Intermediate Macroeconomics* connects real economic data with models of growth, business cycles and policy. Each chapter is an interactive Python notebook that can be read online or run in Google Colab without installing software.
+Why do living standards rise, why do countries differ in prosperity, and how do output, unemployment and inflation move through a downturn? This book starts with economic data and uses models to explain the patterns readers uncover.
 
-The book contains **21 chapters and three appendices**. Readers explore public data, change model parameters with sliders, edit Python code and compare model predictions with observed patterns. Topics range from production, the Solow model and ideas to inflation, monetary and fiscal policy, consumption, investment, trade and exchange rates. The appendices introduce Python and Colab, access to macroeconomic data, and the required mathematics.
+Its approach follows a repeated cycle: **explore data, identify broad patterns, build a model, compare its predictions with the evidence, and revise the question or explanation**. Readers work with public datasets, compare countries and periods, and operate models by moving sliders or changing Python code. The aim is to learn both how to ask useful questions of the data and how to judge what a model explains or misses.
 
-It is an independent companion to Charles I. Jones’s *Macroeconomics* (2024), following the textbook’s chapter order. No programming experience is assumed.
+The **21 interactive chapters** follow the order of Charles I. Jones’s *Macroeconomics* (2024), covering long-run growth, short-run fluctuations and applications to policy, consumption, investment and international economics. This independent companion is designed to be used alongside the textbook. Each chapter combines a model overview, interactive figures, practical tasks and concluding remarks.
 
-The source identifies Carlos Mendez as the author and carries a **2026 copyright notice**; it does not specify a publication day. The original text, code and charts are licensed under **CC BY-NC 4.0**.
+Readers can explore the book online or run its notebooks in **Google Colab without installing software**. No programming experience is assumed; three appendices introduce Python and Colab, access to macroeconomic data, and the necessary mathematics. The book serves students, self-learners, data-science learners and economists who want hands-on experience connecting macroeconomic theory with evidence. AI assistants can help with code, while readers remain responsible for checking their answers.
