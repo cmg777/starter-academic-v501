@@ -1,6 +1,6 @@
 ---
 title: "Books"
-subtitle: "Monographs and open online books on econometrics, causal inference, and macroeconomics."
+subtitle: "Monographs and open online books on econometrics, macroeconomics, and regional development"
 cms_exclude: true
 icon: book
 year_filter: "Year"

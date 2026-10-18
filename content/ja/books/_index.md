@@ -1,6 +1,6 @@
 ---
 title: "著書"
-subtitle: "計量経済学、因果推論、マクロ経済学に関する単著書とオープンなオンライン書籍。"
+subtitle: "計量経済学、マクロ経済学、地域開発に関する単著書とオープンなオンライン書籍。"
 cms_exclude: true
 icon: book
 year_filter: "年"
