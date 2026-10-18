@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: 実際の経済データからパターンを見つけ、マクロ経済モデルがそれをどのように説明するかを探究します。ブラウザーやGoogle Colabで使える対話型Pythonノートブックが、データと理論を結び付けます。
+summary: 国によって豊かさが異なるのはなぜでしょうか。成長や景気変動を生み出す仕組みは何でしょうか。全21章の対話型Python教材、4つの付録、計算用ノートブック、講義スライドを通して、データとマクロ経済モデルを探究します。
 tags:
 - python
 - macroeconomics
@@ -22,10 +22,120 @@ links:
     icon: open-data
 ---
 
-生活水準はなぜ向上するのでしょうか。国によって豊かさが異なるのはなぜでしょうか。景気後退時に生産、失業、インフレはどう変化するのでしょうか。本書は経済データを出発点とし、読者自身が見いだしたパターンをモデルで説明します。
+生活水準はなぜ大きく向上したのでしょうか。それでも国によって豊かさに大きな差があるのはなぜでしょうか。景気後退時に生産・失業・インフレはどう変わるのでしょうか。**データサイエンスとマクロ経済モデル**は、実際のデータと操作できるモデルを通して、これらの問いに取り組みます。
 
-学習の中心は、**データを調べ、広く見られるパターンを見つけ、モデルを構築し、その予測をデータと比較して、問いや説明を見直す**という循環です。公開データを使って国や期間を比較し、スライダーを動かしたりPythonコードを変更したりしてモデルを操作します。データに有益な問いを投げかけ、モデルが説明できることと説明できないことを判断する力を養います。
+**カルロス・メンデス**による本書の原題は *Data Science and Macroeconomic Models* です。Charles I. Jonesの *Macroeconomics*（2024年）をPythonで学ぶための無料公開のオンライン書籍で、**全21章**は同じ章題・順序を採用しています。さらに、**4つの付録**で実践的な基礎とモデル推定への発展的な学習経路を提供します。Jonesの教科書で経済的な論拠を学び、対応するノートブックでデータとモデルを自分で探究できます。本書は独自のコードと図を備えた独立した補助教材であり、教科書の著者・出版社との提携や公認はありません。
 
-**全21章の対話型教材**は、Charles I. Jonesの *Macroeconomics*（2024年）と同じ順序で、長期的な成長、短期的な景気変動、経済政策・消費・投資・国際経済への応用を扱います。本書はJonesの教科書と併せて使うための独立した補助教材です。各章には、モデルの概要、対話型の図、実践課題、まとめが含まれます。
+## 本書の学習サイクル
 
-オンラインで内容を探究したり、**ソフトウェアをインストールせずにGoogle Colabでノートブックを実行**したりできます。プログラミングの経験は必要ありません。3つの付録でPythonとColab、マクロ経済データの取得方法、必要な数学を学べます。学生、独学者、データサイエンスの学習者、経済学者が、実践を通じてマクロ経済理論とデータを結び付けることを目指します。AIアシスタントをコード作成に活用できますが、その回答を確かめるのは読者自身です。
+序文の出発点は、経済の説明をデータに照らして確かめることです。国をまたいで、あるいは長期にわたって繰り返し観察される大まかなパターンは、モデルが説明すべき**定型化された事実**になります。新しいデータが得られたり対象とするサンプルが変わったりすれば、そのパターンも見直せます。
+
+各章は、**データ → 探索 → 定型化された事実 → モデル → データとの比較 → 見直し**という学習サイクルをたどります。前半の3段階では、パターンを発見するためのデータサイエンスの技能を身に付けます。後半では、そのパターンをモデルで説明できるかを検討します。予測とデータが合わなければ、より明確な問いを持ってデータに戻るか、説明を改善するためにモデルに戻ります。
+
+<figure style="width:min(1130px,calc(100vw - 40px));max-width:none;position:relative;left:50%;transform:translateX(-50%);">
+  <a href="learning-cycle.svg">
+    <img src="learning-cycle.svg" alt="学習サイクル：データ、探索、定型化された事実、モデル、データとの比較、見直し。見直しから、より明確な問いを持ってデータへ戻るか、より良いアイデアを持ってモデルへ戻ります。" width="1130" height="176" loading="lazy" decoding="async" style="width:100%;height:auto;">
+  </a>
+  <figcaption>序文に掲載された学習サイクルの図です。青はデータサイエンス、緑はマクロ経済モデリングを表します。 <a href="learning-cycle.svg">原寸の図を開く</a>. <a href="https://quarcs-lab.github.io/macro102-site/#the-cycle-of-the-book">出典：本書の序文</a> · CC BY-NC 4.0.</figcaption>
+</figure>
+
+モデルが説明できることと、その限界の両方から学びます。例えば、ソロー・モデルは豊かさの違いを説明する手掛かりになり、アイデアの経済学は持続的な成長を扱います。新しい付録Dでは比較から推定へと進み、データを使ってパラメーターを選び、モデルの適合度を評価します。
+
+## 本書でできること
+
+- **データを調べる。** 個々の観測値を確認し、期間を拡大し、国や変数を比較できます。FRED、世界銀行、IMF、OECD、Penn World Tableなどの公開データを使い、付録Bでは自分でデータを取得する方法を学びます。
+- **モデルを操作する。** スライダーでパラメーターを変更し、ショックを加え、Pythonで方程式を編集できます。生産と成長、労働市場とインフレ、金融政策、金融危機、国内経済と国際経済のつながりを探究します。
+- **論拠とコードを一緒に理解する。** 各章では仮定から予測までモデルを組み立て、図ごとに目的・描画コード・読み取るべき点を示します。「Your turn」の課題ではデータやモデルを変更し、結果を解釈します。
+- **AIを批判的に活用する。** AIはコードの説明や修正に役立ちますが、動くプログラムでも経済的な問いを取り違えていることがあります。序文では、出力を確かめ、データから得られる根拠を自分で判断することを勧めています。
+
+## 各章の学び方
+
+1. Jonesの対応する章で経済的な論拠を学んでから、下の章リンクを開き、モデルの概要と対話型の図を探究します。
+2. **ノートブック**のリンクからGoogle Colabを開き、**Runtime → Run all**を選びます。コードを実行し、パラメーターを変更し、課題に取り組みます。本編の各章ではローカルへのインストールは必要ありません。
+3. 各章の**スライド**を授業や内容の整理・復習に活用できます。下のリンクは実際の講義スライドを開きます。
+4. モデルの予測とデータを比較し、何が変化したかを説明します。Pythonが初めてなら付録Aから始め、数学を復習したいときは付録Cを参照してください。
+
+## 各章・計算用ノートブック・スライド
+
+以下の教材は本書の順序に沿っています。**章題はオンラインで読む章本文、Colabは実行できる計算用ノートブック、スライドは講義資料を開きます。**リンク先の教材は英語です。
+
+### 基礎：第1〜2章
+
+マクロ経済学が扱う問いと、経済を測定するための道具から始めます。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| 1. [マクロ経済学入門](https://quarcs-lab.github.io/macro102-site/notebooks/ch01-introduction-to-macroeconomics.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch01-introduction-to-macroeconomics.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch01/) |
+| 2. [マクロ経済の測定](https://quarcs-lab.github.io/macro102-site/notebooks/ch02-measuring-the-macroeconomy.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch02-measuring-the-macroeconomy.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch02/) |
+
+
+### 長期：第3〜8章
+
+生産、資本蓄積、アイデア、労働市場、インフレを学び、長期的な豊かさを理解します。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| 3. [長期的な経済成長の概観](https://quarcs-lab.github.io/macro102-site/notebooks/ch03-an-overview-of-long-run-economic-growth.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch03-an-overview-of-long-run-economic-growth.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch03/) |
+| 4. [生産モデル](https://quarcs-lab.github.io/macro102-site/notebooks/ch04-a-model-of-production.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch04-a-model-of-production.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch04/) |
+| 5. [ソロー成長モデル](https://quarcs-lab.github.io/macro102-site/notebooks/ch05-the-solow-growth-model.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch05-the-solow-growth-model.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch05/) |
+| 6. [成長とアイデア](https://quarcs-lab.github.io/macro102-site/notebooks/ch06-growth-and-ideas.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch06-growth-and-ideas.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch06/) |
+| 7. [労働市場・賃金・失業](https://quarcs-lab.github.io/macro102-site/notebooks/ch07-the-labor-market-wages-and-unemployment.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch07-the-labor-market-wages-and-unemployment.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch07/) |
+| 8. [インフレ](https://quarcs-lab.github.io/macro102-site/notebooks/ch08-inflation.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch08-inflation.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch08/) |
+
+
+### 短期：第9〜15章
+
+IS曲線から動学的確率的一般均衡モデルまで、景気変動・危機・安定化政策を探究します。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| 9. [短期分析への入門](https://quarcs-lab.github.io/macro102-site/notebooks/ch09-an-introduction-to-the-short-run.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch09-an-introduction-to-the-short-run.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch09/) |
+| 10. [大不況とCOVID-19パンデミック：最初の考察](https://quarcs-lab.github.io/macro102-site/notebooks/ch10-the-great-recession-and-the-covid-19-pandemic-a-first-look.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch10-the-great-recession-and-the-covid-19-pandemic-a-first-look.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch10/) |
+| 11. [IS曲線](https://quarcs-lab.github.io/macro102-site/notebooks/ch11-the-is-curve.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch11-the-is-curve.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch11/) |
+| 12. [金融政策とフィリップス曲線](https://quarcs-lab.github.io/macro102-site/notebooks/ch12-monetary-policy-and-the-phillips-curve.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch12-monetary-policy-and-the-phillips-curve.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch12/) |
+| 13. [安定化政策と総供給・総需要の枠組み](https://quarcs-lab.github.io/macro102-site/notebooks/ch13-stabilization-policy-and-the-as-ad-framework.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch13-stabilization-policy-and-the-as-ad-framework.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch13/) |
+| 14. [金融危機と短期モデル](https://quarcs-lab.github.io/macro102-site/notebooks/ch14-financial-crises-and-the-short-run-model.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch14-financial-crises-and-the-short-run-model.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch14/) |
+| 15. [DSGEモデル：景気循環研究の最前線](https://quarcs-lab.github.io/macro102-site/notebooks/ch15-dsge-models-the-frontier-of-business-cycle-research.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch15-dsge-models-the-frontier-of-business-cycle-research.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch15/) |
+
+
+### 応用とミクロ的基礎：第16〜20章
+
+家計や企業の意思決定、政府の政策、貿易、国際金融とモデルを結び付けます。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| 16. [消費](https://quarcs-lab.github.io/macro102-site/notebooks/ch16-consumption.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch16-consumption.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch16/) |
+| 17. [投資](https://quarcs-lab.github.io/macro102-site/notebooks/ch17-investment.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch17-investment.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch17/) |
+| 18. [政府とマクロ経済](https://quarcs-lab.github.io/macro102-site/notebooks/ch18-the-government-and-the-macroeconomy.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch18-the-government-and-the-macroeconomy.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch18/) |
+| 19. [国際貿易](https://quarcs-lab.github.io/macro102-site/notebooks/ch19-international-trade.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch19-international-trade.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch19/) |
+| 20. [為替レートと国際金融](https://quarcs-lab.github.io/macro102-site/notebooks/ch20-exchange-rates-and-international-finance.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch20-exchange-rates-and-international-finance.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch20/) |
+
+
+### 今後を考える：第21章
+
+マクロ経済学が明らかにしてきたことと、未解決の問いを考えます。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| 21. [おわりに](https://quarcs-lab.github.io/macro102-site/notebooks/ch21-parting-thoughts.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch21-parting-thoughts.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch21/) |
+
+
+## 4つの付録：最初のノートブックからモデル推定まで
+
+**A**はColab・Python・データサイエンスのライブラリ、**B**はマクロ経済データの取得、**C**はPythonによる計算を交えた数学の復習を扱います。**D**はSnowdropでマクロ経済モデルを書き、解き、推定する発展的な学習経路です。米国のデータを用いたIreland（2004年）のニューケインジアン・モデルの最尤推定とベイズ推定も含まれます。
+
+付録BとDでは、追加パッケージを最初のコードセルでインストールします。A〜Cにはスライドがありますが、**付録Dには現在、スライドへのリンクがありません**。
+
+| 章 | ノートブック | スライド |
+| --- | --- | --- |
+| A. [Google Colab・Pythonプログラミング・データサイエンスのライブラリ](https://quarcs-lab.github.io/macro102-site/notebooks/appA-google-colab-python-and-data-science-libraries.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appA-google-colab-python-and-data-science-libraries.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appA/) |
+| B. [Pythonによるマクロ経済データの取得](https://quarcs-lab.github.io/macro102-site/notebooks/appB-accessing-macroeconomic-data-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appB-accessing-macroeconomic-data-with-python.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appB/) |
+| C. [マクロ経済学のための数学の復習](https://quarcs-lab.github.io/macro102-site/notebooks/appC-math-review-for-macroeconomics.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appC-math-review-for-macroeconomics.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appC/) |
+| D. [PythonによるDSGEモデリング](https://quarcs-lab.github.io/macro102-site/notebooks/appD-dsge-modeling-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appD-dsge-modeling-with-python.ipynb) | 未公開 |
+
+
+## 対象読者
+
+学部生・大学院生、独学者、経済への応用を探しているデータサイエンスの学習者、Pythonの実践経験を身に付けたい経済学者を対象としています。**プログラミングの経験は必要ありません。**より高度な内容に関心がある場合は、付録Dで理論モデルと推定を結び付けられます。
+
+[序文](https://quarcs-lab.github.io/macro102-site/)から始めるか、上の章を選んでください。計算用ノートブックが初めてなら、付録Aが出発点になります。
