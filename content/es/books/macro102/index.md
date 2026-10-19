@@ -8,13 +8,13 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: ¿Por qué algunos países son más ricos y qué impulsa el crecimiento y las fluctuaciones económicas? Explore la evidencia y los modelos macroeconómicos mediante 21 capítulos interactivos de Python, cuatro apéndices, cuadernos computacionales y diapositivas de clase.
+summary: ¿Por qué algunos países son más ricos y qué impulsa el crecimiento y las fluctuaciones económicas? Explore la evidencia y los modelos macroeconómicos mediante 21 capítulos interactivos de Python, ocho apéndices, cuadernos computacionales y diapositivas de clase.
 tags:
 - python
 - macroeconomics
 - data-science
 title: "Ciencia de datos y modelos macroeconómicos"
-subtitle: "Una guía en Python para la macroeconomía intermedia"
+subtitle: "Una guía en Python con apoyo de IA para la macroeconomía intermedia"
 links:
   - name: "Sitio web"
     url: "https://quarcs-lab.github.io/macro102-site/"
@@ -24,7 +24,7 @@ links:
 
 ¿Por qué ha mejorado tanto el nivel de vida y por qué algunos países siguen siendo mucho más ricos que otros? ¿Qué ocurre con la producción, el desempleo y la inflación durante una recesión? **Ciencia de datos y modelos macroeconómicos** aborda estas preguntas poniendo datos reales y modelos operativos al alcance del lector.
 
-Este libro abierto en línea de **Carlos Mendez**, cuyo título original es *Data Science and Macroeconomic Models*, acompaña con Python a *Macroeconomics* (2024), de Charles I. Jones. Sus **21 capítulos** siguen los títulos y el orden del texto de Jones, mientras que **cuatro apéndices** ofrecen apoyo práctico y una vía avanzada hacia la estimación de modelos. Puede leer el razonamiento económico en Jones y después utilizar el cuaderno correspondiente para investigar la evidencia y explorar el modelo. Es un complemento independiente, con código y gráficos propios, sin afiliación ni respaldo del autor o de la editorial del texto.
+Este libro abierto en línea de **Carlos Mendez**, cuyo título original es *Data Science and Macroeconomic Models: An AI-powered Python companion to intermediate macroeconomics*, acompaña con Python a *Macroeconomics* (2024), de Charles I. Jones. Sus **21 capítulos** siguen los títulos y el orden del texto de Jones, mientras que **ocho apéndices** avanzan desde las herramientas prácticas hasta el crecimiento económico y la estimación avanzada de modelos. Puede leer el razonamiento económico en Jones y después utilizar el cuaderno correspondiente para investigar la evidencia y explorar el modelo. Es un complemento independiente, con código y gráficos propios, sin afiliación ni respaldo del autor o de la editorial del texto.
 
 ## El ciclo del libro
 
@@ -39,7 +39,7 @@ Cada capítulo recorre el mismo ciclo de aprendizaje: **datos → exploración �
   <figcaption>Figura original del ciclo de aprendizaje del prefacio: el azul representa la ciencia de datos y el verde la modelización macroeconómica. <a href="learning-cycle.svg">Abra la figura a tamaño completo</a>. <a href="https://quarcs-lab.github.io/macro102-site/#the-cycle-of-the-book">Fuente: prefacio del libro</a> · CC BY-NC 4.0.</figcaption>
 </figure>
 
-El objetivo es aprender tanto de los aciertos de un modelo como de sus límites. El modelo de Solow, por ejemplo, ayuda a explicar las diferencias de prosperidad, mientras que la economía de las ideas aborda el crecimiento sostenido. En el nuevo apéndice D, la comparación se convierte en estimación: los datos permiten elegir parámetros y evaluar el ajuste del modelo.
+El objetivo es aprender tanto de los aciertos de un modelo como de sus límites. El modelo de Solow, por ejemplo, ayuda a explicar las diferencias de prosperidad, mientras que la economía de las ideas aborda el crecimiento sostenido. En el apéndice G, la comparación se convierte en estimación: los datos permiten elegir parámetros y evaluar el ajuste del modelo.
 
 ## Qué puede hacer
 
@@ -120,22 +120,30 @@ Considere lo que ha aprendido la macroeconomía y las preguntas que siguen abier
 | 21. [Reflexiones finales](https://quarcs-lab.github.io/macro102-site/notebooks/ch21-parting-thoughts.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch21-parting-thoughts.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/ch21/) |
 
 
-## Cuatro apéndices: del primer cuaderno a la estimación de modelos
+## Ocho apéndices: herramientas, crecimiento económico y modelos DSGE
 
-**A** presenta Colab, Python y sus bibliotecas de ciencia de datos. **B** explica el acceso a datos macroeconómicos. **C** repasa las matemáticas con cálculos en Python. **D** ofrece una vía avanzada para escribir, resolver y estimar modelos macroeconómicos con Snowdrop, incluida la estimación por máxima verosimilitud y métodos bayesianos del modelo neokeynesiano de Ireland (2004) con datos de Estados Unidos.
+Los apéndices siguen ahora tres rutas de aprendizaje complementarias:
 
-Los apéndices B y D instalan sus paquetes adicionales en la primera celda de código. Hay diapositivas para A–C; **el apéndice D no tiene actualmente una presentación enlazada**.
+- **Herramientas (A–C).** Comience con Colab, Python y sus bibliotecas de ciencia de datos; aprenda a obtener datos macroeconómicos; y repase las matemáticas mediante cálculos en Python.
+- **Crecimiento económico (D–F).** Utilice la Penn World Table para descomponer el crecimiento del PIB y las brechas de ingreso en contribuciones del capital, el trabajo y la productividad. Explore si los países más pobres alcanzan a los más ricos mediante medidas de convergencia; después incorpore capital humano al modelo de Solow y replique el análisis entre países de Mankiw, Romer y Weil (1992).
+- **Modelos DSGE (G–H).** Escriba, resuelva y estime modelos macroeconómicos con Snowdrop. El apéndice G incluye la estimación por máxima verosimilitud y métodos bayesianos del modelo neokeynesiano de Ireland (2004) con datos de Estados Unidos. El apéndice H resuelve el modelo estimado de Smets–Wouters y vuelve a calcular las funciones de impulso-respuesta del capítulo 15.
+
+El apéndice B instala sus bibliotecas de datos adicionales en la primera celda de código; G y H instalan Snowdrop en esa celda. **Los ocho apéndices cuentan ahora con cuadernos computacionales y diapositivas de clase.**
 
 | Capítulo | Cuaderno | Diapositivas |
 | --- | --- | --- |
 | A. [Google Colab, programación en Python y bibliotecas de ciencia de datos](https://quarcs-lab.github.io/macro102-site/notebooks/appA-google-colab-python-and-data-science-libraries.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appA-google-colab-python-and-data-science-libraries.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appA/) |
 | B. [Acceso a datos macroeconómicos con Python](https://quarcs-lab.github.io/macro102-site/notebooks/appB-accessing-macroeconomic-data-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appB-accessing-macroeconomic-data-with-python.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appB/) |
 | C. [Repaso de matemáticas para macroeconomía](https://quarcs-lab.github.io/macro102-site/notebooks/appC-math-review-for-macroeconomics.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appC-math-review-for-macroeconomics.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appC/) |
-| D. [Modelización DSGE con Python](https://quarcs-lab.github.io/macro102-site/notebooks/appD-dsge-modeling-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appD-dsge-modeling-with-python.ipynb) | No disponible |
+| D. [Contabilidad del crecimiento y del desarrollo](https://quarcs-lab.github.io/macro102-site/notebooks/appD-growth-and-development-accounting.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appD-growth-and-development-accounting.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appD/) |
+| E. [Crecimiento y convergencia entre países](https://quarcs-lab.github.io/macro102-site/notebooks/appE-growth-and-convergence-across-countries.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appE-growth-and-convergence-across-countries.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appE/) |
+| F. [Modelo de crecimiento de Solow ampliado](https://quarcs-lab.github.io/macro102-site/notebooks/appF-augmented-solow-growth-model.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appF-augmented-solow-growth-model.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appF/) |
+| G. [Modelización DSGE con Python](https://quarcs-lab.github.io/macro102-site/notebooks/appG-dsge-modeling-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appG-dsge-modeling-with-python.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appG/) |
+| H. [El modelo DSGE de Smets y Wouters](https://quarcs-lab.github.io/macro102-site/notebooks/appH-the-dsge-model-of-smets-and-wouters.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appH-the-dsge-model-of-smets-and-wouters.ipynb) | [Diapositivas](https://quarcs-lab.github.io/macro102-site/slides/appH/) |
 
 
 ## A quién se dirige
 
-El libro está dirigido a estudiantes de grado y maestría, autodidactas, personas que aprenden ciencia de datos y buscan aplicaciones económicas, y economistas que desean experiencia práctica con Python. **No se requieren conocimientos previos de programación.** Quienes busquen un trabajo más avanzado pueden continuar con el apéndice D para conectar los modelos teóricos con la estimación.
+El libro está dirigido a estudiantes de grado y maestría, autodidactas, personas que aprenden ciencia de datos y buscan aplicaciones económicas, y economistas que desean experiencia práctica con Python. **No se requieren conocimientos previos de programación.** Quienes se interesen por el crecimiento económico pueden explorar los apéndices D–F, mientras que G–H conectan los modelos macroeconómicos con su solución y estimación.
 
 Comience por el [prefacio](https://quarcs-lab.github.io/macro102-site/), elija uno de los capítulos anteriores o empiece por el apéndice A si los cuadernos computacionales son nuevos para usted.

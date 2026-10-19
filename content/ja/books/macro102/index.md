@@ -8,13 +8,13 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: 国によって豊かさが異なるのはなぜでしょうか。成長や景気変動を生み出す仕組みは何でしょうか。全21章の対話型Python教材、4つの付録、計算用ノートブック、講義スライドを通して、データとマクロ経済モデルを探究します。
+summary: 国によって豊かさが異なるのはなぜでしょうか。成長や景気変動を生み出す仕組みは何でしょうか。全21章の対話型Python教材、8つの付録、計算用ノートブック、講義スライドを通して、データとマクロ経済モデルを探究します。
 tags:
 - python
 - macroeconomics
 - data-science
 title: "データサイエンスとマクロ経済モデル"
-subtitle: "中級マクロ経済学のためのPython実践ガイド"
+subtitle: "AIを活用した中級マクロ経済学のためのPython実践ガイド"
 links:
   - name: "ウェブサイト"
     url: "https://quarcs-lab.github.io/macro102-site/"
@@ -24,7 +24,7 @@ links:
 
 生活水準はなぜ大きく向上したのでしょうか。それでも国によって豊かさに大きな差があるのはなぜでしょうか。景気後退時に生産・失業・インフレはどう変わるのでしょうか。**データサイエンスとマクロ経済モデル**は、実際のデータと操作できるモデルを通して、これらの問いに取り組みます。
 
-**カルロス・メンデス**による本書の原題は *Data Science and Macroeconomic Models* です。Charles I. Jonesの *Macroeconomics*（2024年）をPythonで学ぶための無料公開のオンライン書籍で、**全21章**は同じ章題・順序を採用しています。さらに、**4つの付録**で実践的な基礎とモデル推定への発展的な学習経路を提供します。Jonesの教科書で経済的な論拠を学び、対応するノートブックでデータとモデルを自分で探究できます。本書は独自のコードと図を備えた独立した補助教材であり、教科書の著者・出版社との提携や公認はありません。
+**カルロス・メンデス**による本書の原題は *Data Science and Macroeconomic Models: An AI-powered Python companion to intermediate macroeconomics* です。Charles I. Jonesの *Macroeconomics*（2024年）をPythonで学ぶための無料公開のオンライン書籍で、**全21章**は同じ章題・順序を採用しています。さらに、**8つの付録**では実践的な基礎から経済成長、モデル推定の発展的な内容へと進みます。Jonesの教科書で経済的な論拠を学び、対応するノートブックでデータとモデルを自分で探究できます。本書は独自のコードと図を備えた独立した補助教材であり、教科書の著者・出版社との提携や公認はありません。
 
 ## 本書の学習サイクル
 
@@ -39,7 +39,7 @@ links:
   <figcaption>序文に掲載された学習サイクルの図です。青はデータサイエンス、緑はマクロ経済モデリングを表します。 <a href="learning-cycle.svg">原寸の図を開く</a>. <a href="https://quarcs-lab.github.io/macro102-site/#the-cycle-of-the-book">出典：本書の序文</a> · CC BY-NC 4.0.</figcaption>
 </figure>
 
-モデルが説明できることと、その限界の両方から学びます。例えば、ソロー・モデルは豊かさの違いを説明する手掛かりになり、アイデアの経済学は持続的な成長を扱います。新しい付録Dでは比較から推定へと進み、データを使ってパラメーターを選び、モデルの適合度を評価します。
+モデルが説明できることと、その限界の両方から学びます。例えば、ソロー・モデルは豊かさの違いを説明する手掛かりになり、アイデアの経済学は持続的な成長を扱います。付録Gでは比較から推定へと進み、データを使ってパラメーターを選び、モデルの適合度を評価します。
 
 ## 本書でできること
 
@@ -120,22 +120,30 @@ IS曲線から動学的確率的一般均衡モデルまで、景気変動・危
 | 21. [おわりに](https://quarcs-lab.github.io/macro102-site/notebooks/ch21-parting-thoughts.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/ch21-parting-thoughts.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/ch21/) |
 
 
-## 4つの付録：最初のノートブックからモデル推定まで
+## 8つの付録：基礎ツール・経済成長・DSGEモデル
 
-**A**はColab・Python・データサイエンスのライブラリ、**B**はマクロ経済データの取得、**C**はPythonによる計算を交えた数学の復習を扱います。**D**はSnowdropでマクロ経済モデルを書き、解き、推定する発展的な学習経路です。米国のデータを用いたIreland（2004年）のニューケインジアン・モデルの最尤推定とベイズ推定も含まれます。
+付録は、相互に補完する3つの学習経路に沿って並んでいます。
 
-付録BとDでは、追加パッケージを最初のコードセルでインストールします。A〜Cにはスライドがありますが、**付録Dには現在、スライドへのリンクがありません**。
+- **基礎ツール（A〜C）。** Colab・Python・データサイエンスのライブラリから始め、マクロ経済データの取得方法を学び、Pythonによる計算を交えて数学を復習します。
+- **経済成長（D〜F）。** Penn World Tableを使い、GDP成長や所得格差を資本・労働・生産性の寄与に分解します。収束の指標を使って貧しい国が豊かな国に追い付くかを調べ、人的資本をソロー・モデルに加え、Mankiw・Romer・Weil（1992年）の国際比較分析を再現します。
+- **DSGEモデル（G〜H）。** Snowdropでマクロ経済モデルを書き、解き、推定します。付録Gでは米国のデータを用いたIreland（2004年）のニューケインジアン・モデルの最尤推定とベイズ推定を扱います。付録Hでは推定済みのSmets–Woutersモデルを解き、第15章のインパルス応答を再計算します。
+
+付録Bでは追加のデータ用ライブラリを、GとHではSnowdropを、それぞれ最初のコードセルでインストールします。**8つすべての付録に、計算用ノートブックと講義スライドがあります。**
 
 | 章 | ノートブック | スライド |
 | --- | --- | --- |
 | A. [Google Colab・Pythonプログラミング・データサイエンスのライブラリ](https://quarcs-lab.github.io/macro102-site/notebooks/appA-google-colab-python-and-data-science-libraries.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appA-google-colab-python-and-data-science-libraries.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appA/) |
 | B. [Pythonによるマクロ経済データの取得](https://quarcs-lab.github.io/macro102-site/notebooks/appB-accessing-macroeconomic-data-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appB-accessing-macroeconomic-data-with-python.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appB/) |
 | C. [マクロ経済学のための数学の復習](https://quarcs-lab.github.io/macro102-site/notebooks/appC-math-review-for-macroeconomics.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appC-math-review-for-macroeconomics.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appC/) |
-| D. [PythonによるDSGEモデリング](https://quarcs-lab.github.io/macro102-site/notebooks/appD-dsge-modeling-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appD-dsge-modeling-with-python.ipynb) | 未公開 |
+| D. [成長会計と発展会計](https://quarcs-lab.github.io/macro102-site/notebooks/appD-growth-and-development-accounting.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appD-growth-and-development-accounting.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appD/) |
+| E. [各国の経済成長と収束](https://quarcs-lab.github.io/macro102-site/notebooks/appE-growth-and-convergence-across-countries.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appE-growth-and-convergence-across-countries.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appE/) |
+| F. [拡張ソロー成長モデル](https://quarcs-lab.github.io/macro102-site/notebooks/appF-augmented-solow-growth-model.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appF-augmented-solow-growth-model.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appF/) |
+| G. [PythonによるDSGEモデリング](https://quarcs-lab.github.io/macro102-site/notebooks/appG-dsge-modeling-with-python.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appG-dsge-modeling-with-python.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appG/) |
+| H. [SmetsとWoutersのDSGEモデル](https://quarcs-lab.github.io/macro102-site/notebooks/appH-the-dsge-model-of-smets-and-wouters.html) | [Colab](https://colab.research.google.com/github/quarcs-lab/macro102-site/blob/main/notebooks/appH-the-dsge-model-of-smets-and-wouters.ipynb) | [スライド](https://quarcs-lab.github.io/macro102-site/slides/appH/) |
 
 
 ## 対象読者
 
-学部生・大学院生、独学者、経済への応用を探しているデータサイエンスの学習者、Pythonの実践経験を身に付けたい経済学者を対象としています。**プログラミングの経験は必要ありません。**より高度な内容に関心がある場合は、付録Dで理論モデルと推定を結び付けられます。
+学部生・大学院生、独学者、経済への応用を探しているデータサイエンスの学習者、Pythonの実践経験を身に付けたい経済学者を対象としています。**プログラミングの経験は必要ありません。**経済成長に関心がある場合は付録D〜Fで学びを深め、G〜Hではマクロ経済モデルとその解法・推定を結び付けられます。
 
 [序文](https://quarcs-lab.github.io/macro102-site/)から始めるか、上の章を選んでください。計算用ノートブックが初めてなら、付録Aが出発点になります。
