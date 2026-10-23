@@ -5,7 +5,7 @@ authors:
 aliases:
   - "/es/projects/intro2causal/"
 date: "2026-04-22T00:00:00Z"
-book_updated: "2026-10-23T14:30:20+09:00"
+book_updated: "2026-10-23T16:27:53+09:00"
 external_link: ""
 image:
   caption: ""
@@ -25,10 +25,10 @@ links:
     url: "https://cmg777.github.io/intro2causal/book/_book/index.html"
     icon_pack: fas
     icon: book
-  - name: "Programa en Spotify"
-    url: "https://open.spotify.com/show/4eleEMEYrSr7pFwOeMuI0r"
-    icon_pack: fab
-    icon: spotify
+  - name: "Pódcasts de IA"
+    url: "https://cmg777.github.io/intro2causal/podcasts.html"
+    icon_pack: fas
+    icon: headphones
   - name: "Tutores de IA"
     url: "https://cmg777.github.io/intro2causal/tutors.html"
     icon_pack: fas
@@ -41,6 +41,10 @@ links:
     url: "https://cmg777.github.io/intro2causal/data-dictionary.html"
     icon_pack: fas
     icon: table
+  - name: "Programa en Spotify"
+    url: "https://open.spotify.com/show/4eleEMEYrSr7pFwOeMuI0r"
+    icon_pack: fab
+    icon: spotify
 
 url_pdf: ""
 url_slides: ""
