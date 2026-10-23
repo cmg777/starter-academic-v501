@@ -4,7 +4,7 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
-book_updated: "2026-10-19T09:33:28+09:00"
+book_updated: "2026-10-23T11:08:07+09:00"
 external_link: ""
 image:
   caption: ""
@@ -21,6 +21,22 @@ links:
     url: "https://quarcs-lab.github.io/macro102-site/"
     icon_pack: ai
     icon: open-data
+  - name: "Spotify Show"
+    url: "https://open.spotify.com/show/5MpdN8gos8te393uEr4ooK"
+    icon_pack: fab
+    icon: spotify
+  - name: "AI Notebooks"
+    url: "https://quarcs-lab.github.io/macro102-site/#chapters"
+    icon_pack: fas
+    icon: laptop-code
+  - name: "Lecture Slides"
+    url: "/books/macro102/#chapters-computational-notebooks-and-slides"
+    icon_pack: fas
+    icon: tv
+  - name: "GitHub"
+    url: "https://github.com/quarcs-lab/macro102-site"
+    icon_pack: fab
+    icon: github
 ---
 
 Why have living standards risen so much, and why are some countries still much richer than others? What happens to output, unemployment and inflation when an economy enters a downturn? **Data Science and Macroeconomic Models** approaches these questions by putting real data and working models in readers’ hands.
