@@ -5,7 +5,7 @@ authors:
 aliases:
   - "/ja/projects/intro2causal/"
 date: "2026-04-22T00:00:00Z"
-book_updated: "2026-10-23T09:09:51+09:00"
+book_updated: "2026-10-23T14:30:20+09:00"
 external_link: ""
 image:
   caption: ""
@@ -37,6 +37,10 @@ links:
     url: "https://cmg777.github.io/intro2causal/cheatsheet.html"
     icon_pack: fas
     icon: code
+  - name: "ケーススタディ"
+    url: "https://cmg777.github.io/intro2causal/data-dictionary.html"
+    icon_pack: fas
+    icon: table
 
 url_pdf: ""
 url_slides: ""
