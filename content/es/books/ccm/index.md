@@ -5,7 +5,7 @@ authors:
 aliases:
   - "/es/projects/ccm/"
 date: "2026-05-17T00:00:00Z"
-lastmod: "2026-10-08T11:16:16+09:00"
+book_updated: "2026-10-08T11:16:16+09:00"
 external_link: ""
 image:
   caption: ""

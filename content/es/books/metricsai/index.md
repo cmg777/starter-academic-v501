@@ -10,7 +10,7 @@ authors:
 
 
 date: "2026-01-26T00:00:00Z"
-lastmod: "2026-10-08T10:23:23+09:00"
+book_updated: "2026-10-08T10:23:23+09:00"
 #doi: "10.1007/s11205-025-03718-3"
 
 # Schedule page publish date (NOT publication's date).

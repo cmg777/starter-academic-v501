@@ -7,7 +7,7 @@ title: "Ensayos sobre productividad agregada, cambio estructural y mala asignaci
 authors:
 - admin
 date: "2015-07-27T00:00:00Z"
-lastmod: "2026-10-08T10:23:23+09:00"
+book_updated: "2026-10-08T10:23:23+09:00"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).

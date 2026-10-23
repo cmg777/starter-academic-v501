@@ -4,7 +4,7 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
-lastmod: "2026-10-19T09:33:28+09:00"
+book_updated: "2026-10-19T09:33:28+09:00"
 external_link: ""
 image:
   caption: ""

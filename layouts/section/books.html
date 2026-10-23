@@ -3,11 +3,11 @@
 {{- define "main" -}}
 {{ partial "page_header.html" . }}
 {{ $items := slice }}
-{{/* Explicit editorial update wins over Hugo's Git-based Lastmod; pages without
+{{/* Explicit book_updated wins over Hugo's Git-based Lastmod; pages without
      either retain their publication date. ByDate supplies the tie-break order. */}}
 {{ range .Pages.ByDate.Reverse }}
   {{ $updated := .Lastmod }}
-  {{ with .Params.lastmod }}{{ $updated = time . }}{{ end }}
+  {{ with .Params.book_updated }}{{ $updated = time . }}{{ end }}
   {{ $items = $items | append (dict
       "title" .Title "summary" .Summary "href" .RelPermalink "external" false
       "img" ((.Resources.ByType "image").GetMatch "*featured*")

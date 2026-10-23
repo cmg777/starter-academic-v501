@@ -5,7 +5,7 @@ authors:
 aliases:
   - "/es/projects/intro2causal/"
 date: "2026-04-22T00:00:00Z"
-lastmod: "2026-10-23T09:09:51+09:00"
+book_updated: "2026-10-23T09:09:51+09:00"
 external_link: ""
 image:
   caption: ""
