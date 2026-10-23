@@ -135,6 +135,8 @@ To do it by hand, copy the front matter of an existing item in the same folder a
 | **New filter value** (e.g. a new region) | Add the option to the `filters:` list in the section `_index.md` **in all three languages**. Options only appear when an item uses them. |
 | **Menu item** | Edit `menus.yaml` and `languages.yaml`. Keep labels short: at 1200px there is only about 15–25px to spare. Run `node scripts/audit-nav.cjs` afterwards. |
 
+**Book update order:** `/books/`, `/es/books/`, and `/ja/books/` show the most recently updated books first. When updating a book, set `lastmod` in its EN/ES/JA `index.md` files to the same actual update timestamp with a timezone, for example `lastmod: "2026-10-23T09:09:51+09:00"`. Keep `date` as the original publication date; year filters still use it. An explicit `lastmod` takes precedence; older entries without it use Hugo’s Git-based `.Lastmod`, which falls back to `date` when Git history is unavailable. Equal update times retain publication-date order (newest first). Do not bump unchanged books. The homepage currently has no separate Books list.
+
 Writing conventions:
 - Use em dashes (—).
 - In math-enabled posts, write a literal dollar sign as `\\$`.

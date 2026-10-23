@@ -53,7 +53,7 @@ Academic portfolio website for Carlos Mendez (carlos-mendez.org): Hugo + Wowchem
   - Mermaid diagrams: add `diagram: true`.
 - **Presentations:** `date:` (the talk date) is required, and future dates are allowed (builds use `--buildFuture`). Keep `publishDate:` at now or earlier; a future `publishDate` hides the event.
 - **Catalog sections:** listed by `layouts/section/<name>.html` through `partials/catalog.html`. Dropdowns come from `filters:` (plus an optional `year_filter`) in each section `_index.md`, and **a new filter value needs its option in all three `_index.md` files**.
-  - Books: `book_format: print|online`; former type-5 publications keep `type: publication`. Book chapters (type 6) stay in Articles.
+  - Books: `book_format: print|online`; former type-5 publications keep `type: publication`. Book chapters (type 6) stay in Articles. Catalog order is newest update first: explicit `lastmod` → Git `.Lastmod` → publication `date`, with publication date breaking ties. On a book update, set the same actual timezone-qualified `lastmod` in EN/ES/JA; preserve `date` and do not bump other books. See README “Book update order”.
   - Data: `data_type: repository|portal`, `region`.
   - WebApps: `app_url`, `platform: gee|streamlit`, `region`, `topic` (an id from `data/tutorial_topics.yaml`), `_build: {render: never, list: always}` (the card opens the app). App card text (the bundle `summary`, or the tutorial `summary` for tutorial apps) is plain language: at most three sentences, no acronyms, platform named. GEE source URLs go only in a front-matter comment, never as a public link. Recipe: `.claude/docs/webapps.md`.
 - **Style:**
