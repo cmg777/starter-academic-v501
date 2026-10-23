@@ -10,7 +10,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A hands-on AI-powered study guide to causal inference with Python notebooks
+summary: "Explore how researchers move from correlation to causal evidence in this Python companion to Angrist and Pischke’s Mastering ’Metrics. Run real-data notebooks in Google Colab to study randomized trials, regression, instrumental variables, regression discontinuity, and differences in differences. AI tutors, a code cheatsheet, and a Spotify show offer complementary ways to practice and review the methods."
 tags:
 - python
 - causal

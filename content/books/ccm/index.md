@@ -5,11 +5,12 @@ authors:
 aliases:
   - "/projects/ccm/"
 date: "2026-05-17T00:00:00Z"
+lastmod: "2026-10-08T11:16:16+09:00"
 external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: An introduction to regional impact evaluation using modern causal-inference methods with worked examples and publicly available data for full reproducibility.
+summary: "Learn to evaluate regional policy effects through this open online book in progress on comparative causal methods. Reproducible R and Quarto chapters compare differences in differences, synthetic control, and related approaches using public data and worked case studies. Follow the analysis from a single treated region to policies adopted at different times to understand how the methods address different evaluation settings."
 tags:
 - r
 - causal

@@ -10,7 +10,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Una guía de estudio práctica sobre inferencia causal impulsada por IA, con cuadernos de Python
+summary: "Explore cómo los investigadores pasan de la correlación a la evidencia causal con este recurso en Python que acompaña a Mastering ’Metrics de Angrist y Pischke. Ejecute cuadernos con datos reales en Google Colab para estudiar experimentos aleatorizados, regresión, variables instrumentales, regresión discontinua y diferencias en diferencias. Los tutores de IA, una referencia de código y un programa en Spotify ofrecen formas complementarias de practicar y repasar los métodos."
 tags:
 - python
 - causal

@@ -7,6 +7,7 @@ title: "Essays on Aggregate Productivity, Structural Change, and Misallocation"
 authors:
 - admin
 date: "2015-07-27T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).
@@ -25,7 +26,7 @@ publication_short: ""
 abstract: "Why are some countries much more prosperous than others? This book argues that differences in average labor productivity, patterns of structural change, and labor misallocation across sectors explain most of the observed differences in economic prosperity around the world. Using a quantitative (calibration) approach, it first shows that cross-country differences in per capita income are mostly explained by cross country differences in labor productivity. Moreover, the dynamics of the world income distribution are largely consistent with those of the world productivity distribution. Next, based on recently updated data sources, it reexamines the relative contribution of the proximate determinants of labor productivity: physical capital human capital, and aggregate efficiency. Finally, taking the structural change patterns of Latin America and East Asia as an example, it shows how labor misallocation across sectors generates large losses in aggregate efficiency and economy-wide productivity. Over time, workers in Latin America keep gravitating to sectors in which the scale of production is minuscule, mostly non-tradable and hardly standardizable."
 
 # Summary. An optional shortened abstract.
-summary: "Why are some countries much more prosperous than others? This book argues that differences in average labor productivity, patterns of structural change, and labor misallocation across sectors explain most of the observed differences in economic prosperity around the world"
+summary: "Explore why prosperity differs across countries through the roles of productivity, structural change, and the allocation of workers across sectors. Quantitative comparisons examine how physical capital, human capital, and aggregate efficiency contribute to differences in income and productivity. Evidence from Latin America and East Asia shows how the movement of labor between sectors can shape economy-wide performance."
 
 tags:
 - Structural Change

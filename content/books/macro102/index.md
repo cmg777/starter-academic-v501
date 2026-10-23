@@ -4,11 +4,12 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
+lastmod: "2026-10-19T09:33:28+09:00"
 external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Why are some countries richer, and what drives growth and economic fluctuations? Explore the evidence and operate macroeconomic models through 21 interactive Python chapters, eight appendices, computational notebooks and lecture slides.
+summary: "Investigate economic growth, differences in prosperity, and business cycles with this Python companion to intermediate macroeconomics. Its 21 chapters and eight appendices combine real data, interactive models, computational notebooks, and lecture slides. Change parameters, explore shocks, and compare model predictions with evidence to connect economic reasoning with hands-on analysis."
 tags:
 - python
 - macroeconomics

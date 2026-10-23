@@ -7,6 +7,7 @@ title: "Convergence Clubs in Labor Productivity and its Proximate Sources: Evide
 authors:
 - admin
 date: "2020-11-17T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).
@@ -25,7 +26,7 @@ publication_short: ""
 abstract: "Testing for economic convergence across countries has been a central issue in the literature of economic growth and development. This book introduces a modern framework to study the cross-country convergence dynamics of labor productivity and its proximate sources: capital accumulation and aggregate efficiency. In particular, recent convergence dynamics of developed as well as developing countries are evaluated through the lens of a non-linear dynamic factor model and a clustering algorithm for panel data. This framework allows us to examine key economic phenomena such as technological heterogeneity and multiple equilibria. Overall, the book provides a succinct review of the recent club convergence literature, a comparative view of developed and developing countries, and a tutorial on how to implement the club convergence framework in the statistical software Stata. These three features will help graduate students and researchers catch up with the latest developments and methodological implementations of the club convergence literature."
 
 # Summary. An optional shortened abstract.
-summary: "This book introduces a modern framework to study the cross-country convergence dynamics of labor productivity and its proximate sources: capital accumulation and aggregate efficiency."
+summary: "Examine why countries follow different productivity paths and whether groups converge toward common outcomes. This book compares developed and developing economies through labor productivity, capital accumulation, and aggregate efficiency using a framework that identifies convergence clubs. A focused literature review, comparative evidence, and a Stata implementation tutorial help graduate students and researchers apply the approach to their own work."
 
 tags:
 - convergence

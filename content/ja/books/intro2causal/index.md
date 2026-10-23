@@ -10,7 +10,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: AIを活用した因果推論の実践的な学習ガイド。Pythonノートブック付き
+summary: "AngristとPischkeのMastering ’Metricsに対応したPython学習ガイドで、相関から因果関係を示す証拠へ進む方法を学びます。Google Colabで実データのノートブックを実行し、ランダム化試験、回帰分析、操作変数法、回帰不連続デザイン、差分の差分法に取り組めます。AIチューター、コード早見表、Spotify番組を活用し、さまざまな角度から手法を練習・復習できます。"
 tags:
 - python
 - causal

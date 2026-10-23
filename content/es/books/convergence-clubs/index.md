@@ -7,6 +7,7 @@ title: "Clubes de convergencia en la productividad laboral y sus fuentes próxim
 authors:
 - admin
 date: "2020-11-17T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).
@@ -25,7 +26,7 @@ publication_short: ""
 abstract: "Comprobar la convergencia económica entre países ha sido una cuestión central en la literatura del crecimiento y el desarrollo económicos. Este libro presenta un marco moderno para estudiar la dinámica de convergencia entre países de la productividad laboral y sus fuentes próximas: la acumulación de capital y la eficiencia agregada. En particular, la dinámica de convergencia reciente tanto de los países desarrollados como de los países en desarrollo se evalúa a través del prisma de un modelo de factores dinámicos no lineal y un algoritmo de agrupamiento para datos de panel. Este marco permite examinar fenómenos económicos clave como la heterogeneidad tecnológica y los equilibrios múltiples. En conjunto, el libro ofrece una revisión concisa de la literatura reciente sobre clubes de convergencia, una visión comparativa de los países desarrollados y en desarrollo, y un tutorial sobre cómo implementar el marco de clubes de convergencia en el software estadístico Stata. Estas tres características ayudarán a los estudiantes de posgrado y a los investigadores a ponerse al día con los avances más recientes y las implementaciones metodológicas de la literatura sobre clubes de convergencia."
 
 # Summary. An optional shortened abstract.
-summary: "Este libro presenta un marco moderno para estudiar la dinámica de convergencia entre países de la productividad laboral y sus fuentes próximas: la acumulación de capital y la eficiencia agregada."
+summary: "Examine por qué los países siguen trayectorias de productividad distintas y si algunos grupos convergen hacia resultados comunes. Este libro compara economías desarrolladas y en desarrollo mediante la productividad laboral, la acumulación de capital y la eficiencia agregada, utilizando un marco que identifica clubes de convergencia. Una revisión de la literatura, evidencia comparativa y un tutorial de implementación en Stata ayudan a estudiantes de posgrado e investigadores a aplicar el enfoque en sus propios trabajos."
 
 tags:
 - convergence

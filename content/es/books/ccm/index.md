@@ -5,11 +5,12 @@ authors:
 aliases:
   - "/es/projects/ccm/"
 date: "2026-05-17T00:00:00Z"
+lastmod: "2026-10-08T11:16:16+09:00"
 external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Una introducción a la evaluación de impacto regional mediante métodos modernos de inferencia causal, con ejemplos resueltos y datos de acceso público para una reproducibilidad completa.
+summary: "Aprenda a evaluar los efectos regionales de las políticas con este libro abierto en desarrollo sobre métodos causales comparativos. Los capítulos reproducibles en R y Quarto comparan diferencias en diferencias, control sintético y enfoques relacionados mediante datos públicos y casos resueltos. Siga el análisis desde una sola región tratada hasta políticas adoptadas en distintos momentos para comprender cómo los métodos responden a diferentes contextos de evaluación."
 tags:
 - r
 - causal

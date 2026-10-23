@@ -4,11 +4,12 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
+lastmod: "2026-10-19T09:33:28+09:00"
 external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: 国によって豊かさが異なるのはなぜでしょうか。成長や景気変動を生み出す仕組みは何でしょうか。全21章の対話型Python教材、8つの付録、計算用ノートブック、講義スライドを通して、データとマクロ経済モデルを探究します。
+summary: "中級マクロ経済学に対応したPython教材で、経済成長、豊かさの違い、景気循環を探究します。全21章と8つの付録に、実データ、対話型モデル、計算用ノートブック、講義スライドを組み合わせています。パラメータやショックを変え、モデルの予測とデータを比較することで、経済理論を実践的な分析につなげられます。"
 tags:
 - python
 - macroeconomics

@@ -10,6 +10,7 @@ authors:
 
 
 date: "2026-01-26T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 #doi: "10.1007/s11205-025-03718-3"
 
 # Schedule page publish date (NOT publication's date).
@@ -28,7 +29,7 @@ publication_short: ""
 abstract: "Este libro y su sitio web asociado presentan un enfoque moderno de la enseñanza de la econometría que integra los fundamentos teóricos con la computación en la nube y herramientas de aprendizaje potenciadas por la IA. Concebido como un complemento computacional de *'Analysis of Economics Data: An Introduction to Econometrics'* de A. Colin Cameron, aborda dificultades persistentes en el aprendizaje de la econometría —la lectura pasiva de manuales, las barreras técnicas y la brecha entre la teoría y su implementación— combinando tres pilares: los conceptos econométricos fundamentales, cuadernos interactivos de Python accesibles a través de un entorno en la nube sin necesidad de instalación, y recursos de aprendizaje potenciados por la IA. A lo largo de diecisiete capítulos que van desde los fundamentos estadísticos hasta temas avanzados como los datos de panel y la inferencia causal, el alumnado trabaja de forma práctica con datos reales utilizando bibliotecas modernas de Python, sin dejar de apoyarse en la teoría estadística y econométrica establecida. Resúmenes visuales, diapositivas, cuestionarios, pódcast, vídeos y tutores de IA proporcionan refuerzo multimodal y retroalimentación personalizada, atendiendo a distintos estilos de aprendizaje. En conjunto, estos elementos conforman un ecosistema de aprendizaje integral que reinventa cómo puede enseñarse y aprenderse la econometría en la era de la computación en la nube y la inteligencia artificial."
 
 # Summary. An optional shortened abstract.
-summary: "Aprender econometría debería ser una experiencia más accesible e interactiva."
+summary: "Desarrolle su comprensión de la econometría con este recurso en Python que acompaña a Analysis of Economics Data de Cameron. Sus diecisiete capítulos conectan fundamentos estadísticos, regresión, datos de panel e inferencia causal con cuadernos de datos reales que se ejecutan en el navegador. Los resúmenes visuales, las diapositivas, los cuestionarios, los videos, los pódcasts y los tutores de IA ofrecen distintas formas de explorar los conceptos y reforzar las habilidades prácticas."
 
 tags:
 - econometrics

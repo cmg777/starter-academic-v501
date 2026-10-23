@@ -7,6 +7,7 @@ title: "Ensayos sobre productividad agregada, cambio estructural y mala asignaci
 authors:
 - admin
 date: "2015-07-27T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 doi: ""
 
 # Schedule page publish date (NOT publication's date).
@@ -25,7 +26,7 @@ publication_short: ""
 abstract: "¿Por qué algunos países son mucho más prósperos que otros? Este libro sostiene que las diferencias en la productividad laboral promedio, los patrones de cambio estructural y la mala asignación del trabajo entre sectores explican la mayor parte de las diferencias observadas en la prosperidad económica en todo el mundo. Mediante un enfoque cuantitativo (de calibración), muestra primero que las diferencias entre países en el ingreso per cápita se explican en su mayoría por las diferencias entre países en la productividad laboral. Además, la dinámica de la distribución mundial del ingreso es en gran medida coherente con la de la distribución mundial de la productividad. A continuación, con base en fuentes de datos actualizadas recientemente, reexamina la contribución relativa de los determinantes próximos de la productividad laboral: el capital físico, el capital humano y la eficiencia agregada. Por último, tomando como ejemplo los patrones de cambio estructural de América Latina y Asia Oriental, muestra cómo la mala asignación del trabajo entre sectores genera grandes pérdidas en la eficiencia agregada y en la productividad de toda la economía. Con el tiempo, los trabajadores de América Latina siguen gravitando hacia sectores en los que la escala de producción es minúscula, en su mayoría no transable y difícilmente estandarizable."
 
 # Summary. An optional shortened abstract.
-summary: "¿Por qué algunos países son mucho más prósperos que otros? Este libro sostiene que las diferencias en la productividad laboral promedio, los patrones de cambio estructural y la mala asignación del trabajo entre sectores explican la mayor parte de las diferencias observadas en la prosperidad económica en todo el mundo"
+summary: "Explore por qué la prosperidad difiere entre países a través de la productividad, el cambio estructural y la distribución de los trabajadores entre sectores. Las comparaciones cuantitativas examinan cómo el capital físico, el capital humano y la eficiencia agregada contribuyen a las diferencias de ingreso y productividad. La evidencia de América Latina y Asia Oriental muestra cómo el movimiento del trabajo entre sectores puede influir en el desempeño del conjunto de la economía."
 
 tags:
 - Structural Change

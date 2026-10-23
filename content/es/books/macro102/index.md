@@ -4,11 +4,12 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
+lastmod: "2026-10-19T09:33:28+09:00"
 external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: ¿Por qué algunos países son más ricos y qué impulsa el crecimiento y las fluctuaciones económicas? Explore la evidencia y los modelos macroeconómicos mediante 21 capítulos interactivos de Python, ocho apéndices, cuadernos computacionales y diapositivas de clase.
+summary: "Investigue el crecimiento económico, las diferencias de prosperidad y los ciclos económicos con este recurso en Python que acompaña el estudio de la macroeconomía intermedia. Sus 21 capítulos y ocho apéndices combinan datos reales, modelos interactivos, cuadernos computacionales y diapositivas de clase. Modifique parámetros, explore perturbaciones y compare las predicciones de los modelos con la evidencia para conectar el razonamiento económico con el análisis práctico."
 tags:
 - python
 - macroeconomics

@@ -10,6 +10,7 @@ authors:
 
 
 date: "2026-01-26T00:00:00Z"
+lastmod: "2026-10-08T10:23:23+09:00"
 #doi: "10.1007/s11205-025-03718-3"
 
 # Schedule page publish date (NOT publication's date).
@@ -28,7 +29,7 @@ publication_short: ""
 abstract: "This book and its related website introduce a modern approach to econometrics education that integrates theoretical foundations with cloud-based computation and AI-enhanced learning tools. Designed as a computational companion to A. Colin Cameron’s *'Analysis of Economics Data: An Introduction to Econometrics'*, it addresses persistent challenges in learning econometrics—passive textbook engagement, technical barriers, and the gap between theory and implementation—by combining three pillars: foundational econometric concepts, interactive Python notebooks accessible through a zero-installation cloud environment, and AI-powered learning resources. Across seventeen chapters spanning statistical foundations to advanced topics such as panel data and causal inference, learners work hands-on with real data using modern Python libraries while remaining grounded in established statistical and econometric theory. Visual summaries, slides, quizzes, podcasts, videos and AI tutors provide multimodal reinforcement and personalized feedback, supporting diverse learning styles. Together, these elements form a comprehensive learning ecosystem that reimagines how econometrics can be taught and learned in the era of cloud computing and artificial intelligence."
 
 # Summary. An optional shortened abstract.
-summary: "Learning econometrics should be a more accessible and interactive experience."
+summary: "Build econometric understanding through this Python companion to Cameron’s Analysis of Economics Data. Seventeen chapters connect statistical foundations, regression, panel data, and causal inference with real-data notebooks that run in the browser. Visual summaries, slides, quizzes, videos, podcasts, and AI tutors provide varied ways to explore the concepts and reinforce practical skills."
 
 tags:
 - econometrics
