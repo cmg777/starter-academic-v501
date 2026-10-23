@@ -20,10 +20,14 @@ links:
     url: "https://cmg777.github.io/intro2causal/"
     icon_pack: ai
     icon: open-data
-  - name: "Guía de estudio"
+  - name: "Libro"
     url: "https://cmg777.github.io/intro2causal/book/_book/index.html"
     icon_pack: fas
     icon: book
+  - name: "Programa en Spotify"
+    url: "https://open.spotify.com/show/4eleEMEYrSr7pFwOeMuI0r"
+    icon_pack: fab
+    icon: spotify
 
 url_pdf: ""
 url_slides: ""
