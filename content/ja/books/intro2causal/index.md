@@ -28,6 +28,14 @@ links:
     url: "https://open.spotify.com/show/4eleEMEYrSr7pFwOeMuI0r"
     icon_pack: fab
     icon: spotify
+  - name: "AIチューター"
+    url: "https://cmg777.github.io/intro2causal/tutors.html"
+    icon_pack: fas
+    icon: robot
+  - name: "コード早見表"
+    url: "https://cmg777.github.io/intro2causal/cheatsheet.html"
+    icon_pack: fas
+    icon: code
 
 url_pdf: ""
 url_slides: ""
