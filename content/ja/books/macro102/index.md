@@ -4,7 +4,7 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
-book_updated: "2026-10-23T11:08:07+09:00"
+book_updated: "2026-10-24T11:41:23+09:00"
 external_link: ""
 image:
   caption: ""
@@ -18,25 +18,29 @@ title: "データサイエンスとマクロ経済モデル"
 subtitle: "AIを活用した中級マクロ経済学のためのPython実践ガイド"
 links:
   - name: "ウェブサイト"
-    url: "https://quarcs-lab.github.io/macro102-site/"
+    url: "https://quarcs-lab.github.io/macro102-hub"
     icon_pack: ai
     icon: open-data
+  - name: "書籍"
+    url: "https://quarcs-lab.github.io/macro102-site/"
+    icon_pack: fas
+    icon: book
+  - name: "AIポッドキャスト"
+    url: "https://quarcs-lab.github.io/macro102-hub/podcasts"
+    icon_pack: fas
+    icon: headphones
+  - name: "データアプリ"
+    url: "https://quarcs-lab.github.io/macro102-hub/data-apps.html"
+    icon_pack: fas
+    icon: chart-bar
+  - name: "図表アプリ"
+    url: "https://quarcs-lab.github.io/macro102-hub/figure-apps.html"
+    icon_pack: fas
+    icon: sliders-h
   - name: "Spotify番組"
     url: "https://open.spotify.com/show/5MpdN8gos8te393uEr4ooK"
     icon_pack: fab
     icon: spotify
-  - name: "AIノートブック"
-    url: "https://quarcs-lab.github.io/macro102-site/#chapters"
-    icon_pack: fas
-    icon: laptop-code
-  - name: "講義スライド"
-    url: "/ja/books/macro102/#各章計算用ノートブックスライド"
-    icon_pack: fas
-    icon: tv
-  - name: "GitHub"
-    url: "https://github.com/quarcs-lab/macro102-site"
-    icon_pack: fab
-    icon: github
 ---
 
 生活水準はなぜ大きく向上したのでしょうか。それでも国によって豊かさに大きな差があるのはなぜでしょうか。景気後退時に生産・失業・インフレはどう変わるのでしょうか。**データサイエンスとマクロ経済モデル**は、実際のデータと操作できるモデルを通して、これらの問いに取り組みます。
