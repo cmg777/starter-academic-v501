@@ -2,8 +2,12 @@
 title: "ジャワにおける地域の光量と経済活動"
 subtitle: "新しい衛星夜間光データは何を語るのか"
 event: 日本地域学会（JSRSAI）第59回年次大会
-event_url: https://ersa.eventsair.com/ersa2022/
+event_url: ""
 location: 日本／オンライン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "59th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
+country: "日本"
+attendance: hybrid
 summary:  日本地域学会（JSRSAI）第59回年次大会
 abstract: "衛星による夜間画像のデータは、地域の経済活動の代理指標として経済学においてますます利用されるようになっています。本論文では、2013年から2020年の期間におけるジャワの118地区を対象に、GDPと地域格差を予測するために、新たに利用可能となった二つの衛星夜間画像を比較します。広く用いられているDMSP夜間光の拡張版と、新たに公開された年次VIIRS夜間光とを比較します。この比較から得られた結果は三点あります。第一に、特にGDPと光量の関係式に二次項を加えた場合、VIIRSの光量は経済活動のより優れた代理指標となります。第二に、いずれのデータセットにおいても、光量は時系列予測としてよりも横断面予測としての方がよく機能します。第三に、DMSPの光量は地域格差を過小評価する一方、VIIRSの光量はそれを過大評価します。本論文は、経済活動の短期的変化の代理指標として光量の時系列を用いる際には、さらなる注意が必要であると論じて結びとします。"
 

@@ -4,6 +4,10 @@ subtitle: "衛星夜間光データによるエビデンス"
 event: 日本地域学会（JSRSAI）第57回年次大会
 event_url: http://jsrsai.jp/en/latest_news/1549
 location: オンライン開催
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "57th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
+country: "日本"
+attendance: online
 summary:  日本地域学会（JSRSAI）第57回年次大会　
 abstract: "衛星夜間光データは、公式統計が存在しない、限られている、または比較可能でない経済のパフォーマンスを評価するために、ますます利用されるようになっています。本稿では、輝度に基づく一人当たりGDPの新たな指標を用いて、1998年から2012年の期間における東南アジア諸国連合（ASEAN）の274のサブナショナル地域にわたる地域収束と空間的依存性を研究します。具体的には、まずこの新たな輝度指標がASEAN地域の文脈において有用であるかを評価します。結果は、（公式の）一人当たりGDPの差異のおよそ60パーセントが、この輝度に基づくGDP指標によって予測できることを示しています。次に、地域GDPの予測における潜在的な有用性を踏まえ、ASEAN全体にわたる地域不平等の時空間動学を評価します。結果は、全体（平均）としては地域収束のプロセスが存在するものの、ほとんどの国の国内における地域不平等は有意には縮小していないことを示しています。空間的依存性のパターンを評価すると、経時的に空間的依存性が高まっていること、および複数の国境をまたいで位置する安定した空間クラスター（ホットスポットおよびコールドスポット）が存在することがわかります。これらの結果を総合すると、ASEAN共同体の統合プロセスについて、新たでより細分化された視点が得られます。"
 

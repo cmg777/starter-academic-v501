@@ -4,6 +4,10 @@ subtitle: "県レベルの新たなエビデンス"
 event: 日本応用経済学会 2020年秋季大会
 event_url: http://www.jaae.org/
 location: オンライン開催
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2020 Fall Meeting of the Japan Association of Applied Economics (JAAE)"
+country: "日本"
+attendance: online
 summary:  日本応用経済学会（JAAE）2020年秋季大会
 abstract: "本稿は、2000年から2017年の期間におけるインドネシアの所得に関する地域収束仮説を再検討することを目的とします。非線形動学的因子モデルを適用し、県レベルの所得に関する新たなデータセットを用いてクラブ収束仮説を検証します。分析の結果、インドネシアの県の所得動学には5つの有意な収束クラブが存在することが示され、地方分権政策の実施後においても県間の所得格差問題が根強く残っていることを示唆しています。続く分析では、収束クラブに関する2つの興味深い特徴が明らかになりました。第一に、同一の州に属する県は同じクラブに属する傾向があり、第二に、特定の特徴を持つ県（すなわち、大都市や天然資源に恵まれた地域）が最高所得クラブを占めています。総じて、本研究の発見は、収束クラブごとに差別化された開発政策の重要性や、州間の開発戦略を含む、示唆に富む政策的含意を提供するものです。"
 

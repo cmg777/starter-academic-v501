@@ -4,6 +4,9 @@ subtitle: "5D世界地図システム"
 event: 国際ワークショップ「グッドガバナンスへの学際的アプローチ」、京都大学 東南アジア地域研究研究所（CSEAS）
 event_url: http://133.27.177.31/5dtest/
 location: 日本、京都、京都ガーデンパレス
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "International Workshop “Transdisciplinary Approaches to Good Governance”, Center for Southeast Asian Studies (CSEAS), Kyoto University"
+country: "日本"
 summary: 国際ワークショップ「グッドガバナンスへの学際的アプローチ」
 abstract: ""
 

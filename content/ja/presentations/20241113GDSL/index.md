@@ -4,6 +4,9 @@ subtitle: "衛星による夜間光の可能性と限界"
 event: "地理データサイエンス研究所セミナー、リバプール大学"  
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: イギリス、リバプール
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Geographic Data Science Lab, University of Liverpool"
+country: "イギリス"
 summary:  "地理データサイエンス研究所セミナー、リバプール大学"    
 abstract: ""
 # Talk start and end times.

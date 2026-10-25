@@ -4,6 +4,9 @@ subtitle: "Perspectivas desde los grandes datos geoespaciales, la economía del 
 event: "Curso de Aplicaciones de Datos Satelitales, Instituto de Investigación del Entorno Espacio-Tierra (ISEE), Universidad de Nagoya"
 event_url: https://coso.isee.nagoya-u.ac.jp/sero/course_2605.html
 location: Instituto de Investigación del Entorno Espacio-Tierra (ISEE), Universidad de Nagoya, Nagoya, Japón
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Satellite Data Applications Course, Institute for Space-Earth Environmental Research (ISEE), Nagoya University"
+country: "Japón"
 summary: Conferencia invitada (en japonés) en el Curso de Aplicaciones de Datos Satelitales del ISEE, Universidad de Nagoya.
 abstract: "El desarrollo es notablemente desigual — las disparidades en el nivel de vida aparecen no solo entre países, sino también dentro de ellos, y estas brechas a menudo persisten durante décadas hasta formar patrones geoespaciales robustos. Esta conferencia invitada se pregunta cuándo, dónde y por qué ocurre el desarrollo, y cómo pueden medirse, predecirse y explicarse tales disparidades. Muestra cómo la convergencia de los grandes datos geoespaciales — en especial las imágenes satelitales, como las luces nocturnas — con la economía del desarrollo y la econometría espacial abre nuevas oportunidades para estudiar la geografía del desarrollo con una alta resolución espacial. A partir de ejemplos aplicados, la conferencia ilustra cómo los datos de observación de la Tierra pueden complementar las estadísticas socioeconómicas tradicionales para monitorear el desarrollo regional, y destaca herramientas y flujos de trabajo accesibles para transformar las imágenes satelitales en conocimiento económico."
 

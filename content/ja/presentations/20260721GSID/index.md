@@ -5,6 +5,9 @@ slug: "gsid-ai-2026"
 event: "セミナー、名古屋大学 大学院国際開発研究科（GSID）"
 event_url: ""
 location: "名古屋大学 大学院国際開発研究科（GSID）、日本"
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Graduate School of International Development (GSID), Nagoya University"
+country: "日本"
 summary: "名古屋大学 GSID でのセミナー。データサイエンス・計量経済学・研究にAI（NotebookLM、Google Colab、GitHub）を活用します。"
 abstract: "本セミナーでは、データサイエンス・計量経済学・研究に人工知能を実践的に活用する方法を紹介します。まず「生産と検証のトレードオフ」から始めます。AIによってコード・文章・結果を生み出すコストがほぼゼロになる一方で、制約は検証へと移ります。次に、3つのツールとそれらを適切に使うための規律を紹介します。NotebookLM は、AIを自分の資料に基づかせ、保護された対話的な学習を可能にします。Google Colab は、AIの支援を受けてデータを対話的に探索するためのクラウドノートブックです。GitHub は、検証の単位を小さくレビュー可能なコミットや差分（diff）へと変えることで、AI支援の研究を透明で監査可能にします。最後の原則は、AIは人間の判断を置き換えるのではなく強化するということです。生産は安価であり、検証こそが希少なスキルになります。"
 

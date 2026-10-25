@@ -4,6 +4,9 @@ subtitle: "Promesas y limitaciones de las luces nocturnas por satélite"
 event: "Seminario del Laboratorio de Ciencia de Datos Geográficos, Universidad de Liverpool"  
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: Liverpool, Reino Unido
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Geographic Data Science Lab, University of Liverpool"
+country: "Reino Unido"
 summary:  "Seminario del Laboratorio de Ciencia de Datos Geográficos, Universidad de Liverpool"    
 abstract: ""
 # Talk start and end times.

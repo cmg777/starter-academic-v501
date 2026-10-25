@@ -4,6 +4,10 @@ subtitle: "宇宙から見たクラブ収束の視点"
 event: 国際開発学会（JASID）第31回全国大会
 event_url: https://www.jasidconference.org/2020annual-en
 location: オンライン開催
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "31st Annual Conference of the Japan Society for International Development (JASID)"
+country: "日本"
+attendance: online
 summary:  国際開発学会（JASID）第31回全国大会
 abstract: "本稿は、アフリカにおける国レベルおよびサブナショナルの不平等の動学を研究します。衛星による夜間光の新たなデータセットを活用し、これにより複数の国およびサブナショナル地域にわたる地域不平等を経時的に測定・比較することが可能になります。具体的には、1992年から2012年の期間における、輝度に基づく一人当たりGDP推計値の時空間動学を評価します。非線形動学的因子モデルを用い、すべてのアフリカ諸国およびサブナショナル地域が最終的に共通の長期均衡へと収束するという仮説を検証します。結果は、国およびサブナショナル地域間の不平等が経時的に縮小してきたものの、アフリカ諸国およびサブナショナル地域は共通の長期均衡へと収束していないことを示しています。実際、アフリカは国レベルおよびサブナショナルレベルのいずれにおいても4つの収束クラブによって特徴づけられるようです。本稿は、開発政策が特定された収束クラブの文脈において策定される必要があることを示唆して結論とします。"
 

@@ -4,6 +4,9 @@ subtitle: "ビッグデータ、社会経済調査、および機械学習の統
 event: GSID-ISEE 2023 研究ワークショップ
 event_url: https://lu.ma/gsid-isee2023
 location: 日本、名古屋
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "GSID-ISEE 2023 Research Workshop"
+country: "日本"
 summary:  GSID-ISEE 2023 研究ワークショップ
 abstract: "カンボジアは急速な経済成長を経験する一方で、根強い貧困の課題に直面しており、東南アジアで最も経済的に脆弱な国の一つとなっています。これに対処するには、貧困の多様な側面に関する包括的な知見が必要です。本研究では、ビッグデータ、機械学習、およびカンボジア社会経済調査を組み合わせ、教育、健康、生活水準にわたる貧困を分析します。地理空間グリッド全体にわたって剥奪確率を算出します。ランダムフォレストのアルゴリズムは高い予測精度をもたらし、貧困の脆弱性を予測する主要な要因を特定します。総じて、本研究は、さまざまな尺度で貧困の脆弱性をマッピングするうえで、調査を補完するビッグ地球観測データと機械学習の可能性を強調するものです。"
 

@@ -3,6 +3,10 @@ title: "Sustainable Development, Space Technology, and Data Science"
 event: "Invited lecture, Universidad Católica Boliviana \"San Pablo\", La Paz"
 event_url: ""
 location: Universidad Católica Boliviana "San Pablo", La Paz, Bolivia
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Invited lecture, Universidad Católica Boliviana \"San Pablo\" (UCB)"
+country: "Bolivia"
+date_precision: month
 summary: "Invited lecture (in Spanish) on how satellite imagery and spatial data science can measure, predict, and explain uneven development."
 abstract: "Development is strikingly uneven — disparities in living standards appear not only across countries but within them, and these gaps often persist over decades to form robust geospatial patterns. This invited lecture asks when, where, and why development happens, and how such disparities can be measured, predicted, and explained. It shows how the convergence of geospatial big data — especially satellite imagery such as nighttime lights — with development economics and spatial econometrics opens new opportunities to study the geography of development at fine spatial resolution. Drawing on applied examples, the lecture illustrates how earth observation data can complement traditional socioeconomic statistics to monitor regional development, and it highlights accessible tools and workflows for turning satellite images into economic insight."
 

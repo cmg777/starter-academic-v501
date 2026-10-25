@@ -3,6 +3,10 @@ title: "Productivity Differences and Convergence Clubs in Latin America"
 event: The 2020 Bolivian Conference of Development Economics
 event_url: http://bcde2020.org
 location: Bolivian Society of Economists (SEBOL online conference), Bolivia
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Bolivian Conference on Development Economics 2020 (BCDE)"
+country: "Bolivia"
+attendance: online
 summary: The 2020 Bolivian Conference of Development Economics
 abstract: "There is a growing literature that highlights that the development potential of Latin America is highly constrained by its low productivity. In this context, this paper evaluates the productivity differences across 20 Latin American countries over the 1980-2014 period. Through the lens of a non-linear dynamic factor model, this paper finds that the productivity dynamics of Latin America appear to be characterized by a lack of overall convergence and the formation of multiple local convergence clubs. Two commonly used indicators support these findings. On the one hand, the dynamics labor productivity suggest the formation of four clubs of countries. On the other, the dynamics of total factor productivity suggest the formation of three clubs. Interestingly, in both indicators, it is the lowest-productivity club that is diverging from the rest at the highest speed. Overall, these results indicate that masked behind the average low productivity of Latin America, there are pockets of heterogeneity that need to be addressed to improve both economic cohesion and competitiveness in region."
 

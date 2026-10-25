@@ -4,6 +4,10 @@ subtitle: "Some insights from satellite images"
 event:  Chennai Mathematical Institute and XKDR Forum Workshop
 event_url: https://www.papers.xkdr.org/index.html
 location: India and Virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Workshop of the Chennai Mathematical Institute and XKDR Forum"
+country: "India"
+attendance: hybrid
 summary:  Chennai Mathematical Institute and XKDR Forum Workshop 
 abstract: "This presentation provides an introduction to the analysis of geospatial development. Specifically, it covers the following three topics:  (1) What is geospatial development? How does it complement micro and macro studies? (2) How can we study geospatial development? How important are satellite images in measuring geospatial development? (3) What is spatial data science? In which way is it different from standard data science? The presentation concludes by highlighting some additional learning materials and tutorials."
 

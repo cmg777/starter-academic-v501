@@ -1,9 +1,13 @@
 ---
 title: "Regional Okun's law, endogeneity, and heterogeneous effects"
 subtitle: "District-level evidence from Indonesia"
-event: 62st Congress  of the European Regional Science Association   
+event: 62nd Congress of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2023
 location: Alicante Spain and Virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "62nd Congress of the European Regional Science Association (ERSA)"
+country: "Spain"
+attendance: hybrid
 summary:  62nd Congress  of the European Regional Science Association   
 abstract: "This paper investigates the regional Okun's law across 514 districts of Indonesia over the 2011-2020 period. To handle the endogeneity issue of the econometric specification, we apply a two-stage least squares (2SLS) model and use regional temperature as instrumentfor economic growth. Our results show that the Okun's coefficient becomes statistically significant only after endogeneity is addressed. Consistent with the prevalent economic divide between the western and eastern regions of Indonesia, we find that Okun's law applies solely to the more industrialized western regions"
 

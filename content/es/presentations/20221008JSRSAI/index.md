@@ -2,8 +2,12 @@
 title: "Luminosidad regional y actividad económica en Java"
 subtitle: "¿Qué dicen los nuevos datos satelitales de luces nocturnas?"
 event: 59.ª Reunión Anual de la Sección Japonesa de la Asociación Internacional de Ciencia Regional (JSRSAI)  
-event_url: https://ersa.eventsair.com/ersa2022/
+event_url: ""
 location: Japón/virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "59th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
+country: "Japón"
+attendance: hybrid
 summary:  59.ª Reunión Anual de la Sección Japonesa de la Asociación Internacional de Ciencia Regional (JSRSAI)  
 abstract: "Los datos provenientes de imágenes satelitales nocturnas se utilizan cada vez más en economía como una variable representativa de la actividad económica local. Este artículo compara dos imágenes satelitales nocturnas de reciente disponibilidad para predecir el PIB y la desigualdad regional en 118 distritos de Java durante el período 2013-2020. Se compara una versión ampliada de las populares luces nocturnas del DMSP con las luces nocturnas anuales del VIIRS recién publicadas. Los resultados de esta comparación son tres. En primer lugar, la luminosidad del VIIRS es una mejor variable representativa de la actividad económica, especialmente cuando se añade un término cuadrático a la especificación PIB-luces. En segundo lugar, en ambos conjuntos de datos, la luminosidad se desempeña mejor como predictor de corte transversal que como predictor de serie temporal. En tercer lugar, la luminosidad del DMSP subestima la desigualdad regional, mientras que la luminosidad del VIIRS la sobreestima. El artículo concluye argumentando que se requiere una cautela adicional al utilizar series temporales de luminosidad como variable representativa de los cambios de corto plazo en la actividad económica."
 

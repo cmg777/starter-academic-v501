@@ -4,3 +4,10 @@
   translation: Correo electrónico
 - id: posts
   translation: Tutoriales
+# Presentation list line (layouts/partials/functions/talk_meta.html).
+- id: talk_online
+  translation: "{{ .Country }} (en línea)"
+- id: talk_hybrid
+  translation: "{{ .Country }} (híbrido)"
+- id: talk_online_only
+  translation: En línea

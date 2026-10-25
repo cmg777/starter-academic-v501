@@ -3,6 +3,10 @@ title: "AI時代の応用計量経済学と研究"
 event: "基調講演とマスタークラス、ウエルバ大学、スペイン"
 event_url: ""
 location: オンライン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Keynote and Master Class, Universidad de Huelva"
+country: "スペイン"
+attendance: online
 summary: "基調講演とマスタークラス、ウエルバ大学、スペイン"
 abstract: "人工知能（AI）の時代に応用計量経済学と実証研究がどのように発展しているかについて、ウエルバ大学（スペイン）のためにオンラインで行われた基調講演とマスタークラスです。本セッションでは、計量経済学の理論をクラウドベースの計算、再現可能なPythonノートブック、学習と研究のためのAI支援ツールと統合し、オープンアクセス教材「Econometrics Powered by AI」に基づいて解説します。"
 

@@ -4,6 +4,9 @@ subtitle: "インドネシアの州からのエビデンス 1990-2010"
 event: 2019年度 応用経済学会 春季大会
 event_url: http://www.jaae.org/
 location: 日本、名古屋市、南山大学
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2019 Spring Conference of the Japan Association of Applied Economics (JAAE)"
+country: "日本"
 summary: 2019年度 応用経済学会 春季大会
 abstract: "本発表は、1990年から2010年の期間におけるインドネシアの州間の効率の収束に関するものです。古典的収束と分布的収束の双方の枠組みを通じて、純粋技術効率と規模効率の分散動学を比較します。結果は、平均的にみれば、両方の効率指標において地域収束が存在することを示唆しています。しかし、分布的枠組みの結果は、純粋技術効率の分布の中に二つの別個の収束クラスターが存在することを示しています。したがって、規模効率が単一の収束クラスターのみで特徴づけられることを踏まえると、純粋技術効率の二つのクラスターがインドネシア全体の効率動学を駆動していると考えられます。"
 

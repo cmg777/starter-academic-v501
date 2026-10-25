@@ -4,6 +4,9 @@ subtitle: "Integración de macrodatos, encuestas socioeconómicas y aprendizaje 
 event: Taller de investigación GSID-ISEE 2023  
 event_url: https://lu.ma/gsid-isee2023
 location: Nagoya, Japón
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "GSID-ISEE 2023 Research Workshop"
+country: "Japón"
 summary:  Taller de investigación GSID-ISEE 2023  
 abstract: "Camboya, si bien experimenta un rápido crecimiento económico, enfrenta desafíos persistentes de pobreza, lo que la convierte en una de las naciones económicamente más vulnerables del Sudeste Asiático. Abordar esta situación requiere una comprensión integral de las diversas dimensiones de la pobreza. Este estudio combina macrodatos, aprendizaje automático y la Encuesta Socioeconómica de Camboya para analizar la pobreza en las áreas de educación, salud y nivel de vida. Calcula probabilidades de privación a lo largo de una cuadrícula geoespacial. Un algoritmo de random forest arroja una alta precisión predictiva e identifica los principales predictores de la vulnerabilidad ante la pobreza. En conjunto, este estudio subraya el potencial de los macrodatos de observación de la Tierra y del aprendizaje automático para complementar las encuestas y mapear las vulnerabilidades ante la pobreza a distintas escalas."
 

@@ -4,6 +4,9 @@ subtitle: "Insights from Geospatial Big Data, Development Economics, and Spatial
 event: "Satellite Data Applications Course, Institute for Space-Earth Environmental Research (ISEE), Nagoya University"
 event_url: https://coso.isee.nagoya-u.ac.jp/sero/course_2605.html
 location: Institute for Space-Earth Environmental Research (ISEE), Nagoya University, Nagoya, Japan
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Satellite Data Applications Course, Institute for Space-Earth Environmental Research (ISEE), Nagoya University"
+country: "Japan"
 summary: Invited lecture (in Japanese) at the Satellite Data Applications Course, ISEE, Nagoya University.
 abstract: "Development is strikingly uneven — disparities in living standards appear not only across countries but within them, and these gaps often persist over decades to form robust geospatial patterns. This invited lecture asks when, where, and why development happens, and how such disparities can be measured, predicted, and explained. It shows how the convergence of geospatial big data — especially satellite imagery such as nighttime lights — with development economics and spatial econometrics opens new opportunities to study the geography of development at fine spatial resolution. Drawing on applied examples, the lecture illustrates how earth observation data can complement traditional socioeconomic statistics to monitor regional development, and it highlights accessible tools and workflows for turning satellite images into economic insight."
 

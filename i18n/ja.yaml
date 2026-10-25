@@ -66,3 +66,10 @@
   translation: よく使われる検索
 - id: posts
   translation: チュートリアル
+# Presentation list line (layouts/partials/functions/talk_meta.html).
+- id: talk_online
+  translation: "{{ .Country }}（オンライン）"
+- id: talk_hybrid
+  translation: "{{ .Country }}（ハイブリッド）"
+- id: talk_online_only
+  translation: オンライン

@@ -3,6 +3,10 @@ title: "La econometría aplicada y la investigación en la era de la IA"
 event: "Conferencia magistral y clase magistral, Universidad de Huelva, España"
 event_url: ""
 location: En línea
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Keynote and Master Class, Universidad de Huelva"
+country: "España"
+attendance: online
 summary: "Conferencia magistral y clase magistral, Universidad de Huelva, España"
 abstract: "Conferencia magistral y clase magistral impartidas en línea para la Universidad de Huelva (España) sobre cómo la econometría aplicada y la investigación empírica están evolucionando en la era de la inteligencia artificial. La sesión integra la teoría econométrica con la computación en la nube, cuadernos de Python reproducibles y herramientas asistidas por IA para el aprendizaje y la investigación, a partir del recurso de acceso abierto Econometrics Powered by AI."
 

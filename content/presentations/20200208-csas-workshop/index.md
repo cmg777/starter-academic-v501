@@ -4,6 +4,9 @@ subtitle: "A 5D World Map System"
 event: The International Workshop “Transdisciplinary Approaches to Good Governance”, The Center for Southeast Asian Studies (CSEAS), Kyoto University
 event_url: http://133.27.177.31/5dtest/
 location: Kyoto Garden Palace, Kyoto, Japan
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "International Workshop “Transdisciplinary Approaches to Good Governance”, Center for Southeast Asian Studies (CSEAS), Kyoto University"
+country: "Japan"
 summary: International Workshop “Transdisciplinary Approaches to Good Governance”
 abstract: ""
 

@@ -1,0 +1,9 @@
+# Project strings that the Wowchemy theme does not define. Hugo merges these
+# over the theme's en.yaml by id. Keep es.yaml and ja.yaml in sync.
+# Presentation list line (layouts/partials/functions/talk_meta.html).
+- id: talk_online
+  translation: "{{ .Country }} (online)"
+- id: talk_hybrid
+  translation: "{{ .Country }} (hybrid)"
+- id: talk_online_only
+  translation: Online

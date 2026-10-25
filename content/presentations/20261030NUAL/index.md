@@ -3,6 +3,9 @@ title: "AI-Assisted Learning and Research: Production, Verification, and Tool In
 event: "Keynote Speaker, Annual Meeting of the Nagoya University Alumni Association, Thailand Branch"
 event_url: ""
 location: Thammasat University, Bangkok, Thailand
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Annual Meeting of the Nagoya University Alumni Association, Thailand Branch"
+country: "Thailand"
 summary: "Keynote Speaker, Annual Meeting of the Nagoya University Alumni Association, Thailand Branch"
 abstract: "This presentation introduces a conceptual framework for integrating artificial intelligence into learning and research. As AI becomes better at generating content, the main challenge is ensuring that AI-assisted work remains reliable and transparent. The framework addresses this shift through three core themes. First, it positions AI tools as collaborative instruments that require structured human oversight. Users must clearly separate content production from verification processes. Second, the framework outlines practical strategies for AI-assisted learning. These include activating planning mode, using agentic skills, and supplying reference materials. A key strategy is instructing the AI to ask clarifying questions before executing tasks, which reduces assumptions and improves quality. Third, the presentation examines AI-assisted research. It highlights how platforms like GitHub support transparent, auditable workflows. By enabling step-by-step reviews of code, results, and manuscripts, researchers can avoid “black-box” practices. Ultimately, effective AI integration requires intentional workflow design. By combining agentic skills, iterative verification, and clear documentation, AI can augment human judgment rather than replace it."
 

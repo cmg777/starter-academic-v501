@@ -4,6 +4,9 @@ subtitle: "Evidencia de las regiones metropolitanas de Bolivia"
 event: Reunión de Otoño 2018 de la Sociedad Japonesa para el Desarrollo Internacional (JASID)
 event_url: https://www.jasid.org/conference_en
 location: Universidad de Tsukuba, Prefectura de Ibaraki, Japón
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2018 Fall Meeting of the Japan Society for International Development (JASID)"
+country: "Japón"
 summary: Reunión de Otoño 2018 de la Sociedad Japonesa para el Desarrollo Internacional (JASID)
 abstract: "Bolivia ha experimentado grandes transformaciones socioeconómicas en las últimas décadas. Entre ellas, casi la mitad de la población vive actualmente en las principales regiones metropolitanas del país. Motivada por el potencial de crecimiento y convergencia del desarrollo en estas regiones, esta presentación trata sobre la evolución de las disparidades en el desarrollo humano y los patrones de convergencia durante el período 1992-2013. Empleando un marco de dinámica de distribución, este artículo evalúa tanto la dinámica de transición como el equilibrio de largo plazo de la distribución interregional del desarrollo humano. Los resultados del análisis de dinámica de transición sugieren que la formación de múltiples clústeres de convergencia es una característica destacada de la reducción de la desigualdad en el desarrollo humano. Por otro lado, los resultados del análisis del equilibrio de largo plazo sugieren que el proceso de convergencia regional se caracteriza por la transformación de una distribución trimodal en una distribución unimodal sesgada a la izquierda. El artículo concluye subrayando que la distribución interregional del desarrollo humano en Bolivia es bastante persistente en su cola izquierda y que, como resultado, las regiones menos desarrolladas todavía están relativamente lejos de alcanzar una convergencia completa en el largo plazo."
 

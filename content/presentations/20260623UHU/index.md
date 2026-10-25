@@ -3,6 +3,10 @@ title: "Applied Econometrics and Research in the Age of AI"
 event: "Keynote & Master Class, Universidad de Huelva, Spain"
 event_url: ""
 location: Online
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Keynote and Master Class, Universidad de Huelva"
+country: "Spain"
+attendance: online
 summary: "Keynote & Master Class, Universidad de Huelva, Spain"
 abstract: "A keynote lecture and master class delivered online for the University of Huelva (Spain) on how applied econometrics and empirical research are evolving in the age of artificial intelligence. The session integrates econometric theory with cloud-based computation, reproducible Python notebooks, and AI-assisted tools for learning and research, drawing on the open-access resource Econometrics Powered by AI."
 

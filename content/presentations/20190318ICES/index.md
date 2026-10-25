@@ -4,6 +4,9 @@ subtitle: "A Nonparametric Density Approach"
 event: The 3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies
 event_url: http://www.gakkai.ne.jp/papaios/en/index.html
 location: Ritsumeikan University, Osaka Prefecture, Japan
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies (PAPAIOS)"
+country: "Japan"
 summary: The 3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies
 abstract: "This presentation is about environmental efficiency convergence across the prefectures of Japan over the 1992-2008 period. Using a novel nonparametric density estimation clustering framework, two alternative indicators of environmental efficiency are contrasted: a conventional indicator, based on the ratio of gross regional product to CO2 emissions, and a more comprehensive indicator, based on the data envelopment analysis (DEA) model. Results show, on the one hand, a lack of intra-distributional mobility and potentially a unique convergence cluster when using the more conventional indicator. On the other hand, large backward mobility and at least two convergence clusters are identified when using the DEA-based indicator of environmental efficiency. The paper concludes arguing the importance of accounting for production inputs, as they appear to be driving the formation of regional convergence clusters in Japan."
 

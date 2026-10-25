@@ -4,6 +4,10 @@ subtitle: "Algunas perspectivas a partir de imágenes satelitales"
 event:  Taller del Chennai Mathematical Institute y del XKDR Forum
 event_url: https://www.papers.xkdr.org/index.html
 location: India y virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Workshop of the Chennai Mathematical Institute and XKDR Forum"
+country: "India"
+attendance: hybrid
 summary:  Taller del Chennai Mathematical Institute y del XKDR Forum 
 abstract: "Esta presentación ofrece una introducción al análisis del desarrollo geoespacial. En concreto, abarca los tres temas siguientes: (1) ¿Qué es el desarrollo geoespacial? ¿Cómo complementa a los estudios micro y macro? (2) ¿Cómo podemos estudiar el desarrollo geoespacial? ¿Qué importancia tienen las imágenes satelitales para medir el desarrollo geoespacial? (3) ¿Qué es la ciencia de datos espaciales? ¿En qué se diferencia de la ciencia de datos estándar? La presentación concluye destacando algunos materiales de aprendizaje y tutoriales adicionales."
 

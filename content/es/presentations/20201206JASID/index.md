@@ -4,6 +4,10 @@ subtitle: "Una visión de convergencia por clubes desde el espacio exterior"
 event: 31.ª Conferencia Anual de la Sociedad Japonesa para el Desarrollo Internacional
 event_url: https://www.jasidconference.org/2020annual-en
 location: Conferencia virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "31st Annual Conference of the Japan Society for International Development (JASID)"
+country: "Japón"
+attendance: online
 summary:  31.ª Conferencia Anual de la Sociedad Japonesa para el Desarrollo Internacional
 abstract: "Este artículo estudia la dinámica de la desigualdad nacional y subnacional en África. Aprovechamos un novedoso conjunto de datos satelitales de luces nocturnas que nos permite medir y comparar la desigualdad regional entre múltiples países y regiones subnacionales a lo largo del tiempo. En concreto, evaluamos la dinámica espacio-temporal de una estimación del PIB per cápita basada en la luminosidad durante el período 1992-2012. Utilizando un modelo de factores dinámicos no lineal, ponemos a prueba la hipótesis de que todas las naciones y regiones subnacionales africanas convergerían finalmente hacia un equilibrio común de largo plazo. Los resultados indican que, aunque la desigualdad entre naciones y regiones subnacionales ha disminuido con el tiempo, las naciones y regiones subnacionales africanas no están convergiendo hacia un equilibrio común de largo plazo. De hecho, África parece caracterizarse por cuatro clubes de convergencia tanto a nivel nacional como subnacional. El artículo concluye sugiriendo que las políticas de desarrollo deben abordarse en el contexto de los clubes de convergencia identificados."
 

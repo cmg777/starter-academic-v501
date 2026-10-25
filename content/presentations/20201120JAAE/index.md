@@ -4,6 +4,10 @@ subtitle: "New District-Level Evidence"
 event: The 2020 Fall Meeting of the Japan Association of Applied Economics
 event_url: http://www.jaae.org/
 location: Virtual Conference
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2020 Fall Meeting of the Japan Association of Applied Economics (JAAE)"
+country: "Japan"
+attendance: online
 summary:  The 2020 Fall Meeting of the Japan Association of Applied Economics (JAAE)
 abstract: "This paper aims to re-examine the regional convergence hypothesis on income in Indonesia over the 2000-2017 period. By applying a non-linear dynamic factor model, this paper tests the club convergence hypothesis using a novel dataset of income at the district level. The results show significant five convergence clubs in Indonesian districts’ income dynamics, implying the persistence of income disparity problems across districts even after implementing the decentralization policy. The subsequent analysis reveals two appealing features regarding the convergence clubs. First, districts belonging to the same province tend to be in the same club, and second, districts with specific characteristics (i.e., big cities or natural resources-rich regions) dominate the highest income club. Overall, our findings suggest some insightful policy implications, including the importance of differentiated development policies across convergence clubs and inter-provincial development strategies."
 

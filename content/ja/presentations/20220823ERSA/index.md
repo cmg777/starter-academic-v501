@@ -4,6 +4,10 @@ subtitle: "空間的依存性と近隣効果の役割を再考する"
 event: 第61回欧州地域科学協会大会（ERSA）
 event_url: https://ersa.eventsair.com/ersa2022/
 location: ハンガリー、ペーチおよびオンライン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "61st Congress of the European Regional Science Association (ERSA)"
+country: "ハンガリー"
+attendance: hybrid
 summary:  第61回欧州地域科学協会大会（ERSA）
 abstract: "本論文は、2007年から2019年の期間におけるトルコの81県を対象に、地域所得の収束とその規定要因を研究します。非線形動学的因子モデルの枠組みを用いて、まずすべての県が最終的に共通の長期均衡へ収束するという仮説を検証します。この仮説は棄却され、一人当たり所得の県別動学は6つの収束クラブによって特徴づけられることがわかりました。次に、クラブ形成の背後にある規定要因を評価します。我々の結果は、県間の空間的依存性が収束クラブの形成において本質的な役割を果たすことを示唆しています。収束クラブの空間分布には明確な空間的パターンがあり、県別所得分布の動学は空間的に統合されています。また、地理的な近隣は中所得および高所得の県にとってより重要であることもわかりました。最後に、地理的な近隣のパフォーマンスが、資本蓄積と構造変化のスピルオーバーを通じてクラブ所属の確率に影響を与えることを示します。"
 

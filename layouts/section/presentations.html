@@ -50,11 +50,13 @@
       {{ with $p.Params.external_link }}{{ $link = . }}{{ $target = "target=\"_blank\" rel=\"noopener\"" }}{{ end }}
       {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
       {{ $year := $p.Date.Format "2006" }}
-      {{ $searchText := lower (printf "%s %s %s %s %s"
+      {{ $searchText := lower (printf "%s %s %s %s %s %s %s"
             ($p.Title | default "")
             ($p.Params.subtitle | default "")
             ($p.Params.location | default "")
             ($p.Params.event | default "")
+            ($p.Params.event_name | default "")
+            ($p.Params.country | default "")
             ($p.Params.summary | default "")) }}
       <article class="cz-showcase-item"
                data-year="{{ $year }}"
@@ -69,9 +71,12 @@
         </a>
         <div class="cz-showcase-body">
           <h3 class="cz-showcase-title"><a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{ $p.Title }}</a></h3>
+          {{/* Standardized meta line: DATE / EVENT / COUNTRY (partials/functions/talk_meta.html). */}}
+          {{ $m := partial "functions/talk_meta.html" $p }}
           <div class="cz-showcase-meta">
-            <span>{{ partial "functions/get_event_dates" $p }}</span>
-            {{ with $p.Params.location }}<span class="middot-divider"></span><span>{{ . }}</span>{{ end }}
+            <time datetime="{{ $m.datetime }}">{{ $m.date }}</time>
+            {{ with $m.event }}<span aria-hidden="true">/</span><span>{{ . }}</span>{{ end }}
+            {{ with $m.place }}<span aria-hidden="true">/</span><span>{{ . }}</span>{{ end }}
           </div>
           {{ with $p.Params.summary }}<div class="cz-showcase-summary">{{ . | markdownify | emojify }}</div>{{ end }}
           {{ if partial "functions/has_attachments" $p }}

@@ -4,6 +4,10 @@ subtitle: "Evidencia a nivel de distrito en Indonesia"
 event: 62.º Congreso de la Asociación Europea de Ciencia Regional   
 event_url: https://ersa.eventsair.com/ersa2023
 location: Alicante, España, y virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "62nd Congress of the European Regional Science Association (ERSA)"
+country: "España"
+attendance: hybrid
 summary:  62.º Congreso de la Asociación Europea de Ciencia Regional   
 abstract: "Este artículo investiga la ley de Okun regional en 514 distritos de Indonesia durante el período 2011-2020. Para abordar el problema de endogeneidad de la especificación econométrica, aplicamos un modelo de mínimos cuadrados en dos etapas (2SLS) y utilizamos la temperatura regional como instrumento del crecimiento económico. Nuestros resultados muestran que el coeficiente de Okun solo resulta estadísticamente significativo después de abordar la endogeneidad. De forma coherente con la marcada brecha económica entre las regiones occidentales y orientales de Indonesia, encontramos que la ley de Okun se cumple únicamente en las regiones occidentales, más industrializadas."
 

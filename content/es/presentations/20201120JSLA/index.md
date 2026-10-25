@@ -4,6 +4,10 @@ subtitle: "Un enfoque de convergencia espacial"
 event: 57.ª Conferencia Anual 2020 de la Sociedad Japonesa de Ciencias Sociales sobre América Latina (JSLA)
 event_url: http://www.js3la.jp/meetings.html
 location: Conferencia virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "57th Annual Conference of the Japan Society of Social Science on Latin America (JSLA)"
+country: "Japón"
+attendance: online
 summary:  57.ª Conferencia Anual 2020 de la Sociedad Japonesa de Ciencias Sociales sobre América Latina )
 abstract: "Este artículo estudia la evolución de las disparidades económicas y sociales en América del Sur. Aprovechando un novedoso conjunto de datos subnacionales multipaís, evaluamos la evolución del ingreso nacional bruto per cápita (INB) y del índice de desarrollo humano (IDH) en 151 regiones subnacionales durante el período 1990-2018. En particular, la dinámica regional se evalúa a través de la óptica de dos marcos de convergencia espacial. El primer marco destaca el papel de la dependencia espacial. Los resultados indican que, tanto para el INB como para el IDH, existe un proceso general de convergencia regional. Además, la dependencia espacial desempeña un papel significativo en este proceso. Una especificación de error espacial sugiere que la dependencia espacial acelera la velocidad de convergencia en algunas décadas, pero la desacelera en otras. El segundo marco destaca el papel de la heterogeneidad espacial. Los resultados indican que, tanto para el INB como para el IDH, la velocidad de convergencia es en gran medida heterogénea a través del espacio y del tiempo. Asimismo, la dinámica de la desigualdad económica y social en América del Sur se caracteriza por conglomerados espaciales multipaís que muestran tendencias tanto convergentes como divergentes. En conjunto, estos resultados subrayan la importancia de tener en cuenta la dependencia y la heterogeneidad espaciales al evaluar la dinámica de la desigualdad económica y social en América del Sur."
 

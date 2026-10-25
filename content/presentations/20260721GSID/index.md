@@ -7,6 +7,9 @@ aliases:
 event: "Seminar, Graduate School of International Development (GSID), Nagoya University"
 event_url: ""
 location: "Graduate School of International Development (GSID), Nagoya University, Japan"
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Graduate School of International Development (GSID), Nagoya University"
+country: "Japan"
 summary: "Seminar at GSID, Nagoya University — using AI (NotebookLM, Google Colab, and GitHub) for data science, econometrics, and research."
 abstract: "This seminar introduces a practical way to use artificial intelligence for data science, econometrics, and research. It opens with the production-versus-verification trade-off: as AI makes producing code, text, and results almost free, the binding constraint shifts to verification. It then presents three tools and the discipline to use them well — NotebookLM, which grounds AI in your own sources for protected, interactive learning; Google Colab, a cloud notebook for interactively exploring data with AI support; and GitHub, which makes AI-assisted research transparent and auditable by changing the unit of verification to small, reviewable commits and diffs. The closing principle is that AI augments human judgment rather than replacing it — production is cheap, so verification becomes the scarce skill."
 

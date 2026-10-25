@@ -4,6 +4,10 @@ subtitle: "衛星画像から得られる知見"
 event:  チェンナイ数理科学研究所およびXKDRフォーラム・ワークショップ
 event_url: https://www.papers.xkdr.org/index.html
 location: インドおよびオンライン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Workshop of the Chennai Mathematical Institute and XKDR Forum"
+country: "インド"
+attendance: hybrid
 summary:  チェンナイ数理科学研究所およびXKDRフォーラム・ワークショップ
 abstract: "本発表では、地理空間的な開発の分析について入門的な解説を行います。具体的には、次の三つの話題を取り上げます。（1）地理空間的な開発とは何か。ミクロ研究やマクロ研究をどのように補完するのか。（2）地理空間的な開発をどのように研究できるか。地理空間的な開発を測定するうえで衛星画像はどれほど重要か。（3）空間データサイエンスとは何か。標準的なデータサイエンスとはどのように異なるのか。発表の最後には、追加の学習教材やチュートリアルをいくつか紹介します。"
 

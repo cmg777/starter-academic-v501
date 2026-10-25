@@ -4,6 +4,9 @@ A Convergence Clubs Approach"
 event: The 2019 Applied Regional Science Conference (ARSC)
 event_url: https://sites.google.com/view/arsc2019sagae
 location: Saga University (Honjo Campus), Saga, Japan
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2019 Applied Regional Science Conference (ARSC)"
+country: "Japan"
 summary: The 2019 Applied Regional Science Conference (ARSC)
 abstract: "This paper studies the evolution of regional disparities in labor productivity, capital accumulation, and efficiency across Indonesian provinces over the 1990-2010 period. Through the lens of a non-linear dynamic factor model, we test the hypothesis that all provinces would eventually converge to a common steady-state path. We find that the cross-provincial dynam- ics of labor productivity are characterized by two convergence clubs. The dynamics of the proximate determinants of labor productivity show some mixed results. On the one hand, physical and human capital accumulation are characterized by four and two convergence clubs, respectively. On the other hand, efficiency is characterized by a unique convergence club. The pa- per concludes suggesting that based on the provincial composition of each convergence club, considerable improvements in capital accumulation and efficiency are still needed to reduce regional disparities and accelerate pro- ductivity growth."
 

@@ -3,6 +3,10 @@ title: "Desarrollo sostenible, tecnología espacial y ciencia de datos"
 event: "Conferencia invitada, Universidad Católica Boliviana \"San Pablo\", La Paz"
 event_url: ""
 location: Universidad Católica Boliviana "San Pablo", La Paz, Bolivia
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Invited lecture, Universidad Católica Boliviana \"San Pablo\" (UCB)"
+country: "Bolivia"
+date_precision: month
 summary: "Conferencia invitada (en español) sobre cómo las imágenes satelitales y la ciencia de datos espaciales permiten medir, predecir y explicar el desarrollo desigual."
 abstract: "El desarrollo es notablemente desigual — las disparidades en los niveles de vida aparecen no solo entre países, sino también dentro de ellos, y estas brechas suelen persistir durante décadas hasta formar patrones geoespaciales robustos. Esta conferencia invitada se pregunta cuándo, dónde y por qué ocurre el desarrollo, y cómo se pueden medir, predecir y explicar esas disparidades. Muestra cómo la convergencia de los macrodatos geoespaciales — en particular las imágenes satelitales, como las luces nocturnas — con la economía del desarrollo y la econometría espacial abre nuevas oportunidades para estudiar la geografía del desarrollo con alta resolución espacial. A partir de ejemplos aplicados, la conferencia ilustra cómo los datos de observación de la Tierra pueden complementar las estadísticas socioeconómicas tradicionales para monitorear el desarrollo regional, y destaca herramientas y flujos de trabajo accesibles para convertir las imágenes satelitales en conocimiento económico."
 

@@ -3,6 +3,9 @@ title: "AI時代の開発研究"
 event: "国際学際ワークショップ、プノンペン王立大学"  
 event_url: https://luma.com/ebw5y0k4
 location: カンボジア、プノンペン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "International and Interdisciplinary Workshop, Royal University of Phnom Penh (RUPP)"
+country: "カンボジア"
 summary:  "国際学際ワークショップ、プノンペン王立大学"    
 abstract: "名古屋大学のアジア衛星キャンパス学院（ASCI）、国際開発研究科（GSID）、宇宙地球環境研究所（ISEE）は、プノンペン王立大学および国連開発計画（UNDP）カンボジア事務所と協力し、「AI時代の開発研究：新しいデータ、新しい手法、新しい視点」と題したハイブリッド形式の研究ワークショップを開催します。このハイブリッド形式（対面およびオンライン）のワークショップは、衛星画像と社会経済データを統合することによって、カンボジアおよびアジアにおける持続可能な開発に関する研究を推進するための学際的なプラットフォームを提供します。"
 

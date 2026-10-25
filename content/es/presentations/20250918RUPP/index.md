@@ -3,6 +3,9 @@ title: "Los estudios del desarrollo en la era de la IA"
 event: "Taller internacional e interdisciplinario, Universidad Real de Phnom Penh"  
 event_url: https://luma.com/ebw5y0k4
 location: Phnom Penh, Camboya
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "International and Interdisciplinary Workshop, Royal University of Phnom Penh (RUPP)"
+country: "Camboya"
 summary:  "Taller internacional e interdisciplinario, Universidad Real de Phnom Penh"    
 abstract: "El Instituto de Campus por Satélite de Asia (ASCI), la Escuela de Posgrado en Desarrollo Internacional (GSID) y el Instituto de Investigación del Entorno Espacio-Tierra (ISEE) de la Universidad de Nagoya, en colaboración con la Universidad Real de Phnom Penh y el Programa de las Naciones Unidas para el Desarrollo (PNUD) en Camboya, organizan un taller de investigación híbrido titulado «Los estudios del desarrollo en la era de la IA: nuevos datos, nuevos métodos y nuevas perspectivas». Este taller híbrido (presencial y en línea) ofrece una plataforma interdisciplinaria para impulsar la investigación sobre el desarrollo sostenible en Camboya y Asia, integrando imágenes de satélite con datos socioeconómicos."
 

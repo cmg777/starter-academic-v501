@@ -4,6 +4,10 @@ subtitle: "Un cuaderno de Python para procesar y analizar luces nocturnas sateli
 event: 62.º Congreso de la Asociación Europea de Ciencia Regional   
 event_url: https://ersa.eventsair.com/ersa2023
 location: Alicante, España, y virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "62nd Congress of the European Regional Science Association (ERSA)"
+country: "España"
+attendance: hybrid
 summary:  62.º Congreso de la Asociación Europea de Ciencia Regional   
 abstract: "Los datos de luces nocturnas (NTL) son ampliamente reconocidos como una variable representativa útil para monitorear la actividad económica nacional, subnacional y supranacional. Estos datos ofrecen ventajas frente a indicadores económicos tradicionales como el PIB, entre ellas una mayor granularidad espacial, oportunidad, menor costo y comparabilidad entre regiones independientemente de la capacidad estadística o de la interferencia política. Sin embargo, a pesar de estos beneficios, el uso de los datos NTL en la ciencia regional ha sido limitado. Esto se debe en parte a la falta de métodos accesibles para procesar y analizar imágenes satelitales. Para abordar este problema, este artículo presenta un cuaderno geocomputacional fácil de usar que ilustra cómo procesar y analizar imágenes satelitales de luces nocturnas (NTL). En primer lugar, el cuaderno introduce un entorno de Python en la nube para visualizar, analizar y transformar imágenes satelitales ráster en datos tabulares. A continuación, presenta herramientas interactivas para explorar los patrones espaciotemporales de los datos tabulados. Por último, describe métodos para evaluar la utilidad de los datos NTL en términos de sus predicciones de corte transversal, sus predicciones de serie temporal y la dinámica de la desigualdad regional."
 

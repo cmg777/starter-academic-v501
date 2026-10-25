@@ -4,6 +4,9 @@ subtitle: "Promises and pitfalls of satellite nighttime lights"
 event: "Seminar of the Geographic Data Science Lab, University of Liverpool"  
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: Liverpool, UK
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Geographic Data Science Lab, University of Liverpool"
+country: "United Kingdom"
 summary:  "Seminar of the Geographic Data Science Lab, University of Liverpool"    
 abstract: ""
 # Talk start and end times.

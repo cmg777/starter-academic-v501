@@ -4,6 +4,9 @@ subtitle: "Un enfoque de regresión geográficamente ponderada multiescala"
 event: XV Conferencia Mundial de la Asociación de Econometría Espacial (SEA)
 event_url: https://confit.atlas.jp/guide/event/sea2021/top
 location: Conferencia virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "15th World Conference of the Spatial Econometrics Association (SEA)"
+attendance: online
 summary:  XV Conferencia Mundial de la Asociación de Econometría Espacial (SEA)
 abstract: "Este artículo emplea un modelo de regresión geográficamente ponderada multiescala (MGWR) para examinar la variación espacial de la convergencia del ingreso regional en Indonesia. Este nuevo modelo MGWR ofrece un análisis multiescala de la heterogeneidad espacial. Dadas las grandes diferencias socioeconómicas, demográficas y geográficas entre las islas indonesias, los modelos basados en la heterogeneidad espacial probablemente proporcionen una evaluación más precisa y realista de un proceso de convergencia regional. La mayoría de los estudios previos ha ignorado en gran medida el papel de la heterogeneidad espacial. Por lo general, reportan una velocidad de convergencia común para todas las regiones subnacionales. En contraste, este artículo se aparta del supuesto de una velocidad de convergencia común y tiene como objetivo identificar múltiples conglomerados espaciales que caractericen la heterogeneidad del proceso de convergencia regional de Indonesia."
 

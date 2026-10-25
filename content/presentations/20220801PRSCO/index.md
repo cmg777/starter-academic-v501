@@ -4,6 +4,9 @@ subtitle: "A view from outer space"
 event: 27th Conference  of the Pacific Regional Science Conference Organisation 
 event_url: http://www.lst.hokkai-s-u.ac.jp/~soushi-s/prsco/
 location: Virtual Conference
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "27th Conference of the Pacific Regional Science Conference Organisation (PRSCO)"
+attendance: online
 summary:  27th Conference  of the Pacific Regional Science Conference Organisation 
 abstract: "Subnational measures of economic activity are fundamental for monitoring progress toward sustainable development within countries.  Nighttime lights  data from satellites are a useful proxy for monitoring local economic activity in developing countries where regionally disaggregated data are usually unavailable or unreliable. In this paper, we study the evolution of regional inequality across provinces in the Philippines using a novel dataset on nighttime lights that covers the 2000-2020 period. Specifically, we first construct a luminosity-based inequality index and document the evolution of regional inequality in the Philippines. Our results indicate that---on average---regional inequality across provinces has been decreasing. Next, through the lens of a nonlinear dynamic factor model, we test the hypothesis that inequality across all provinces would eventually converge to a common long-run equilibrium. We reject this hypothesis and find that---beyond the average---the provincial dynamics of inequality are characterized multiple local equilibria.  In particular, we identify two convergence clubs with largely separating trends. We conclude arguing that the reduction of regional inequality is still a central issue for the Philippines. In this regard, nighttime light data and club convergence analyses may prove useful for both monitoring and modeling regional development."
 

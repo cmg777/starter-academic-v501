@@ -4,6 +4,9 @@ title: "インドネシアにおける地域生産性、資本蓄積、効率の
 event: 2019年度 応用地域学会（ARSC）
 event_url: https://sites.google.com/view/arsc2019sagae
 location: 日本、佐賀、佐賀大学（本庄キャンパス）
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "2019 Applied Regional Science Conference (ARSC)"
+country: "日本"
 summary: 2019年度 応用地域学会（ARSC）
 abstract: "本稿は、1990年から2010年の期間におけるインドネシアの州間の労働生産性、資本蓄積、効率の地域格差の推移を研究します。非線形動学的因子モデルの観点から、すべての州が最終的に共通の定常状態経路に収束するという仮説を検証します。州間の労働生産性の動学は二つの収束クラブによって特徴づけられることがわかりました。労働生産性の近接的決定要因の動学は、いくつかの混合的な結果を示しています。一方で、物的資本と人的資本の蓄積は、それぞれ4つと2つの収束クラブによって特徴づけられます。他方で、効率は単一の収束クラブによって特徴づけられます。本稿は、各収束クラブの州構成に基づくと、地域格差を縮小し生産性成長を加速させるためには、資本蓄積と効率において依然としてかなりの改善が必要であることを示唆して結論づけます。"
 

@@ -1,0 +1,26 @@
+{{/*
+  Standardized talk line: DATE / EVENT / COUNTRY.
+  Returns a dict {date, datetime, event, place} for orbital-talks.html and
+  section/presentations.html, which each add their own separators.
+  - event:   `event_name` (official name, same in EN/ES/JA); falls back to `event`.
+  - place:   `country` (translated per language) plus an `attendance`
+             (online|hybrid) marker from i18n; a fully virtual talk with no
+             known host country shows just the online label.
+  - date:    day precision by default; `date_precision: month` drops the day.
+*/}}
+{{ $p := . }}
+{{ $ja := eq site.Language.Lang "ja" }}
+{{ $fmt := cond $ja "2006年1月2日" "2 Jan 2006" }}
+{{ if eq $p.Params.date_precision "month" }}{{ $fmt = cond $ja "2006年1月" "Jan 2006" }}{{ end }}
+{{ $place := "" }}
+{{ with $p.Params.country }}
+  {{ $place = . }}
+  {{ with $p.Params.attendance }}{{ $place = i18n (printf "talk_%s" .) (dict "Country" $place) }}{{ end }}
+{{ else }}
+  {{ with $p.Params.attendance }}{{ $place = i18n (printf "talk_%s_only" .) }}{{ end }}
+{{ end }}
+{{ return dict
+  "date" (time.Format $fmt $p.Date)
+  "datetime" ($p.Date.Format "2006-01-02")
+  "event" (trim ($p.Params.event_name | default $p.Params.event | default "") " ")
+  "place" $place }}

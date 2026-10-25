@@ -4,6 +4,10 @@ subtitle: "Un enfoque econométrico espacial"
 event: 34.ª Reunión Anual de la Conferencia de Ciencia Regional Aplicada (ARSC)
 event_url: https://sites.google.com/view/arsc2020en
 location: Conferencia virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "34th Annual Meeting of the Applied Regional Science Conference (ARSC)"
+country: "Japón"
+attendance: online
 summary:  34.ª Reunión Anual de la Conferencia de Ciencia Regional Aplicada (ARSC)
 abstract: "Utilizando un novedoso conjunto de datos del índice de desarrollo humano a nivel distrital, este artículo estudia la evolución de las disparidades regionales en Indonesia durante el período 2010-2018. En particular, el artículo evalúa el papel de la dependencia espacial en la velocidad de convergencia regional. Los principales hallazgos son tres. En primer lugar, las disparidades regionales han disminuido en el índice general de desarrollo humano, así como en la mayoría de sus componentes. En segundo lugar, existen diferencias considerables en la velocidad de convergencia de los componentes del índice de desarrollo humano. En concreto, los componentes relacionados con la educación han tendido a acelerar la velocidad de convergencia regional, mientras que los componentes de esperanza de vida y de gasto han tendido a desacelerarla. En tercer lugar, hay un grado creciente de dependencia espacial que se asocia con la disminución de las disparidades regionales. Asimismo, los resultados derivados de las regresiones de convergencia espacial indican que el desempeño de las regiones vecinas tiene un efecto significativo sobre la velocidad de convergencia regional."
 

@@ -2,8 +2,12 @@
 title: "Regional luminosity and economic activity in Java"
 subtitle: "What do the new satellite nighttime light data say?"
 event: 59th Annual Meeting of the Japan Section of the Regional Science Association International  
-event_url: https://ersa.eventsair.com/ersa2022/
+event_url: ""
 location: Japan/Virtual
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "59th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
+country: "Japan"
+attendance: hybrid
 summary:  59th Annual Meeting of the Japan Section of the Regional Science Association International  
 abstract: "Data from satellite nighttime images are increasingly being used in economics as a proxy for local economic activity.  This paper compares two newly available satellite nighttime images to predict GDP and regional inequality across  118 districts of Java over the 2013-2020 period.  An extended version of the popular DMSP night lights is compared with the newly released annual VIIRS night lights. The results of this comparison are three-fold. First, VIIRS luminosity is a better proxy for economic activity, especially when a quadratic term is added to the GDP-lights specification.  Second, in both data sets, luminosity performs better as a cross-sectional predictor rather than a time-series predictor.  Third, the DMSP luminosity underestimates regional inequality, while the VIIRS luminosity overestimates it. The paper concludes by arguing that additional caution is needed when using luminosity time series as proxy for short-run changes in economic activity."
 

@@ -5,6 +5,9 @@ slug: "gsid-ai-2026"
 event: "Seminario, Escuela de Posgrado en Desarrollo Internacional (GSID), Universidad de Nagoya"
 event_url: ""
 location: "Escuela de Posgrado en Desarrollo Internacional (GSID), Universidad de Nagoya, Japón"
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Seminar, Graduate School of International Development (GSID), Nagoya University"
+country: "Japón"
 summary: "Seminario en la GSID, Universidad de Nagoya: uso de la IA (NotebookLM, Google Colab y GitHub) para la ciencia de datos, la econometría y la investigación."
 abstract: "Este seminario presenta una forma práctica de usar la inteligencia artificial en la ciencia de datos, la econometría y la investigación. Comienza con el equilibrio entre producción y verificación: a medida que la IA hace que producir código, texto y resultados resulte casi gratuito, la restricción determinante se desplaza hacia la verificación. Luego presenta tres herramientas y la disciplina para usarlas bien: NotebookLM, que ancla la IA en sus propias fuentes para un aprendizaje protegido e interactivo; Google Colab, un cuaderno en la nube para explorar datos de forma interactiva con apoyo de IA; y GitHub, que vuelve la investigación asistida por IA transparente y auditable al cambiar la unidad de verificación a commits y diferencias (diffs) pequeños y revisables. El principio final es que la IA potencia el juicio humano en lugar de reemplazarlo: producir es barato, por lo que la verificación se convierte en la habilidad escasa."
 

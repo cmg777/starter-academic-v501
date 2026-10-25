@@ -42,6 +42,12 @@ Model bundles: `content/presentations/20260827ISEE/` (Canva link), `content/pres
 - **Front matter draft:** `title`, `subtitle`, `event`, `event_url`, `location` ("City, Country"),
   `date` (talk date; future dates are fine), `all_day: true`, `publishDate` (now or earlier — a future
   `publishDate` hides the talk), `authors: []`, `tags`, `featured: false`.
+- **List line fields** (homepage and `/presentations/` show `DATE / event_name / country`; see
+  `layouts/partials/functions/talk_meta.html`): `event_name` = official event name plus `(ACRONYM)` only if
+  a real acronym exists, no role or session (for a talk at an institution with no named event: type word
+  plus institution, e.g. "Seminar, Graduate School of International Development (GSID), Nagoya University");
+  `country` = full common name; `attendance: online|hybrid` only when not fully in person (omit `country`
+  when a virtual talk has no known host country); `date_precision: month` when the day is not yet known.
 - **Plain-language `summary:`** — general audience, at most two sentences, no acronyms or jargon. Also an
   `abstract:` (one paragraph, single-line YAML).
 - **Slides button and hosting:**
@@ -68,7 +74,7 @@ approved.
 ## Phase 4 — Translations, CV
 
 1. Follow `.claude/skills/translate-content/SKILL.md` for `presentations/<folder> --lang all` (title, subtitle, event description,
-   location, summary, abstract and body prose translated; URLs, dates, `featured`, `date_tba` copied
+   location, `country`, summary, abstract and body prose translated; `event_name`, `attendance`, URLs, dates, `featured`, `date_tba` copied
    byte-for-byte; `featured.jpg` copied; `slides.pdf` stays only in the EN bundle and the ES/JA buttons point
    to the EN absolute URL).
 2. Follow `.claude/skills/update-cv/SKILL.md` with `--section presentations` (confirm the city/country split; it inserts at the top of

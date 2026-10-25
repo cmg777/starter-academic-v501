@@ -4,6 +4,9 @@ subtitle: "地理空間ビッグデータ、開発経済学、空間計量経済
 event: "衛星データ応用講座、名古屋大学 宇宙地球環境研究所（ISEE）"
 event_url: https://coso.isee.nagoya-u.ac.jp/sero/course_2605.html
 location: 名古屋大学 宇宙地球環境研究所（ISEE）、名古屋、日本
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "Satellite Data Applications Course, Institute for Space-Earth Environmental Research (ISEE), Nagoya University"
+country: "日本"
 summary: 名古屋大学 宇宙地球環境研究所（ISEE）「衛星データ応用講座」における招待講義（日本語）。
 abstract: "開発の度合いは著しく不均一です — 生活水準の格差は国家間だけでなく国内にも存在し、こうした格差は数十年にわたって持続し、強固な地理空間パターンを形成することが少なくありません。本招待講義では、開発が「いつ」「どこで」「なぜ」生じるのか、そしてこうした格差をどのように測定し、予測し、説明できるのかを問います。地理空間ビッグデータ — とりわけ夜間光などの衛星画像 — を開発経済学および空間計量経済学と結びつけることで、開発の地理学を高い空間解像度で研究する新たな可能性が開かれることを示します。応用事例を交えながら、地球観測データが従来の社会経済統計を補完して地域開発をモニタリングできることを紹介し、衛星画像を経済学的な知見へと変換するための使いやすいツールとワークフローを解説します。"
 

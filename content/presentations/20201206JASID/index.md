@@ -4,6 +4,10 @@ subtitle: "A Club Convergence View from Outer Space Motivation"
 event: The 31st Annual Conference of the Japan Society for International Development
 event_url: https://www.jasidconference.org/2020annual-en
 location: Virtual Conference
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "31st Annual Conference of the Japan Society for International Development (JASID)"
+country: "Japan"
+attendance: online
 summary:  The 31st Annual Conference of the Japan Society for International Development
 abstract: "This paper studies the dynamics of national and subnational inequality in Africa. We exploit a novel satellite nighttime light dataset that allows us to measure and compare regional inequality across multiple countries and subnational regions over time. Specifically, we evaluate the spatio-temporal dynamics of a luminosity-based estimate of GDP per capita over the 1992-2012 period. Using a non-linear dynamic factor model, we test the hypothesis that all African nations and subnational regions would eventually converge to a common long-run equilibrium. Results indicate that although inequality across nations and subnational regions has decreased over time, African nations and subnational regions are not converging to a common long-run equilibrium. Indeed, Africa appears to be characterized by four convergence clubs at both national and subnational levels. The paper concludes suggesting that development policies need to be addressed in the context of the identified convergence clubs."
 

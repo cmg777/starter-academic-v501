@@ -4,6 +4,10 @@ subtitle: "衛星夜間光の処理と分析のためのPythonノートブック
 event: 第62回欧州地域科学協会大会（ERSA）
 event_url: https://ersa.eventsair.com/ersa2023
 location: スペイン、アリカンテおよびオンライン
+# Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
+event_name: "62nd Congress of the European Regional Science Association (ERSA)"
+country: "スペイン"
+attendance: hybrid
 summary:  第62回欧州地域科学協会大会（ERSA）
 abstract: "夜間光（NTL）データは、国・サブナショナル・スープラナショナルの経済活動をモニタリングするための有用な代理指標として広く認識されています。これらのデータは、GDPのような従来の経済指標と比べて、より高い空間的粒度、適時性、低コスト、そして統計能力や政治的干渉にかかわらず地域間で比較可能であることといった利点を備えています。しかし、こうした利点があるにもかかわらず、地域科学におけるNTLデータの利用は限られてきました。これは一つには、衛星画像を処理・分析するための利用しやすい手法が不足していることに起因します。この問題に対処するため、本論文では、衛星のNTL画像を処理・分析する方法を示す、使いやすい地理計算ノートブックを提示します。まず、ノートブックはラスタ衛星画像を可視化・分析し、表形式データへと変換するためのクラウドベースのPython環境を紹介します。次に、表形式化されたデータの時空間パターンを探索するためのインタラクティブなツールを提示します。最後に、NTLデータの有用性を、横断面予測、時系列予測、地域格差の動学の観点から評価する手法を説明します。"
 
