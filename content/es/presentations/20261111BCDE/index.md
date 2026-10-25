@@ -2,16 +2,17 @@
 title: "Predecir y monitorizar el desarrollo local desde el espacio"
 subtitle: "Evidencia de los municipios de Bolivia"
 slug: "local-development-outer-space"
-event: "Presentación en conferencia — sede y fecha por anunciar (2026)"
-event_url: ""
-location: "Por anunciar"
+event: "Conferencia Boliviana de Economía del Desarrollo 2026 (BCDE), Sesión F2: Pronóstico y Métodos Espaciales"
+event_url: "https://bcde2026.sebol.org/"
+location: "Universidad Privada Boliviana (UPB), La Paz, Bolivia"
 summary: "Predicción de quince índices de los ODS para los 339 municipios de Bolivia a partir de las luces nocturnas y de los embeddings diurnos de AlphaEarth, y combinación de ambas vistas satelitales para monitorizar los clústeres locales de desarrollo y las trampas espaciales de desarrollo."
 abstract: "Las imágenes satelitales son un instrumento moderno para predecir y monitorizar el desarrollo sostenible a escalas locales en zonas con escasez de datos. A partir de datos satelitales de reciente publicación, este artículo predice primero quince índices de los Objetivos de Desarrollo Sostenible (ODS) desde dos vistas satelitales: las ya consolidadas luces nocturnas (NTL) y los nuevos embeddings diurnos de AlphaEarth. Para los 339 municipios de Bolivia, un modelo de random forest ajustado mediante optimización bayesiana evalúa la capacidad predictiva de cada vista. Al agregarse sobre los lugares donde vive la población, los embeddings diurnos predicen la mayoría de los objetivos de desarrollo con mayor precisión que las luces nocturnas. No obstante, las luces nocturnas siguen siendo una referencia sólida y de bajo costo, y son las que más se acercan a los embeddings en los objetivos de infraestructura y desarrollo urbano. A continuación, el artículo combina las dos vistas satelitales para monitorizar los patrones locales del desarrollo regional. Los análisis de dependencia espacial muestran que el predictor combinado permite monitorizar los clústeres locales de desarrollo y las trampas espaciales de desarrollo mejor que la referencia basada en luces nocturnas. En conjunto, estos hallazgos sugieren que combinar vistas satelitales puede ayudar a orientar los recursos escasos hacia los lugares que más los necesitan."
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
-date: "2026-12-31T00:00:00Z"
-all_day: true
+date: "2026-11-11T15:30:00-04:00"
+date_end: "2026-11-11T17:00:00-04:00"
+all_day: false
 
 # Schedule page publish date (NOT talk date).
 publishDate: "2026-07-30T00:00:00Z"
@@ -28,7 +29,7 @@ image:
 
 links:
 url_code: ""
-url_pdf: ""
+url_pdf: "https://carlos-mendez.org/presentations/local-development-outer-space/slides.pdf"
 url_slides: "https://quarcs-lab.github.io/project2026e-slides/"
 url_video: ""
 

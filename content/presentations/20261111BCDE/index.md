@@ -2,16 +2,17 @@
 title: "Predicting and monitoring local development from outer space"
 subtitle: "Evidence from the Bolivian municipalities"
 slug: "local-development-outer-space"
-event: "Conference presentation — venue and date to be announced (2026)"
-event_url: ""
-location: "To be announced"
+event: "Bolivian Conference on Development Economics 2026 (BCDE), Session F2: Forecasting and Spatial Methods"
+event_url: "https://bcde2026.sebol.org/"
+location: "Universidad Privada Boliviana (UPB), La Paz, Bolivia"
 summary: "Predicting fifteen SDG indices for 339 Bolivian municipalities from nighttime lights and AlphaEarth daytime embeddings, and combining both satellite views to monitor local development clusters and spatial development traps."
 abstract: "Satellite imagery is a modern instrument for predicting and monitoring sustainable development at local scales in data-poor areas. Using newly released satellite data, this article first predicts fifteen Sustainable Development Goal (SDG) indices from two satellite views: the long-standing nighttime lights and the new AlphaEarth daytime embeddings. For 339 Bolivian municipalities, a Bayesian-tuned random forest model evaluates the predictive power of each view. Aggregated over where people live, daytime embeddings predict most development goals more accurately than nighttime lights. Nevertheless, nighttime lights remain a strong, low-cost baseline, coming closest to the embeddings for the infrastructure and urban development goals. Next, the article combines the two satellite views to monitor local patterns of regional development. Spatial-dependence analyses show that the combined predictor can monitor local development clusters and spatial development traps better than the nighttime-lights baseline. Together, these findings suggest that combining satellite views can help target scarce resources toward the places that need them most."
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
-date: "2026-12-31T00:00:00Z"
-all_day: true
+date: "2026-11-11T15:30:00-04:00"
+date_end: "2026-11-11T17:00:00-04:00"
+all_day: false
 
 # Schedule page publish date (NOT talk date).
 publishDate: "2026-07-30T00:00:00Z"
@@ -28,7 +29,7 @@ image:
 
 links:
 url_code: ""
-url_pdf: ""
+url_pdf: "https://carlos-mendez.org/presentations/local-development-outer-space/slides.pdf"
 url_slides: "https://quarcs-lab.github.io/project2026e-slides/"
 url_video: ""
 

@@ -2,16 +2,17 @@
 title: "宇宙から地域開発を予測・モニタリングする"
 subtitle: "ボリビアの自治体からのエビデンス"
 slug: "local-development-outer-space"
-event: "学会報告 — 開催地・日程は未定（2026年）"
-event_url: ""
-location: "未定"
+event: "2026年 ボリビア開発経済学会議（BCDE）、セッションF2：予測と空間分析手法"
+event_url: "https://bcde2026.sebol.org/"
+location: "ボリビア私立大学（UPB）、ラパス、ボリビア"
 summary: "夜間光（NTL）と AlphaEarth の日中の衛星埋め込みから、ボリビアの339自治体について15のSDGs指標を予測し、さらに両方の衛星の視点を組み合わせて、地域開発の局所的なクラスターと空間的な開発の罠をモニタリングします。"
 abstract: "衛星画像は、データが乏しい地域において、持続可能な開発を局所的なスケールで予測・モニタリングするための現代的な手段です。本稿では、新たに公開された衛星データを用いて、まず2つの衛星の視点から15の持続可能な開発目標（SDGs）指標を予測します。すなわち、長年利用されてきた夜間光（NTL）と、新しい AlphaEarth の日中の衛星埋め込みです。ボリビアの339自治体を対象に、ベイズ最適化でチューニングしたランダムフォレストモデルによって、それぞれの視点の予測力を評価します。人々が実際に居住している場所で集計すると、日中の衛星埋め込みは、ほとんどの開発目標について夜間光よりも高い精度で予測します。とはいえ、夜間光は依然として低コストで有力なベースラインであり、インフラおよび都市開発の目標では衛星埋め込みに最も近い精度を示します。次に本稿では、2つの衛星の視点を組み合わせて、地域開発の局所的なパターンをモニタリングします。空間的依存性の分析からは、組み合わせた予測値が、夜間光のベースラインよりも、局所的な開発クラスターと空間的な開発の罠をうまくモニタリングできることが示されます。これらの結果を総合すると、衛星の視点を組み合わせることによって、限られた資源を最も必要としている場所に向けやすくなることが示唆されます。"
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
-date: "2026-12-31T00:00:00Z"
-all_day: true
+date: "2026-11-11T15:30:00-04:00"
+date_end: "2026-11-11T17:00:00-04:00"
+all_day: false
 
 # Schedule page publish date (NOT talk date).
 publishDate: "2026-07-30T00:00:00Z"
@@ -28,7 +29,7 @@ image:
 
 links:
 url_code: ""
-url_pdf: ""
+url_pdf: "https://carlos-mendez.org/presentations/local-development-outer-space/slides.pdf"
 url_slides: "https://quarcs-lab.github.io/project2026e-slides/"
 url_video: ""
 
