@@ -8,7 +8,7 @@ date: "2026-10-11T00:00:00Z"
 publishDate: "2026-10-11T00:00:00Z"
 doi: "10.18335/region.v13i2.676"
 publication_types: ["2"]
-publication: "*REGION*, 13(2), 173–196"
+publication: "*REGION*"
 publication_short: "REGION"
 abstract: "Utilizando datos satelitales de luces nocturnas como indicador aproximado de la actividad económica, Chanda y Kabiraj (2020, World Development) estudiaron el crecimiento regional y la convergencia en 520 distritos de India. Mediante un enfoque reproducible de ciencia abierta, este artículo amplía sus principales hallazgos en tres frentes empíricos. Primero, ilustramos los patrones de convergencia regional con una herramienta interactiva de visualización de imágenes satelitales. Segundo, evaluamos el grado de dependencia espacial en su principal especificación econométrica. Tercero, empleamos un modelo espacial de Durbin para medir el papel de los efectos de desbordamiento espacial en el proceso de convergencia. Nuestros resultados indican que estos efectos aumentan la velocidad estimada de convergencia regional. En nuestro modelo con la especificación completa, los desbordamientos elevan la velocidad de convergencia de aproximadamente 3,0 % a aproximadamente 5,2 % anual, lo que reduce el tiempo necesario para cerrar la mitad de las disparidades regionales de unos 23 a 13 años. Concluimos mostrando cómo el mismo flujo de trabajo reproducible se extiende más allá de la producción económica, mediante un análisis exploratorio de la relación entre luminosidad y participación cultural en los estados de India."
 summary: "Las luces nocturnas satelitales muestran cómo los distritos más pobres de India acortan las brechas. Considerar las conexiones entre distritos vecinos eleva el ritmo estimado de convergencia y reduce de unos 23 a 13 años el tiempo necesario para cerrar la mitad de la brecha."
@@ -94,6 +94,6 @@ El [repositorio de GitHub](https://github.com/quarcs-lab/project2025s-py) contie
 
 ## Publicación y fuentes de la imagen
 
-Carlos Mendez, Sujana Kabiraj y Jiaqi Li (2026). “Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space”. *REGION*, **13**(2), 173–196. Publicado el 11 de octubre de 2026. [DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676).
+Carlos Mendez, Sujana Kabiraj y Jiaqi Li (2026). “Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space”. *REGION*. Publicado el 11 de octubre de 2026. [DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676).
 
 La infografía reproduce el [mapa de luminosidad de la Figura 1](https://quarcs-lab.github.io/project2025s-py/images/luminosity_map.png) de los autores y representa los valores del Modelo 4 publicados en el Cuadro 3. El mapa conserva sus colores, geografía y escala originales; el diseño que lo rodea y el gráfico comparativo son nuevos. Artículo y mapa fuente: Mendez, Kabiraj y Li (2026), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

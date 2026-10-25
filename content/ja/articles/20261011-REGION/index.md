@@ -8,7 +8,7 @@ date: "2026-10-11T00:00:00Z"
 publishDate: "2026-10-11T00:00:00Z"
 doi: "10.18335/region.v13i2.676"
 publication_types: ["2"]
-publication: "*REGION*, 13(2), 173–196"
+publication: "*REGION*"
 publication_short: "REGION"
 abstract: "ChandaとKabiraj（2020, World Development）は、衛星夜間光データを経済活動の代理指標として用い、インドの520地区における地域成長と収束を研究しました。本論文は、再現可能なオープンサイエンスのアプローチに基づき、その主要な知見を実証面の三つの方向に拡張します。第一に、衛星画像のインタラクティブな可視化ツールを用いて地域収束のパターンを示します。第二に、先行研究の主要な計量経済モデルにおける空間的依存の程度を評価します。第三に、空間ダービンモデルを用いて、収束過程における空間的波及効果の役割を測定します。分析結果は、空間的波及効果を考慮すると地域収束の推定速度が高まることを示しています。すべての要素を含むモデルでは、波及効果によって収束速度が年率約3.0%から約5.2%に上昇し、地域格差の半減期が約23年から13年に短縮されます。最後に、インドの州における光の明るさと文化活動への参加の関係を探索的に分析し、同じ再現可能なワークフローが経済産出以外にも適用できることを示します。"
 summary: "衛星夜間光から、インドの貧しい地区がどのように格差を縮めるかを調べます。近隣地区とのつながりを考慮すると推定される収束速度が高まり、格差の半分を縮めるために必要な期間は約23年から13年になります。"
@@ -94,6 +94,6 @@ image:
 
 ## 出版情報と画像の出典
 
-Carlos Mendez、Sujana Kabiraj、Jiaqi Li（2026）。“Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space.” *REGION*, **13**(2), 173–196。2026年10月11日公開。[DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676)。
+Carlos Mendez、Sujana Kabiraj、Jiaqi Li（2026）。“Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space.” *REGION*。2026年10月11日公開。[DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676)。
 
 インフォグラフィックは、著者による[図1の夜間光地図](https://quarcs-lab.github.io/project2025s-py/images/luminosity_map.png)を再掲し、表3のモデル4の公表値をグラフにしています。地図の色、地理、尺度は原図を維持し、その周囲のレイアウトと比較グラフを新たに作成しました。論文と元の地図：Mendez、Kabiraj、Li（2026）、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。

@@ -8,7 +8,7 @@ date: "2026-10-11T00:00:00Z"
 publishDate: "2026-10-11T00:00:00Z"
 doi: "10.18335/region.v13i2.676"
 publication_types: ["2"]
-publication: "*REGION*, 13(2), 173–196"
+publication: "*REGION*"
 publication_short: "REGION"
 abstract: "Using satellite nighttime light data as a proxy for economic activity, Chanda and Kabiraj (2020, World Development) studied regional growth and convergence across 520 districts in India. Adopting a reproducible open-science approach, this article builds on their work by extending their main findings on three empirical fronts. First, we illustrate regional convergence patterns using an interactive tool for satellite imagery visualization. Second, we assess the degree of spatial dependence in their main econometric specification. Third, we employ a spatial Durbin model to measure the role of spatial spillovers in the convergence process. Our results indicate that spatial spillovers increase the estimated speed of regional convergence. In our fully specified model, spillovers raise the convergence speed from about 3.0% to about 5.2% per year, which shortens the half-life of regional disparities from roughly 23 to 13 years. We close by illustrating how the same reproducible workflow extends beyond economic output, with an exploratory analysis of how luminosity relates to cultural participation across Indian states."
 summary: "Satellite nighttime lights reveal how poorer districts in India catch up. Accounting for connections between neighboring districts raises the estimated pace of catch-up and shortens the time needed to close half the gap from about 23 to 13 years."
@@ -94,6 +94,6 @@ The [GitHub repository](https://github.com/quarcs-lab/project2025s-py) contains 
 
 ## Publication and image sources
 
-Carlos Mendez, Sujana Kabiraj, and Jiaqi Li (2026). “Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space.” *REGION*, **13**(2), 173–196. Published October 11, 2026. [DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676).
+Carlos Mendez, Sujana Kabiraj, and Jiaqi Li (2026). “Regional growth, convergence, and spatial spillovers in India: A reproducible view from outer space.” *REGION*. Published October 11, 2026. [DOI: 10.18335/region.v13i2.676](https://doi.org/10.18335/region.v13i2.676).
 
 The infographic reproduces the authors' [Figure 1 luminosity map](https://quarcs-lab.github.io/project2025s-py/images/luminosity_map.png) and plots the reported Model 4 values from Table 3. The map retains its original colors, geography, and scale; the surrounding layout and comparison chart are new. Article and source map: Mendez, Kabiraj, and Li (2026), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
