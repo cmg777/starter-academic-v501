@@ -7,7 +7,7 @@ location: Kyoto Garden Palace, Kioto, Japón
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "International Workshop “Transdisciplinary Approaches to Good Governance”, Center for Southeast Asian Studies (CSEAS), Kyoto University"
 country: "Japón"
-summary: Taller Internacional «Enfoques transdisciplinarios para el buen gobierno»
+summary: "Mesa redonda en un taller sobre enfoques interdisciplinarios de la buena gobernanza, centrada en el sistema 5D World Map."
 abstract: ""
 
 # Talk start and end times.

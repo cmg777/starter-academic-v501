@@ -6,7 +6,7 @@ location: Universidad de Tokio (Campus Komaba), Tokio, Japón
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "2019 International Joint Conference of JAHSS and JASID"
 country: "Japón"
-summary: Conferencia Conjunta Internacional 2019 de JAHSS y JASID
+summary: "Cómo evolucionaron entre 1980 y 2014 las diferencias de productividad entre 20 países de América Latina. En lugar de alcanzarse entre sí, los países se dividen en varios grupos separados."
 abstract: "Existe una literatura creciente que destaca que el potencial de desarrollo de América Latina está fuertemente limitado por su baja productividad. En este contexto, este artículo evalúa las diferencias de productividad entre 20 países latinoamericanos durante el período 1980-2014. A través de la óptica de un modelo de factores dinámicos no lineal, este artículo encuentra que la dinámica de la productividad de América Latina parece caracterizarse por una falta de convergencia general y la formación de múltiples clubes de convergencia locales. Dos indicadores de uso común respaldan estos hallazgos. Por un lado, la dinámica de la productividad laboral sugiere la formación de cuatro clubes de países. Por otro, la dinámica de la productividad total de los factores sugiere la formación de tres clubes. Resulta interesante que, en ambos indicadores, es el club de menor productividad el que diverge del resto a mayor velocidad. En conjunto, estos resultados indican que, ocultos tras la baja productividad promedio de América Latina, existen focos de heterogeneidad que deben abordarse para mejorar tanto la cohesión económica como la competitividad en la región."
 
 # Talk start and end times.

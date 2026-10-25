@@ -6,7 +6,7 @@ location: Tokyo, Japan
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Workshop on Poverty Impact and Vulnerability Estimator System Solutions, Asian Development Bank Institute (ADBI)"
 country: "Japan"
-summary:  Workshop of the Asian Development Bank Institute    
+summary: "How satellite images, both at night and by day, combined with surveys and maps can reveal development gaps within countries. Together, these sources help predict and understand poverty at many scales."
 abstract: "This presentation examines the use of satellite images to understand and predict economic activities.  Beyond nighttime lights, significant development gaps within countries are observable through satellite data. The integration of large-scale geospatial data, including daytime images and GIS layers, enhances our understanding of poverty across multiple dimensions and scales. The combination of survey data with satellite imagery provides a more comprehensive tool for predicting and understanding economic development."
 
 # Talk start and end times.

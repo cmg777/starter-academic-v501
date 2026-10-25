@@ -6,7 +6,7 @@ location: 日本、東京
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Workshop on Poverty Impact and Vulnerability Estimator System Solutions, Asian Development Bank Institute (ADBI)"
 country: "日本"
-summary:  アジア開発銀行研究所（ADBI）ワークショップ    
+summary: "夜間と昼間の衛星画像を調査データや地図と組み合わせることで、国内の開発格差をどのように明らかにできるかを紹介します。これらのデータを組み合わせることで、さまざまなスケールで貧困を予測し理解することができます。"
 abstract: "本発表では、経済活動を理解し予測するための衛星画像の活用について検討します。夜間光にとどまらず、衛星データは各国内に存在する重要な発展の格差を観測することを可能にします。日中の画像やGISレイヤーを含む大規模な地理空間データを統合することで、複数の次元やスケールにわたる貧困への理解が向上します。調査データと衛星画像を組み合わせることで、経済発展を予測し理解するためのより包括的なツールが得られます。"
 
 # Talk start and end times.

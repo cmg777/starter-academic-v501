@@ -8,7 +8,7 @@ location: Virtual Conference
 event_name: "19th International Conference of the Japan Economic Policy Association (JEPA)"
 country: "Japan"
 attendance: online
-summary:  The 19th International Conference of the Japan Economic Policy Association
+summary: "How income gaps across Indonesian districts evolved between 2000 and 2017, using new district-level data. Districts form five separate groups, so income gaps persisted even after the country decentralized government."
 
 abstract: "This paper aims to re-examine the regional convergence hypothesis on income in Indonesia over the 2000-2017 period. By applying a non-linear dynamic factor model, this paper tests the club convergence hypothesis using a novel dataset of income at the district level. The results show significant five convergence clubs in Indonesian districts’ income dynamics, implying the persistence of income disparity problems across districts even after implementing the decentralization policy. The subsequent analysis reveals two appealing features regarding the convergence clubs. First, districts belonging to the same province tend to be in the same club, and second, districts with specific characteristics (i.e., big cities or natural resources-rich regions) dominate the highest income club. Overall, our findings suggest some insightful policy implications, including the importance of differentiated development policies across convergence clubs and inter-provincial development strategies."
 

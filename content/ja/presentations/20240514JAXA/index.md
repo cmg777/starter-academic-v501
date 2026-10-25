@@ -7,7 +7,7 @@ location: 日本、東京、X-NIHONBASHI
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Satellite Data × Social Studies Workshop, Japan Aerospace Exploration Agency (JAXA)"
 country: "日本"
-summary:  JAXA主催 衛星データ×経済社会学　ワークショップ
+summary: "公式データが乏しい国々で、衛星画像、世帯調査、機械学習を組み合わせて地域開発を追跡する方法を紹介します。調査の費用が高く実施が難しい地域でも、持続可能な開発目標の進捗をモニタリングできるようになります。"
 abstract: "従来のデータ源が限られている国における地域開発のモニタリングは、持続可能な開発目標の達成状況を追跡するうえで大きな障害となります。標準的な手法は社会経済調査に大きく依存していますが、調査は貧しいサブナショナル地域においては費用がかかり、実施が困難な場合があります。本発表では、地球観測データ、社会経済調査、および機械学習の手法を統合することで、こうした課題をどのように軽減できるかを示します。"
 
 # Talk start and end times.

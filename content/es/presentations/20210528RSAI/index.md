@@ -7,7 +7,7 @@ location: Conferencia virtual
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "13th World Congress of the Regional Science Association International (RSAI)"
 attendance: online
-summary:  13.º Congreso Mundial de la Asociación Internacional de Ciencia Regional (RSAI)
+summary: "Muestra que las regiones de Indonesia no se ponen al día a la misma velocidad, con un método que permite que el ritmo varíe de un lugar a otro. Esto ofrece una imagen más realista de las brechas regionales entre las numerosas islas del país."
 abstract: "Este artículo emplea un modelo de regresión geográficamente ponderada multiescala (MGWR) para examinar la variación espacial de la convergencia del ingreso regional en Indonesia. Este nuevo modelo MGWR ofrece un análisis multiescala de la heterogeneidad espacial. Dadas las grandes diferencias socioeconómicas, demográficas y geográficas entre las islas indonesias, los modelos basados en la heterogeneidad espacial probablemente proporcionen una evaluación más precisa y realista de un proceso de convergencia regional. La mayoría de los estudios previos ha ignorado en gran medida el papel de la heterogeneidad espacial. Por lo general, reportan una velocidad de convergencia común para todas las regiones subnacionales. En contraste, este artículo se aparta del supuesto de una velocidad de convergencia común y tiene como objetivo identificar múltiples conglomerados espaciales que caractericen la heterogeneidad del proceso de convergencia regional de Indonesia."
 
 # Talk start and end times.

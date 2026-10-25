@@ -7,7 +7,7 @@ location: En línea
 event_name: "Keynote and Master Class, Universidad de Huelva"
 country: "España"
 attendance: online
-summary: "Conferencia magistral y clase magistral, Universidad de Huelva, España"
+summary: "Conferencia magistral y clase maestra sobre cómo la inteligencia artificial está transformando la econometría aplicada y la investigación empírica. Combina la teoría econométrica con la computación en la nube, notebooks de Python reproducibles y herramientas de inteligencia artificial para el aprendizaje y la investigación."
 abstract: "Conferencia magistral y clase magistral impartidas en línea para la Universidad de Huelva (España) sobre cómo la econometría aplicada y la investigación empírica están evolucionando en la era de la inteligencia artificial. La sesión integra la teoría econométrica con la computación en la nube, cuadernos de Python reproducibles y herramientas asistidas por IA para el aprendizaje y la investigación, a partir del recurso de acceso abierto Econometrics Powered by AI."
 
 # Talk start and end times.

@@ -7,7 +7,7 @@ location: Ritsumeikan University, Osaka Prefecture, Japan
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies (PAPAIOS)"
 country: "Japan"
-summary: The 3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies
+summary: "How much economic output each Japanese prefecture produces per unit of carbon emissions, and how this changed between 1992 and 2008. A broader efficiency measure reveals at least two groups of prefectures moving apart, which a simpler measure misses."
 abstract: "This presentation is about environmental efficiency convergence across the prefectures of Japan over the 1992-2008 period. Using a novel nonparametric density estimation clustering framework, two alternative indicators of environmental efficiency are contrasted: a conventional indicator, based on the ratio of gross regional product to CO2 emissions, and a more comprehensive indicator, based on the data envelopment analysis (DEA) model. Results show, on the one hand, a lack of intra-distributional mobility and potentially a unique convergence cluster when using the more conventional indicator. On the other hand, large backward mobility and at least two convergence clusters are identified when using the DEA-based indicator of environmental efficiency. The paper concludes arguing the importance of accounting for production inputs, as they appear to be driving the formation of regional convergence clusters in Japan."
 
 # Talk start and end times.

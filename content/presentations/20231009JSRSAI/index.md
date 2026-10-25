@@ -7,7 +7,7 @@ location: Nagoya, Japan
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "60th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
 country: "Japan"
-summary:  60th (2023) Meeting of the Japan Section of Regional Science Association International 
+summary: "Uses satellite images of lights at night to study how economic activity grows across regions of Java, Indonesia, from 2013 to 2020. Technology and skills spill over between neighboring regions, so education in one place also benefits its neighbors."
 abstract: "Luminosity at night is a well-known proxy for measuring local economic activity. This paper studies the space-time dynamics of regional luminosity through the lens a spatial Solow growth model. The model accounts for cross-regional technological interdependence, which is assumed to operate through geospatial externalities. By exploiting new nighttime light images for Java (Indonesia) over the 2013-2020 period, our results show that technological interdependence plays an important role in explaining regional output. Unlike non-spatial models, results from a spatial panel Durbin model reveal that human capital has both direct and indirect (spillover) effects on regional output. Moreover, accounting for technological interdependence yields a greater positive effect of physical capital and a smaller negative effect of labor force growth. Overall, our results highlight the importance of using both nighttime light images and spatial econometrics for understanding regional economic growth."
 
 # Talk start and end times.

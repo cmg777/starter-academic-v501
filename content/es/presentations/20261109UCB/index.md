@@ -1,19 +1,18 @@
 ---
-title: "Sustainable Development, Space Technology, and Data Science"
-event: "Invited lecture, Universidad Católica Boliviana \"San Pablo\", La Paz"
+title: "Desarrollo sostenible, tecnología espacial y ciencia de datos"
+event: "Conferencia invitada, Universidad Católica Boliviana \"San Pablo\", La Paz"
 event_url: ""
 location: Universidad Católica Boliviana "San Pablo", La Paz, Bolivia
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Invited lecture, Universidad Católica Boliviana \"San Pablo\" (UCB)"
 country: "Bolivia"
-date_precision: month
-summary: "Invited lecture (in Spanish) on how satellite imagery and spatial data science can measure, predict, and explain uneven development."
-abstract: "Development is strikingly uneven — disparities in living standards appear not only across countries but within them, and these gaps often persist over decades to form robust geospatial patterns. This invited lecture asks when, where, and why development happens, and how such disparities can be measured, predicted, and explained. It shows how the convergence of geospatial big data — especially satellite imagery such as nighttime lights — with development economics and spatial econometrics opens new opportunities to study the geography of development at fine spatial resolution. Drawing on applied examples, the lecture illustrates how earth observation data can complement traditional socioeconomic statistics to monitor regional development, and it highlights accessible tools and workflows for turning satellite images into economic insight."
+summary: "Conferencia invitada (en español) sobre cómo las imágenes satelitales y la ciencia de datos espaciales permiten medir, predecir y explicar el desarrollo desigual."
+abstract: "El desarrollo es notablemente desigual — las disparidades en los niveles de vida aparecen no solo entre países, sino también dentro de ellos, y estas brechas suelen persistir durante décadas hasta formar patrones geoespaciales robustos. Esta conferencia invitada se pregunta cuándo, dónde y por qué ocurre el desarrollo, y cómo se pueden medir, predecir y explicar esas disparidades. Muestra cómo la convergencia de los macrodatos geoespaciales — en particular las imágenes satelitales, como las luces nocturnas — con la economía del desarrollo y la econometría espacial abre nuevas oportunidades para estudiar la geografía del desarrollo con alta resolución espacial. A partir de ejemplos aplicados, la conferencia ilustra cómo los datos de observación de la Tierra pueden complementar las estadísticas socioeconómicas tradicionales para monitorear el desarrollo regional, y destaca herramientas y flujos de trabajo accesibles para convertir las imágenes satelitales en conocimiento económico."
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
-date: "2026-11-01T00:00:00Z"
-all_day: true
+date: "2026-11-09T18:00:00-04:00"
+all_day: false
 
 # Schedule page publish date (NOT talk date).
 publishDate: "2026-09-12T00:00:00Z"
@@ -58,19 +57,19 @@ math: false
     src="https://www.canva.com/design/DAHU8dyn5fU/DLPqJS8GALh_CPSH8pPOWQ/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="https://carlos-mendez.my.canva.site/quarcs-intro-esp" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
+<a href="https://carlos-mendez.my.canva.site/quarcs-intro-esp" target="_blank" rel="noopener">Diapositivas</a> por Carlos Mendez
 
-The exact venue and time will be announced soon.
+La sede exacta y el horario se anunciarán próximamente.
 
-## Nagoya University and The Graduate School of International Development (GSID): An Overview by Leonardo Soto
+## Universidad de Nagoya y la Escuela de Posgrado en Desarrollo Internacional (GSID): una presentación general por Leonardo Soto
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
   <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https://www.youtube.com/embed/10-41DdeI8k" title="Nagoya University and The Graduate School of International Development (GSID): An Overview by Leonardo Soto"
+    src="https://www.youtube.com/embed/10-41DdeI8k" title="Universidad de Nagoya y la Escuela de Posgrado en Desarrollo Internacional (GSID): una presentación general por Leonardo Soto"
     allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
   </iframe>
 </div>
-<a href="https://youtu.be/10-41DdeI8k" target="_blank" rel="noopener">Open in YouTube</a>
+<a href="https://youtu.be/10-41DdeI8k" target="_blank" rel="noopener">Abrir en YouTube</a>

@@ -7,7 +7,7 @@ location: Nanzan University, Nagoya City, Japan
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "2019 Spring Conference of the Japan Association of Applied Economics (JAAE)"
 country: "Japan"
-summary: The 2019 Spring Conference of the Japanese Association of Applied Economics
+summary: "Whether Indonesian provinces became more alike in how efficiently they turn resources into output between 1990 and 2010. On average they did, but one type of efficiency splits the provinces into two separate groups."
 abstract: "This presentation is about efficiency convergence across provinces in Indonesia over the 1990-2010 period. Through the lens of both classical and distributional convergence frameworks, the dispersion dynamics of pure technical efficiency and scale efficiency are contrasted. The results suggest that—on average—there is regional convergence in both measures of efficiency. However, results from the distributional framework indicate the existence of two separate convergence clusters within the pure technical efficiency distribution. Thus, since scale efficiency is characterized by only one convergence cluster, the two clusters of pure technical efficiency appear to be driving the overall efficiency dynamics of Indonesia."
 
 # Talk start and end times.

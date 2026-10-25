@@ -8,7 +8,7 @@ location: Alicante Spain and Virtual
 event_name: "62nd Congress of the European Regional Science Association (ERSA)"
 country: "Spain"
 attendance: hybrid
-summary:  62nd Congress  of the European Regional Science Association   
+summary: "Tests whether faster economic growth lowers unemployment across 514 districts of Indonesia from 2011 to 2020. Once the link is measured carefully, the effect appears only in the more industrialized western regions."
 abstract: "This paper investigates the regional Okun's law across 514 districts of Indonesia over the 2011-2020 period. To handle the endogeneity issue of the econometric specification, we apply a two-stage least squares (2SLS) model and use regional temperature as instrumentfor economic growth. Our results show that the Okun's coefficient becomes statistically significant only after endogeneity is addressed. Consistent with the prevalent economic divide between the western and eastern regions of Indonesia, we find that Okun's law applies solely to the more industrialized western regions"
 
 # Talk start and end times.

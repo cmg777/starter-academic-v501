@@ -7,7 +7,7 @@ location: オンライン開催
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "13th World Congress of the Regional Science Association International (RSAI)"
 attendance: online
-summary:  地域科学協会国際機構（RSAI）第13回世界大会
+summary: "地域ごとに速さが異なることを許容する手法を用いて、インドネシアの各地域が同じ速さで追いついているわけではないことを示します。これにより、多くの島々からなるこの国の地域格差をより現実的に捉えられます。"
 abstract: "本稿は、マルチスケール地理的加重回帰（MGWR）モデルを用いて、インドネシア全体にわたる地域所得収束の空間的変動を検討します。この新たなMGWRモデルは、空間的異質性のマルチスケール分析を提供します。インドネシアの島々の間には社会経済的、人口統計学的、地理的に大きな差異があることを踏まえると、空間的異質性に基づくモデルは、地域収束プロセスについてより正確で現実的な評価を提供する可能性が高いといえます。従来の研究の多くは、空間的異質性の役割を概ね無視してきました。それらは通常、すべてのサブナショナル地域について共通の収束速度を報告します。これに対して本稿は、共通の収束速度という仮定から離れ、インドネシアの地域収束プロセスの異質性を特徴づける複数の空間クラスターを特定することを目指します。"
 
 # Talk start and end times.

@@ -7,7 +7,7 @@ location: Online
 event_name: "Keynote and Master Class, Universidad de Huelva"
 country: "Spain"
 attendance: online
-summary: "Keynote & Master Class, Universidad de Huelva, Spain"
+summary: "A keynote and master class on how artificial intelligence is changing applied econometrics and empirical research. It combines econometric theory with cloud computing, reproducible Python notebooks, and tools powered by artificial intelligence for learning and research."
 abstract: "A keynote lecture and master class delivered online for the University of Huelva (Spain) on how applied econometrics and empirical research are evolving in the age of artificial intelligence. The session integrates econometric theory with cloud-based computation, reproducible Python notebooks, and AI-assisted tools for learning and research, drawing on the open-access resource Econometrics Powered by AI."
 
 # Talk start and end times.

@@ -8,7 +8,7 @@ location: Alicante, España, y virtual
 event_name: "62nd Congress of the European Regional Science Association (ERSA)"
 country: "España"
 attendance: hybrid
-summary:  62.º Congreso de la Asociación Europea de Ciencia Regional   
+summary: "Analiza si un mayor crecimiento económico reduce el desempleo en 514 distritos de Indonesia entre 2011 y 2020. Cuando la relación se mide con cuidado, el efecto aparece solo en las regiones occidentales, más industrializadas."
 abstract: "Este artículo investiga la ley de Okun regional en 514 distritos de Indonesia durante el período 2011-2020. Para abordar el problema de endogeneidad de la especificación econométrica, aplicamos un modelo de mínimos cuadrados en dos etapas (2SLS) y utilizamos la temperatura regional como instrumento del crecimiento económico. Nuestros resultados muestran que el coeficiente de Okun solo resulta estadísticamente significativo después de abordar la endogeneidad. De forma coherente con la marcada brecha económica entre las regiones occidentales y orientales de Indonesia, encontramos que la ley de Okun se cumple únicamente en las regiones occidentales, más industrializadas."
 
 # Talk start and end times.

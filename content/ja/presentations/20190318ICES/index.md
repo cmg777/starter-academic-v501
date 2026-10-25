@@ -7,7 +7,7 @@ location: 日本、大阪府、立命館大学
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies (PAPAIOS)"
 country: "日本"
-summary: 環太平洋産業連関分析学会 第3回 経済構造に関する国際会議（ICES）
+summary: "日本の各都道府県が炭素排出1単位あたりにどれだけの経済産出を生み出しているか、そして1992年から2008年にかけてそれがどう変化したかを分析します。より包括的な効率性の指標では、互いに離れていく少なくとも二つの都道府県グループが見られ、単純な指標ではこれを捉えられません。"
 abstract: "本発表は、1992年から2008年の期間における日本の都道府県間の環境効率の収束に関するものです。新たなノンパラメトリック密度推定によるクラスタリングの枠組みを用いて、環境効率の二つの代替指標を比較します。一つは地域内総生産とCO2排出量の比に基づく従来型の指標、もう一つは包絡分析法（DEA）モデルに基づくより包括的な指標です。結果は、一方で、従来型の指標を用いた場合には分布内の移動性が乏しく、単一の収束クラスターのみが存在する可能性を示しています。他方で、DEAに基づく環境効率の指標を用いた場合には、大きな後退的移動と少なくとも二つの収束クラスターが識別されます。本稿は、生産要素を考慮することの重要性を論じて結論づけます。これらの要素が日本における地域収束クラスターの形成を駆動していると考えられるためです。"
 
 # Talk start and end times.

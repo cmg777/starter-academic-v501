@@ -8,7 +8,7 @@ location: Pecs Hungary and Virtual
 event_name: "61st Congress of the European Regional Science Association (ERSA)"
 country: "Hungary"
 attendance: hybrid
-summary:  61st Congress  of the European Regional Science Association   
+summary: "How income gaps across Turkey's 81 provinces evolved between 2007 and 2019. The provinces split into six groups, and their neighbors help explain which group each province joins."
 abstract: "This paper studies regional income convergence and its conditioning factors across 81 provinces of Turkey over the 2007–2019 period. Through the lens of a nonlinear dynamic factor model, we first test the hypothesis that all provinces would eventually converge to a common long-run equilibrium. We reject this hypothesis and find that the provincial dynamics of income per capita are characterized by 6 convergence clubs. Next, we evaluate the conditioning factors behind club formation. Our results suggest that spatial dependence across provinces plays an essential role in the formation of convergence clubs. The spatial distribution of the convergence clubs has a clear spatial pattern, and the dynamics of the provincial income distribution are spatially integrated. We also find that geographical neighbors are more important for middle and high-income provinces. Finally, we show that the performance of geographical neighbors affects the probability of club membership through spillovers in capital accumulation and structural change"
 
 # Talk start and end times.

@@ -7,7 +7,7 @@ location: Virtual Conference
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "13th World Congress of the Regional Science Association International (RSAI)"
 attendance: online
-summary:  13th World Congress of the Regional Science Association International
+summary: "Shows that Indonesian regions do not all catch up at the same speed, using a method that lets the pace vary from place to place. This gives a more realistic picture of regional gaps across the country's many islands."
 abstract: "This paper employs a Multiscale Geographically Weighted Regression (MGWR) model to examine the spatial variation of regional income convergence across Indonesia. This new MGWR model provides a multiscale analysis of spatial heterogeneity. Given the large socioeconomic, demographic, and geographic differences across Indonesian islands, models based on spatial heterogeneity are likely to provide a more accurate and realistic assessment of a regional convergence process. Most previous studies have largely ignored the role of spatial heterogeneity. They usually report a common convergence speed for all subnational regions. In contrast, this paper departs from the assumption of a common convergence speed and aims to identify multiple spatial clusters that characterize the heterogeneity of the regional convergence process of Indonesia."
 
 # Talk start and end times.

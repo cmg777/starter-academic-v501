@@ -7,7 +7,7 @@ location: Liverpool, Reino Unido
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Seminar, Geographic Data Science Lab, University of Liverpool"
 country: "Reino Unido"
-summary:  "Seminario del Laboratorio de Ciencia de Datos Geográficos, Universidad de Liverpool"    
+summary: "Seminario sobre lo que las imágenes satelitales de luces nocturnas pueden y no pueden decirnos sobre el desarrollo local."
 abstract: ""
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.

@@ -7,7 +7,7 @@ location: X-NIHONBASHI Tokyo, Japan
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Satellite Data × Social Studies Workshop, Japan Aerospace Exploration Agency (JAXA)"
 country: "Japan"
-summary:  Satellite data X Social studies workshop organized by JAXA (衛星データ×経済社会学　ワークショップ)
+summary: "How combining satellite images, household surveys, and machine learning can track regional development in countries where official data are scarce. This helps monitor progress toward the Sustainable Development Goals where surveys are costly or hard to run."
 abstract: "Monitoring regional development in countries with limited traditional data sources poses a significant obstacle for tracking the achivement of the sustainable development goals. Standard approaches depend heavily on socioeconomic surveys, which can be expensive and logistically difficult in poor subnational regions. This presentation shows how integrating earth observation data, socioeconomic surveys, and machine learning techniques can mitigate these challenges. ."
 
 # Talk start and end times.

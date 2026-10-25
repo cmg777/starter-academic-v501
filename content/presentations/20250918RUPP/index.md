@@ -6,7 +6,7 @@ location: Phnom Penh, Cambodia
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "International and Interdisciplinary Workshop, Royal University of Phnom Penh (RUPP)"
 country: "Cambodia"
-summary:  "International and Interdisciplinary Workshop, Royal University of Phnom Penh"    
+summary: "A workshop on how new data such as satellite images, new methods, and artificial intelligence are changing research on sustainable development in Cambodia and Asia."
 abstract: "The Asian Satellite Campuses Institute (ASCI), the Graduate School of International Development (GSID), and the Institute for Space–Earth Environmental Research (ISEE) at Nagoya University, in collaboration with the Royal University of Phnom Penh and the United Nations Development Programme (UNDP) in Cambodia, are convening a hybrid research workshop titled “Development Studies in the Age of AI: New Data, New Methods, and New Insights. This hybrid workshop (on-site and online) provides an interdisciplinary platform to advance research on sustainable development in Cambodia and Asia by integrating satellite imagery with socioeconomic data."
 
 # Talk start and end times.

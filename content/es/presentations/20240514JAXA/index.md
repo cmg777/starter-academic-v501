@@ -7,7 +7,7 @@ location: X-NIHONBASHI, Tokio, Japón
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Satellite Data × Social Studies Workshop, Japan Aerospace Exploration Agency (JAXA)"
 country: "Japón"
-summary:  Taller «Datos satelitales × Estudios sociales» organizado por la JAXA (衛星データ×経済社会学　ワークショップ)
+summary: "Cómo la combinación de imágenes satelitales, encuestas de hogares y aprendizaje automático permite seguir el desarrollo regional en países con pocos datos oficiales. Esto ayuda a monitorear el avance hacia los Objetivos de Desarrollo Sostenible donde las encuestas son costosas o difíciles de realizar."
 abstract: "El monitoreo del desarrollo regional en países con fuentes de datos tradicionales limitadas plantea un obstáculo importante para hacer seguimiento al cumplimiento de los objetivos de desarrollo sostenible. Los enfoques estándar dependen en gran medida de encuestas socioeconómicas, que pueden resultar costosas y logísticamente difíciles en regiones subnacionales pobres. Esta presentación muestra cómo la integración de datos de observación de la Tierra, encuestas socioeconómicas y técnicas de aprendizaje automático puede mitigar estos desafíos. ."
 
 # Talk start and end times.

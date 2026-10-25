@@ -8,7 +8,7 @@ location: Azores, Portugal and Virtual
 event_name: "63rd Congress of the European Regional Science Association (ERSA)"
 country: "Portugal"
 attendance: hybrid
-summary:  63rd Congress  of the European Regional Science Association   
+summary: "Presents an easy-to-use Python notebook for processing satellite images of lights at night and using them to study economic activity. It aims to make this kind of data accessible to more regional researchers."
 abstract: "Nighttime lights (NTL) data are widely recognized as a useful proxy for monitoring national, subnational, and supranational economic activity. These data offer advantages over traditional economic indicators such as GDP, including greater spatial granularity, timeliness, lower cost, and comparability between regions regardless of statistical capacity or political interference. However, despite these benefits, the use of NTL data in regional science has been limited. This is in part due to the lack of accessible methods for processing and analyzing satellite images. To address this issue, this paper presents a user-friendly geocomputational notebook that illustrates how to process and analyze satellite NTL images. First, the notebook introduces a cloud-based Python environment for visualizing, analyzing, and transforming raster satellite images into tabular data. Next, it presents interactive tools to explore the space-time patterns of the tabulated data. Finally, it describes methods for evaluating the usefulness of NTL data in terms of their cross-sectional predictions, time-series predictions, and regional inequality dynamics."
 
 # Talk start and end times.

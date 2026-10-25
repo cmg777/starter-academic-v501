@@ -8,7 +8,7 @@ location: Japan/Virtual
 event_name: "59th Annual Meeting of the Japan Section of the Regional Science Association International (JSRSAI)"
 country: "Japan"
 attendance: hybrid
-summary:  59th Annual Meeting of the Japan Section of the Regional Science Association International  
+summary: "Compares two sets of satellite images of lights at night to see which better predicts income and inequality across 118 districts of Java from 2013 to 2020. The newer images perform better, especially when comparing places at one point in time."
 abstract: "Data from satellite nighttime images are increasingly being used in economics as a proxy for local economic activity.  This paper compares two newly available satellite nighttime images to predict GDP and regional inequality across  118 districts of Java over the 2013-2020 period.  An extended version of the popular DMSP night lights is compared with the newly released annual VIIRS night lights. The results of this comparison are three-fold. First, VIIRS luminosity is a better proxy for economic activity, especially when a quadratic term is added to the GDP-lights specification.  Second, in both data sets, luminosity performs better as a cross-sectional predictor rather than a time-series predictor.  Third, the DMSP luminosity underestimates regional inequality, while the VIIRS luminosity overestimates it. The paper concludes by arguing that additional caution is needed when using luminosity time series as proxy for short-run changes in economic activity."
 
 # Talk start and end times.

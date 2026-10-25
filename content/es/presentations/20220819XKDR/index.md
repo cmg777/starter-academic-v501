@@ -8,7 +8,7 @@ location: India y virtual
 event_name: "Workshop of the Chennai Mathematical Institute and XKDR Forum"
 country: "India"
 attendance: hybrid
-summary:  Taller del Chennai Mathematical Institute y del XKDR Forum 
+summary: "Una introducción al estudio del desarrollo con gran detalle geográfico mediante imágenes satelitales y ciencia de datos espaciales. Concluye con materiales de aprendizaje y tutoriales."
 abstract: "Esta presentación ofrece una introducción al análisis del desarrollo geoespacial. En concreto, abarca los tres temas siguientes: (1) ¿Qué es el desarrollo geoespacial? ¿Cómo complementa a los estudios micro y macro? (2) ¿Cómo podemos estudiar el desarrollo geoespacial? ¿Qué importancia tienen las imágenes satelitales para medir el desarrollo geoespacial? (3) ¿Qué es la ciencia de datos espaciales? ¿En qué se diferencia de la ciencia de datos estándar? La presentación concluye destacando algunos materiales de aprendizaje y tutoriales adicionales."
 
 # Talk start and end times.
