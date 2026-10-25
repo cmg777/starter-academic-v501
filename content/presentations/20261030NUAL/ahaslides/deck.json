@@ -1,0 +1,256 @@
+[
+  {
+    "kind": "image",
+    "page": 1,
+    "label": "Title",
+    "position": 1
+  },
+  {
+    "kind": "qr_code",
+    "id": "N0",
+    "label": "Join code",
+    "notes": "Join slide. The audience scans the code or types the join code at ahaslides.com. No names are asked. Keep it up while people settle, then move to the agenda.",
+    "position": 2
+  },
+  {
+    "kind": "image",
+    "page": 2,
+    "label": "Agenda",
+    "position": 3
+  },
+  {
+    "kind": "word_cloud",
+    "id": "N1",
+    "label": "In one word: how do you use AI in your work today?",
+    "notes": "Warm-up, no right answer. Read the three biggest words aloud. Words such as writing, coding or searching set up the point of Section 1: AI makes production cheap.",
+    "position": 4
+  },
+  {
+    "kind": "image",
+    "page": 3,
+    "label": "Section 1: A conceptual framework",
+    "position": 5
+  },
+  {
+    "kind": "image",
+    "page": 4,
+    "label": "Production and verification costs",
+    "position": 6
+  },
+  {
+    "kind": "poll",
+    "id": "N2",
+    "label": "Where does most of your AI-assisted work sit today?",
+    "notes": "Ask right after the trade-off chart. The third option (cheap to make, rarely verified) is the danger zone: cheap to make, expensive to confirm. Honest answers are the point, so stress that the poll is anonymous. Whatever its share, the rest of the talk is about moving that bar to the second option.",
+    "position": 7
+  },
+  {
+    "kind": "image",
+    "page": 5,
+    "label": "Section 2: AI-assisted learning",
+    "position": 8
+  },
+  {
+    "kind": "image",
+    "page": 6,
+    "label": "Challenges of teaching econometrics",
+    "position": 9
+  },
+  {
+    "kind": "image",
+    "page": 7,
+    "label": "Accessible and interactive learning",
+    "position": 10
+  },
+  {
+    "kind": "image",
+    "page": 8,
+    "label": "Python in Google Colab",
+    "position": 11
+  },
+  {
+    "kind": "image",
+    "page": 9,
+    "label": "metricsAI book",
+    "position": 12
+  },
+  {
+    "kind": "youtube",
+    "page": 10,
+    "label": "Video: AI in Colab",
+    "url": "https://www.youtube.com/watch?v=V7RXyqFUR98",
+    "title": "Supercharge your Programming in Colab with AI-Powered tools",
+    "position": 13
+  },
+  {
+    "kind": "image",
+    "page": 11,
+    "label": "Other AI products",
+    "position": 14
+  },
+  {
+    "kind": "image",
+    "page": 12,
+    "label": "AI tutors (1)",
+    "position": 15
+  },
+  {
+    "kind": "image",
+    "page": 13,
+    "label": "AI tutors (2)",
+    "position": 16
+  },
+  {
+    "kind": "image",
+    "page": 14,
+    "label": "AI tutors (3)",
+    "position": 17
+  },
+  {
+    "kind": "image",
+    "page": 15,
+    "label": "AI tutors (4)",
+    "position": 18
+  },
+  {
+    "kind": "image",
+    "page": 16,
+    "label": "Short video overviews",
+    "position": 19
+  },
+  {
+    "kind": "youtube",
+    "page": 17,
+    "label": "Video: s01 Analysis of Economics Data",
+    "url": "https://www.youtube.com/watch?v=RyE01v-zliM",
+    "title": "s01 Analysis of Economics Data",
+    "position": 20
+  },
+  {
+    "kind": "image",
+    "page": 18,
+    "label": "AI podcast series",
+    "position": 21
+  },
+  {
+    "kind": "image",
+    "page": 19,
+    "label": "Key lesson: agent skills",
+    "position": 22
+  },
+  {
+    "kind": "youtube",
+    "page": 20,
+    "label": "Video: Claude Skills",
+    "url": "https://www.youtube.com/watch?v=wc54-e6Dt68",
+    "title": "Ultimate Guide To Claude Skills",
+    "position": 23
+  },
+  {
+    "kind": "image",
+    "page": 21,
+    "label": "A workflow example",
+    "position": 24
+  },
+  {
+    "kind": "scale",
+    "id": "N3",
+    "label": "Before we move to research: where do you stand?",
+    "notes": "Closes the learning section. Read both averages aloud. A gap between the two (willing to try, less sure about verifying) is the bridge to Section 3, where GitHub makes verification concrete.",
+    "position": 25
+  },
+  {
+    "kind": "image",
+    "page": 22,
+    "label": "Section 3: AI-assisted research",
+    "position": 26
+  },
+  {
+    "kind": "image",
+    "page": 23,
+    "label": "The prompt and the result",
+    "position": 27
+  },
+  {
+    "kind": "image",
+    "page": 24,
+    "label": "The transparent pipeline",
+    "position": 28
+  },
+  {
+    "kind": "image",
+    "page": 25,
+    "label": "Claude Code + GitHub + Overleaf",
+    "position": 29
+  },
+  {
+    "kind": "image",
+    "page": 26,
+    "label": "Prompt, checkpoint, result",
+    "position": 30
+  },
+  {
+    "kind": "image",
+    "page": 27,
+    "label": "Changing the unit of verification",
+    "position": 31
+  },
+  {
+    "kind": "image",
+    "page": 28,
+    "label": "GitHub and the manuscript",
+    "position": 32
+  },
+  {
+    "kind": "image",
+    "page": 29,
+    "label": "A work environment built for verification",
+    "position": 33
+  },
+  {
+    "kind": "image",
+    "page": 30,
+    "label": "Git is easier with AI",
+    "position": 34
+  },
+  {
+    "kind": "image",
+    "page": 31,
+    "label": "The accountability imperative",
+    "position": 35
+  },
+  {
+    "kind": "youtube",
+    "page": 32,
+    "label": "Video: Goldsmith-Pinkham interview",
+    "url": "https://www.youtube.com/watch?v=EcloxLPcRsY",
+    "title": "Integration & Collaboration: Claude Code for Econ. w/ P. Goldsmith-Pinkham",
+    "position": 36
+  },
+  {
+    "kind": "image",
+    "page": 33,
+    "label": "Concluding remarks",
+    "position": 37
+  },
+  {
+    "kind": "open_ended_survey",
+    "id": "N4",
+    "label": "One thing you will try after today",
+    "notes": "Take-away. Give a minute, then read three or four answers. Answers are anonymous.",
+    "position": 38
+  },
+  {
+    "kind": "q&a",
+    "id": "N5",
+    "label": "Your questions",
+    "notes": "Q&A is open on all slides, so questions asked during the talk are already here. Upvotes push a question to the top. Answer the top three, then close on the Thank You slide.",
+    "position": 39
+  },
+  {
+    "kind": "image",
+    "page": 34,
+    "label": "Thank you",
+    "position": 40
+  }
+]

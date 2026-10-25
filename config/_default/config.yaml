@@ -69,6 +69,7 @@ module:
         - '**/.quarto/**'
         - '**/_freeze/**'
         - 'courses/slides/ahaslides/**'
+        - 'presentations/20261030NUAL/ahaslides/**'
         - 'keynote/**'
     - source: content/es
       target: content

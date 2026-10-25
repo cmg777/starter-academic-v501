@@ -37,6 +37,10 @@ this file is the procedure:
   visitors**, built from **captures of the public Canva view** (no PDF), with one
   activity list translated and anchored by topic. See *Canva capture, three languages,
   self-paced* below.
+- `content/presentations/20261030NUAL/ahaslides/` (deck `10482865`) — the seventh: a
+  conference keynote from a Canva PDF, with 4 YouTube slides and a light anonymous set of
+  6 activities. It is live first and self-paced afterwards. Its compact `build.py`
+  replaces the two generators.
 
 ---
 
@@ -233,6 +237,9 @@ rebuild the same ID.
   nothing. `move_slide` and `update_slide_content` responses do return it.
 - **`update_slide_content` replaces the whole slide** — resend `notes` or they are wiped.
 - **Returned ID arrays are not in input order.** Match on `order`.
+- **Option order: re-check in the editor.** On 2026-10-25 (NUAL deck) `poll` rejected
+  plain-string options, accepted `{"text": ...}` objects, and displayed them **in payload
+  order**. The rule below held for earlier decks; verify in the editor before reversing.
 - **Option order is not kept — options display in REVERSE payload order.** The API gives
   successive options `order` 1, 0.5, 0.25, … and every view sorts ascending, so a payload
   of A, B, C shows as C, B, A (`get_presentation_detail_tool` lists yet another order —

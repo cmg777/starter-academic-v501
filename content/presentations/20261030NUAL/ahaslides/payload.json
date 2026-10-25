@@ -1,0 +1,136 @@
+[
+  {
+    "after_page": 1,
+    "insert_after_slide_id": 163127909,
+    "ids": [
+      "N0"
+    ],
+    "slides": [
+      {
+        "slide_type": "qr_code",
+        "notes": "Join slide. The audience scans the code or types the join code at ahaslides.com. No names are asked. Keep it up while people settle, then move to the agenda."
+      }
+    ],
+    "props": {
+      "N0": {}
+    }
+  },
+  {
+    "after_page": 2,
+    "insert_after_slide_id": 163127911,
+    "ids": [
+      "N1"
+    ],
+    "slides": [
+      {
+        "slide_type": "word_cloud",
+        "heading": "In one word: how do you use AI in your work today?",
+        "notes": "Warm-up, no right answer. Read the three biggest words aloud. Words such as writing, coding or searching set up the point of Section 1: AI makes production cheap."
+      }
+    ],
+    "props": {
+      "N1": {
+        "hasTimeLimit": false,
+        "entriesPerParticipant": 3
+      }
+    }
+  },
+  {
+    "after_page": 4,
+    "insert_after_slide_id": 163127912,
+    "ids": [
+      "N2"
+    ],
+    "slides": [
+      {
+        "slide_type": "poll",
+        "heading": "Where does most of your AI-assisted work sit today?",
+        "options": [
+          {
+            "text": "Old world: I still produce mostly by hand"
+          },
+          {
+            "text": "Cheap to make, and I verify it carefully"
+          },
+          {
+            "text": "Cheap to make, and I rarely verify it"
+          },
+          {
+            "text": "I do not use AI tools yet"
+          }
+        ],
+        "notes": "Ask right after the trade-off chart. The third option (cheap to make, rarely verified) is the danger zone: cheap to make, expensive to confirm. Honest answers are the point, so stress that the poll is anonymous. Whatever its share, the rest of the talk is about moving that bar to the second option."
+      }
+    ],
+    "props": {
+      "N2": {
+        "hasTimeLimit": false,
+        "multipleChoice": false,
+        "typeChart": "barChart",
+        "showPercentage": true
+      }
+    }
+  },
+  {
+    "after_page": 21,
+    "insert_after_slide_id": 163127926,
+    "ids": [
+      "N3"
+    ],
+    "slides": [
+      {
+        "slide_type": "scale",
+        "heading": "Before we move to research: where do you stand?",
+        "options": [
+          {
+            "text": "I can verify AI output in my own field"
+          },
+          {
+            "text": "I will try planning mode or agent skills this month"
+          }
+        ],
+        "scale_config": {
+          "low_label": "Not at all",
+          "high_label": "Completely",
+          "low_value": 1,
+          "high_value": 5,
+          "must_rate": true,
+          "show_average": true,
+          "show_mid_values": true
+        },
+        "notes": "Closes the learning section. Read both averages aloud. A gap between the two (willing to try, less sure about verifying) is the bridge to Section 3, where GitHub makes verification concrete."
+      }
+    ],
+    "props": {
+      "N3": {
+        "hasTimeLimit": false
+      }
+    }
+  },
+  {
+    "after_page": 33,
+    "insert_after_slide_id": 163127937,
+    "ids": [
+      "N4",
+      "N5"
+    ],
+    "slides": [
+      {
+        "slide_type": "open_ended_survey",
+        "heading": "One thing you will try after today",
+        "notes": "Take-away. Give a minute, then read three or four answers. Answers are anonymous."
+      },
+      {
+        "slide_type": "q&a",
+        "heading": "Your questions",
+        "notes": "Q&A is open on all slides, so questions asked during the talk are already here. Upvotes push a question to the top. Answer the top three, then close on the Thank You slide."
+      }
+    ],
+    "props": {
+      "N4": {
+        "hasTimeLimit": false
+      },
+      "N5": {}
+    }
+  }
+]

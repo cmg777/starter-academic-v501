@@ -25,6 +25,10 @@ image:
   focal_point: Center
 
 links:
+  - icon: poll
+    icon_pack: fas
+    name: "Interactive slides (AhaSlides)"
+    url: https://audience.ahaslides.com/mcro9daa2x
 url_code: ""
 url_pdf: ""
 url_slides: "https://carlos-mendez.my.canva.site/ai-assisted-learning-and-research-tool-integration-and-verification"
