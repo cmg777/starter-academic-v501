@@ -16,7 +16,7 @@ tags:
 title: カンボジアのジオ開発観測所（GeoDevelopment Observatory）
 links:
   - name: "ウェブサイト"
-    url: "https://bit.ly/gdo-cambodia"
+    url: "https://quarcs-lab.github.io/geo4cambodia/"
     icon_pack: ai
     icon: open-data
 
@@ -55,7 +55,7 @@ url_video: "https://youtu.be/9CcppQpArWI?si=j4-eerh6SIRTpC9E"
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGye-QAKJY&#x2F;W0nsfoueC3jXXgojBCFhOQ&#x2F;view?utm_content=DAGye-QAKJY&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">スライド</a>：カルロス・メンデス
 
-出典： <https://bit.ly/gdo-cambodia>
+出典： <https://quarcs-lab.github.io/geo4cambodia/>
 
 
 ご意見・ご協力は [https://github.com/gdo-cambodia](https://github.com/gdo-cambodia) までお願いします。

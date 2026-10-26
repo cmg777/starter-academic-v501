@@ -16,7 +16,7 @@ tags:
 title: GeoDevelopment Observatory of Cambodia
 links:
   - name: "Website"
-    url: "https://bit.ly/gdo-cambodia"
+    url: "https://quarcs-lab.github.io/geo4cambodia/"
     icon_pack: ai
     icon: open-data
 
@@ -55,7 +55,7 @@ The GeoDevelopment Observatory (GDO) of Cambodia provides a public access platfo
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGye-QAKJY&#x2F;W0nsfoueC3jXXgojBCFhOQ&#x2F;view?utm_content=DAGye-QAKJY&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
 
-Source: <https://bit.ly/gdo-cambodia>
+Source: <https://quarcs-lab.github.io/geo4cambodia/>
 
 
 Contribute and provide feedback at [https://github.com/gdo-cambodia](https://github.com/gdo-cambodia)

@@ -75,6 +75,6 @@ math: true
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGye-QAKJY&#x2F;W0nsfoueC3jXXgojBCFhOQ&#x2F;view?utm_content=DAGye-QAKJY&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">スライド</a> by Carlos Mendez
 
-出典: <https://bit.ly/gdo-cambodia>
+出典: <https://quarcs-lab.github.io/geo4cambodia/>
 
 
