@@ -28,7 +28,7 @@ url_video: "https://youtu.be/9CcppQpArWI?si=j4-eerh6SIRTpC9E"
 
 Cómo citar este proyecto:
 
-> Mendez C., Khoun T., Poortinga A. (2025) GeoDevelopment Observatory of Cambodia.[https://bit.ly/gdo-cambodia](https://bit.ly/gdo-cambodia)
+> Mendez C., Khoun T., Poortinga A. (2025) GeoDevelopment Observatory of Cambodia.[https://quarcs-lab.github.io/geo4cambodia/](https://quarcs-lab.github.io/geo4cambodia/)
 
 
 El Observatorio de GeoDesarrollo (GDO) de Camboya ofrece una plataforma de acceso público para el análisis, el seguimiento y la evaluación del desarrollo regional sostenible. El observatorio integra indicadores ambientales, sociales y económicos —denominados Indicadores de GeoDesarrollo— recopilados a partir de imágenes satelitales, encuestas de campo y registros administrativos. Estos conjuntos de datos multidimensionales se analizan mediante cuadernos computacionales potenciados con IA y aplicaciones web especializadas dentro del marco de Herramientas de GeoDesarrollo. Los análisis técnicos se convierten luego en Perspectivas de GeoDesarrollo, que presentan los datos en formatos accesibles para distintos grupos de usuarios. Las personas investigadoras utilizan la plataforma para realizar análisis empíricos, quienes toman decisiones acceden a ella para el diseño y la implementación de políticas, y la ciudadanía la consulta para comprender los patrones de desarrollo en sus regiones. Este enfoque sistemático facilita la transformación de datos de sostenibilidad complejos en información útil para monitorear el progreso, evaluar intervenciones e informar las políticas de desarrollo regional sostenible.
