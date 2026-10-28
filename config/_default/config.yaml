@@ -63,6 +63,9 @@ module:
       # `keynote/**` holds the AhaSlides build sources of the hero keynote
       # (content/keynote/ahaslides/); its deck_*.md presenter copies would
       # otherwise become a /keynote/ section.
+      # `presentations/*/slides/figures-src/**` holds the data extracts and the
+      # script that draw a talk deck's figures (e.g. 20261030ADBI); only the
+      # rendered PNGs in slides/img/ are published.
       excludeFiles:
         - '{es,ja,cv}/**'
         - '**/.venv/**'
@@ -70,6 +73,7 @@ module:
         - '**/_freeze/**'
         - 'courses/slides/ahaslides/**'
         - 'presentations/20261030NUAL/ahaslides/**'
+        - 'presentations/*/slides/figures-src/**'
         - 'keynote/**'
     - source: content/es
       target: content

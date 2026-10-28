@@ -1,0 +1,34 @@
+/* Deck-specific components for the ADBI workshop talk (layered over site-brand.scss). */
+.reveal .kicker { display: block; font-size: 0.5em; letter-spacing: 0.28em; text-transform: uppercase; color: #00d4c8; margin-bottom: 0.2em; }
+.reveal .src { display: block; font-size: 0.45em; color: #aebfd8; margin-top: 0.4em; }
+.reveal .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6em; margin-top: 0.5em; }
+.reveal .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-top: 4px solid #6a9bcc; border-radius: 10px; padding: 0.45em 0.6em; font-size: 0.66em; line-height: 1.35; }
+.reveal .card:nth-child(1) { border-top-color: #d97757; }
+.reveal .card:nth-child(2) { border-top-color: #00d4c8; }
+.reveal .card b { display: block; color: #f2f5fa; font-size: 1.12em; margin-bottom: 0.25em; }
+.reveal .card .who { display: block; color: #aebfd8; font-size: 0.85em; margin-top: 0.35em; }
+.reveal .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; margin: 0.3em 0; text-align: center; }
+.reveal .duo .n { display: block; font-family: "Cinzel", serif; font-weight: 700; font-size: 2.3em; line-height: 1.05; }
+.reveal .duo .l { display: block; color: #aebfd8; font-size: 0.62em; }
+.reveal .flow { display: flex; align-items: stretch; justify-content: center; gap: 0.35em; margin: 0.4em 0; font-size: 0.64em; }
+.reveal .flow .box { flex: 1; background: rgba(15,23,41,0.85); border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; padding: 0.5em 0.6em; text-align: center; line-height: 1.3; }
+.reveal .flow .box b { display: block; color: #e9c184; font-size: 1.1em; margin-bottom: 0.2em; }
+.reveal .flow .arr { align-self: center; color: #6a9bcc; font-size: 1.6em; font-weight: 700; }
+.reveal .slides section .small-table table { font-size: 0.64em; width: 100%; }
+.reveal .small-table colgroup col { width: auto !important; }
+.reveal .small-table td:first-child, .reveal .small-table th:first-child { white-space: nowrap; }
+.reveal ul.tight li { margin: 0.18em 0; font-size: 0.82em; }
+
+/* Closing slide: centred, one card per author (presenter highlighted). */
+.reveal section.thanks { text-align: center; }
+.reveal section.thanks h2 { display: inline-block; }
+.reveal .thanks-lead { display: block; font-size: 0.82em; color: #e6ebf3; margin: 0.2em 0 0.7em; }
+.reveal .authors { display: flex; justify-content: center; gap: 0.7em; margin: 0 auto 0.7em; }
+.reveal .authors .author { flex: 0 1 30%; background: rgba(15,23,41,0.78); border: 1px solid rgba(255,255,255,0.14); border-top: 4px solid #6a9bcc; border-radius: 12px; padding: 0.55em 0.5em 0.5em; }
+.reveal .authors .author.presenter { border-top-color: #e9c184; }
+.reveal .authors .name { display: block; font-family: "Cinzel", Georgia, serif; font-weight: 700; font-size: 0.9em; color: #f2f5fa; }
+.reveal .authors .aff { display: block; font-size: 0.58em; color: #aebfd8; margin-top: 0.2em; }
+.reveal .authors .role { display: block; font-size: 0.5em; letter-spacing: 0.18em; text-transform: uppercase; color: #00d4c8; margin-top: 0.45em; }
+.reveal .authors .presenter .role { color: #e9c184; }
+.reveal .thanks-meta { display: block; font-size: 0.56em; color: #aebfd8; margin-bottom: 0.35em; }
+.reveal .thanks-contact { display: block; font-size: 0.66em; color: #e6ebf3; }
