@@ -16,9 +16,9 @@ key-results:
   - num: "−25.7%"
     cap: "Fukushima light, month of the quake"
 title-slide-attributes:
-  data-background-image: img/cover.webp
+  data-background-image: img/cover-title.webp
   data-background-size: cover
-  data-background-opacity: "0.38"
+  data-background-opacity: "1"
 format:
   revealjs:
     output-file: index.html
@@ -257,12 +257,12 @@ The VIIRS satellites cross the equator at about **01:30 local time**. Homes and 
 
 ## Thank you {.thanks background-image="img/orbit-night.webp" background-opacity="0.55"}
 
-[Access, inequality and disaster recovery can all be seen in night light.]{.thanks-lead}
+[Infrastructure, inequality and disaster recovery can all be monitored from outer space using new nighttime lights.]{.thanks-lead}
 
 ::: {.authors}
-<div class="author presenter"><span class="name">Carlos Mendez</span><span class="aff">Nagoya University</span><span class="role">Presenter · Section 4</span></div>
-<div class="author"><span class="name">Li Xiaomeng</span><span class="aff">Nagoya University</span><span class="role">Section 3</span></div>
-<div class="author"><span class="name">Jiang Qian</span><span class="aff">Independent researcher</span><span class="role">Section 2</span></div>
+<div class="author presenter"><span class="name">Carlos Mendez</span><span class="aff">Nagoya University</span></div>
+<div class="author"><span class="name">Li Xiaomeng</span><span class="aff">Nagoya University</span></div>
+<div class="author"><span class="name">Jiang Qian</span><span class="aff">Independent researcher</span></div>
 :::
 
 [Chapter for the ADBI volume *Building Sustainable Infrastructure in Asia and the Pacific*]{.thanks-meta}

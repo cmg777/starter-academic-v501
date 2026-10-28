@@ -22,7 +22,7 @@
 /* Closing slide: centred, one card per author (presenter highlighted). */
 .reveal section.thanks { text-align: center; }
 .reveal section.thanks h2 { display: inline-block; }
-.reveal .thanks-lead { display: block; font-size: 0.82em; color: #e6ebf3; margin: 0.2em 0 0.7em; }
+.reveal .thanks-lead { display: block; text-wrap: balance; font-size: 0.82em; color: #e6ebf3; margin: 0.2em 0 0.7em; }
 .reveal .authors { display: flex; justify-content: center; gap: 0.7em; margin: 0 auto 0.7em; }
 .reveal .authors .author { flex: 0 1 30%; background: rgba(15,23,41,0.78); border: 1px solid rgba(255,255,255,0.14); border-top: 4px solid #6a9bcc; border-radius: 12px; padding: 0.55em 0.5em 0.5em; }
 .reveal .authors .author.presenter { border-top-color: #e9c184; }
@@ -32,3 +32,25 @@
 .reveal .authors .presenter .role { color: #e9c184; }
 .reveal .thanks-meta { display: block; font-size: 0.56em; color: #aebfd8; margin-bottom: 0.35em; }
 .reveal .thanks-contact { display: block; font-size: 0.66em; color: #e6ebf3; }
+
+/* Title slide: full-strength background (img/cover-title.webp is pre-darkened behind
+   the text), so every text layer gets a shadow and the numbers a soft glow. */
+.reveal #title-slide .title { color: #ffffff; font-size: 2.2em; letter-spacing: 0.01em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 28px rgba(0,0,0,0.85), 0 0 60px rgba(233,193,132,0.25); }
+.reveal #title-slide .subtitle { color: #f2f5fa; text-wrap: balance; max-width: 30em; margin-left: auto; margin-right: auto;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 18px rgba(0,0,0,0.9); }
+.reveal .title-result-strip { gap: 1.3em; flex-wrap: nowrap; }
+.reveal .title-result-strip .kr-cap { white-space: nowrap; }
+.reveal .title-result-strip .kr-num { font-size: 1.95em; text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 22px currentColor; }
+.reveal .title-result-strip .kr:nth-of-type(3) .kr-num { color: #8fc0ea; }
+.reveal .title-result-strip .kr-cap { color: #dbe4f0; text-shadow: 0 1px 3px rgba(0,0,0,0.95); }
+.reveal #title-slide .author a { color: #a9cdf0; text-shadow: 0 1px 3px rgba(0,0,0,0.95); }
+.reveal #title-slide .institute, .reveal #title-slide .date { color: #dbe4f0; text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 12px rgba(0,0,0,0.8); }
+
+/* Thumbnail mode (?thumb, set by the capture script): only what reads at card size. */
+.reveal.thumb #title-slide .author, .reveal.thumb #title-slide .institute,
+.reveal.thumb #title-slide .date, .reveal.thumb .title-result-strip .kr-cap { display: none; }
+.reveal.thumb #title-slide .title { font-size: 2.55em; white-space: nowrap; }
+.reveal.thumb #title-slide .subtitle { font-size: 1.35em; }
+.reveal.thumb .title-result-strip { gap: 1.9em; margin-top: 0.8em; }
+.reveal.thumb .title-result-strip .kr-num { font-size: 2.35em; }
