@@ -1,6 +1,5 @@
 ---
-title: "Visible from Outer Space?"
-subtitle: "Infrastructure access, regional inequality, and disaster resilience in ASEAN and Japan"
+title: "Visible from Outer Space? Infrastructure, Regional Inequality, and Disaster Resilience"
 slug: "adbi-2026"
 event: "Authors' Workshop, Asian Development Bank Institute (ADBI), Tokyo"
 event_url: ""
@@ -8,8 +7,7 @@ location: "Online (Asian Development Bank Institute, Tokyo, Japan)"
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Asian Development Bank Institute (ADBI) Authors' Workshop"
 country: "Japan"
-attendance: online
-summary: "Satellite images of night light, taken at about 1:30 a.m., show where roads and other infrastructure reach people across Southeast Asia and Japan and how the gap between regions narrowed over 2014–2024. The same light reveals how deeply the 2011 earthquake in Japan cut infrastructure and how long it took to return."
+summary: "Night light seen from space tracks access to infrastructure in Southeast Asia and Japan and shows the gap between regions narrowing. It also reveals how long the 2011 earthquake kept infrastructure in northeastern Japan down."
 abstract: "Infrastructure needs assessments in Southeast Asia are costly, infrequent, and stop at the national border. This talk, prepared with Li Xiaomeng and Jiang Qian for the ADBI edited volume Building Sustainable Infrastructure in Asia and the Pacific: Shifting from Disaster Recovery to Resilience, evaluates nighttime lights as an annual, subnational measure of infrastructure for 325 first-level regions of the ASEAN member states and Japan. Because the VIIRS satellite passes overhead at about 01:30, the light it records comes mainly from installed infrastructure rather than from economic activity. First, the measure agrees with satellite-based Sustainable Development Goal indicators of access to roads, transport, and open space that use no lights at all. Second, regional inequality in luminosity across ASEAN declined over 2014–2024 while average brightness rose, whereas inequality across Japanese prefectures stayed lower and stable. Third, synthetic control estimates show that nighttime lights record the 2011 Great East Japan Earthquake in Fukushima, Miyagi, and Iwate, and that the shortfall in light persists after official output statistics no longer show it. Nighttime lights thus offer a low-cost tool to monitor access to infrastructure, its regional inequality, and its recovery from disasters."
 
 # Talk start and end times.

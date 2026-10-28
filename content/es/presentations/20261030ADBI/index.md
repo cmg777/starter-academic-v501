@@ -1,6 +1,5 @@
 ---
-title: "¿Visible desde el espacio exterior?"
-subtitle: "Acceso a la infraestructura, desigualdad regional y resiliencia ante desastres en la ASEAN y Japón"
+title: "¿Visible desde el espacio exterior? Infraestructura, desigualdad regional y resiliencia ante desastres"
 slug: "adbi-2026"
 event: "Taller de autores, Instituto del Banco Asiático de Desarrollo (ADBI), Tokio"
 event_url: ""
@@ -8,8 +7,7 @@ location: "En línea (Instituto del Banco Asiático de Desarrollo, Tokio, Japón
 # Standardized list line: DATE / event_name / country (see layouts/partials/functions/talk_meta.html).
 event_name: "Asian Development Bank Institute (ADBI) Authors' Workshop"
 country: "Japón"
-attendance: online
-summary: "Las imágenes satelitales de luz nocturna, tomadas hacia la 1:30 a. m., muestran dónde las carreteras y otras infraestructuras llegan a la población del Sudeste Asiático y Japón, y cómo se redujo la brecha entre regiones en 2014–2024. La misma luz revela cuán profundamente el terremoto de 2011 en Japón afectó la infraestructura y cuánto tardó en recuperarse."
+summary: "La luz nocturna vista desde el espacio sigue el acceso a la infraestructura en el Sudeste Asiático y Japón, y muestra que la brecha regional se reduce. También muestra cuánto duró el impacto del terremoto de 2011 en Japón."
 abstract: "Las evaluaciones de necesidades de infraestructura en el Sudeste Asiático son costosas, poco frecuentes y se detienen en la frontera nacional. Esta presentación, preparada con Li Xiaomeng y Jiang Qian para el volumen editado del ADBI Building Sustainable Infrastructure in Asia and the Pacific: Shifting from Disaster Recovery to Resilience, evalúa las luces nocturnas como una medida anual y subnacional de infraestructura para 325 regiones de primer nivel de los Estados miembros de la ASEAN y Japón. Como el satélite VIIRS pasa hacia la 01:30, la luz que registra proviene principalmente de la infraestructura instalada y no de la actividad económica. Primero, la medida concuerda con indicadores satelitales de los Objetivos de Desarrollo Sostenible sobre acceso a carreteras, transporte y espacios abiertos que no utilizan luces. Segundo, la desigualdad regional de luminosidad en la ASEAN disminuyó en 2014–2024 mientras aumentaba el brillo promedio, mientras que la desigualdad entre las prefecturas japonesas se mantuvo más baja y estable. Tercero, las estimaciones de control sintético muestran que las luces nocturnas registran el Gran Terremoto del Este de Japón de 2011 en Fukushima, Miyagi e Iwate, y que la caída de la luz persiste cuando las estadísticas oficiales de producción ya no la muestran. Las luces nocturnas ofrecen así una herramienta de bajo costo para monitorear el acceso a la infraestructura, su desigualdad regional y su recuperación tras desastres."
 
 # Talk start and end times.
