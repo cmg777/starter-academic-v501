@@ -6,7 +6,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Center
-summary: Explore poverty, population, and satellite data across 339 Bolivian municipalities, with tools and research to understand regional development.
+summary: An observatory of subnational development for monitoring Bolivia’s regions at multiple geographic scales, with open data, analysis tools, and research insights.
 tags:
 - spatial
 - python
@@ -23,11 +23,11 @@ url_slides: ""
 url_video: ""
 ---
 
-How does development vary across Bolivia, and what can satellites tell us about those differences? The **GeoDevelopment Observatory of Bolivia (GDO-Bolivia)** brings together public-access data, analysis tools, and research insights to help answer these questions. It connects indicators from satellite imagery, censuses, and administrative records with reproducible workflows for researchers, decision-makers, and the public.
+The **GeoDevelopment Observatory of Bolivia (GDO-Bolivia)** brings together public-access data, analysis tools, and research insights to monitor subnational development at multiple geographic scales. It connects indicators from satellite imagery, censuses, and administrative records with reproducible workflows for researchers, decision-makers, and the public.
 
 ## Explore the data
 
-The current indicator collections use a common geography of **339 municipalities**. Linked identifiers connect these units to provinces and departments. Each dataset page documents its variables, sources, reference years, and licensing conditions.
+The observatory links geographic units through common identifiers, allowing data to be connected and aggregated across scales, including municipalities, provinces, and departments. Available coverage depends on the dataset; each page documents its variables, sources, reference years, and licensing conditions.
 
 | Collection | Current coverage |
 |---|---|

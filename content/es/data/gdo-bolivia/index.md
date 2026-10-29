@@ -6,7 +6,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Center
-summary: Explore datos de pobreza, población e imágenes satelitales de 339 municipios bolivianos, con herramientas e investigaciones para comprender el desarrollo regional.
+summary: Un observatorio del desarrollo subnacional para el seguimiento del desarrollo regional de Bolivia a distintas escalas geográficas, con datos abiertos, herramientas de análisis y resultados de investigación.
 tags:
 - spatial
 - python
@@ -23,11 +23,11 @@ url_slides: ""
 url_video: ""
 ---
 
-¿Cómo varía el desarrollo entre las regiones de Bolivia y qué pueden revelar los satélites sobre estas diferencias? El **Observatorio de GeoDesarrollo de Bolivia (GDO-Bolivia)** reúne datos de acceso público, herramientas de análisis y resultados de investigación para abordar estas preguntas. Conecta indicadores de imágenes satelitales, censos y registros administrativos con flujos de trabajo reproducibles para la investigación, la toma de decisiones y la ciudadanía.
+El **Observatorio de GeoDesarrollo de Bolivia (GDO-Bolivia)** reúne datos de acceso público, herramientas de análisis y resultados de investigación para el seguimiento del desarrollo subnacional a distintas escalas geográficas. Conecta indicadores de imágenes satelitales, censos y registros administrativos con flujos de trabajo reproducibles para la investigación, la toma de decisiones y la ciudadanía.
 
 ## Explore los datos
 
-Las colecciones actuales de indicadores utilizan una geografía común de **339 municipios**. Los identificadores vinculados conectan estas unidades con provincias y departamentos. Cada página de datos documenta sus variables, fuentes, años de referencia y condiciones de licencia.
+El observatorio vincula unidades geográficas mediante identificadores comunes, lo que permite conectar y agregar datos a distintas escalas, incluidos municipios, provincias y departamentos. La cobertura disponible depende del conjunto de datos; cada página documenta sus variables, fuentes, años de referencia y condiciones de licencia.
 
 | Colección | Cobertura actual |
 |---|---|
