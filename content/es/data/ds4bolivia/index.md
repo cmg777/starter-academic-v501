@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Un repositorio de ciencia de datos para estudiar el desarrollo geoespacial en Bolivia
+summary: Un repositorio de datos espaciales y socioeconómicos para estudiar el desarrollo local en Bolivia, con conjuntos de datos vinculados, mapas interactivos y cuadernos para análisis reproducibles.
 tags:
 - spatial
 - python

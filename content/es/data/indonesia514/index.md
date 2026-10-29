@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Un repositorio de ciencia de datos para estudiar el desarrollo regional en los 514 distritos de Indonesia
+summary: Un repositorio que conecta límites distritales e indicadores económicos para estudiar el desarrollo regional en Indonesia, con identificadores comunes que facilitan combinar y analizar los datos.
 tags:
 - spatial
 - python

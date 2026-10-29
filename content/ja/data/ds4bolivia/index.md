@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: ボリビアの地理空間的な開発を研究するためのデータサイエンス・リポジトリ
+summary: 空間・社会経済データ、対話型地図、分析ノートブックをまとめ、データの連携と再現可能な分析を通じてボリビアの地域開発の研究を支援します。
 tags:
 - spatial
 - python

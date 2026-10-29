@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Una plataforma de acceso público para el análisis, el seguimiento y la evaluación del desarrollo regional sostenible en Camboya
+summary: Un observatorio que combina indicadores de desarrollo, herramientas de análisis y resultados de investigación para apoyar el estudio y seguimiento del desarrollo regional sostenible en Camboya.
 tags:
 - spatial
 - python

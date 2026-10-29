@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: カンボジアにおける持続可能な地域開発の分析・モニタリング・評価のための一般公開プラットフォーム
+summary: 開発指標、分析ツール、研究の知見を組み合わせ、カンボジアの持続可能な地域開発の研究とモニタリングを支援する観測所です。
 tags:
 - spatial
 - python

@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: インドネシアの514地区における地域開発を研究するためのデータサイエンス・リポジトリ
+summary: 地区の境界と経済指標を共通の識別子で結び付け、データの統合・分析を通じてインドネシアの地域開発を研究するためのリポジトリです。
 tags:
 - spatial
 - python

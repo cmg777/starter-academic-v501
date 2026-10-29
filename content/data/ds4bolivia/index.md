@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A Data Science Repository to Study GeoSpatial Development in Bolivia
+summary: A repository of spatial and socioeconomic data for studying local development in Bolivia, with linked datasets, interactive maps, and notebooks for reproducible analysis.
 tags:
 - spatial
 - python

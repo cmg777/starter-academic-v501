@@ -8,7 +8,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A public access platform for the analysis, monitoring, and evaluation of sustainable regional development in Cambodia
+summary: An observatory combining development indicators, analysis tools, and research insights to support the study and monitoring of sustainable regional development across Cambodia.
 tags:
 - spatial
 - python
