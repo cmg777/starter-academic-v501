@@ -1,0 +1,49 @@
+/* Layout extension to the Bolivia template. */
+/* Audience-focused layouts using the original Bolivia Nightlight palette. */
+.reveal .slide h2 {font-size:1.24em; line-height:1.13; margin-bottom:.42em;}
+.reveal .slide .kicker {margin-bottom:.35em;}
+.reveal .slide p {margin:.3em 0;}
+.reveal .slide .takeaway {display:block; font-size:.78em; line-height:1.35; border-top:1px solid #2A5183; padding-top:.5em; margin-top:.45em; color:#F5B455;}
+.reveal .slide .source {font-size:.42em; line-height:1.35; margin-top:.55em; color:#A9BDD4;}
+.reveal .slide .wide-illustration {width:100%; height:390px; object-fit:cover; margin:0;}
+.reveal .picture-slide figure {margin:.2em 0 0;}
+.reveal .slide .three-labels {display:flex; justify-content:space-between; font-size:.65em; color:#A9BDD4; padding:0 6%; margin:.4em 0 -.25em;}
+.reveal .slide .plain-pair {display:flex; justify-content:space-around; gap:1.5em; text-align:center; font-size:.85em; line-height:1.35; margin:.4em 0;}
+.reveal .slide .definition {display:flex; gap:1.4em; align-items:center; margin:1.2em .5em .8em;}
+.reveal .slide .hero-number {font-size:5.1em; font-weight:700; color:#8FC0EC; line-height:1; letter-spacing:-.06em;}
+.reveal .slide .lead {font-size:1.12em; font-weight:500; line-height:1.3;}
+.reveal .slide .quiet {font-size:.82em; color:#A9BDD4; line-height:1.5;}
+.reveal .slide .word-note {font-size:.85em; margin:1em .8em;}
+.reveal .slide .vector {font-family:'Fira Code',monospace; font-size:2.05em; letter-spacing:-.04em; text-align:center; margin:1em 0 .2em; color:#8FC0EC;}
+.reveal .slide .vector-caption {font-size:.5em; color:#A9BDD4; text-align:center; margin-bottom:1.5em;}
+.reveal .slide .learning-row {display:flex; gap:.9em; align-items:center; margin:1em .4em;}
+.reveal .slide .step-number {font-family:'Source Serif 4',serif; font-size:2.5em; line-height:1; color:#8FC0EC; width:1.1em; flex-shrink:0;}
+.reveal .slide h3 {font-size:1.05em; color:#EEF3F9; margin:0 0 .28em; font-weight:600;}
+.reveal .slide .learning-row p {font-size:.82em; color:#A9BDD4;}
+.reveal .slide .two-columns {display:flex; align-items:center; gap:1.4em; height:470px;}
+.reveal .slide .two-columns > div {width:50%;}
+.reveal .slide .two-columns img {height:450px; width:100%; object-fit:contain; margin:0; max-height:450px;}
+.reveal .study-slide .two-columns .image-column {width:43%;}
+.reveal .study-slide .two-columns .text-column {width:57%;}
+.reveal .slide .hero-small {font-family:'Source Serif 4',serif; font-size:1.9em; color:#8FC0EC; margin:0 0 .3em;}
+.reveal .slide .comparison {display:flex; gap:2em; margin:1.2em .45em 1.4em;}
+.reveal .slide .comparison > div {flex:1;}
+.reveal .slide .comparison > div + div {border-left:1px solid #2A5183; padding-left:1.2em;}
+.reveal .slide .comparison h3 {min-height:2.4em; font-size:1em; color:#8FC0EC;}
+.reveal .slide .comparison p {font-size:.81em; line-height:1.45; margin:.4em 0; color:#A9BDD4;}
+.reveal .slide .comparison .question {color:#EEF3F9; margin-top:1em; font-weight:500;}
+.reveal .slide .evidence-figure {width:100%; height:410px; object-fit:contain; max-height:410px; margin:0;}
+.reveal .slide .map-figure {width:100%; height:460px; object-fit:contain; max-height:460px; margin:0;}
+.reveal .evidence-slide figure,.reveal .map-slide figure {margin:.1em 0;}
+.reveal .slides section.closing-statement {padding:1.4em 1.5em; box-sizing:border-box;}
+.reveal .slides section.closing-statement h2 {max-width:16em; font-size:1.7em; font-family:'Source Serif 4',serif; margin:0 0 .6em;}
+.reveal .slides section.closing-statement .closing-line {font-size:.85em; line-height:1.55; color:#A9BDD4;}
+.reveal .slides section.closing-statement .closing-author {font-size:.57em; margin-top:1.5em;}
+.reveal .slide-background[data-background-hash*="closing"] {background-color:#06101F;}
+#title-slide .title-card {width:48%;}
+#title-slide .title {font-size:1.94em; max-width:9em;}
+#title-slide .subtitle {font-size:.83em; max-width:22em;}
+#title-slide .occasion {font-size:.51em; letter-spacing:.055em;}
+/* Embedded image URLs do not retain filenames, so scope the closing veil by its slide class. */
+.reveal .slide-background.closing-statement .slide-background-content::after {content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(6,16,31,.92) 0%,rgba(6,16,31,.78) 49%,rgba(6,16,31,.10) 82%);}
+.reveal .slides section.closing-statement h2 {max-width:14em;}
