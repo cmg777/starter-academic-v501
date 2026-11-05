@@ -174,6 +174,7 @@
       font-display: block;
     }
   </style>
+
 </head>
 <body class="quarto-dark">
   <div class="reveal">
@@ -203,6 +204,7 @@
   </div>
   <p class="title-background-description">Illustrative orbital view of a generic Earth-observation satellite above Earth's day-night boundary, with daylight terrain and restrained settlement lights visible below.</p>
 </section>
+
 <section id="local-decisions-need-information-between-surveys" class="slide level2 picture-slide">
 <h2>Local decisions need information between surveys</h2>
 <p><span class="kicker">The information gap</span></p>
@@ -236,31 +238,11 @@ Which places need a closer look?
 <div class="three-labels">
 <span>Many observations</span><span>AI model</span><span>Numerical summary</span>
 </div>
-<p><img data-src="figures/embedding-compression.png" class="wide-illustration" alt="Illustrative repeated seasonal observations of one place pass through a compression metaphor into a grid representing one numerical summary."></p>
+<p><img data-src="figures/embedding-compression.png" class="wide-illustration" alt="Illustrative repeated observations of one place pass through a compression metaphor into a grid representing one numerical summary."></p>
 <p><span class="takeaway">The summary becomes an input to a separate prediction model.</span></p>
 <aside class="notes">
 <p>This is the entire idea of the talk. We start with repeated observations of a place. A general-purpose AI model compresses the observations into a useful numerical description called an embedding. We can then ask whether those numerical descriptions help predict an outcome for which we have measured examples.</p>
 <p>The picture is an analogy, not AlphaEarth’s literal architecture. It is a new AI-generated scientific illustration. The colored cells represent numerical features, not a geographic grid or a poverty classification. Sources: https://deepmind.google/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/ and https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL .</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="one-place-looks-different-across-a-year" class="slide level2 picture-slide">
-<h2>One place looks different across a year</h2>
-<p><span class="kicker">Repeated observations</span></p>
-<p><img data-src="figures/year-observations.png" class="wide-illustration" alt="Illustrative repeated overhead views of the same river, village and fields under greener, cloudier and drier conditions."></p>
-<p><span class="takeaway">The landscape includes both stable features and seasonal patterns.</span></p>
-<aside class="notes">
-<p>Point to the same river bend, settlement and roads in each view. The appearance of fields changes, and some observations have clouds. An annual embedding uses observations across a calendar year, including the context around each pixel. It is richer than one photograph or a simple average of image colors.</p>
-<p>These are AI-generated illustrative scenes, not actual observations, and no numerical result comes from them. Source for annual temporal coverage and neighborhood context: Google Earth Engine satellite-embedding catalog, https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL .</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -473,6 +455,49 @@ This is an index,<br>not the poverty rate.
           display:block!important;
       }</style></aside>
 </section>
+<section id="can-nighttime-lights-tell-us-about-poverty" class="slide level2 evidence-slide">
+<h2>Can nighttime lights tell us about poverty?</h2>
+<p><span class="kicker">Each dot is one municipality</span></p>
+<p><img data-src="figures/ntl-poverty-scatter.svg" class="evidence-figure" alt="Scatter of all 339 Bolivian municipalities in 2017. The x axis is population-weighted mean nighttime-light radiance on a log scale. The y axis is the SDG 1 achievement index, from 0 to 100; higher means less poverty."></p>
+<p><span class="takeaway">Brighter places tend to score higher, but the relationship is far from exact.</span></p>
+<p><span class="source">SDG 1 is an achievement index: higher means less poverty. Source: Bolivia study, 2017 municipal data.</span></p>
+<aside class="notes">
+<p>Each dot is a municipality. The horizontal axis is a single measure of nighttime lights: population-weighted mean VIIRS radiance. The axis is logarithmic, so equal distances represent equal ratios of brightness. The vertical axis is the No Poverty achievement index, not a poverty rate. Higher means less poverty.</p>
+<p>Places with brighter lights tend to score higher, but municipalities with similar light levels can have quite different outcomes. This is an association, not evidence that lighting causes poverty reduction. All 339 observations come directly from the pinned study’s original interactive scatter, decoded at full precision. The SDG 1 outcomes match the source CSV exactly. Source: https://github.com/quarcs-lab/project2026e-slides/blob/bb860234b4c4f4f279509ae26cc4c1483fe10256/figures/fig-ntl-sdg1-scatter.html and scripts/fig-ntl-sdg1-scatter.py. VIIRS DNB Annual V2.1, population-weighted average band, 2017, nW/sr/cm².</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="r²-compares-a-model-with-predicting-the-average" class="slide level2 evidence-slide">
+<h2>R² compares a model with predicting the average</h2>
+<p><img data-src="figures/ntl-r2-teaching.svg" class="evidence-figure" alt="The same 339 municipalities appear in two panels. On the left, everyone is assigned the mean SDG 1 index, 37.46. On the right, a fitted line uses the log of mean nighttime-light radiance. Squared error falls from 100 percent of the baseline to 45.6 percent. In-sample R squared equals 0.544. The next step is to test on municipalities left out."></p>
+<p><span class="takeaway">Here, nighttime lights reduce squared errors by 54.4% in the same places used to fit the line.</span></p>
+<p><span class="source">Blue gaps illustrate errors. This is a descriptive fit, not a test of prediction in new places.</span></p>
+<aside class="notes">
+<p>Start with the simplest prediction: give every municipality the same average score, 37.46. The gaps from each dot to that horizontal line are errors. Square these gaps and add them up. This is our 100% baseline.</p>
+<p>Now use one nighttime-light measure to fit a line. Its total squared error is 45.6% of that baseline. R² measures the reduction: one minus 0.456 equals 0.544. In this descriptive fit, the line captures about 54.4% of the variation in the index. This is not the percentage of households classified correctly, a causal effect, or an accuracy rate.</p>
+<p>The line is ordinary least squares fitted to all 339 observations, with SDG 1 achievement as the outcome and the natural logarithm of population-weighted mean radiance as the single predictor. R² = 0.5440562265527182. Both panels and the score use the same municipalities; the blue gaps show a representative subset only for legibility. The score uses all observations. This in-sample illustration cannot establish performance in new places. That requires held-out evaluation, introduced next. A held-out R² can be negative if the model does worse than its mean-only benchmark.</p>
+<p>Do not confuse this one-predictor descriptive result with the study’s 0.553 held-out nighttime-light result, which uses eight features in a random-forest model. Provenance and exact calculations are in the editable source bundle, NIGHTLIGHTS-PROVENANCE.md. Source: pinned original fig-ntl-sdg1-scatter.html and scripts/fig-ntl-sdg1-scatter.py.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="a-useful-prediction-must-work-on-places-left-out-of-training" class="slide level2 validation-slide">
 <h2>A useful prediction must work on places left out of training</h2>
 <p><span class="kicker">Testing, not memorizing</span></p>
@@ -502,7 +527,7 @@ Can it travel to another region?
 </div>
 <p><span class="takeaway">Harder tests reveal where confidence should fall.</span></p>
 <aside class="notes">
-<p>A prediction score is meaningful only when the model has not trained on the outcomes it is asked to predict. The study uses nested validation, keeping model tuning inside the training procedure. Random folds ask about interpolation among similar places. Holding out whole departments is a more demanding transfer test.</p>
+<p>To assess prediction in new places, evaluate outcomes excluded from model training. The previous slide described how well a simple line fits the same places used to estimate it; here we ask a different question. The study uses nested validation, keeping model tuning inside the training procedure. Random folds ask about interpolation among similar places. Holding out whole departments is a more demanding transfer test.</p>
 <p>Spatial neighbors can resemble one another, so a random split may be optimistic about performance in entirely new regions. Neither design establishes future-year performance or performance in another country. Source: source deck methods and tbl-views-lodo.csv, tbl-mon-comprehensive.csv.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -542,9 +567,9 @@ Can it travel to another region?
 <p><span class="kicker">Random municipal splits</span></p>
 <p><img data-src="figures/poverty-random-split.svg" class="evidence-figure" alt="Poverty prediction R squared is 0.553 for nighttime lights, 0.691 for satellite embeddings and 0.721 for their combination."></p>
 <p><span class="takeaway">The combined view adds a modest gain over embeddings alone.</span></p>
-<p><span class="source">Population-weighted features; mean out-of-sample R². Source: tbl-mon-featureset-comparison.csv.</span></p>
+<p><span class="source">Held-out tests of random-forest models; nightlights uses eight features. Source: tbl-mon-featureset-comparison.csv.</span></p>
 <aside class="notes">
-<p>Nighttime lights provide a useful baseline. Population-weighted nighttime features reach 0.553, embeddings 0.691, and their combination 0.721 in the random-split test. The chart rounds these to two decimal places. Do not call these percentages of accuracy or infer that the small combined gain is statistically significant without the relevant uncertainty analysis.</p>
+<p>Nighttime lights provide a useful baseline. Unlike the earlier one-variable fitted line, this study model uses eight population-weighted nighttime-light features in a random forest. Its mean held-out R² is 0.553, embeddings 0.691, and their combination 0.721 in the random-split test. The chart rounds these to two decimal places. Do not call these percentages of accuracy or infer that the small combined gain is statistically significant without the relevant uncertainty analysis.</p>
 <p>“Daytime embeddings” preserves the original study’s label, but AlphaEarth uses radar alongside optical imagery. The chart label “Satellite embeddings” is technically more precise. All values come from the No Poverty outcome only. Source: tbl-mon-featureset-comparison.csv, SDG 1 row, population-weighted columns.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
