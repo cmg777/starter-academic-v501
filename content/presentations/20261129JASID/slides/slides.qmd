@@ -214,7 +214,7 @@ Do not confuse this one-predictor descriptive result with the study's 0.553 held
 ## Averaged over empty land, the lights still read poverty better
 
 ```{=html}
-{{< include figures/fig-r2-master-simple.html >}}
+{{< include figures-src/fig-r2-master-simple.html >}}
 ```
 
 [Simple average over every pixel · out of sample · 339 municipalities. On poverty, the top row, nighttime lights reach 0.52 and the embeddings only 0.38 — and the embeddings lead on just 8 of the 15 goals.]{.source}
@@ -252,7 +252,7 @@ The population raster shown is an existing analytical figure from the Bolivia de
 ## Weight by where people live and the embeddings read poverty best
 
 ```{=html}
-{{< include figures/fig-r2-master.html >}}
+{{< include figures-src/fig-r2-master.html >}}
 ```
 
 [Weighted by population · out of sample · same models, same splits. On poverty the embeddings move from 0.38 to 0.69 and now beat the lights at 0.55 — and they lead on 14 of the 15 goals, up from 8.]{.source}
@@ -271,7 +271,7 @@ This is a large change in this study, not a guarantee that weighting always help
 ## How you test decides what you get: 0.54 to 0.72
 
 ```{=html}
-{{< include figures/fig-combined-range.html >}}
+{{< include figures-src/fig-combined-range.html >}}
 ```
 
 [Combined predictor, lights and embeddings together. For poverty the score runs from 0.54 when a whole department is held out of training to 0.72 when the test municipalities sit among regions the model already knows.]{.source}
@@ -290,7 +290,7 @@ These two numbers are not a confidence interval and not bounds guaranteed for ev
 ## The satellite view recovers the geography of poverty {.map-slide}
 
 ```{=html}
-{{< include figures/fig-views-lisa-sdg1.html >}}
+{{< include figures-src/fig-views-lisa-sdg1.html >}}
 ```
 
 [Red: clusters of low poverty · Blue: poverty traps · Compare panel (a), the measured map, with panel (d), the combined prediction: 80% agreement across all classes, 75% among the measured clusters.]{.source}

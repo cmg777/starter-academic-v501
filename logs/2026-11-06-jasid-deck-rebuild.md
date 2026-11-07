@@ -112,3 +112,41 @@ Side fix: `.claude/skills/write-slides/SKILL.md` and two of its references point
 The trilingual `index.md` files are unchanged: title, subtitle, slug, `url_slides`, the iframe and
 the summary and abstract all remain accurate — the talk is still scoped to SDG 1, with the other
 goals present only as context around the highlighted poverty row.
+
+## Netlify build failure and fix (same day)
+
+The first push (`0b5b865f`) failed the Netlify build in 31 s:
+
+```text
+Error building site: "/opt/build/repo/content/presentations/20261129JASID/slides/figures/fig-combined-range.html:1:1": pl
+```
+
+The message is truncated in the Netlify log, so the root cause is **not confirmed**. What is
+established: Hugo parses `.html` page-bundle resources, and `config/_default/config.yaml` already
+documents a build dying the same way on `jupyter_server/templates/404.html`. The named file was
+simply the alphabetically first of the four new interactive includes.
+
+A leading `<!--` was the obvious suspect — every content `.html` that builds today opens with
+`<!DOCTYPE`, `<!doctype`, `<section` or `<script>`, while all seven new files opened with a comment.
+That theory is **wrong on its own**: `slides_files/libs/revealjs/plugin/notes/speaker-view.html`
+also opens with `<!--`, ships in about 75 bundles, and was in this bundle during the previous
+successful build.
+
+The fix therefore does not depend on knowing the cause:
+
+* The four generated includes moved from `slides/figures/` to `slides/figures-src/`, which the
+  content mount already excludes via `presentations/*/slides/figures-src/**` — the rule added for
+  the ADBI deck's figure sources. **No config change.** The exclusion is confirmed to cover files
+  sitting directly in that directory: `make_figures.py` and `requirements.txt` are direct children
+  of `20261030ADBI/slides/figures-src/` and both return 404 on the live site. The includes are
+  spliced into `index.html` at Quarto render time, so nothing needs them at runtime
+  (`grep -c figures-src index.html` is 0), and they stay byte-identical to their upstream
+  `do not hand-edit` source.
+* `fonts.html`, `plotly.html` and `title-slide.html` keep their explanatory comments, moved to the
+  end of the file, so each now opens with a real tag: `<style>`, `<script src=…>` and
+  `<section id="$idprefix$title-slide"`. Each opening now matches a file that builds today —
+  `mathjax-fonts.html` for the first two, ADBI's and GSID's `title-slide.html` for the third.
+
+After the change every `.html` the bundle still exposes to Hugo has a direct precedent in a bundle
+Netlify already builds. Re-rendered and re-verified: 17 slides, 0 px overflow on every slide, all
+four Plotly figures drawing, one theme stylesheet, console clean.

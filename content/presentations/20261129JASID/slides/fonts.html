@@ -1,3 +1,28 @@
+<style>
+  @font-face {
+    font-family: "Inter";
+    src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
+    font-family: "Source Serif 4";
+    src: url("fonts/SourceSerif4-Variable.ttf") format("truetype-variations");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: block;
+  }
+  /* Fira Code: used only for the website line on the cover and the closing card. */
+  @font-face {
+    font-family: "Fira Code";
+    src: url("fonts/FiraCode-Variable.ttf") format("truetype-variations");
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: block;
+  }
+</style>
+
 <!-- Bundled webfonts, declared here rather than in theme.scss ON PURPOSE.
 
      Quarto compiles theme.scss to
@@ -25,27 +50,6 @@
      Firefox 62, Safari 11, Edge 17), and a browser old enough to skip this src simply falls
      through to the system stack in theme.scss ($font-family-sans-serif / $title-serif), which
      degrades gracefully rather than breaking. Do not re-add the second url(). -->
-<style>
-  @font-face {
-    font-family: "Inter";
-    src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: block;
-  }
-  @font-face {
-    font-family: "Source Serif 4";
-    src: url("fonts/SourceSerif4-Variable.ttf") format("truetype-variations");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: block;
-  }
-  /* Fira Code: used only for the website line on the cover and the closing card. */
-  @font-face {
-    font-family: "Fira Code";
-    src: url("fonts/FiraCode-Variable.ttf") format("truetype-variations");
-    font-weight: 300 700;
-    font-style: normal;
-    font-display: block;
-  }
-</style>
+<!-- NOTE: this file must NOT begin with an HTML comment. Hugo parses .html page-bundle
+     resources as front matter and a leading `<!--` kills the whole site build at 1:1.
+     Keep a real tag on line 1; the explanatory comment lives at the end of the file. -->

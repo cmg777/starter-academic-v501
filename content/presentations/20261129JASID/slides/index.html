@@ -123,6 +123,31 @@
       margin-right: 0; 
     }
   </style>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Source Serif 4";
+      src: url("fonts/SourceSerif4-Variable.ttf") format("truetype-variations");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: block;
+    }
+    /* Fira Code: used only for the website line on the cover and the closing card. */
+    @font-face {
+      font-family: "Fira Code";
+      src: url("fonts/FiraCode-Variable.ttf") format("truetype-variations");
+      font-weight: 300 700;
+      font-style: normal;
+      font-display: block;
+    }
+  </style>
+
   <!-- Bundled webfonts, declared here rather than in theme.scss ON PURPOSE.
 
        Quarto compiles theme.scss to
@@ -150,51 +175,27 @@
        Firefox 62, Safari 11, Edge 17), and a browser old enough to skip this src simply falls
        through to the system stack in theme.scss ($font-family-sans-serif / $title-serif), which
        degrades gracefully rather than breaking. Do not re-add the second url(). -->
-  <style>
-    @font-face {
-      font-family: "Inter";
-      src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
-      font-weight: 100 900;
-      font-style: normal;
-      font-display: block;
-    }
-    @font-face {
-      font-family: "Source Serif 4";
-      src: url("fonts/SourceSerif4-Variable.ttf") format("truetype-variations");
-      font-weight: 100 900;
-      font-style: normal;
-      font-display: block;
-    }
-    /* Fira Code: used only for the website line on the cover and the closing card. */
-    @font-face {
-      font-family: "Fira Code";
-      src: url("fonts/FiraCode-Variable.ttf") format("truetype-variations");
-      font-weight: 300 700;
-      font-style: normal;
-      font-display: block;
-    }
-  </style>
+  <!-- NOTE: this file must NOT begin with an HTML comment. Hugo parses .html page-bundle
+       resources as front matter and a leading `<!--` kills the whole site build at 1:1.
+       Keep a real tag on line 1; the explanatory comment lives at the end of the file. -->
+  <script src="figures/plotly.min.js" charset="utf-8"></script>
+  <!-- The 339 municipal polygons and the national outline, shared by every interactive map slide.
+       Written by scripts/_interactive.py write_geometry() (called from fig-views-lisa.py). -->
+  <script src="figures/geo-municipalities.js" charset="utf-8"></script>
+
   <!-- plotly.js for the interactive charts (fig-ntl-sdg1-scatter, fig-r2-master[-simple], fig-combined-range).
        A LOCAL file, not a CDN: embed-resources inlines it, so the single-file deck still works offline.
        figures/plotly.min.js is written by scripts/_interactive.py from the pinned `plotly` package —
        do not replace it by hand. It is loaded synchronously in <head> because each chart's inline
        script calls Plotly.newPlot as soon as the slide's HTML is parsed. -->
-  <script src="figures/plotly.min.js" charset="utf-8"></script>
-  <!-- The 339 municipal polygons and the national outline, shared by every interactive map slide.
-       Written by scripts/_interactive.py write_geometry() (called from fig-views-lisa.py). -->
-  <script src="figures/geo-municipalities.js" charset="utf-8"></script>
+  <!-- NOTE: this file must NOT begin with an HTML comment. Hugo parses .html page-bundle
+       resources as front matter and a leading `<!--` kills the whole site build at 1:1.
+       Keep a real tag on line 1; the explanatory comment lives at the end of the file. -->
 </head>
 <body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
-<!-- Quarto reveal.js title-slide partial (referenced via `template-partials:` in the deck YAML).
-     Image-led academic cover: serif title, a subtitle framed by a thin rule, then a
-     left-aligned author block (name, then the author-site URL as a link, then affiliations) and a small-caps footer
-     (venue · date, paper/project link). Driven by the deck's top-level metadata: title, subtitle,
-     author, author-site, affil-school, affil-university, affil-country, venue, date, paper-url. Any absent field is
-     omitted. All visual styling lives in theme.scss, scoped to #title-slide so other slides are untouched.
-     NOTE: do not use `website:` for the link — it is a reserved Quarto key; use `author-site:`. -->
 <section id="title-slide" data-background-color="#06101F" data-background-image="figures/fig-title-ai-satellite.webp" data-background-size="cover" data-background-position="center center" class="center">
   <div class="title-card">
     <h1 class="title">Mapping local development</h1>
@@ -212,6 +213,17 @@
   </div>
   <p class="title-background-description">Illustrative view of an Andean valley from orbit at dawn, with a river, fields and a small town below. A network of faint blue lines rises from the landscape and gathers into a short vertical column of numbers, standing for the numerical summary an AI model produces from satellite imagery.</p>
 </section>
+
+<!-- Quarto reveal.js title-slide partial (referenced via `template-partials:` in the deck YAML).
+     Image-led academic cover: serif title, a subtitle framed by a thin rule, then a
+     left-aligned author block (name, then the author-site URL as a link, then affiliations) and a small-caps footer
+     (venue · date, paper/project link). Driven by the deck's top-level metadata: title, subtitle,
+     author, author-site, affil-school, affil-university, affil-country, venue, date, paper-url. Any absent field is
+     omitted. All visual styling lives in theme.scss, scoped to #title-slide so other slides are untouched.
+     NOTE: do not use `website:` for the link — it is a reserved Quarto key; use `author-site:`. -->
+<!-- NOTE: this file must NOT begin with an HTML comment. Hugo parses .html page-bundle
+     resources as front matter and a leading `<!--` kills the whole site build at 1:1.
+     Keep a real tag on line 1; the explanatory comment lives at the end of the file. -->
 <section id="local-decisions-need-information-between-surveys" class="slide level2 picture-slide">
 <h2>Local decisions need information between surveys</h2>
 <p><span class="kicker">The information gap</span></p>
