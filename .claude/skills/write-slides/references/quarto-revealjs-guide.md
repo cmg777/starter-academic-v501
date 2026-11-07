@@ -1,7 +1,7 @@
 # Quarto reveal.js guide
 
 How a deck is built and what every knob does. The deck is authored as a `.qmd` and rendered
-by the **Quarto CLI** (`/Applications/quarto/bin/quarto`, 1.8.27+) to a reveal.js HTML deck
+by the **Quarto CLI** (`$HOME/opt/bin/quarto`, 1.8.27+) to a reveal.js HTML deck
 that Hugo serves from the post bundle. Read this in Phase 3.
 
 ---
@@ -16,7 +16,7 @@ that Hugo serves from the post bundle. Read this in Phase 3.
 
 Render (from the `slides/` dir):
 ```bash
-/Applications/quarto/bin/quarto render slides.qmd
+$HOME/opt/bin/quarto render slides.qmd
 ```
 → `index.html` + `slides_files/` (reveal.js + plugins + libs, ~8 MB). Figures are referenced
 in place as `../<slug>_*.png` (Quarto keeps the relative ref; Hugo resolves it). The `.qmd`,

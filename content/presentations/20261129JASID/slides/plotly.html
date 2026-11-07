@@ -1,0 +1,9 @@
+<!-- plotly.js for the interactive charts (fig-ntl-sdg1-scatter, fig-r2-master[-simple], fig-combined-range).
+     A LOCAL file, not a CDN: embed-resources inlines it, so the single-file deck still works offline.
+     figures/plotly.min.js is written by scripts/_interactive.py from the pinned `plotly` package —
+     do not replace it by hand. It is loaded synchronously in <head> because each chart's inline
+     script calls Plotly.newPlot as soon as the slide's HTML is parsed. -->
+<script src="figures/plotly.min.js" charset="utf-8"></script>
+<!-- The 339 municipal polygons and the national outline, shared by every interactive map slide.
+     Written by scripts/_interactive.py write_geometry() (called from fig-views-lisa.py). -->
+<script src="figures/geo-municipalities.js" charset="utf-8"></script>

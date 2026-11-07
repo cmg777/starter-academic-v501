@@ -46,7 +46,7 @@ Devil's-Advocate) lives in [`references/rhetoric-of-decks.md`](references/rhetor
 - **Does not support standalone-topic invocation.** A deck requires an existing post.
 - **Does not create ES/JA copies.** The deck rides with the English post like `web_app/`.
 - **Does not ship a companion review skill.** Write-only for now.
-- **Requires the Quarto CLI** (`/Applications/quarto/bin/quarto`, 1.8.27+) to (re)generate.
+- **Requires the Quarto CLI** (`$HOME/opt/bin/quarto`, 1.8.27+) to (re)generate.
 
 ---
 
@@ -232,7 +232,7 @@ Unicode (slide-mapping § "Math symbols → LaTeX"). Run the **MB/MC + one-idea-
 
 ### 3.4 Render
 ```bash
-cd content/tutorials/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
+cd content/tutorials/<slug>/slides && $HOME/opt/bin/quarto render slides.qmd
 ```
 → `index.html` + `slides_files/`. On failure, apply the **render-and-fix loop (max 3
 attempts)** from [`references/render-and-fix.md`](references/render-and-fix.md) (e.g. the
@@ -298,7 +298,7 @@ NEXT STEPS (copy + paste)
       # verify: pdfinfo deck.pdf  ->  Pages == Reveal.getTotalSlides()
 
 3. Re-render after editing slides.qmd:
-   cd content/tutorials/<slug>/slides && /Applications/quarto/bin/quarto render slides.qmd
+   cd content/tutorials/<slug>/slides && $HOME/opt/bin/quarto render slides.qmd
 
 4. Optional — republish as an interactive AhaSlides deck (audience polls/quizzes on
    top of pixel-faithful slide images). Needs the PDF from step 2b:

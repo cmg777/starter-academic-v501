@@ -11,7 +11,7 @@ kernel or package install is needed.
 From the deck dir:
 ```bash
 cd content/tutorials/<slug>/slides
-/Applications/quarto/bin/quarto render slides.qmd
+$HOME/opt/bin/quarto render slides.qmd
 ```
 Must produce `index.html` (> 30 KB) + a `slides_files/` directory. On failure, apply the
 render-and-fix loop (max 3 attempts) using `render-and-fix.md`, then re-render. Common first-

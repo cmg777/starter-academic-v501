@@ -1,0 +1,45 @@
+<!-- Quarto reveal.js title-slide partial (referenced via `template-partials:` in the deck YAML).
+     Image-led academic cover: serif title, a subtitle framed by a thin rule, then a
+     left-aligned author block (name, then the author-site URL as a link, then affiliations) and a small-caps footer
+     (venue · date, paper/project link). Driven by the deck's top-level metadata: title, subtitle,
+     author, author-site, affil-school, affil-university, affil-country, venue, date, paper-url. Any absent field is
+     omitted. All visual styling lives in theme.scss, scoped to #title-slide so other slides are untouched.
+     NOTE: do not use `website:` for the link — it is a reserved Quarto key; use `author-site:`. -->
+<section id="$idprefix$title-slide" data-background-color="#06101F" data-background-image="figures/fig-title-ai-satellite.webp" data-background-size="cover" data-background-position="center center"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$>
+  <div class="title-card">
+    <h1 class="title">$title$</h1>
+$if(subtitle)$
+  <p class="subtitle">$subtitle$</p>
+$endif$
+  <div class="author-block">
+$for(author)$
+    <p class="author">$author$</p>
+$endfor$
+$if(author-site)$
+    <p class="author-site"><a href="https://$author-site$">https://$author-site$</a></p>
+$endif$
+$if(affil-school)$
+    <p class="affil">$affil-school$</p>
+$endif$
+$if(affil-university)$
+    <p class="affil">$affil-university$</p>
+$endif$
+$if(affil-country)$
+    <p class="affil">$affil-country$</p>
+$endif$
+  </div>
+  <div class="title-footer">
+$if(venue)$
+    <p class="occasion"><span class="venue">$venue$</span>$if(date)$ &middot; <span class="date">$date$</span>$endif$</p>
+$else$
+$if(date)$
+    <p class="occasion"><span class="date">$date$</span></p>
+$endif$
+$endif$
+$if(paper-url)$
+    <p class="paper-link">$paper-url$</p>
+$endif$
+  </div>
+  </div>
+  <p class="title-background-description">Illustrative view of an Andean valley from orbit at dawn, with a river, fields and a small town below. A network of faint blue lines rises from the landscape and gathers into a short vertical column of numbers, standing for the numerical summary an AI model produces from satellite imagery.</p>
+</section>

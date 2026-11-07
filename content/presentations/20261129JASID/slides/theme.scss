@@ -1,0 +1,797 @@
+/*-- scss:defaults --*/
+
+// ===== "Nightlight" palette, DARK — an Earth-at-night canvas =====
+// The same register as the manuscript's own nighttime-lights, population and embedding rasters, so
+// deck and paper look like one body of work.
+//
+// Every ratio below is MEASURED against the $bg canvas, not asserted. Re-run scripts/_qa_checks.py
+// after ANY change to this block; it parses this file and fails the gate if a foreground colour
+// stops clearing 4.5:1.
+//
+// Naming matters here, and not only for readability: the contrast gate decides whether a variable
+// is a background or foreground FROM ITS NAME (`bg`, `surface`, `divider`, `hairline`, `fill`,
+// `canvas`, `shade`). A background that skips those words gets graded as body text against the
+// canvas and fails at ~1.2:1 for doing its job correctly.
+
+// ----- depth ramp (backgrounds; name-exempt from the foreground contrast check) -----
+$bg-deep:       #06101F;   // vignette floor + full-bleed section dividers
+$bg:            #0A1C36;   // canvas base — night sky
+$bg-lift:       #10294B;   // gradient high point, upper-left
+$bg-alt:        #13304F;   // legacy alias, kept so existing rules resolve
+$surface:       #13304F;   // card / panel fill
+$surface-hi:    #193C63;   // table header, raised row
+$hairline:      #2A5183;   // 1px borders on surfaces
+
+// ----- foreground (graded against $bg) -----
+$ink:           #EEF3F9;   // primary text ................ 15.3:1
+$ink-muted:     #A9BDD4;   // secondary text .............. 8.9:1
+$ink-faint:     #8199B4;   // captions, .source, footer ... 5.8:1
+$accent:        #8FC0EC;   // daytime embeddings, links ... 8.9:1
+$accent-2:      #F5B455;   // nighttime lights, emphasis .. 9.4:1
+$accent-dim:    #5A8FC4;   // rules, inactive markers ..... 5.0:1
+$accent-bright: #B0D4F5;   // link hover .................. 11.6:1
+$alert:         #F58A73;   // negative .................... 7.1:1
+$success:       #6FD69B;   // positive .................... 9.6:1
+$tertiary-1:    #63D2E0;   // teal series ................. 9.6:1
+$tertiary-2:    #DCC77A;   // gold series ................. 10.1:1
+
+// $accent-dim was going to be #4E85BC, which measures 4.39:1 — a hair under AA. It is only ever
+// used for ornament, so an exemption would have been defensible; it was lightened instead. Contrast
+// on ornament costs nothing, and an exemption is permanent.
+
+// ----- map ramp (LISA clusters + choropleth brackets), mirrored by _fourview.py -----
+// Declared HERE, rather than only in the figure code, so the palette-drift check has something to
+// compare against. While these lived only in _fourview.py the checker flagged the cluster red as an
+// off-palette colour, which was true but useless: it is a deliberate categorical ramp, and the fix
+// is to declare it, not to bend it toward $alert. (Aligning it would have cost real legibility —
+// #F58A73 sits ~40 RGB from the High-low amber, against ~107 for the red actually used, so two
+// adjacent map classes would have become hard to tell apart.)
+$cluster-high-high: #E05A4E;   // low-poverty cluster ... 4.7:1
+$cluster-low-low:   #6FA8DC;   // poverty trap .......... 6.7:1
+$cluster-high-low:  #EFB16E;   // outlier ............... 9.1:1
+$cluster-low-high:  #8FC4DC;   // outlier ............... 9.0:1
+$bracket-mid:       #9AA6B5;   // middle choropleth class 6.9:1
+$map-outline:       #8899AD;   // national boundary ..... 5.9:1
+// "Not significant" must RECEDE — low contrast is the GOAL, so it is named `*-fill` to tell the
+// gate it is a background, not text. On white this class was #d3d3d3; carried onto a dark canvas
+// unchanged it scores 11:1 and makes the null class the brightest thing on the map.
+$cluster-null-fill: #33415A;   // recessive by design ... 1.7:1
+
+// ----- typography -----
+// Bundled variable fonts, both SIL OFL. The @font-face rules live in fonts.html, NOT here — see the
+// comment in that file for why a relative url() in this stylesheet resolves to the wrong directory.
+$font-family-sans-serif: "Inter", system-ui, "Helvetica Neue", Helvetica, sans-serif;
+$title-serif:            "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
+$font-family-mono:       "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+
+// ----- map onto verified Quarto reveal.js Sass variables -----
+$body-bg:          $bg;
+$body-color:       $ink;
+$text-muted:       $ink-muted;
+$primary:          $accent;
+$link-color:       $accent;
+$link-color-hover: $accent-bright;
+
+// Held at 34px. The first cut of this theme raised it to 35px with 1.45 leading to help fill the
+// empty lower half — and pushed the densest two-column slide's last bullet down into the footer.
+// The void is closed by the footer band and the surfaces, not by larger type; scaling up as well
+// just bought overflow. Raise these only after re-shooting the two-column and devil's-advocate
+// slides, which are the binding constraint.
+$presentation-font-size-root: 34px;
+$presentation-line-height: 1.42;
+
+$presentation-heading-font:        $font-family-sans-serif;
+$presentation-heading-color:       $ink;
+$presentation-heading-font-weight: 700;
+$presentation-heading-line-height: 1.12;
+$presentation-h2-font-size:        1.36em;
+
+$presentation-slide-text-align: left;          // ragged-right; never justify
+$presentation-list-bullet-color: $accent;
+
+$code-block-bg:           $surface;
+$code-block-border-color: $hairline;
+
+// dark-slide auto-recolour for full-bleed night-sky dividers
+$dark-bg-text-color: $ink;
+$dark-bg-link-color: $accent-2;
+
+// The divider fill, named so the gate resolves and grades it.
+$divider-dark: $bg-deep;
+
+/*-- scss:rules --*/
+
+:root {
+  --accent:       #{$accent};
+  --accent-2:     #{$accent-2};
+  --accent-dim:   #{$accent-dim};
+  --bg:           #{$bg};
+  --bg-deep:      #{$bg-deep};
+  --bg-alt:       #{$surface};
+  --surface:      #{$surface};
+  --surface-hi:   #{$surface-hi};
+  --hairline:     #{$hairline};
+  --ink:          #{$ink};
+  --text-muted:   #{$ink-muted};
+  --ink-faint:    #{$ink-faint};
+  --alert:        #{$alert};
+  --success:      #{$success};
+  --tertiary-1:   #{$tertiary-1};
+  --tertiary-2:   #{$tertiary-2};
+  --divider:      #{$bg-deep};
+}
+
+// ====================================================================
+//  DEPTH — the canvas is lit, not flat.
+//
+//  A single flat fill is what made this deck read as an inverted default rather than a designed
+//  dark theme. Three stacked radial gradients fix that: a cool glow behind the title area, a
+//  deeper pool in the opposite corner, and an overall vignette. All are low-amplitude and very
+//  large; the effect should register as atmosphere, never as a visible band.
+//
+//  This is also why figures must save with a TRANSPARENT background (see _palette.py). An opaque
+//  figure facecolor matching $bg would sit on the gradient as a visible flat rectangle.
+// ====================================================================
+.reveal-viewport {
+  background-color: $bg;
+  background-image:
+    radial-gradient(58% 46% at 16% 10%,  rgba(74, 142, 205, 0.20), transparent 68%),
+    radial-gradient(52% 44% at 90% 96%,  rgba(18,  58, 110, 0.42), transparent 70%),
+    radial-gradient(126% 108% at 50% 46%, transparent 40%, rgba(3, 8, 18, 0.62) 100%);
+  background-attachment: fixed;
+}
+// Let the viewport gradient show through; reveal paints an opaque .reveal by default.
+.reveal { background: transparent; }
+
+// ====================================================================
+//  HEADINGS
+//  Frame titles are near-white, not accent-coloured. On a dark canvas, maximum-contrast ink gives
+//  the cleanest hierarchy and — more usefully — it keeps blue and amber meaning "embeddings" and
+//  "lights" everywhere they appear, instead of also meaning "this is a heading".
+// ====================================================================
+.reveal .slide h2 {
+  color: $ink;
+  letter-spacing: -0.012em;
+  padding-left: 0.5em;
+  margin-bottom: 0.55em;
+  position: relative;
+}
+// A two-tone rule: the deck's two views, in the order the argument introduces them.
+.reveal .slide h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.06em;
+  bottom: 0.06em;
+  width: 5px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, $accent 0%, $accent 55%, $accent-2 55%, $accent-2 100%);
+}
+
+// Bullets + emphasis.
+.reveal .slide ul li::marker { color: $accent-dim; }
+.reveal .slide li { margin-bottom: 0.32em; }
+.reveal .slide strong { color: $accent-2; font-weight: 650; }   // amber emphasis = "the lights"
+.reveal .slide .alert  { color: $alert; }
+.reveal .slide .good   { color: $success; }
+
+// A small uppercase amber kicker.
+.reveal .slide .kicker {
+  color: $accent-2;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.5em;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.9em;
+}
+
+// Blockquote — the deck's "one line to remember" device. Given a surface so it reads as a pulled
+// aside rather than as an indented paragraph.
+.reveal .slide blockquote {
+  background: $surface;
+  border-left: 4px solid $accent-2;
+  border-radius: 0 10px 10px 0;
+  padding: 0.7em 1em;
+  margin: 0.6em 0;
+  color: $ink;
+  font-style: normal;
+  box-shadow: none;
+  width: auto;
+}
+
+// ====================================================================
+//  SECTION DIVIDERS — a chapter break, not an empty slide.
+// ====================================================================
+.reveal .slide.has-dark-background h1,
+.reveal .slide.has-dark-background h2 {
+  color: $ink;
+  font-family: $title-serif;
+  font-weight: 600;
+  letter-spacing: 0.002em;
+  padding-left: 0;
+}
+.reveal .slide.has-dark-background h1::before,
+.reveal .slide.has-dark-background h2::before { display: none; }
+// A short amber rule under the section title. Left-aligned to the title, NOT centred: the deck is
+// left-aligned throughout, and a centred rule under a left-aligned heading reads as a mistake.
+.reveal .slide.has-dark-background h1::after,
+.reveal .slide.has-dark-background h2::after {
+  content: "";
+  display: block;
+  width: 2.6em;
+  height: 3px;
+  border-radius: 2px;
+  background: $accent-2;
+  margin: 0.5em 0 0;
+}
+.reveal .slide.has-dark-background strong { color: $accent-2; }
+.reveal .slide.has-dark-background .kicker { text-align: left; margin-top: 0.9em; }
+
+// ====================================================================
+//  STAT CARD — the headline-number archetype.
+//  A bare numeral top-aligned beside a text column reads as a leftover, not a focal point. On a
+//  surface with a hairline and a label it becomes the thing the slide is built around.
+// ====================================================================
+.reveal .slide .stat {
+  background: $surface;
+  border: 1px solid rgba($accent, 0.20);
+  border-radius: 16px;
+  padding: 0.75em 0.8em 0.85em;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(3, 8, 18, 0.35);
+}
+.reveal .slide .stat .bignum { margin: 0; }
+.reveal .slide .stat .stat-label {
+  display: block;
+  color: $ink-faint;
+  font-size: 0.42em;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 0.5em;
+}
+
+// Headline-result archetype — one giant number. Tabular figures so digits align.
+//
+// INK, not $accent. This deck assigns $accent to the daytime embeddings and $accent-2 to the
+// nighttime lights on every chart, and the one number this class is used for — 0.72 on slide 16 —
+// belongs to the COMBINED predictor, which slide 18 draws in green. Setting the largest piece of
+// type in a rival series' colour contradicted the deck's own convention. A headline number is a
+// headline, not a series.
+.reveal .slide .bignum {
+  display: block;
+  color: $ink;
+  font-weight: 800;
+  font-size: 2.7em;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+// Optional vertical centring for slides whose content is short by design.
+.reveal .slide.vcenter { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+
+// ====================================================================
+//  EXPLAINER PRIMITIVES — .chain and .cards
+//  Added for the 20-minute conference cut, whose audience is applied economists rather than
+//  remote-sensing people. Three slides now have to EXPLAIN rather than assert (what the outcome
+//  variable is, what an embedding is, how the model is tested), and prose bullets were the wrong
+//  instrument for all three: a chain of steps and a two-panel comparison are shapes, and a shape is
+//  read before it is parsed.
+//
+//  NO NEW COLOURS. Every declaration below resolves to a variable already in the palette block, so
+//  _palette.py does not move and the drift check has nothing new to compare. If you ever need a
+//  colour here that is not already above, change BOTH files (CLAUDE.md rule 7) — do not inline a hex.
+// ====================================================================
+
+// A vertical sequence of steps with connectors. Used on the outcome-variable slide, where the point
+// is the DIRECTION of construction (indicators -> indices -> municipalities) and not the wording of
+// any one step.
+.reveal .slide .chain {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin: 0.2em 0;
+}
+.reveal .slide .chain-step {
+  background: $surface;
+  border: 1px solid rgba($accent, 0.20);
+  border-radius: 12px;
+  padding: 0.42em 0.7em;
+  font-size: 0.78em;
+  line-height: 1.3;
+  color: $ink;
+}
+// The connector is ornament: it must be visible without competing with the steps it joins, hence
+// $accent-dim (the deck's declared ornament colour) rather than $accent.
+.reveal .slide .chain-arrow {
+  color: $accent-dim;
+  font-size: 0.8em;
+  line-height: 1.0;
+  text-align: center;
+  margin: 0.12em 0;
+  user-select: none;
+}
+
+// Two panels side by side, for a contrast the audience must hold simultaneously rather than in
+// sequence — the two test protocols. Grid rather than .columns because the panels must share a
+// baseline and an equal height regardless of which carries more text.
+.reveal .slide .cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55em;
+  margin: 0.35em 0 0.45em;
+}
+.reveal .slide .card {
+  background: $surface;
+  border: 1px solid rgba($accent, 0.20);
+  border-radius: 14px;
+  padding: 0.6em 0.75em 0.7em;
+  box-shadow: 0 10px 30px rgba(3, 8, 18, 0.35);
+}
+.reveal .slide .card .card-head {
+  display: block;
+  color: $accent;
+  font-weight: 700;
+  font-size: 0.62em;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  margin-bottom: 0.5em;
+}
+.reveal .slide .card ul { margin: 0; }
+.reveal .slide .card li { font-size: 0.78em; line-height: 1.32; }
+// A .card holding one bare line of prose instead of a list still needs the list's optical size.
+.reveal .slide .card p { font-size: 0.78em; line-height: 1.32; margin: 0; }
+
+// Three panels, one per stage of a left-to-right figure directly above them: the embeddings slide,
+// where each card captions the stage it sits under (images -> model -> 64 numbers). The cards are
+// the explanation; the figure is the picture of it, so the two must read as one row.
+.reveal .slide .cards.cards-3 {
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0.2em 0 0.3em;
+}
+.reveal .slide .cards.cards-3 .card { padding: 0.45em 0.65em 0.5em; }
+.reveal .slide .cards.cards-3 .card p { font-size: 0.66em; }
+
+// Four panels, one per pair of the eight nighttime-lights bands, under the world-at-night image.
+.reveal .slide .cards.cards-4 {
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0.2em 0 0.3em;
+}
+.reveal .slide .cards.cards-4 .card { padding: 0.45em 0.6em 0.5em; }
+.reveal .slide .cards.cards-4 .card p { font-size: 0.62em; }
+
+// The embeddings slide: a landscape figure with a card row and a one-line quote below it. Same
+// pixels-not-vh reasoning as .figure-with-quote; the cap is the room left after the title, the cards
+// (~130px), the quote and the footer band.
+.reveal .slides section.embedding-explainer img {
+  max-height: 320px;
+  width: auto;
+}
+.reveal .slides section.embedding-explainer .quarto-figure,
+.reveal .slides section.embedding-explainer figure,
+.reveal .slides section.embedding-explainer img { margin-bottom: 0; }
+.reveal .slides section.embedding-explainer blockquote {
+  font-size: 0.72em;
+  padding: 0.45em 0.9em;
+  margin: 0.3em 0 0;
+}
+// The nighttime-lights slide borrows .embedding-explainer, but its cards wrap to four lines and it
+// carries a source line, so the world image gives back the height (scrollHeight 723px at the 320px cap).
+// Must stay below the rule above, which it overrides at equal specificity.
+.reveal .slides section.ntl-explainer img { max-height: 290px; }
+
+// A grid of labelled tiles, for a set the audience must see whole rather than read: the fifteen goal
+// indices on the outcome-variable slide. Tiles stay in SDG order and uncoloured on purpose — the
+// manuscript no longer groups the goals (see scripts/fig-r2-master.py), so nothing here implies a
+// taxonomy. The label mirrors .card-head.
+.reveal .slide .goal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.32em;
+  margin: 0.2em 0;
+}
+.reveal .slide .goal {
+  background: $surface;
+  border: 1px solid rgba($accent, 0.20);
+  border-radius: 10px;
+  padding: 0.3em 0.55em 0.34em;
+  font-size: 0.68em;
+  font-weight: 600;
+  line-height: 1.2;
+  color: $ink;
+}
+.reveal .slide .goal .goal-num {
+  display: block;
+  color: $accent;
+  font-size: 0.62em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.15em;
+}
+
+// The outcome-variable slide leads with the cover of the 2020 atlas the ground data come from, centred
+// under the kicker. To make room below it, the chain runs as one row and the goal grid as five columns
+// (three rows, SDG order kept). The cover cap is in pixels (see .portrait-figure for why not vh).
+.reveal .slides section.outcome-atlas .kicker { margin-bottom: 0.3em; }
+.reveal .slides section.outcome-atlas .quarto-figure,
+.reveal .slides section.outcome-atlas figure,
+.reveal .slides section.outcome-atlas p:has(> img) { margin: 0; }
+.reveal .slides section.outcome-atlas img {
+  max-height: 235px;
+  width: auto;
+  margin: 0 auto;
+}
+.reveal .slides section.outcome-atlas .chain {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0.3em 0 0.35em;
+}
+.reveal .slides section.outcome-atlas .chain-step { flex: 1; text-align: center; font-size: 0.66em; }
+.reveal .slides section.outcome-atlas .chain-arrow { margin: 0; }
+.reveal .slides section.outcome-atlas .goal-grid { grid-template-columns: repeat(5, 1fr); }
+
+// ====================================================================
+//  TABLES
+// ====================================================================
+.reveal .slide table {
+  font-size: 0.66em;
+  border-collapse: collapse;
+  border: 1px solid $hairline;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.reveal .slide table th {
+  background: $surface-hi;
+  color: $ink;
+  font-weight: 650;
+  border-bottom: 1px solid $hairline;
+}
+.reveal .slide table td { border-top: 1px solid rgba(42, 81, 131, 0.45); }
+.reveal .slide table tbody tr:nth-child(even) { background: rgba(19, 48, 79, 0.45); }
+
+// Placeholder box for figures not yet generated (fast-draft phase).
+.reveal .slide .placeholder {
+  border: 2px dashed $accent-dim;
+  background: $surface;
+  color: $accent;
+  border-radius: 10px;
+  padding: 1.2em;
+  text-align: center;
+  font-style: italic;
+  margin: 0.4em auto;
+}
+
+// Cap slide images so they always fit — static sizing, robust in both live and print
+// (avoids reveal.js `.r-stretch`, whose JS height calc collapses in the print-pdf path).
+.reveal .slides section img {
+  max-height: 64vh;
+  max-width: 94%;
+  height: auto;
+  object-fit: contain;
+}
+
+// Portrait figures. CURRENTLY UNREFERENCED — the three data-layer rasters it was written for are
+// now one landscape three-panel figure on slide 3, which is bound by `max-width` like every other
+// figure here. It is kept, not deleted, because `scripts/fig-{ntl,emb,pop}-raster.py` still render
+// those maps full-bleed for a venue that wants a single layer, and they need this cap. Deleting the
+// rule would also delete the reasoning below, which was expensive to work out.
+//
+// Bolivia is taller than it is wide,
+// so a map of it is bound by the HEIGHT cap, never the width one: at 64vh it renders about 410px
+// wide on a 1280px canvas and leaves two-thirds of the slide empty, with the department labels too
+// small to read from the back of a room. 64vh is the right cap for this deck's landscape figures
+// (2.65:1, which fill the width and land just under it) — it is simply the wrong constraint for a
+// tall one. These slides carry no bullets and a single-line source, so the vertical room exists.
+// Do NOT put this class on a landscape figure: it would push the source line off the bottom.
+//
+// The cap is in PIXELS, not vh, and that is deliberate. Reveal renders into a fixed 1280x720
+// logical canvas and then CSS-transform-scales the whole thing to the window; `vh` resolves against
+// the real viewport *before* that transform, so a vh cap means something different at every window
+// size and does not correspond to the slide proportions you designed against. The deck's landscape
+// figures never exposed this because they are bound by `max-width: 94%`, not by the height cap.
+// 430px is the room left on a 720px slide after a TWO-line title (~180px with its top margin), the
+// source line (~55px) and the footer band (~55px). Two of these three titles wrap to two lines, so
+// the cap is set for the worst case rather than per-slide: at 500px the caption on those two slides
+// collided with the footer.
+.reveal .slides section.portrait-figure img {
+  max-height: 430px;
+}
+
+// A landscape figure on a slide that ALSO carries a pull-quote. Same pixels-not-vh reasoning as
+// above. At the default 64vh the three-panel data figure took the whole frame on slide 11 and the
+// blockquote under it was sliced by the slide edge, colliding with the footer band — so the second
+// of the two contrasting numbers that ARE that slide's argument (the lights slipping 0.25 -> 0.22)
+// was unreadable from the room. Caught by the 2026-07-28 rhetoric audit, from the rendered
+// screenshot; no static checker sees this, because each element fits on its own.
+//
+// Budget on the 720px logical canvas: a one-line title (~110px with its margin), the kicker (~40px),
+// the quote block (~150px for two lines with its padding) and the footer band (~55px) leave ~365px.
+// 340px keeps a margin for a title that wraps.
+// A figure carrying a ONE-LINE lede above it. .figure-with-quote's 340px cap assumes a kicker plus
+// a two-line pull-quote; on the pixels-to-municipalities slide that cap shrank a flow chart's
+// internal labels below reading distance, and removing the cap entirely pushed the chart's lowest
+// box under the footer band. 430px is the measured fit for title + one-line quote + footer.
+// Like .figure-with-quote this is a LANDSCAPE cap — it assumes the figure is wider than it is tall.
+.reveal .slides section.figure-lede img {
+  max-height: 430px;
+  width: auto;
+}
+
+.reveal .slides section.figure-with-quote img {
+  max-height: 340px;
+}
+
+// The hero figure: the three-ways-to-see-Bolivia slide, the most impactful image in the deck. It
+// carries a two-line title and a kicker and nothing else, so the figure takes every remaining pixel.
+// The image is ~2.5:1, so at `max-width: 100%` (the full 1280px canvas, not the global 94%) it is
+// WIDTH-bound and renders ~515px tall, its bottom ~28px clear of the footer band. Measured at
+// 1280x720: kicker bottom ~153px, footer band top ~709px. The 520px cap is only a guard, so that a
+// regenerated figure that came out taller cannot run under the footer. The kicker's bottom margin
+// and the paragraph's margins are trimmed on this slide only, so the pixels go to the figure.
+.reveal .slides section.figure-hero .kicker { margin-bottom: 0.4em; }
+.reveal .slides section.figure-hero p:has(> img),
+.reveal .slides section.figure-hero .quarto-figure p { margin: 0; }
+.reveal .slides section.figure-hero img {
+  max-height: 520px;
+  max-width: 100%;
+  width: auto;
+  margin: 0 auto;
+}
+
+// The methods slide: the illustration leads and the two cards caption it. The figure is the intuition
+// for how both methods work, so it gets the larger share; the cards are set one step smaller than the
+// default .card so the pair fits under a ~3.5:1 figure inside the 720px canvas.
+.reveal .slides section.methods-explainer .kicker { margin-bottom: 0.4em; }
+.reveal .slides section.methods-explainer p:has(> img),
+.reveal .slides section.methods-explainer .quarto-figure,
+.reveal .slides section.methods-explainer figure,
+.reveal .slides section.methods-explainer .quarto-figure p { margin: 0; }
+.reveal .slides section.methods-explainer img {
+  max-height: 330px;
+  width: auto;
+  margin: 0 auto;
+}
+.reveal .slides section.methods-explainer .cards { margin: 0.3em 0 0; gap: 0.5em; }
+.reveal .slides section.methods-explainer .card { padding: 0.45em 0.65em 0.5em; }
+.reveal .slides section.methods-explainer .card .card-head { font-size: 0.56em; margin-bottom: 0.35em; }
+.reveal .slides section.methods-explainer .card li { font-size: 0.66em; line-height: 1.28; }
+
+// A banner illustration in the bottom third of a text slide. One third of the 720px canvas is 240px;
+// 225px keeps the image clear of the footer hairline. At ~3.4:1 it runs ~755px wide, centred.
+.reveal .slides section.banner-bottom img {
+  max-height: 225px;
+  width: auto;
+  margin: 0.3em auto 0;
+}
+// For slides whose text pushes the banner lower: under the motivation slide's three bullets and quote
+// it overflowed to a 734px scrollHeight at 225px. 195px, with no top margin, fits inside the 720px canvas.
+.reveal .slides section.banner-bottom.banner-short img {
+  max-height: 195px;
+  margin-top: 0;
+}
+// With the illustration moved above the text, a two-line quote pushed the motivation slide to a
+// 756px scrollHeight. Tighter quote padding and a smaller gap under the image bring it back inside 720.
+.reveal .slides section.banner-bottom.banner-short blockquote {
+  padding: 0.45em 0.9em;
+  margin: 0.4em 0 0;
+}
+.reveal .slides section.banner-bottom.banner-short .quarto-figure { margin-bottom: 0; }
+
+// Small caption / source line — the third text step. Before this existed, captions were set in the
+// same muted grey as secondary body copy and competed with it.
+.reveal .slide .source {
+  color: $ink-faint;
+  font-size: 0.46em;
+  line-height: 1.45;
+  display: block;
+  margin-top: 0.5em;
+}
+// Slides with an interactive (Plotly) figure: the source line sits 4px under the figure, not 12px.
+// The figures are sized to end at y = 669 on that assumption (scripts/_interactive.py BOX_*), which
+// is what lets them grow into the space below. The <p>'s margin and the span's collapse into one gap.
+.reveal .slides section:has(.plotly-figure) p:has(> .source) { margin-top: 4px; }
+.reveal .slides section:has(.plotly-figure) p > .source { margin-top: 0; }
+// A link inside a source line stays at the caption's quiet grey; only its underline says "clickable".
+.reveal .slide .source a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: $accent-dim;
+  text-underline-offset: 0.2em;
+}
+.reveal .slide .source a:hover { color: $accent; text-decoration-color: $accent; }
+
+.reveal .slide-number {
+  color: $ink-faint;
+  background: transparent;
+  font-size: 0.5em;
+}
+.reveal .progress { color: $accent; height: 3px; }
+
+// Sign-off slide — centred. The deck is left-aligned throughout because that is easier to scan,
+// but the closing card carries no argument to scan, so it is centred like the title slide.
+.reveal .slide.signoff { text-align: center; }
+.reveal .slide.signoff h2 {
+  text-align: center;
+  font-family: $title-serif;
+  font-weight: 600;
+  font-size: 1.9em;
+  padding-left: 0;
+  margin-bottom: 0.6em;
+}
+.reveal .slide.signoff h2::before { display: none; }
+// The sign-off is also a .has-dark-background slide, so it inherits that rule's LEFT-aligned amber
+// underline — which floated off to the far left under a centred title. Re-centre it here.
+.reveal .slide.signoff h2::after { margin: 0.5em auto 0; }
+.reveal .slide.signoff a {
+  color: $accent-2;
+  font-size: 1.1em;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245, 180, 85, 0.35);
+  padding-bottom: 0.08em;
+}
+.reveal .slide.signoff a:hover { border-bottom-color: $accent-2; }
+
+// ====================================================================
+//  TITLE SLIDE — an orbital image with the academic title set into its negative space.
+//  Every rule is scoped to #title-slide so the other slides are untouched.
+// ====================================================================
+#title-slide {
+  align-items: center;
+  display: flex !important;
+  isolation: isolate;
+  text-align: left;
+}
+
+// The photograph already leaves the left side dark. Apply the directional veil to Reveal's actual
+// full-canvas background layer, not the content section, so no rectangular panel edge is visible.
+.reveal .slide-background-content[style*="fig-title-ai-satellite"]::after {
+  background:
+    linear-gradient(90deg, rgba(6, 16, 31, 0.97) 0%, rgba(10, 28, 54, 0.88) 31%, rgba(10, 28, 54, 0.40) 55%, rgba(10, 28, 54, 0.04) 76%),
+    linear-gradient(0deg, rgba(6, 16, 31, 0.42) 0%, rgba(6, 16, 31, 0) 45%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+#title-slide .title-card {
+  margin-left: 5.5%;
+  position: relative;
+  transform: translateY(-1.5%);
+  width: 45%;
+  z-index: 1;
+}
+
+// Serif display title, set in near-white for maximum presence.
+#title-slide .title {
+  font-family: $title-serif;
+  color: $ink;
+  font-weight: 600;
+  font-size: 1.78em;
+  line-height: 1.04;
+  letter-spacing: 0.004em;
+  margin: 0 0 0.32em;
+  text-shadow: 0 2px 24px rgba(6, 16, 31, 0.78);
+  text-wrap: balance;
+  max-width: 9.5em;
+}
+// A short amber rule between title and subtitle.
+#title-slide .title::after {
+  content: "";
+  display: block;
+  width: 3.2em;
+  height: 3px;
+  border-radius: 2px;
+  background: $accent-2;
+  margin: 0.42em 0 0;
+}
+
+#title-slide .subtitle {
+  font-family: $font-family-sans-serif;
+  color: $accent;
+  font-weight: 400;
+  font-size: 0.7em;
+  line-height: 1.35;
+  max-width: 24em;
+  margin: 0.45em 0 1.1em;
+  letter-spacing: 0.008em;
+  text-shadow: 0 2px 16px rgba(6, 16, 31, 0.85);
+}
+
+// Author / affiliation block.
+#title-slide .author-block { margin-top: 0.2em; }
+#title-slide .author {
+  font-family: $font-family-sans-serif;
+  color: $ink;
+  font-weight: 600;
+  font-size: 0.72em;
+  margin: 0 0 0.16em;
+}
+#title-slide .affil,
+#title-slide .author-site {
+  color: $ink-muted;
+  font-size: 0.47em;
+  font-weight: 400;
+  line-height: 1.35;
+  margin: 0.02em 0;
+}
+// The website sits under the name so the audience can find the slides later. It is the visible
+// link (the name is plain); same size and grey as the affiliations, set apart only by the mono face.
+#title-slide .author-site { font-family: $font-family-mono; }
+#title-slide .author-site a { color: inherit; text-decoration: none; }
+#title-slide .author-site a:hover { text-decoration: underline; }
+
+// Footer: venue (small caps) and the paper/project link. The DATE is deliberately absent from the
+// deck metadata — this talk is reused across venues, and a stale date on the cover is worse than
+// no date at all. title-slide.html omits any field it is not given, so nothing here needs guarding.
+#title-slide .title-footer { margin-top: 1.15em; }
+#title-slide .occasion {
+  font-variant: small-caps;
+  letter-spacing: 0.11em;
+  color: $ink-faint;
+  font-size: 0.42em;
+  margin: 0;
+}
+#title-slide .paper-link {
+  color: $ink-faint;
+  font-size: 0.4em;
+  margin: 0.35em 0 0;
+}
+
+// ---- Closing card: the cover, reprised, with the thank-you across the bottom ----------------
+// The last slide is the first slide again. It cannot BE #title-slide (one id, one slide), and the
+// title-slide partial renders only once, so the deck body hand-writes the same .title-card markup
+// and this one `@extend` hands it every rule scoped to `#title-slide` above — the flex centring,
+// the card geometry, the serif title with its amber rule, the subtitle, the author block. Copying
+// those ninety lines instead would have created a second palette to keep in sync, which is the
+// exact failure mode `_palette.py` and `theme.scss` already document.
+// The directional veil needs nothing here: it keys off the BACKGROUND IMAGE
+// (`.slide-background-content[style*="fig-title-ai-satellite"]`), not off the slide id, so
+// the closing slide gets it by using the same file.
+.reveal .slides section.closing-cover { @extend #title-slide; }
+
+// The thank-you itself is the slide's own h2, moved to the bottom of the frame rather than written
+// twice — the outline, the menu and the PDF bookmark all read "Thank you" from this heading, and a
+// visually-hidden duplicate would be read aloud twice by a screen reader.
+// Bottom 9% clears reveal's progress bar and the slide number; the text sits over the lower veil
+// (`linear-gradient(0deg, rgba(6,16,31,0.42) ...)`), which is what makes it legible against the
+// bright limb of the Earth on the right of the photograph.
+.reveal .slides section.closing-cover h2 {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9%;
+  z-index: 2;
+  margin: 0;
+  padding-left: 0;
+  text-align: center;
+  font-family: $title-serif;
+  font-weight: 600;
+  font-size: 1.5em;
+  color: $ink;
+  text-shadow: 0 2px 24px rgba(6, 16, 31, 0.85);
+}
+// Kill the left accent bar every other h2 carries — it would float at the far left of a centred
+// line — and re-centre the amber underline the .has-dark-background rule left-aligns.
+.reveal .slides section.closing-cover h2::before { display: none; }
+.reveal .slides section.closing-cover h2::after { margin: 0.45em auto 0; }
+
+// Alt-text equivalent for the meaningful background image, available to assistive technology
+// without creating visible copy or affecting the title-card layout.
+#title-slide .title-background-description {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
