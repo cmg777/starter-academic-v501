@@ -4,7 +4,7 @@ authors:
 - admin
 # Catalog addition date; the source gives copyright 2026, not a publication day.
 date: "2026-10-17T00:00:00Z"
-book_updated: "2026-10-24T11:41:23+09:00"
+book_updated: "2026-11-18T23:32:54+09:00"
 external_link: ""
 image:
   caption: ""
@@ -33,6 +33,14 @@ links:
     url: "https://quarcs-lab.github.io/macro102-hub/data-apps.html"
     icon_pack: fas
     icon: chart-bar
+  - name: "PWT Snapshots"
+    url: "https://quarcs-lab.github.io/macro102-site/apps/pwt-snapshots.html"
+    icon_pack: fas
+    icon: camera
+  - name: "WEO Snapshots"
+    url: "https://quarcs-lab.github.io/macro102-site/apps/weo-snapshots.html"
+    icon_pack: fas
+    icon: camera
   - name: "Figure Apps"
     url: "https://quarcs-lab.github.io/macro102-hub/figure-apps.html"
     icon_pack: fas
