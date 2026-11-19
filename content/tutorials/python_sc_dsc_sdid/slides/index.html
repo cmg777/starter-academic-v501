@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
 
-  <meta name="dcterms.date" content="2026-08-04">
+  <meta name="dcterms.date" content="2026-11-20">
   <title>The Ladder and the Defaults</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +17,9 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -95,7 +98,7 @@
     code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-4488a4dd4807c2c9a5603c247e31f6f3.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -200,11 +203,11 @@
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">1.76 pp</span><span class="kr-cap">one default’s covariate spread</span></div>
     <div class="kr"><span class="kr-num">0.31 pp</span><span class="kr-cap">the whole ladder’s spread</span></div>
-    <div class="kr"><span class="kr-num">92</span><span class="kr-cap">estimators behind one config dict</span></div>
+    <div class="kr"><span class="kr-num">~70</span><span class="kr-cap">estimators behind one config dict</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">August 4, 2026</p>
+  <p class="date">November 20, 2026</p>
 </section>
 <section>
 <section id="one-treated-unit" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -237,10 +240,11 @@
 <section id="one-line-in-a-crowd" class="slide level2 center">
 <h2>One line in a crowd</h2>
 
-<img data-src="../python_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD economies, 1995–2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.</p><p><span class="takeaway fragment">24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.</span></p>
+<img data-src="../python_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD economies, 1995–2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.</p><p><span class="comment">OECD Economic Outlook, November 2018 vintage: observed through 2018Q3, OECD projections from 2018Q4 on — so no COVID drop in 2020.</span></p>
+<p><span class="takeaway fragment">24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.</span></p>
 <aside class="notes">
 <p>No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.</p>
-<p>The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values.</p>
+<p>The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values. It is the OECD Economic Outlook November 2018 vintage: values are observed through 2018Q3, and from 2018Q4 to 2020Q4 every series is an OECD projection — smooth paths, no COVID collapse. Both evaluation quarters used later, 2018Q4 and 2019Q4, are therefore projections, which is why the bottom line also quotes 2018Q3, the last observed quarter.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -253,16 +257,17 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="ninety-two-estimators-one-configuration-dictionary" class="slide level2 center">
-<h2>Ninety-two estimators, one configuration dictionary</h2>
+<section id="about-seventy-estimators-one-configuration-dictionary" class="slide level2 center">
+<h2>About seventy estimators, one configuration dictionary</h2>
 <p>One interface for the whole single-treated-unit literature: build a config, call <code>.fit()</code>, read a standardized result.</p>
 <div class="fragment">
-<p><strong>Six stages in this deck. Eighty-six more estimators behind the same door.</strong></p>
+<p><strong>Six stages in this deck. Some sixty more estimators behind the same door.</strong></p>
 </div>
 <div class="fragment">
 <p><span class="takeaway fragment">Pin the commit, not the release — <code>__version__</code> says <code>1.0.0</code> either way.</span></p>
 <aside class="notes">
 <p>This is the pitch, and it is the reason a package-level reading is worth doing at all. Normally climbing this ladder means learning Synth, then synthdid, then masc, then augsynth — four packages, four interfaces, four result formats, four sets of conventions about signs. Here it is one config dict and one result object throughout.</p>
+<p>Counting carefully: <code>mlsynth.__all__</code> exports 92 names, of which 69 are estimator classes with a <code>.fit</code> method; the rest are result and spec classes plus 16 functions. The six stages use five of those classes.</p>
 <p>The version warning is not pedantry. The release numbered 1.0.0 on PyPI is missing a config field this deck uses, and the version string does not distinguish it from git main. Pin the commit.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -525,7 +530,7 @@
 <img data-src="../python_sc_dsc_sdid_04_sc_fit_gap.png" class="r-stretch quarto-figure-center"><p class="caption">UK log real GDP against its synthetic control (top) and the gap between them (bottom), shaded orange after the referendum.</p><p><span class="takeaway fragment">The synthetic UK: a fifth Hungary, a fifth the US, a fifth Japan — plus Canada and Norway.</span></p>
 <aside class="notes">
 <p>The two smaller shares are a sixth Canada and an eighth Norway; fourteen of the twenty-three donors get nothing at all.</p>
-<p>The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%.</p>
+<p>The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%. Both quarters lie beyond the data’s last observation, 2018Q3, so the end-2019 figure in particular is a projected gap, not a measured loss.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -545,7 +550,7 @@
 <p><span class="takeaway fragment">The offset is <span class="math inline">\(+0.0024\)</span> log points. Its smallness is the finding: SC was already level-balanced.</span></p>
 <aside class="notes">
 <p>Why an offset helps: plain SC will reject a well-shaped blend sitting slightly too high in favour of a worse-shaped blend at the right level. Demeaned SC removes that constraint. Here the offset comes out at a quarter of one per cent of GDP, which is why DSC’s 2.99% sits so close to SC’s 3.04%.</p>
-<p>In mlsynth this is the MSCa variant of the Li and Shankar two-step estimator, reached through the TSSC class. Left to itself TSSC fits all four variants — SC, MSCa, MSCb, MSCc — and runs a subsampling procedure to choose one; here it recommends plain SC, because the Step-1 test does not reject the restriction.</p>
+<p>In mlsynth this is the MSCa variant of the Li and Shankar two-step estimator, reached through the TSSC class. Left to itself TSSC fits all four variants — SC, MSCa, MSCb, MSCc — and runs a subsampling procedure to choose one; here it recommends plain SC, because the Step-1 subsampling test does not reject the joint restriction that the weights sum to one and the intercept is zero. The printed “CI [+0.029, +9.10]” is not a confidence interval but the test’s acceptance region; the statistic, 2.21, sits inside it, so the null stands and plain SC is kept.</p>
 <p>The cost of that convenience is real: four variants with 500 subsampling draws takes about 17 seconds, forcing one variant with inference off takes 0.01 seconds. A factor of roughly 1,700, which is exactly why the placebo tournament in Act IV sets <code>method=</code> and <code>inference=False</code>.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -678,7 +683,8 @@
 <th>mlsynth call</th>
 <th style="text-align: right;">end-2018</th>
 <th style="text-align: right;">end-2019</th>
-<th style="text-align: right;">published</th>
+<th style="text-align: right;">R edition</th>
+<th style="text-align: right;">paper</th>
 </tr>
 </thead>
 <tbody>
@@ -687,6 +693,7 @@
 <td><code>FDID(...).fit().did</code></td>
 <td style="text-align: right;">4.98</td>
 <td style="text-align: right;">6.18</td>
+<td style="text-align: right;">4.98</td>
 <td style="text-align: right;">—</td>
 </tr>
 <tr class="even">
@@ -695,12 +702,14 @@
 <td style="text-align: right;">3.04</td>
 <td style="text-align: right;">4.17</td>
 <td style="text-align: right;">3.06</td>
+<td style="text-align: right;">3.06</td>
 </tr>
 <tr class="odd">
 <td>DSC</td>
 <td><code>TSSC(..., method="MSCa")</code></td>
 <td style="text-align: right;">2.99</td>
 <td style="text-align: right;">4.12</td>
+<td style="text-align: right;">2.99</td>
 <td style="text-align: right;">2.98</td>
 </tr>
 <tr class="even">
@@ -709,12 +718,14 @@
 <td style="text-align: right;"><span class="key">2.80</span></td>
 <td style="text-align: right;">3.94</td>
 <td style="text-align: right;">2.79</td>
+<td style="text-align: right;">2.79</td>
 </tr>
 <tr class="odd">
 <td>MASC</td>
 <td><code>MASC(..., set_f=range(6, 87))</code></td>
 <td style="text-align: right;">2.73</td>
 <td style="text-align: right;">3.83</td>
+<td style="text-align: right;">2.73</td>
 <td style="text-align: right;">2.73</td>
 </tr>
 <tr class="even">
@@ -723,13 +734,16 @@
 <td style="text-align: right;">3.04</td>
 <td style="text-align: right;">4.19</td>
 <td style="text-align: right;">3.04</td>
+<td style="text-align: right;">3.04</td>
 </tr>
 </tbody>
 </table>
+<p><span class="comment">R edition: the R version of this post, end-2018. Paper: de Brabander, Juodis &amp; Miyazato Szini (2025), which does not report DiD.</span></p>
 <p><span class="takeaway fragment">The width of the cluster — 2.73–3.04% — not any point inside it, is the honest answer.</span></p>
 <aside class="notes">
-<p>The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.</p>
-<p>The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79), and both differ in the same direction and for the same reason. That reason is the last slide of the next act.</p>
+<p>The R edition column is the R version of this post, using synthdid, Synth, masc and augsynth; the paper column is de Brabander, Juodis and Miyazato Szini (2025), which does not report DiD. DiD, DSC, MASC and ASCM agree with the R edition to two decimals, and MASC and ASCM match the paper too. DSC prints 2.99 against the paper’s 2.98 only because R’s estimate, 2.985, sits on the rounding boundary; mlsynth’s 2.9887 differs from it in the third decimal.</p>
+<p>The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79). They go in opposite directions — mlsynth is 0.02 lower on SC and 0.01 higher on SDID — but for the same reason: the solver. That is the last slide of the next act.</p>
+<p>Both evaluation quarters are OECD projections in this data vintage; the end-2019 column most of all is a projected gap, not a measured loss.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -745,8 +759,10 @@
 <section id="every-stage-exceeds-the-published-2.4" class="slide level2 center">
 <h2>Every stage exceeds the published 2.4%</h2>
 
-<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every stage’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="takeaway fragment"><strong>2.73–3.04%</strong> at end-2018 and <strong>3.83–4.19%</strong> a year later — every stage above the 2.4% previously published for this same dataset.</span></p>
+<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every stage’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="comment">Both quarters are OECD projections (data observed to 2018Q3). At 2018Q3 itself the ladder reads 2.46–2.78%.</span></p>
+<p><span class="takeaway fragment"><strong>2.73–3.04%</strong> at end-2018 and <strong>3.83–4.19%</strong> a year later — every stage above the 2.4% previously published for this same dataset.</span></p>
 <aside class="notes">
+<p>Read the 2019Q4 values as a projection. The panel is the OECD’s November 2018 vintage, observed through 2018Q3, so the 2019Q4 numbers are the gap between the OECD’s own projection for the UK and a blend of its projections for the donors — not a measured loss. At 2018Q3, the last observed quarter, the fitted stages read SC 2.77, DSC 2.72, SDID 2.53, MASC 2.46 and ASCM 2.78.</p>
 <p>The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.</p>
 <p>Also visible: the three SDID flavours sit almost on top of each other, within 0.03 percentage points. The choice among SDID variants is not where the uncertainty lives — which is worth remembering when we reach the published placebo ranking.</p>
 <style type="text/css">
@@ -1113,15 +1129,15 @@
 </section>
 <section id="the-strongest-objection-and-the-answer" class="slide level2 center">
 <h2>The strongest objection — and the answer</h2>
-<p><span class="objection">Objection.</span> <span class="math inline">\(p = 0.042\)</span> is the <em>smallest attainable</em> with 24 units — the test is at its floor. And SDID’s own interval contains zero.</p>
+<p><span class="objection">Objection.</span> <span class="math inline">\(p = 0.042\)</span> is the smallest a <em>permutation</em> test can give with 24 units — that test is at its floor. And SDID’s own interval contains zero.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Four p-values span <span class="math inline">\(0.006\)</span> to <span class="math inline">\(0.042\)</span>; <code>scpi</code>’s interval stops short of zero. Five routes, all rejecting at 5%. But the floor is real, and no estimator changes it.</p>
+<p><span class="rebuttal">Response.</span> Four p-values span <span class="math inline">\(0.006\)</span> to <span class="math inline">\(0.042\)</span>; <code>scpi</code>’s interval stops short of zero. Five routes, all rejecting at 5%. But the permutation floor is real, and no estimator changes it.</p>
 </div>
 <div class="fragment">
 <p><span class="takeaway fragment">Which is why the deliverable is the cluster, not the point.</span></p>
 <aside class="notes">
-<p>Steelman this properly. The five inference methods are not five independent tests — they share a point estimate and a donor pool and differ only in how they build a reference distribution from 23 donors. Read them as orders of magnitude, not as digits.</p>
-<p>Three further caveats belong with the number. It is a net gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And <code>jackknife_plus</code> raises MlsynthEstimationError on this configuration and is excluded — reported rather than quietly dropped.</p>
+<p>Steelman this properly. The 0.042 floor belongs to the permutation test alone: the debiased t-test (0.006) and the leave-two-out placebo (0.008) can and do go lower. The SDID interval that contains zero, with p = 0.20, comes from SDID’s own placebo variance in section 11 of the post, not from the inference section. The five inference methods are not five independent tests — they share a point estimate and a donor pool and differ only in how they build a reference distribution from 23 donors. Read them as orders of magnitude, not as digits.</p>
+<p>Three further caveats belong with the number. It is a net gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when EU members carry about 31% of the synthetic UK — Hungary 0.223, Ireland 0.052, Italy 0.020, Portugal 0.012, Finland 0.007 — since they are the donors most exposed to Brexit’s own spillovers; the United States, at 0.19, is the less worrying large weight. And <code>jackknife_plus</code> raises MlsynthEstimationError on this configuration and is excluded — reported rather than quietly dropped.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1138,9 +1154,9 @@
 <section id="what-the-referendum-cost" class="slide level2 center" data-background-color="#1a3a8a">
 <h2>What the referendum cost</h2>
 <p><span class="bignum">2.7–3.0%</span></p>
-<p><span class="bignum-label">UK GDP shortfall at end-2018, at every fitted stage of the ladder · 3.8–4.2% a year later · against 2.4% previously published</span></p>
+<p><span class="bignum-label">UK GDP shortfall at end-2018, at every fitted stage of the ladder (2.5–2.8% at 2018Q3, the last observed quarter) · against 2.4% previously published · OECD November 2018 projections imply 3.8–4.2% by end-2019 — a projected gap, not a measured loss</span></p>
 <aside class="notes">
-<p>That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.</p>
+<p>That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. One caveat travels with it: the panel is the OECD’s November 2018 vintage, observed through 2018Q3, so even end-2018 is a one-quarter projection, and the end-2019 range is entirely the OECD’s projected path. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1181,7 +1197,7 @@
 <li><strong>Post, notebook, Colab</strong> — <a href="/tutorials/python_sc_dsc_sdid/">carlos-mendez.org/tutorials/python_sc_dsc_sdid</a></li>
 <li><strong>Three cheat sheets</strong> — Python, R and Stata; each hard-codes the others’ column.</li>
 <li><strong>R edition</strong> — <a href="/tutorials/r_sc_dsc_sdid/">r_sc_dsc_sdid</a> hand-codes every estimator; go there for the derivations.</li>
-<li><strong>Data</strong> — Born, Müller, Schularick and Sedláček (2019), via de Brabander et al.</li>
+<li><strong>Data</strong> — Born, Müller, Schularick and Sedláček (2019), via de Brabander et al.; OECD Economic Outlook, November 2018 vintage (observed to 2018Q3).</li>
 <li><strong>Library</strong> — <code>mlsynth</code> by Jared Greathouse, pinned at <code>15f168b</code>.</li>
 </ul>
 <aside class="notes">

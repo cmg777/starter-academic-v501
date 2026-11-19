@@ -79,7 +79,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/tutorials/python_sc_dsc_sdid/index.md
 slides:
-summary: "How much did the 2016 Brexit vote cost the British economy? This Python tutorial builds a look-alike United Kingdom from other wealthy economies with six related methods, finds output about 3 percent lower by the end of 2018, and shows how default settings can quietly change the answer. It comes with an interactive app that runs in your web browser."
+summary: "How much did the 2016 Brexit vote cost the British economy? This Python tutorial builds a look-alike United Kingdom from other wealthy economies with six related methods, finds output about 3 percent lower by late 2018, and shows how default settings can quietly change the answer. It comes with an interactive app that runs in your web browser."
 tags:
   - python
   - causal inference
@@ -104,7 +104,7 @@ diagram: true
 
 ## Abstract
 
-Estimating what a policy cost requires building a version of the world in which it never happened, and the software for doing that is scattered across a dozen packages with a dozen different interfaces. This tutorial is a guided tour of `mlsynth`, a Python library that puts about seventy panel-data causal estimators (92 exported names) behind a single configuration dictionary and a single result object, and it uses that library to climb the whole ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per stage. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the United Kingdom as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.19% a year later — every one above the 2.4% previously published for this dataset. An in-sample placebo tournament over twenty artificial treatment dates ranks the SDID family first at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. Three findings emerge that only a package-level reading produces: three of the library's defaults change the answer materially, two of them by more than the 0.31-point spread across the ladder above difference-in-differences, one estimator silently rounds the number you are most likely to quote, and the three routes `mlsynth` offers for "controlling for a covariate" disagree by 1.8 percentage points.
+Estimating what a policy cost requires building a version of the world in which it never happened. This tutorial is a guided tour of `mlsynth`, a Python library that puts about seventy panel-data causal estimators behind one configuration dictionary and one result object, and uses it to climb the ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per stage. The data are quarterly log real GDP for 24 OECD economies, 1995Q1–2020Q4, from the OECD's November 2018 vintage (values after 2018Q3 are projections): the United Kingdom is treated, with 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, all above the 2.4% previously published; the OECD's projections imply 3.83% to 4.19% a year later. An in-sample placebo tournament ranks the SDID family first, at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. A package-level reading adds three findings: two library defaults each move the answer by more than the spread across the ladder above difference-in-differences, one estimator silently rounds the number you are most likely to quote, and three routes for "controlling for a covariate" disagree by 1.8 percentage points. The practical lesson: report the ladder and the defaults you set, not a single specification.
 
 ## 1. Overview
 
@@ -112,7 +112,7 @@ On 23 June 2016 the United Kingdom voted to leave the European Union. Three and 
 
 The standard move is to build that missing country out of the countries we do observe — weight the other OECD economies, add them up, and require the blend to track the real UK quarter by quarter through the two decades before the referendum. That is the synthetic control method, and it is one stage of a ladder that starts at difference-in-differences and climbs through several increasingly flexible estimators.
 
-[The R edition of this post](/tutorials/r_sc_dsc_sdid/) climbs that ladder the hard way: every estimator is hand-coded in twenty lines before its package is called, and four separate R packages are needed to cover the six stages. **This post makes a different argument.** Every stage here is a single class from one library, `mlsynth`, and the interesting work is not in deriving the estimators but in *driving the package*: which configuration field selects which estimator, what the result object actually contains, and — the part that turns out to matter most — where a default will quietly hand you a different estimator than the one you meant to fit.
+[The R edition of this post](/tutorials/r_sc_dsc_sdid/) [1] climbs that ladder the hard way: every estimator is hand-coded in twenty lines before its package is called, and four separate R packages are needed to cover the six stages. **This post makes a different argument.** Every stage here is a single class from one library, `mlsynth`, and the interesting work is not in deriving the estimators but in *driving the package*: which configuration field selects which estimator, what the result object actually contains, and — the part that turns out to matter most — where a default will quietly hand you a different estimator than the one you meant to fit.
 
 That last point is not a minor caveat. By the end of this post you will have seen three separate defaults that change the headline estimate materially, two of them by more than the 0.31-point spread across the five stages above difference-in-differences. Knowing the econometrics is not enough. You have to know the software.
 
@@ -212,7 +212,7 @@ Unit weights say how much each donor country counts. Time weights say how much e
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-`mlsynth` keeps them in separate places, and finding the second one is the single most common stumbling block. Unit weights are `result.donor_weights`; SDID's time weights are `result.cohorts[a].time_weights`. Ours put 0.9585 on 2016Q2, 0.0386 on 2008Q4 and almost nothing on the other 84 quarters.
+`mlsynth` keeps them in separate places, and finding the second one is the single most common stumbling block. Unit weights are `result.donor_weights`; SDID's time weights are `result.cohorts[a].time_weights`. Fitted to predict the treatment quarter, ours put 0.9585 on 2016Q2, 0.0386 on 2008Q4 and almost nothing on the other 84 quarters.
 
 </details>
 
@@ -307,7 +307,7 @@ Two hikers are told to find the lowest point of a wide, almost flat valley in fo
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-`mlsynth.DSC` is *Distributional* Synthetic Control (Gunsilius 2023): it matches whole outcome distributions in Wasserstein space and needs micro-level data with many observations per unit-period. This post's DSC is *Demeaned* Synthetic Control, which in `mlsynth` is `TSSC(method="MSCa")`. Section 6 is devoted to this.
+`mlsynth.DSC` is *Distributional* Synthetic Control (Gunsilius 2023 [2]): it matches whole outcome distributions in Wasserstein space and needs micro-level data with many observations per unit-period. This post's DSC is *Demeaned* Synthetic Control, which in `mlsynth` is `TSSC(method="MSCa")`. Section 6 is devoted to this.
 
 </details>
 
@@ -325,7 +325,7 @@ With the vocabulary in place, we can install the library.
 
 ### 3.1 Install and version pinning
 
-`mlsynth` is on PyPI, but both the README and the documentation still recommend installing from GitHub — and there is a concrete reason to follow that advice rather than reach for `pip install mlsynth`.
+`mlsynth` [3, 4] is on PyPI, but both the README and the documentation still recommend installing from GitHub — and there is a concrete reason to follow that advice rather than reach for `pip install mlsynth`.
 
 **The PyPI release numbered 1.0.0 is behind git `main` at the same version number.** Installing from PyPI gives you a package that reports `mlsynth.__version__ == "1.0.0"` but is missing `VanillaSCConfig.w_constr`, which sections 9.2 and 19 use. Nothing in the version string warns you. So install from git, and pin the commit:
 
@@ -342,7 +342,11 @@ With the vocabulary in place, we can install the library.
 #   "mlsynth[all]    @ git+..."  everything
 
 import warnings
-warnings.filterwarnings("ignore")
+from pydantic.warnings import PydanticDeprecationWarning
+# mlsynth's config classes use Pydantic features that Pydantic 2.x has deprecated,
+# which prints hundreds of identical notices. Silence only those, so that any
+# warning about your data or an estimator still reaches you.
+warnings.filterwarnings("ignore", category=PydanticDeprecationWarning)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -361,17 +365,17 @@ mlsynth 1.0.0
 names exported: 92
 ```
 
-Everything below was produced with **`mlsynth` 1.0.0 at commit `15f168b`**, Python 3.13.11, NumPy 2.3.5, pandas 3.0.1, Matplotlib 3.10.8 and CVXPY 1.8.1. `mlsynth` requires Python 3.10 or later — the README's claim of 3.9 is out of date, and `pyproject.toml` is the authority. The core dependencies are pandas, NumPy, Matplotlib, SciPy, scikit-learn, statsmodels, CVXPY, ECOS, Pydantic and PyArrow; both optional solver backends are lazily imported, so a base install can always `import mlsynth` and construct any estimator class.
+Everything below was produced with **`mlsynth` 1.0.0 at commit `15f168b`**, Python 3.13.11 [5], NumPy 2.3.5, pandas 3.0.1, Matplotlib 3.10.8 and CVXPY 1.8.1. `mlsynth` requires Python 3.10 or later — the README's claim of 3.9 is out of date, and `pyproject.toml` is the authority. The core dependencies are pandas, NumPy, Matplotlib, SciPy, scikit-learn, statsmodels, CVXPY, ECOS, Pydantic and PyArrow; both optional solver backends are lazily imported, so a base install can always `import mlsynth` and construct any estimator class.
 
 ### 3.2 The library at a glance
 
-Ninety-two exported names is a lot, and the temptation is to reach for whichever class name looks closest to what you want. Resist it: several of the names are near-homonyms of each other. The library ships a machine-readable index of the whole catalogue, which is the fastest way to find out what a class actually does.
+Ninety-two exported names is a lot, and the temptation is to reach for whichever class name looks closest to what you want. Resist it: several of the names are near-homonyms of each other. The library ships a machine-readable index of the whole catalogue, which is the fastest way to find out what a class actually does. It lives in a private module, `mlsynth._guides_api`, so the import path may change between versions.
 
 ```python
 from mlsynth._guides_api import get_llm_guide
 
 guide = get_llm_guide()          # "concise" | "full" | "practitioner"
-print(guide[:420])
+print(guide.split("\n\n#")[0])      # the opening section
 ```
 
 ```text
@@ -385,7 +389,7 @@ print(guide[:420])
 > (see the Replications page).
 ```
 
-That guide is worth reading in full before you pick an estimator, and section 20 tabulates the part of it relevant to this ladder. For now the important sentence is the second one: *every* estimator exposes a Pydantic config and a `.fit()` that returns a standardized result. That uniformity is the whole reason this post can cover six estimators without six separate interfaces to learn.
+That guide is worth reading in full before you pick an estimator, and section 20 tabulates the part of it relevant to this ladder. For now the important sentence is the second one: *every* estimator exposes a Pydantic config and a `.fit()` that returns a standardised result. That uniformity is the whole reason this post can cover six estimators without six separate interfaces to learn.
 
 ## 4. The mlsynth data contract
 
@@ -411,64 +415,25 @@ Australia        1995Q2  2 -0.010585        0
 Australia        1995Q3  3  0.012037        0
 ```
 
-The panel is quarterly log real GDP for 24 OECD economies over 1995Q1–2020Q4, assembled by Born, Müller, Schularick and Sedláček [2] and redistributed in the replication package of de Brabander, Juodis and Miyazato Szini [1]. There are no missing values, 23 donors, and 86 pre-treatment quarters if we date the treatment at 2016Q3.
+The panel is quarterly log real GDP for 24 OECD economies over 1995Q1–2020Q4, assembled by Born, Müller, Schularick and Sedláček [6] and redistributed in the replication package of de Brabander, Juodis and Miyazato Szini [7]. There are no missing values, 23 donors, and 86 pre-treatment quarters if we date the treatment at 2016Q3.
 
 Notice that the 1995 values of `log_rgdp` sit close to zero. The outcome is not the log of GDP in currency units: each country's real GDP is first divided by its own 1995 average, so `log_rgdp` measures cumulative growth since 1995 (0.44 for the UK in 2016Q2, about 56% more output than in 1995). Every column, its construction and its caveats are documented in the [data dictionary](data/index.html), which also offers the panel as a labelled Stata file and the full 36-country source panel it was cut from.
 
-### 4.2 Pydantic configs, and what happens when you get it wrong
+{{% callout note %}}
+**These data stop being data in 2018Q3.** The panel comes from the November 2018 edition of the OECD *Economic Outlook*. Values through 2018Q3 are national-accounts outturns; values from 2018Q4 to 2020Q4 are the OECD's own projections, made in November 2018. You can see it in the figure in section 4.4: after 2018 every series turns into a smooth line, and 2020 shows no pandemic collapse. Both quarters this post evaluates are therefore projections — 2018Q4 is one quarter past the last observation and 2019Q4 is five. At 2018Q3, the last observed quarter, the five stages above DiD read 2.46%–2.78%, against 2.73%–3.04% at 2018Q4. The end-2019 estimates measure how differently the OECD *expected* the UK and its synthetic twin to grow, not a realised loss. The in-sample placebo tournament in section 16 uses 2010–2015 only and is unaffected.
+{{% /callout %}}
 
-The configs are Pydantic v2 models with `extra = "forbid"`. In practice this means the library refuses to accept a field it does not recognise, which is a much better failure mode than silently ignoring it.
-
-```python
-base = dict(df=window(T_2018Q4), outcome="log_rgdp", treat="treat",
-            unitid="country", time="tt", display_graphs=False)
-
-for bad, why in [
-    (dict(base, backendd="outcome-only"), "misspelled keyword"),
-    (dict(base, outcome="gdp_log"),       "column not in the DataFrame"),
-]:
-    try:
-        VanillaSC(bad).fit()
-    except (MlsynthConfigError, MlsynthDataError) as exc:
-        print(f"{why:<28s} -> {type(exc).__name__}: {str(exc).splitlines()[0][:70]}")
-```
-
-```text
-misspelled keyword           -> MlsynthConfigError: 1 validation error for VanillaSCConfig
-column not in the DataFrame  -> MlsynthDataError: Missing required columns in DataFrame 'df': gdp_log
-```
-
-There are four exception types — `MlsynthConfigError`, `MlsynthDataError`, `MlsynthEstimationError` and `MlsynthPlottingError` — and they tell you which phase failed. A `MlsynthConfigError` means you wrote the config wrong; a `MlsynthDataError` means the DataFrame does not satisfy the contract (empty, missing columns, duplicate unit-period pairs); a `MlsynthEstimationError` means the optimiser gave up. Catching the first two separately from the third is a good habit in any loop over specifications.
-
-### 4.3 What the data look like before we assume anything
-
-Before fitting anything, look at the twenty-four series.
-
-```python
-fig, ax = plt.subplots(figsize=(9.5, 6))
-for c in DONORS:
-    ax.plot(QDEC, Y[c], color=GREY_DONOR, lw=0.8, alpha=0.75)
-ax.plot(QDEC, Y[TREATED], color=ORANGE, lw=2.4, label="United Kingdom", zorder=5)
-ax.axvline(QDEC[T0], color=LIGHT_TEXT, ls="--", lw=1.0)
-ax.set_xlabel("year"); ax.set_ylabel("log real GDP")
-plt.savefig("python_sc_dsc_sdid_01_gdp_paths.png", dpi=300, bbox_inches="tight")
-plt.show()
-```
-
-![Log real GDP for twenty-four OECD countries from 1995 to 2020, with the United Kingdom highlighted in orange among twenty-three grey donor series and a dashed vertical line at the 2016 referendum.](python_sc_dsc_sdid_01_gdp_paths.png)
-
-The UK is one line among twenty-four, and nothing in the picture tells you what would have happened without the referendum. Notice also that the series are strongly trending and highly correlated: this is close to a set of random walks with drift, which will matter enormously in section 11 when we look at what the time weights do.
-
-### 4.4 The one trick that makes everything else simple
+### 4.2 The one trick that makes everything else simple
 
 Every `mlsynth` estimator reports an ATT averaged over **all** post-treatment periods. But the question here — and the question in the published tables — is the shortfall at two specific quarters, 2018Q4 and 2019Q4.
 
-There is a neat way to get exactly that without any post-estimation arithmetic. Keep the 86 pre-treatment quarters plus the single quarter of interest, renumber time so it runs 1 to 87, and "the average over all post periods" becomes an average over one period. A bare `.fit()` then returns precisely the number you want.
+There is a neat way to get exactly that without any post-estimation arithmetic. Keep the 86 pre-treatment quarters plus the single quarter of interest, renumber time so it runs 1 to 87, and "the average over all post periods" becomes an average over one period. A bare `.fit()` then returns precisely the number you want. The trick is harmless because every estimator here learns its weights from the pre-treatment quarters (plus, for SDID, the one evaluation quarter it targets), so the post-referendum quarters we drop never enter any fit.
 
 ```python
 T0 = 86                                    # pre-treatment quarters, through 2016Q2
 EVAL = {"2018Q4": 96, "2019Q4": 100}       # evaluation quarters, as values of `t`
 TREATED = "United Kingdom"
+SEED = 20260801                            # one seed for every randomised step (placebo draws)
 
 def window(post, pre=T0):
     """`pre` pre-treatment quarters + the given post quarter(s), renumbered 1..pre+1."""
@@ -494,11 +459,68 @@ In formal terms, the estimand throughout is the average treatment effect on the 
 
 $$\tau\_t = Y\_{\text{UK},t}(1) - Y\_{\text{UK},t}(0),$$
 
-where $Y\_{\text{UK},t}(0)$ is the unobserved no-Brexit path. Every stage is a different estimator of that same quantity, and we report $-100 \times \tau\_t$ so that a larger number means a larger loss.
+where $Y\_{\text{UK},t}(0)$ is the unobserved no-Brexit path. With one treated unit and one quarter there is nothing to average over: this "ATT" is simply the UK's own treatment effect at quarter $t$, and every stage is a different estimator of that same quantity.
+
+This is an **observational design, not an experiment** — nobody randomised which country voted to leave — so no stage can lean on random assignment. Each identifies $\tau\_t$ only under its own model of the no-Brexit UK: parallel trends with the donor average for DiD, a stable weighted combination of donors for synthetic control and its relatives. All of them also share three assumptions: **no anticipation** (the UK through 2016Q2 is untreated), **no interference** (Brexit did not move the donors' GDP) and **no other UK-specific shock** after mid-2016 that the donors do not share.
+
+We report $-100 \times \tau\_t$ so that a larger number means a larger loss. Strictly, that is a gap in *log points*: a difference of 0.01 in a log is about 1%, and at these sizes the approximation is close (3.04 log points is a 2.99% shortfall, 4.19 is a 4.10% shortfall), so we follow the literature in writing it as a percentage.
+
+### 4.3 Pydantic configs, and what happens when you get it wrong
+
+The configs are Pydantic v2 models with `extra = "forbid"`. In practice this means the library refuses to accept a field it does not recognise, which is a much better failure mode than silently ignoring it.
+
+```python
+base = cfg(96)                             # a valid config: the 2018Q4 window
+
+for bad, why in [
+    (dict(base, backendd="outcome-only"), "misspelled keyword"),
+    (dict(base, outcome="gdp_log"),       "column not in the DataFrame"),
+]:
+    try:
+        VanillaSC(bad).fit()
+    except (MlsynthConfigError, MlsynthDataError) as exc:
+        print(f"{why:<28s} -> {type(exc).__name__}: {str(exc).splitlines()[0][:70]}")
+```
+
+```text
+misspelled keyword           -> MlsynthConfigError: 1 validation error for VanillaSCConfig
+column not in the DataFrame  -> MlsynthDataError: Missing required columns in DataFrame 'df': gdp_log
+```
+
+There are four exception types — `MlsynthConfigError`, `MlsynthDataError`, `MlsynthEstimationError` and `MlsynthPlottingError` — and they tell you which phase failed. A `MlsynthConfigError` means you wrote the config wrong; a `MlsynthDataError` means the DataFrame does not satisfy the contract (empty, missing columns, duplicate unit-period pairs); a `MlsynthEstimationError` means the optimiser gave up. Catching the first two separately from the third is a good habit in any loop over specifications.
+
+### 4.4 What the data look like before we assume anything
+
+Before fitting anything, look at the twenty-four series.
+
+```python
+# Wide views of the panel, used by this plot and by later sections
+Y = panel.pivot(index="t", columns="country", values="log_rgdp").sort_index()
+DONORS = [c for c in Y.columns if c != TREATED]
+QLAB = panel[panel.country == TREATED].sort_values("t")["quarter_label"].to_numpy()
+QDEC = panel[panel.country == TREATED].sort_values("t")["date_dec"].to_numpy()
+
+# Plot colours (the full dark figure theme is set at the top of analysis.py)
+GREY_DONOR, ORANGE, LIGHT_TEXT = "#54618a", "#d97757", "#c8d0e0"
+
+fig, ax = plt.subplots(figsize=(9.5, 6))
+for c in DONORS:
+    ax.plot(QDEC, Y[c], color=GREY_DONOR, lw=0.8, alpha=0.75)
+ax.plot(QDEC, Y[TREATED], color=ORANGE, lw=2.4, label="United Kingdom", zorder=5)
+ax.axvline(QDEC[T0], color=LIGHT_TEXT, ls="--", lw=1.0)
+ax.set_xlabel("year"); ax.set_ylabel("log real GDP")
+plt.savefig("python_sc_dsc_sdid_01_gdp_paths.png", dpi=300, bbox_inches="tight")
+plt.show()
+```
+
+![Log real GDP for twenty-four OECD countries from 1995 to 2020, with the United Kingdom highlighted in orange among twenty-three grey donor series and a dashed vertical line at the 2016 referendum.](python_sc_dsc_sdid_01_gdp_paths.png)
+*Figure 1. Log real GDP, 1995Q1–2020Q4, indexed to each country's 1995 average: the United Kingdom (orange) among the 23 donors (grey). The dashed line marks the referendum; values after 2018Q3 are OECD projections.*
+
+The UK is one line among twenty-four, and nothing in the picture tells you what would have happened without the referendum. Notice also that the series are strongly trending and highly correlated: this is close to a set of random walks with drift, which will matter enormously in section 11 when we look at what the time weights do.
 
 ## 5. Anatomy of a fit
 
-### 5.1 Config in, standardized result out
+### 5.1 Config in, standardised result out
 
 The call pattern never changes: build a config, construct the estimator, call `.fit()`, read the result.
 
@@ -566,6 +588,7 @@ plt.show()
 ```
 
 ![Two side-by-side panels produced entirely by mlsynth's own plotting code: on the left the observed treated series against its synthetic counterfactual, on the right the estimated gap between them, both on the package's default light background with red and black lines.](python_sc_dsc_sdid_02_mlsynth_native_plot.png)
+*Figure 2. `mlsynth`'s own `.plot()` output for a fitted synthetic control: the observed series against its counterfactual (left) and the gap between them (right).*
 
 That figure is deliberately unstyled — it is what the library draws with no help from us, and it is already publishable. `kind` takes `"auto"`, `"counterfactual"` or `"gap"`; passing `ax=` lets you compose several results into one panel.
 
@@ -612,7 +635,7 @@ This section exists because getting it wrong costs nothing at runtime and everyt
 - `mlsynth.DSC` is **Distributional** Synthetic Control (Gunsilius 2023, *Econometrica*). It reconstructs the treated unit's whole outcome *distribution* as a Wasserstein-space average of donor distributions and returns quantile treatment effects. It requires **micro-level** data: many individual observations per unit-period. Handed a panel like ours, with one observation per country-quarter, it is answering a question the data cannot support.
 - The DSC on this ladder is **Demeaned** Synthetic Control (Doudchenko and Imbens [8]; Ferman and Pinto [9]) — synthetic control plus an intercept. In `mlsynth` it is `TSSC(method="MSCa")`.
 
-Same three letters, different estimators, and no error is raised. The mapping used throughout this post follows [mlsynth issue #312](https://github.com/jgreathouse9/mlsynth/issues/312), which is itself a reading of the paper we replicate.
+Same three letters, different estimators, and no error is raised. The mapping used throughout this post follows [mlsynth issue #312 [10]](https://github.com/jgreathouse9/mlsynth/issues/312), which is itself a reading of the paper we replicate.
 
 The library has several more acronym neighbours worth knowing about before you reach for one by name:
 
@@ -632,7 +655,7 @@ Before the code, one unifying idea. Every stage on this ladder is the same weigh
 
 $$(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum\_{i,t} \omega\_i \lambda\_t \left( Y\_{it} - \mu - \alpha\_i - \beta\_t - \tau D\_{it} \right)^2,$$
 
-with a different choice of the unit weights $\omega\_i$ and the time weights $\lambda\_t$. In words: fit a two-way fixed-effects regression, but let some units and some periods count more than others. The stages differ only in how those two weight vectors are chosen.
+with a different choice of the unit weights $\omega\_i$ and the time weights $\lambda\_t$. In words: fit a two-way fixed-effects regression, but let some units and some periods count more than others. The stages differ only in how those two weight vectors are chosen and, for synthetic control, in also dropping the unit effect $\alpha\_i$.
 
 ```mermaid
 graph TD
@@ -671,7 +694,7 @@ Now we climb it.
 
 ## 8. Stage 0 — Difference-in-differences
 
-`mlsynth` has no standalone DiD class, and this trips people up. The plain two-way estimator comes free inside `FDID` (Forward DiD, Li 2024), which fits its own estimator and the textbook benchmark side by side and exposes them as `.fdid` and `.did`.
+`mlsynth` has no standalone DiD class, and this trips people up. The plain two-way estimator comes free inside `FDID` (Forward DiD, Li [11]), which fits its own estimator and the textbook benchmark side by side and exposes them as `.fdid` and `.did`.
 
 ```python
 fdid_res = {k: FDID(cfg(e)).fit() for k, e in EVAL.items()}
@@ -692,7 +715,7 @@ donor weights: 23 donors, all equal to 0.043478 = 1/23
 pre-treatment RMSE 0.02170, R^2 0.9706
 ```
 
-Difference-in-differences puts the Brexit cost at 4.98% of GDP by the end of 2018 — far above every other stage, and far above the 2.4% previously published. The uniform $1/23 = 0.043478$ weights are the giveaway that nothing was fitted: DiD assumes the average of all twenty-three OECD economies would have moved in parallel with the UK, and the pre-treatment RMSE of 0.0217 says it did not. That number is roughly four times the 0.0056 that synthetic control achieves, and it is the entire reason the rest of the ladder exists.
+Difference-in-differences puts the Brexit cost at 4.98% of GDP by the end of 2018 — far above every other stage, and far above the 2.4% previously published. The uniform $1/23 = 0.043478$ weights are the giveaway that nothing was fitted: DiD assumes the average of all twenty-three OECD economies would have moved in parallel with the UK, and the pre-treatment RMSE — root mean squared error, the typical size of the gap between the UK and its counterfactual before the referendum — of 0.0217 says it did not. That number is roughly four times the 0.0056 that synthetic control achieves, and it is the entire reason the rest of the ladder exists. Ignore the analytic standard error of 2.19 points: it rests on large-sample theory that does not apply with a single treated unit, and section 18 does inference properly.
 
 **A free seventh stage.** The same call also gives you Forward DiD, which selects a subset of donors greedily and then runs DiD on them. It is not on the paper's ladder, but it costs nothing:
 
@@ -711,7 +734,7 @@ Forward DiD picks four donors, cuts the pre-treatment RMSE from 0.0217 to 0.0088
 
 ## 9. Stage 1 — Synthetic control
 
-DiD's complaint is that the donor average does not look like the UK. Synthetic control fixes that by fitting the unit weights, subject to the simplex constraint
+DiD's complaint is that the donor average does not look like the UK. Synthetic control (Abadie and Gardeazabal [12]; Abadie, Diamond and Hainmueller [13, 14]; Abadie [15] is the practitioner's guide) fixes that by fitting the unit weights, subject to the simplex constraint
 
 $$\hat\omega = \arg\min\_{\omega \in \mathbb{W}} \sum\_{t=1}^{T\_0} \left( Y\_{\text{UK},t} - \sum\_j \omega\_j Y\_{j,t} \right)^2, \qquad \mathbb{W} = \left\\{ \omega : \omega\_j \ge 0, \sum\_j \omega\_j = 1 \right\\}.$$
 
@@ -760,10 +783,10 @@ Note that the United States carries about a fifth of the counterfactual. That wi
 | `"auto"` (default) | `"outcome-only"` without covariates, `"mscmt"` with them | always a safe default |
 | `"outcome-only"` | convex simplex fit on pre-treatment outcomes | no covariates; unique solution |
 | `"mscmt"` | global differential-evolution search over predictor weights $V$ | covariates (Becker-Klössner) |
-| `"malo"` | corner search over $V$ (Malo et al. 2024) | covariates |
+| `"malo"` | corner search over $V$ (Malo et al. [16]) | covariates |
 | `"penalized"` | Abadie-L'Hour unique/sparse estimator | covariates, when uniqueness matters |
 
-The distinction that matters: **with no covariates the problem is convex and has a unique solution; with covariates it becomes a bilevel program whose predictor weights are generically not identified.** That is why `VanillaSC` reports a `v_agreement` diagnostic alongside covariate fits — small means the predictor weights are well identified, large means they are fragile. We come back to this in section 17.
+The distinction that matters: **with no covariates the problem is convex and has a unique solution; with covariates it becomes a bilevel program whose predictor weights $V$ — how much each covariate counts when the blend is matched to the UK — are generically not identified.** That is why `VanillaSC` reports a `v_agreement` diagnostic alongside covariate fits — small means the predictor weights are well identified, large means they are fragile. We come back to this in section 17.
 
 ### 9.2 One estimator, four solvers
 
@@ -774,6 +797,11 @@ gap series rather than its rounded `.att` field. Section 10.1 explains why it is
 needed; for now take it as "the unrounded ATT".)
 
 ```python
+def tssc_att(res, variant="MSCa", n_post=1):
+    """Full-precision ATT for a TSSC variant, read off the unrounded gap series."""
+    gap = np.asarray(res.variants[variant].gap, float).ravel()
+    return float(gap[-n_post:].mean())
+
 for label, klass, kw in [
     ("VanillaSC, backend='auto'",         VanillaSC, dict(inference=False)),
     ("VanillaSC, backend='outcome-only'", VanillaSC, dict(backend="outcome-only", inference=False)),
@@ -797,6 +825,7 @@ R synthdid (Frank-Wolfe, published)  2018Q4 3.060
 ```
 
 ![Horizontal bar chart comparing the 2018Q4 estimate from four mlsynth solver routes, all at 3.039 percent in steel blue, against R's Frank-Wolfe implementation at 3.060 percent in orange.](python_sc_dsc_sdid_03_solver_comparison.png)
+*Figure 3. Four solver routes inside `mlsynth` agree at 3.039%; R's Frank-Wolfe implementation stops at 3.060%.*
 
 Four independent code paths inside `mlsynth` — two backends, an explicit constraint family, and a completely different estimator class — agree to three decimals at 3.039%. R's `synthdid` stops at 3.06%. Section 15 explains why, and argues that this is the most interesting number in the post.
 
@@ -820,14 +849,15 @@ pre-RMSE 0.005589, mean post gap -0.02882 log points
 ```
 
 ![Two stacked panels: on top the UK log real GDP against its synthetic control, indistinguishable until 2016 and then diverging; below, the gap between them, hovering around zero for two decades before turning persistently negative and shaded orange after the referendum.](python_sc_dsc_sdid_04_sc_fit_gap.png)
+*Figure 4. Synthetic control on the full panel: the UK against its synthetic twin (top) and the gap between them (bottom).*
 
-The average post-treatment gap is $-0.0288$ log points, or about 2.9% of GDP averaged across all eighteen quarters after the referendum. The bottom panel is the one to look at: the gap oscillates around zero for eighty-six quarters and then goes negative and stays there. That persistence, rather than the size of any single quarter's gap, is what makes the result credible.
+The average post-treatment gap is $-0.0288$ log points, or about 2.9% of GDP averaged across all eighteen quarters after the referendum. The bottom panel is the one to look at: the gap oscillates around zero for eighty-six quarters and then goes negative and stays there. That persistence is suggestive, but read it with the data vintage in mind (section 4.1): only the first nine post-referendum quarters, 2016Q3–2018Q3, are observed, and the last nine are OECD projections that extend the gap smoothly by construction.
 
 ## 10. Stage 2 — Demeaned synthetic control
 
 Synthetic control insists the blend match the UK's *level*. Sometimes a blend tracks the shape perfectly while sitting slightly above or below, and plain SC will reject it in favour of a worse-shaped blend at the right level. Demeaned SC adds one free parameter — a constant offset — so the blend has to match the shape but not the level.
 
-In `mlsynth` this is the `MSCa` variant of the two-step estimator of Li and Shankar (2023).
+In `mlsynth` this is the `MSCa` variant of the two-step estimator of Li and Shankar [17].
 
 ```python
 dsc = {k: TSSC(cfg(e, method="MSCa", inference=False)).fit() for k, e in EVAL.items()}
@@ -845,6 +875,9 @@ MSCa intercept: +0.002410 log points = +0.241% of GDP
 The estimated offset is $+0.0024$ log points, about a quarter of one per cent of GDP. That is small, and its smallness is informative: it says the SC fit was already close to level-balanced, which is why DSC's 2.99% sits so near SC's 3.04%.
 
 ![The UK, plain synthetic control and demeaned synthetic control from 2010 to 2020, with the demeaned series shifted by a small constant offset annotated at plus 0.0024 log points.](python_sc_dsc_sdid_05_dsc_offset.png)
+*Figure 5. Demeaned synthetic control is plain synthetic control shifted by a constant offset of +0.0024 log points.*
+
+At this scale the two synthetic paths are almost indistinguishable: a shift of 0.0024 log points is a quarter of a percentage point, which is why the figure has to annotate it. Demeaning changed how the result is read off, not who was picked.
 
 ### 10.1 A precision trap worth knowing about
 
@@ -864,7 +897,7 @@ gap[-1] (full precision)    np.float64(-0.0298873295228968)
 variants['MSCa'].rmse_pre   0.006
 ```
 
-Take the headline off `.att` and DSC reads exactly 3.00%. Take it off the gap series and it reads 2.99%, which is what `mlsynth`'s own replication table reports and matches the R edition's 2.985 (the published paper prints 2.98). A hundredth of a percentage point is not going to change anyone's policy view, but it will make you think you have failed to replicate a table when you have not. The fix is three lines:
+Take the headline off `.att` and DSC reads exactly 3.00%. Take it off the gap series and it reads 2.99%, which is what `mlsynth`'s own replication table reports and matches the R edition's 2.985 (the published paper prints 2.98). A hundredth of a percentage point is not going to change anyone's policy view, but it will make you think you have failed to replicate a table when you have not. The fix is the three-line helper we have been using since section 9.2:
 
 ```python
 def tssc_att(res, variant="MSCa", n_post=1):
@@ -900,19 +933,16 @@ TSSC recommends: SC
   MSCa  loss 2.989%   (.att reports -0.03000)   intercept +0.00241
   MSCb  loss 3.041%   (.att reports -0.03000)   intercept none
   MSCc  loss 3.021%   (.att reports -0.03000)   intercept +0.00282
-```
-
-```text
   test 'joint': stat +2.21193  CI [+0.02894, +9.10199]  rejected False
 ```
 
-All four variants land between 2.99% and 3.04%, and all four report `.att` as exactly $-0.03$ — a compact demonstration of the rounding trap. The four differ in which constraints they impose: `SC` is the simplex with no intercept, `MSCa` adds an intercept, `MSCb` relaxes the sum-to-one constraint, and `MSCc` relaxes both. The Step-1 test does not reject the restriction, so `TSSC` recommends plain `SC`.
+All four variants land between 2.99% and 3.04%, and all four report `.att` as exactly $-0.03$ — a compact demonstration of the rounding trap. The four differ in which constraints they impose: `SC` is the simplex with no intercept, `MSCa` adds an intercept, `MSCb` drops the sum-to-one constraint, and `MSCc` adds the intercept *and* drops sum-to-one. The bracket in the Step-1 line is not a confidence interval: it is the subsampling *acceptance region* for the joint null that the weights sum to one and the intercept is zero. The statistic 2.21 falls inside it, so the null is not rejected and `TSSC` recommends plain `SC`. Its own test, in other words, says the DSC intercept is unnecessary on this panel; we fit DSC anyway because it is the next rung of the ladder.
 
 The cost of that convenience is real. Fitting four variants with 500 subsampling draws takes about 17 seconds; forcing one variant with `inference=False` takes 0.01 seconds — a factor of roughly 1,700. If you are running an estimator inside a loop, as we do in section 16, set `method=` and `inference=False`. Note that `inference=False` *requires* `method` to be set; asking for no inference without naming a variant raises, because there would be nothing to select with.
 
 ## 11. Stage 3 — Synthetic difference-in-differences
 
-DSC still treats all eighty-six pre-treatment quarters as equally informative. SDID fits the time weights too, solving the transposed version of the same problem: which blend of quarters, judged across all donors, best predicts the treatment quarter.
+DSC still treats all eighty-six pre-treatment quarters as equally informative. SDID (Arkhangelsky et al. [18]) fits the time weights too, solving the transposed version of the same problem: which blend of quarters, judged across all donors, best predicts the treatment quarter.
 
 ```python
 sdid = {k: SDID(cfg(e, zeta=0.0, vce="placebo", B=500, seed=SEED)).fit()
@@ -931,9 +961,11 @@ ATT -0.02801, SE 0.02636, CI [-0.07968, +0.02365]
 p = 0.2016, method 'placebo', n_placebo 500
 ```
 
-SDID puts the shortfall at 2.80% and 3.94%. Note the standard error: 0.0264 against a point estimate of 0.0280, giving a confidence interval that comfortably contains zero and a placebo p-value of 0.20. With one treated unit and twenty-three donors, that is the honest state of the evidence — section 18 returns to it.
+SDID puts the shortfall at 2.80% and 3.94%. Note the standard error: 0.0264 against a point estimate of 0.0280, giving a confidence interval that comfortably contains zero and a placebo p-value of 0.20. With one treated unit and twenty-three donors, that is the honest state of the evidence — section 18 returns to it. One detail: each placebo draw makes one of the twenty-three donors the pseudo-treated unit, so the 500 draws can produce at most 23 distinct placebo estimates. The extra draws repeat assignments; they do not add information.
 
 ### 11.1 The one setting that carries the result
+
+SDID's unit weights carry a ridge penalty, `zeta`, which the paper switches off. Here is what leaving it at its default does:
 
 ```python
 default = SDID(cfg(96, vce="noinference")).fit()
@@ -965,33 +997,36 @@ Identical to four decimals. `intercept_adjust` matters when there are several po
 
 ### 11.2 Time weights, cohorts and the event study
 
-SDID's time weights are the one output that is not where you would first look. They live on the cohort object, not on `weights`:
+SDID's time weights are the one output that is not where you would first look. They live on the cohort object, not on `weights`. The weights depend on which post-treatment quarter they are fitted to predict, so here are two fits: one aimed at the treatment quarter, 2016Q3 (variant (i) in section 11.3), and the 2018Q4 window behind the headline:
 
 ```python
-coh = list(sdid["2018Q4"].cohorts.values())[0]
-lam = np.asarray(coh.time_weights, float)
-
-print(f"cohorts: {list(sdid['2018Q4'].cohorts)}  (n_treated={coh.n_treated}, n_post={coh.n_post})")
-print(f"lambda: {len(lam)} weights summing to {lam.sum():.6f}")
-for i in np.where(lam > 1e-4)[0]:
-    print(f"    {QLAB[i]:<8s} {lam[i]:.4f}")
+fits = {"fitted on 2016Q3": SDID(cfg(T0 + 1, zeta=0.0, vce="noinference")).fit(),
+        "fitted on 2018Q4": sdid["2018Q4"]}
+for label, res in fits.items():
+    coh = list(res.cohorts.values())[0]
+    lam = np.asarray(coh.time_weights, float)
+    print(f"{label}: cohorts {list(res.cohorts)}, {len(lam)} weights summing to {lam.sum():.6f}")
+    for i in np.where(lam > 1e-4)[0]:
+        print(f"    {QLAB[i]:<8s} {lam[i]:.4f}")
 ```
 
 ```text
-cohorts: [87]  (n_treated=1, n_post=1)
-lambda: 86 weights summing to 1.000000
+fitted on 2016Q3: cohorts [87], 86 weights summing to 1.000000
     2008Q4   0.0386
     2014Q3   0.0029
     2016Q2   0.9585
+fitted on 2018Q4: cohorts [87], 86 weights summing to 1.000000
+    2016Q2   1.0000
 ```
 
 ![Stem plot of SDID's eighty-six time weights against year, with almost all the mass on a single orange point at 2016Q2 labelled 0.958, and a dashed gold line marking the uniform weight that difference-in-differences would use.](python_sc_dsc_sdid_06_sdid_time_weights.png)
+*Figure 6. SDID time weights fitted to predict the treatment quarter: 95.85% of the mass falls on 2016Q2. The dashed line is the uniform weight DiD would use.*
 
-The time weights put 95.85% of their mass on 2016Q2, the last pre-treatment quarter, 3.86% on 2008Q4, the trough of the financial crisis, and almost nothing on the other eighty-four. Difference-in-differences would place the dashed uniform weight, $1/86 \approx 0.0116$, on all of them.
+Fitted to predict the treatment quarter, the time weights put 95.85% of their mass on 2016Q2, the last pre-treatment quarter, 3.86% on 2008Q4, the trough of the financial crisis, and almost nothing on the other eighty-four; the figure plots this fit. Fitted to predict 2018Q4 directly, they collapse completely onto 2016Q2. Difference-in-differences would place the dashed uniform weight, $1/86 \approx 0.0116$, on all of them.
 
 Why? Because log real GDP behaves close to a random walk. If the outcome is a random walk, the best predictor of next quarter is *this* quarter, and the eighty-five quarters before it add noise rather than information. The source paper reports exactly this collapse and attributes it to the same cause. Do not read it as a bug; read it as SDID correctly discovering that most of the pre-treatment history is not informative about the level at the treatment date.
 
-`mlsynth` also aggregates an event-study estimator alongside the headline ATT, which the R packages on this ladder do not:
+`mlsynth` also returns an event study alongside the headline ATT — the effect estimated separately at each quarter relative to the referendum, before and after it (Ciccia [19]) — which the R packages on this ladder do not:
 
 ```python
 full_sdid = SDID(dict(full, zeta=0.0, vce="placebo", B=200, seed=SEED)).fit()
@@ -1010,8 +1045,9 @@ pre-treatment tau mean  +0.00208
 ```
 
 ![Event-study plot of the SDID effect by quarters since the referendum, with a shaded ninety-five percent placebo confidence band, a flat pre-treatment path near zero and a clearly negative post-treatment path.](python_sc_dsc_sdid_07_sdid_event_study.png)
+*Figure 7. SDID event study with a 95% placebo band: flat before the referendum, negative after it. Quarters after 2018Q3 are OECD projections.*
 
-The pre-treatment effects average $+0.0021$ — essentially zero — while the post-treatment effects average $-0.0281$. That flat pre-treatment path is a falsification test the single ATT number cannot give you, and it is available from `result.event_study` for the cost of one extra line.
+The pre-treatment effects average $+0.0021$ — essentially zero — while the post-treatment effects average $-0.0281$. A flat pre-treatment path is a useful check, but a weak one: the weights were fitted on these same quarters, so a near-zero pre-period is partly built in. The post-treatment mean also averages eight observed quarters (2016Q4–2018Q3) with nine projected ones. What the path does show, and a single ATT cannot, is when the gap opens and whether it keeps growing — all from `result.event_study` for the cost of one extra line.
 
 ### 11.3 Three flavours of SDID
 
@@ -1074,11 +1110,11 @@ With a single treated unit, jackknife and bootstrap have nothing to resample, so
 
 ## 12. Stage 4 — MASC
 
-Sections 9 to 11 improve the counterfactual by choosing better weights within the simplex. MASC (Kellogg, Mogstad, Pouliot and Torgovitsky [11]) does something different: it forms a convex combination of synthetic control and $m$-nearest-neighbour matching,
+Sections 9 to 11 improve the counterfactual by choosing better weights within the simplex. MASC (Kellogg, Mogstad, Pouliot and Torgovitsky [20]) does something different: it forms a convex combination of synthetic control and $m$-nearest-neighbour matching — the plain average of the $m$ donors whose pre-treatment paths are closest to the UK's,
 
 $$\hat{Y}^{\text{MASC}} = \phi \cdot \hat{Y}^{\text{match}}\_m + (1 - \phi) \cdot \hat{Y}^{\text{SC}},$$
 
-and chooses $m$ and $\phi$ jointly by rolling-origin cross-validation. The motivation is the bias decomposition: synthetic control attacks extrapolation bias, matching attacks interpolation bias, and the cross-validation buys whichever trade-off the data prefer.
+and chooses $m$ and $\phi$ jointly by rolling-origin cross-validation: repeatedly pretend that an earlier quarter is the treatment date, forecast the quarter after it, and keep the $m$ and $\phi$ that forecast best. The motivation is the bias decomposition: synthetic control attacks extrapolation bias, matching attacks interpolation bias, and the cross-validation buys whichever trade-off the data prefer.
 
 ```python
 M_GRID = list(range(1, 11))
@@ -1087,19 +1123,20 @@ masc = {k: MASC(cfg(e, m_grid=M_GRID, set_f=SET_F)).fit() for k, e in EVAL.items
 m18 = masc["2018Q4"]
 
 print(f"MASC  2018Q4 {pct(m18.att):.2f}%   2019Q4 {pct(masc['2019Q4'].att):.2f}%")
-print(f"weights.summary_stats: {m18.weights.summary_stats}")
+st = m18.weights.summary_stats
+print(f"m_hat {st['m_hat']}, phi_hat {st['phi_hat']:.4f}, constraint '{st['constraint']}'")
 ```
 
 ```text
 MASC  2018Q4 2.73%   2019Q4 3.83%
-weights.summary_stats: {'constraint': 'simplex (matching+SC blend)', 'phi_hat': 0.1576922233857826, 'm_hat': 10}
+m_hat 10, phi_hat 0.1577, constraint 'simplex (matching+SC blend)'
 ```
 
 MASC gives 2.73%, the lowest estimate on the ladder. The two tuned dials are in `weights.summary_stats`, not in `method_details.parameters_used` — which is `None` for this estimator, so looking there first will send you away empty-handed. The cross-validation picked $m = 10$ neighbours and $\phi = 0.158$, so the estimate is roughly one-sixth matching and five-sixths synthetic control.
 
 ### 12.1 The argument that decides the answer
 
-`set_f` and `min_preperiods` both control the cross-validation fold set, and they are mutually exclusive. The default is not the fold set the paper uses, and the difference is not subtle.
+`set_f` and `min_preperiods` both control the cross-validation fold set — the list of pretend treatment dates the cross-validation forecasts from — and they are mutually exclusive. The default is not the fold set the paper uses, and the difference is not subtle.
 
 ```python
 for label, kw in [
@@ -1147,12 +1184,13 @@ print(pd.DataFrame(rows).to_string(index=False, float_format=lambda v: f"{v:.5f}
 ```
 
 ![Bar chart of the 2018Q4 estimate for each forced number of matched neighbours from one to ten, each bar labelled with the corresponding phi, with the winning m equal to ten highlighted in orange and a dashed teal line at the freely cross-validated answer of 2.73 percent.](python_sc_dsc_sdid_08_masc_cv.png)
+*Figure 8. MASC's 2018Q4 estimate for each forced number of neighbours m, labelled with its cross-validated φ; the dashed line is the freely cross-validated 2.73%.*
 
 Two patterns. First, $\phi$ broadly rises with $m$ (not strictly: it dips at $m = 2$ and $m = 7$) — the more neighbours you average over, the more weight the cross-validation is willing to put on matching, because averaging more neighbours reduces the variance that makes matching unattractive. Second, the estimate is not monotone in $m$: it wanders between 2.73% and 3.23% with no obvious structure. That non-monotonicity is worth remembering when someone reports a single MASC number without saying what grid produced it.
 
 ## 13. Stage 5 — Augmented synthetic control
 
-Every stage so far assumes the treated unit lies inside the convex hull of the donors, because the simplex cannot reach outside it. If the fit is imperfect — if there is pre-treatment imbalance that no non-negative blend can close — augmented SC (Ben-Michael, Feller and Rothstein [12]) fits a ridge regression to whatever imbalance is left and corrects for it. The correction is allowed to use negative weights.
+Every stage so far assumes the treated unit lies inside the convex hull of the donors (up to DSC's level shift), because the simplex cannot reach outside it. If the fit is imperfect — if there is pre-treatment imbalance that no non-negative blend can close — augmented SC (Ben-Michael, Feller and Rothstein [21]) fits a ridge regression to whatever imbalance is left and corrects for it. The correction is allowed to use negative weights.
 
 ```python
 ascm = {k: VanillaSC(cfg(e, augment="ridge", inference=False)).fit() for k, e in EVAL.items()}
@@ -1171,7 +1209,7 @@ weights: sum 1.00000, 8 negative, min -0.0090, max +0.2262
 pre-RMSE 0.005428 vs SC's 0.005589
 ```
 
-Augmented SC lands at 3.04%, indistinguishable from plain SC. The reason is visible in the weights: eight are negative, but the largest in magnitude is $-0.0090$, and the pre-treatment RMSE improves only from 0.005589 to 0.005428. There was very little imbalance left for the ridge correction to fix, because the UK sits comfortably inside the convex hull of twenty-three OECD economies. Augmentation earns its keep when the treated unit is extreme; here it has almost nothing to do.
+Augmented SC lands at 3.04%, indistinguishable from plain SC. The reason is visible in the weights: eight are negative, but the largest in magnitude is $-0.0090$, and the pre-treatment RMSE improves only from 0.005589 to 0.005428. There was very little imbalance left for the ridge correction to fix, because the UK sits close to the convex hull of twenty-three OECD economies. Augmentation earns its keep when the treated unit is extreme; here it has almost nothing to do.
 
 The `augment` field is the whole interface — one keyword on the class you already used for plain SC. Two companions are worth knowing:
 
@@ -1196,7 +1234,7 @@ out as `att_headline.csv`.
 ```python
 ladder = pd.read_csv("att_headline.csv")
 print(ladder[["method", "command", "loss_2018Q4", "loss_2019Q4",
-              "r_post_2018Q4", "published_2018Q4"]].to_string(index=False))
+              "r_post_2018Q4", "published_2018Q4"]].round(2).to_string(index=False))
 ```
 
 ```text
@@ -1209,17 +1247,22 @@ method                         command  loss_2018Q4  loss_2019Q4  r_post_2018Q4 
   ASCM VanillaSC(..., augment="ridge")         3.04         4.19           3.04              3.04
 ```
 
-Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [1]. **DiD, DSC, MASC and ASCM agree with the R edition to two decimals, and MASC and ASCM match the published paper too (it does not report DiD). DSC prints 2.99 against the paper's 2.98 because the R estimate, 2.985, sits exactly on the rounding boundary; `mlsynth`'s 2.9887 differs from it only in the third decimal. The two real disagreements are SC and SDID — in opposite directions (`mlsynth` is 0.02 lower on SC and 0.01 higher on SDID), but for the same reason.**
+Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [7]. **DiD, DSC, MASC and ASCM agree with the R edition to two decimals, and MASC and ASCM match the published paper too (it does not report DiD). DSC prints 2.99 against the paper's 2.98 because the R estimate, 2.985, sits exactly on the rounding boundary; `mlsynth`'s 2.9887 differs from it only in the third decimal. The two real disagreements are SC and SDID — in opposite directions (`mlsynth` is 0.02 lower on SC and 0.01 higher on SDID), but for the same reason.**
 
-Every stage puts the cost of the referendum above the 2.4% that Born, Müller, Schularick and Sedláček [2] published for this same dataset, and the excluding-DiD range is a fairly tight 2.73% to 3.04% at the end of 2018, widening to 3.83% to 4.19% a year later.
+Every stage puts the cost of the referendum above the 2.4% that Born, Müller, Schularick and Sedláček [6] published for this same dataset, and the excluding-DiD range is a fairly tight 2.73% to 3.04% at the end of 2018, widening to 3.83% to 4.19% a year later in the OECD's projections.
 
 ![Grouped horizontal bar chart of donor weights for synthetic control, demeaned SC, SDID, MASC and augmented SC across the donor countries, with a shaded region marking negative weights that only augmented SC enters.](python_sc_dsc_sdid_09_donor_weights.png)
+*Figure 9. Donor weights by method. Hungary, Canada, the United States, Japan and Norway carry the counterfactual throughout; only augmented SC uses negative weights.*
 
 The weights tell a consistent story. Hungary, Canada, the United States, Japan and Norway carry the counterfactual under every method, and only ASCM ever goes negative — eight times, all of them tiny. Five estimators built on quite different principles are picking essentially the same five countries.
 
 ![Six counterfactual paths for the United Kingdom from 2014 to 2020 alongside the observed series, agreeing closely until the 2016 referendum and then fanning apart, with difference-in-differences the clear outlier.](python_sc_dsc_sdid_10_all_counterfactuals.png)
+*Figure 10. All six counterfactual paths for the UK, 2014–2020; difference-in-differences is the outlier.*
+
+Before 2016 every path hugs the observed UK series. After it, the five fitted counterfactuals stay within a narrow band while difference-in-differences runs well above them, which is why its 4.98% is an outlier rather than a competing answer.
 
 ![Dot plot of every stage's estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately and a dashed gold line at Born et al.'s published 2.4 percent, which every stage exceeds.](python_sc_dsc_sdid_11_att_dotplot.png)
+*Figure 11. Every stage's estimated shortfall at 2018Q4 and 2019Q4, against Born et al.'s published 2.4% (dashed).*
 
 The dot plot makes the shape of the disagreement clear: DiD is off on its own, and the other seven estimates cluster within about a third of a percentage point of each other at 2018Q4. The width of that cluster, not any single point in it, is the honest answer.
 
@@ -1238,6 +1281,8 @@ comparison = compare_estimators(
 )
 ax = plot_counterfactual_comparison(comparison)
 ```
+
+The result is one Matplotlib axis with the three counterfactual paths drawn against the observed UK series (without bands, because `show_bands=False`). We do not reproduce it here, because the figure above already shows the same comparison for all six stages.
 
 `compare_estimators` fits several estimators on one panel and lines their counterfactuals up on a common time axis; `compare_counterfactuals` does the same for already-fitted results; `plot_counterfactual_comparison` draws them with their prediction intervals. For an exploratory comparison this is one call instead of thirty lines, and it is the right starting point before you invest in custom figures.
 
@@ -1329,6 +1374,7 @@ SDID (iii) 0.0066 0.0039 0.0020
 ```
 
 ![Two panels of strip plots showing twenty placebo errors for each of the seven estimators, graded one quarter ahead and four quarters ahead, with the root mean squared error marked as an orange diamond and the SDID family visibly tighter around zero.](python_sc_dsc_sdid_12_placebo_tournament.png)
+*Figure 12. Placebo errors for twenty fake treatment dates, graded one and four quarters ahead; diamonds mark the root mean squared error.*
 
 At a one-quarter horizon the whole SDID family scores 0.0066 root mean squared error, against 0.0080 for MASC and 0.0086 for SC, DSC and ASCM alike. The gap is even larger in mean absolute bias: 0.0037 for SDID (i) against 0.0068 for SC, close to a factor of two. **The time weights are doing real work**, and this is the paper's central theoretical claim surviving an empirical test.
 
@@ -1348,9 +1394,11 @@ Running every estimator at both horizons settles it:
 | MASC | 0.0080 | 0.0140 | 0.0080 |
 | ASCM | 0.0086 | 0.0146 | 0.0086 |
 
-Every cell reproduces the published value to within 0.0003 — except the two that were graded on a different exam. Graded on the same task, the three SDID variants are **indistinguishable**: 0.0066 at one quarter, 0.0132–0.0133 at four. The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact of the horizon, not a property of the estimators. This is the same finding the R edition reports, arrived at with a different library, which is about as much corroboration as a result of this kind can get.
+Every cell reproduces the published value to within 0.0003 — except the two that were graded on a different exam. Graded on the same task, the three SDID variants are **indistinguishable**: 0.0066 at one quarter, 0.0132–0.0133 at four. The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact of the horizon, not a property of the estimators. This is the same finding the R edition reports, arrived at with a different library — an independent second implementation reaching the same conclusion.
 
 What survives is the finding that matters more: **at either horizon the whole SDID family beats every other stage**, and the ordering below it is stable — SDID, then MASC, then SC, ASCM and DSC, and those last three are indistinguishable at one quarter and separated by less than 0.0001 at four.
+
+Two cautions before leaning on this ranking. First, the headline quarters are 10 and 14 quarters past the last pre-treatment quarter, but the tournament grades 1 and 4 quarters ahead, and SDID's advantage over SC shrinks from 23% at one quarter (0.0066 against 0.0086) to 9% at four (0.0132 against 0.0145). The tournament ranks short-horizon forecasting skill; whether the ranking holds at ten quarters is exactly what exercise 5 asks. Second, the twenty placebo dates are consecutive quarters, so their errors overlap and are correlated: they are not twenty independent tests.
 
 ## 17. Do covariates help? Three meanings of "control for"
 
@@ -1360,9 +1408,9 @@ The answer `mlsynth` gives is more interesting than yes or no: **it asks which o
 
 | Key | Method | What it does |
 |---|---|---|
-| `"adjust"` | Kranz (2022) two-step | residualise the *outcome* on covariates first, then run SDID on the residuals |
-| `"match"` | de Brabander et al. [1], eqs. 11–12 | put the covariates *inside the unit-weight problem* |
-| `"optimized"` | Arkhangelsky et al. [10], fn. 4 | estimate weights and covariate coefficients *jointly* |
+| `"adjust"` | Kranz [22] two-step | residualise the *outcome* on covariates first, then run SDID on the residuals |
+| `"match"` | de Brabander et al. [7], eqs. 11–12 | put the covariates *inside the unit-weight problem* |
+| `"optimized"` | Arkhangelsky et al. [18], fn. 4 | estimate weights and covariate coefficients *jointly* |
 
 These are three different estimators, and they are all defensible readings of "SDID with covariates" in the literature.
 
@@ -1384,7 +1432,7 @@ covariates={'match': ...}  2018Q4  1.85   2019Q4  2.93
 covariates={'optimized': ...}  2018Q4  3.11   2019Q4  4.56
 ```
 
-The three routes disagree by **1.76 percentage points** at 2018Q4 — from 1.85% to 3.61%, against 2.80% with no covariates at all. That spread is more than five times the spread across the entire outcomes-only ladder. Adding covariates does not refine the answer here; it replaces one well-identified number with three poorly-identified ones.
+The three routes disagree by **1.76 percentage points** at 2018Q4 — from 1.85% to 3.61%, against 2.80% with no covariates at all. That spread is more than five times the spread across the entire outcomes-only ladder. Adding covariates does not refine the answer here; it replaces one well-identified number with three estimators that disagree.
 
 `match_pre_periods` is the companion setting for the `"match"` route, taking `"all"`, `"half"`, `"last"` or an integer. It controls which pre-treatment periods the covariate means are computed over, and `mlsynth`'s own benchmarks report that its agreement with R's `Synth` degrades from a weight-vector correlation of 0.998 under `"last"` to 0.636 under `"all"` — precisely because the predictor weights become less identified as more periods enter.
 
@@ -1416,13 +1464,16 @@ reduced (maxiter=120, popsize=12)     1.11%   pre-RMSE 0.009928   v_agreement 0.
     labprod_growth 0.419, emp_pop 0.396, cons_share 0.141, inv_share 0.045
 ```
 
-![Grouped horizontal bar chart comparing the SDID estimate under no covariates and under the adjust, match and optimized covariate methods, plus VanillaSC's bilevel covariate route, with a dashed gold reference line at Born et al.'s 2.4 percent.](python_sc_dsc_sdid_13_covariate_methods.png)
-
 Same estimator, same seed, same data. Shortening the search moves the estimate from 1.32% to 1.11% — and, far more strikingly, moves the predictor weights from a **corner solution** that puts all the weight on the import share to a **spread** across labour productivity, employment, and the consumption and investment shares. Those are not slightly different answers to the same question. They are different economic stories about what makes a country comparable to the UK.
 
-Three diagnostics all point the same way. The pre-treatment RMSE **rises** from 0.005589 to about 0.0097 — adding six covariates makes the pre-treatment fit nearly twice as bad, because the optimiser now spends its effort matching predictor means instead of the outcome path. `v_agreement`, the gap between the two canonical choices of $V$, is 0.055 to 0.083 rather than near zero. And the answer moves with the optimiser budget, which is the definition of a non-identified problem.
+Three diagnostics all point the same way. The pre-treatment RMSE **rises** from 0.005589 to about 0.0097 — adding six covariates makes the pre-treatment fit nearly twice as bad, because the optimiser now spends its effort matching predictor means instead of the outcome path. `v_agreement`, the gap between the two canonical choices of $V$, is 0.055 to 0.083 rather than near zero. And the answer moves with the optimiser budget, which is the signature of a flat, poorly identified objective.
 
 This is why the R edition's placebo tournament found covariates make the counterfactual *worse* rather than better, and why the headline specification here matches on outcomes alone. **When you have eighty-six pre-treatment quarters of the outcome itself, six covariate means are not adding information — they are adding a poorly identified optimisation problem.** The fact that `mlsynth` reports `v_agreement` at all is what let us see it.
+
+![Grouped horizontal bar chart comparing the SDID estimate under no covariates and under the adjust, match and optimized covariate methods, plus VanillaSC's bilevel covariate route, with a dashed gold reference line at Born et al.'s 2.4 percent.](python_sc_dsc_sdid_13_covariate_methods.png)
+*Figure 13. The 2018Q4 estimate under each covariate route, against outcomes-only SDID and Born et al.'s 2.4% (dashed).*
+
+The figure collects every covariate route in one place. The outcomes-only SDID estimate sits in the middle; the three SDID covariate methods scatter from 1.85% to 3.61% around it; and VanillaSC's bilevel route falls lowest, at 1.32%, below even Born et al.'s 2.4%. A plausible reason the published figure is lower than this ladder is exactly this: it came from a covariate specification.
 
 ## 18. Inference
 
@@ -1432,7 +1483,8 @@ This is why the R edition's placebo tournament found covariates make the counter
 rows = []
 for meth in ("placebo", "scpi", "lto", "conformal", "ttest", "jackknife_plus"):
     try:
-        r = VanillaSC(cfg(96, inference=meth, alpha=0.05)).fit()
+        r = VanillaSC(cfg(96, inference=meth, alpha=0.05,
+                          lto_max_pairs=120, scpi_sims=200)).fit()   # cap the costly ones
         inf = r.inference
         rows.append(dict(method=meth, att=r.att, p_value=inf.p_value,
                          ci_lower=inf.ci_lower, ci_upper=inf.ci_upper,
@@ -1453,13 +1505,17 @@ print(pd.DataFrame(rows).to_string(index=False))
 jackknife_plus       NaN      NaN       NaN       NaN                                  FAILED: MlsynthEstimationError
 ```
 
-Reported honestly: `jackknife_plus` raises `MlsynthEstimationError` on this configuration and is excluded. The other five all reject at the 5% level: four report p-values between 0.006 and 0.042, and `scpi` reports no p-value but an interval that stops short of zero.
+Reported honestly: `jackknife_plus` raises `MlsynthEstimationError` on this configuration and is excluded. The other five all reject at the 5% level: four report p-values between 0.006 and 0.042, and `scpi` reports no p-value but an interval that stops short of zero. The five are the in-space placebo [13], `scpi` prediction intervals [23], the leave-two-out refined placebo [24], conformal intervals [25] and the debiased t-test [26]. Two of those p-values are floors rather than measurements: the placebo's 0.042 is $1/24$, and the leave-two-out test's 0.0083 is $1/120$ because we capped it at 120 donor pairs — with all 253 pairs it reports $1/253 = 0.0040$.
 
-That looks decisive, and it should be read with more caution than it invites. The five methods are not five independent tests — they all use the same point estimate and the same donor pool, and they differ in how they build a reference distribution from twenty-three donors. Note also that SDID's own placebo inference in section 11 gave p = 0.20 with an interval containing zero. Different estimator, different variance estimator, very different verdict. Read these as orders of magnitude rather than as digits.
+That looks decisive, and it should be read with more caution than it invites. The five methods are not five independent tests — they all use the same point estimate and the same donor pool, and they differ in how they build a reference distribution from twenty-three donors. Note also that SDID's own placebo inference in section 11 gave p = 0.20 with an interval containing zero. Different estimator, different variance estimator, very different verdict — and they answer different questions. SDID's placebo measures how much an estimate varies when each donor in turn plays the treated unit, which is a lot for series this close to random walks; the RMSPE ratio below asks instead whether the UK's gap is unusual *relative to its own very good pre-treatment fit*. Read these as orders of magnitude rather than as digits.
 
 ### 18.1 Placebo in space
 
-The most interpretable of the five is worth doing explicitly: give every donor the treatment in turn and see where the UK ranks.
+The most interpretable of the five is worth doing explicitly: give every donor the treatment in turn and see where the UK ranks. The statistic is the ratio of post-treatment to pre-treatment root mean squared prediction error,
+
+$$R\_j = \frac{\text{RMSPE}\_j^{\text{post}}}{\text{RMSPE}\_j^{\text{pre}}},$$
+
+which asks whether unit $j$'s gap grew after the treatment date *relative to how well it was fitted beforehand*. Dividing by the pre-treatment fit is what stops a badly fitted donor from looking treated.
 
 ```python
 rows = []
@@ -1479,12 +1535,6 @@ placebo_space = (pd.DataFrame(rows)
 print(placebo_space.head(6).round(4).to_string(index=False))
 ```
 
-The statistic is the ratio of post-treatment to pre-treatment root mean squared prediction error,
-
-$$R\_j = \frac{\text{RMSPE}\_j^{\text{post}}}{\text{RMSPE}\_j^{\text{pre}}},$$
-
-which asks whether unit $j$'s gap grew after the treatment date *relative to how well it was fitted beforehand*. Dividing by the pre-treatment fit is what stops a badly fitted donor from looking treated.
-
 ```text
        country  rmspe_pre  rmspe_post  ratio  rank
 United Kingdom     0.0056      0.0327 5.8488     1
@@ -1496,8 +1546,9 @@ United Kingdom     0.0056      0.0327 5.8488     1
 ```
 
 ![Placebo-in-space plot showing twenty-three grey gap paths, one for each donor country given the treatment in turn, with the United Kingdom's gap in orange diverging further below zero than any placebo after 2016.](python_sc_dsc_sdid_14_placebo_in_space.png)
+*Figure 14. Placebo in space: each donor given the treatment in turn (grey) against the UK's gap (orange).*
 
-The UK's ratio of 5.85 is the largest of all twenty-four units, giving a permutation p-value of $1/24 = 0.042$. That is as small as this permutation design can produce: with twenty-four units the smallest p-value a permutation test can give is 0.042, so the test is at its floor and could not have been more favourable.
+The UK's ratio of 5.85 is the largest of all twenty-four units, giving a permutation p-value of $1/24 = 0.042$. That is as small as this permutation design can produce: with twenty-four units the smallest p-value a permutation test can give is 0.042, so the test is at its floor and could not have been more favourable. Keep the data vintage in mind here too: half of each unit's post-treatment RMSPE (2018Q4–2020Q4) is computed on OECD projections, so the ratio partly measures how the OECD extrapolated each country's late-2018 position.
 
 ### 18.2 What this can and cannot tell you
 
@@ -1521,7 +1572,7 @@ Four departures from the headline specification, each one line of config. The SD
 
 Four observations.
 
-**The treatment date matters most for SDID.** Moving from 2016Q3 to 2016Q2 barely touches SC (3.04 to 3.09) but moves SDID from 2.77% to 3.18%. That is exactly what section 11.2 predicts: SDID puts 96% of its time weight on the last pre-treatment quarter, so changing which quarter that is changes the bias adjustment directly. The estimator that is best on the placebo tournament is also the one most sensitive to the treatment date — a trade-off worth stating out loud.
+**The treatment date matters most for SDID.** Moving from 2016Q3 to 2016Q2 barely touches SC (3.04 to 3.09) but moves SDID from 2.77% to 3.18%. That is exactly what section 11.2 predicts: SDID puts 96% of its time weight on the last pre-treatment quarter, so changing which quarter that is changes the bias adjustment directly. The estimator that is best on the placebo tournament is also the one most sensitive to the treatment date — a trade-off worth stating out loud. There is also a substantive reading: 2016Q2, the quarter SDID leans on, is the referendum campaign quarter. If uncertainty already weighed on UK output then, the no-anticipation assumption fails for that quarter, SDID anchors its bias correction on a partly treated quarter and understates the loss — and moving the treatment date to 2016Q2 removes exactly that contamination.
 
 **Dropping the United States barely moves anything.** The US carries about a fifth of the counterfactual, and removing it entirely shifts SC from 3.04% to 3.06% and SDID from 2.77% to 2.83%. The result does not hinge on one donor.
 
@@ -1556,9 +1607,9 @@ For the current list on your installed version, `get_llm_guide()` is authoritati
 
 ## 21. Discussion
 
-**What Brexit cost.** Taking the ladder as a whole, the referendum had cost the UK between **2.7% and 3.0% of GDP by the end of 2018**, and between **3.8% and 4.2% by the end of 2019**. That is above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and section 17 shows covariates make the counterfactual worse here rather than better.
+**What Brexit cost.** Taking the ladder above DiD as a whole, the referendum had cost the UK between **2.7% and 3.0% of GDP by the end of 2018** — 2.5% to 2.8% at 2018Q3, the last quarter these data actually observe. The end-2019 range of **3.8% to 4.2%** compares OECD projections for the UK with OECD projections for its donors, so it is a projected gap rather than a measured one; re-estimating on a later data vintage is the natural next step. Both ranges sit above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and section 17 shows covariates make the counterfactual worse here rather than better.
 
-Three caveats belong with the number. It is a *net* gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And the estimate is a point on a specification cloud rather than a parameter that has been pinned down — every interval in section 18 is wide, and SDID's (section 11) contains zero.
+Three caveats belong with the number. It is a *net* gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strongest for the EU members in the blend — Hungary, Ireland, Italy, Portugal and Finland carry about 31% of the synthetic-control weight — because Brexit plausibly hurt their trade with the UK too; if it did, the synthetic UK is pulled down and the loss is understated. And the estimate is a point on a specification cloud rather than a parameter that has been pinned down — every interval in section 18 is wide, and SDID's (section 11) contains zero.
 
 **What the software taught.** This is where a package-first reading pays off, and the findings are not econometric.
 
@@ -1576,7 +1627,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 
 ## 22. Summary and next steps
 
-- **The Brexit referendum cost the UK 2.7–3.0% of GDP by end-2018 and 3.8–4.2% by end-2019**, at every stage of the ladder, against 2.4% previously published for the same data.
+- **The Brexit referendum cost the UK 2.7–3.0% of GDP by end-2018 at every stage above DiD** (2.5–2.8% at 2018Q3, the last observed quarter), against 2.4% previously published for the same data; **the OECD's November 2018 projections imply 3.8–4.2% by end-2019**.
 - **`mlsynth` puts all six stages behind one interface**: `Estimator({"df": ..., "outcome": ..., "treat": ..., "unitid": ..., "time": ...}).fit()`, returning a result with seven flat accessors that work everywhere.
 - **Three defaults matter, and two of them more than the estimator choice.** `SDID` penalises unit weights unless you set `zeta=0.0` (2.80% vs 2.67%); `MASC` cross-validates on a different fold set unless you set `set_f` (2.73% vs 3.19%); and `SDID`'s three covariate methods disagree by 1.76 percentage points. Against a ladder that spans 0.31, the last two each clear it alone.
 - **The time weights earn their keep.** SDID's placebo RMSE is 0.0066 against 0.0086 for plain SC, a 23% reduction, and the advantage holds at both forecast horizons.
@@ -1589,39 +1640,44 @@ All three cheat sheets ship with this post, so the cross-language comparison in 
 
 ## 23. Exercises
 
-1. **Move the treatment date.** Re-run the headline table with `pre=T0-1` (treatment materialising 2016Q2). Which stage moves most, and can you explain it from the time weights?
-2. **Break the rounding.** Compute DSC's estimate from `variants["MSCa"].att` and from the gap series across all twenty placebo windows in section 16. How large does the discrepancy get?
-3. **Time the inference default.** `VanillaSC`'s `inference` defaults to `True`, which runs in-space placebo. Time a fit with `inference=False` against the default, and decide when the difference matters.
-4. **Read the simplex.** Print `weights.summary_stats` for every stage that has one (DiD's `FDID(...).fit().did` has no `.weights`). The keys differ by estimator — only `VanillaSC` reports `n_negative` — so which stages report a `constraint` other than the plain simplex, and which actually produce negative weights? (Hint: inspect `donor_weights` directly.)
-5. **Grade the horizon.** Extend section 16's tournament to $h = 8$. Restrict the last pre-treatment quarter to $k \le 78$ so that the evaluation quarter $k + h$ never reaches a post-referendum quarter, and change the SDID (ii)/(iii) targets from `k + 4` to `k + h`. Does the SDID family's advantage survive a two-year forecast?
-6. **Separate MASC's two dials.** Fix `m=10` and vary `set_f`; then fix `set_f` and vary `m_grid`. Which of the two drives the 0.47-point swing?
-7. **Try a fourth covariate route.** Fit `SDID` with `covariates={"match": [...]}` under each of `match_pre_periods` in `{"all", "half", "last", 20}`. How wide is the resulting range, and how does it compare with the range across methods?
-8. **Pick a different estimator entirely.** Fit `CLUSTERSC` and `PDA` on this panel with the config you already have. Do they land inside the ladder's range, and what does that tell you about the range?
+1. *(Warm-up)* **Move the treatment date.** Section 19 reports SC, DSC and SDID with `pre=T0-1` (treatment materialising in 2016Q2). Extend it to MASC and ASCM. Which stage moves most, and can you explain it from the time weights?
+2. *(Warm-up)* **Break the rounding.** Compute DSC's estimate from `variants["MSCa"].att` and from the gap series across all twenty placebo windows in section 16. How large does the discrepancy get?
+3. *(Warm-up)* **Time the inference default.** `VanillaSC`'s `inference` defaults to `True`, which runs in-space placebo. Time a fit with `inference=False` against the default, and decide when the difference matters.
+4. *(Core)* **Read the simplex.** Print `weights.summary_stats` for every stage that has one (DiD's `FDID(...).fit().did` has no `.weights`). The keys differ by estimator — only `VanillaSC` reports `n_negative` — so which stages report a `constraint` other than the plain simplex, and which actually produce negative weights? (Hint: inspect `donor_weights` directly.)
+5. *(Stretch)* **Grade the horizon.** Extend section 16's tournament to $h = 8$. Restrict the last pre-treatment quarter to $k \le 78$ so that the evaluation quarter $k + h$ never reaches a post-referendum quarter, and change the SDID (ii)/(iii) targets from `k + 4` to `k + h`. Does the SDID family's advantage survive a two-year forecast?
+6. *(Core)* **Separate MASC's two dials.** Fix `m=10` and vary `set_f`; then fix `set_f` and vary `m_grid`. Which of the two drives the 0.47-point swing?
+7. *(Core)* **Tune the match route.** Fit `SDID` with `covariates={"match": [...]}` under each of `match_pre_periods` in `{"all", "half", "last", 20}`. How wide is the resulting range, and how does it compare with the range across methods?
+8. *(Stretch)* **Pick a different estimator entirely.** Fit `CLUSTERSC` and `PDA` on this panel with the config you already have. Do they land inside the ladder's range, and what does that tell you about the range?
+9. *(Core)* **Evaluate at the last observed quarter.** Re-run the ladder at `t = 95` (2018Q3), the last quarter these data observe rather than project. How much of the 2018Q4 headline comes from the single projected quarter, and does any stage fall to Born et al.'s 2.4%?
 
 ## 24. References
 
-1. [de Brabander, E., Juodis, A., & Miyazato Szini, G. (2025). On the use of synthetic difference-in-differences approach with (-out) covariates: The case study of Brexit referendum. *Econometric Reviews* 44(10), 1617–1646.](https://doi.org/10.1080/07474938.2025.2530649)
-2. [Born, B., Müller, G. J., Schularick, M., & Sedláček, P. (2019). The costs of economic nationalism: Evidence from the Brexit experiment. *The Economic Journal* 129(623), 2722–2744.](https://doi.org/10.1093/ej/uez020)
-3. [Abadie, A., & Gardeazabal, J. (2003). The economic costs of conflict: A case study of the Basque Country. *American Economic Review* 93(1), 113–132.](https://doi.org/10.1257/000282803321455188)
-4. [Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies. *Journal of the American Statistical Association* 105(490), 493–505.](https://doi.org/10.1198/jasa.2009.ap08746)
-5. [Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science* 59(2), 495–510.](https://doi.org/10.1111/ajps.12116)
-6. [Abadie, A. (2021). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature* 59(2), 391–425.](https://doi.org/10.1257/jel.20191450)
-7. [Li, K. T., & Shankar, V. (2023). A two-step synthetic control approach for estimating causal effects of marketing events. *Management Science* 70(6), 3734–3747.](https://doi.org/10.1287/mnsc.2023.4878)
+1. [Companion tutorials on this site: the R edition of this ladder, the Basque Country, Kansas and Proposition 99.](/tutorials/r_sc_dsc_sdid/)
+2. [Gunsilius, F. F. (2023). Distributional synthetic controls. *Econometrica* 91(3), 1105–1117.](https://doi.org/10.3982/ECTA18260)
+3. [Greathouse, J. mlsynth: A Python library of synthetic control and difference-in-differences estimators.](https://github.com/jgreathouse9/mlsynth)
+4. [mlsynth documentation.](https://mlsynth.readthedocs.io/)
+5. [Van Rossum, G., & Drake, F. L. (2009). *Python 3 Reference Manual*. CreateSpace.](https://www.python.org/)
+6. [Born, B., Müller, G. J., Schularick, M., & Sedláček, P. (2019). The costs of economic nationalism: Evidence from the Brexit experiment. *The Economic Journal* 129(623), 2722–2744.](https://doi.org/10.1093/ej/uez020)
+7. [de Brabander, E., Juodis, A., & Miyazato Szini, G. (2025). On the use of synthetic difference-in-differences approach with (-out) covariates: The case study of Brexit referendum. *Econometric Reviews* 44(10), 1617–1646.](https://doi.org/10.1080/07474938.2025.2530649)
 8. [Doudchenko, N., & Imbens, G. W. (2016). Balancing, regression, difference-in-differences and synthetic control methods: A synthesis. NBER Working Paper 22791.](https://doi.org/10.3386/w22791)
 9. [Ferman, B., & Pinto, C. (2021). Synthetic controls with imperfect pretreatment fit. *Quantitative Economics* 12(4), 1197–1221.](https://doi.org/10.3982/QE1596)
-10. [Arkhangelsky, D., Athey, S., Hirshberg, D. A., Imbens, G. W., & Wager, S. (2021). Synthetic difference-in-differences. *American Economic Review* 111(12), 4088–4118.](https://doi.org/10.1257/aer.20190159)
-11. [Kellogg, M., Mogstad, M., Pouliot, G. A., & Torgovitsky, A. (2021). Combining matching and synthetic control to trade off biases from extrapolation and interpolation. *Journal of the American Statistical Association* 116(536), 1804–1816.](https://doi.org/10.1080/01621459.2021.1979562)
-12. [Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The augmented synthetic control method. *Journal of the American Statistical Association* 116(536), 1789–1803.](https://doi.org/10.1080/01621459.2021.1929245)
-13. [Gunsilius, F. F. (2023). Distributional synthetic controls. *Econometrica* 91(3), 1105–1117.](https://doi.org/10.3982/ECTA18260)
-14. [Cattaneo, M. D., Feng, Y., & Titiunik, R. (2021). Prediction intervals for synthetic control methods. *Journal of the American Statistical Association* 116(536), 1865–1880.](https://doi.org/10.1080/01621459.2021.1979561)
-15. [Chernozhukov, V., Wüthrich, K., & Zhu, Y. (2021). An exact and robust conformal inference method for counterfactual and synthetic controls. *Journal of the American Statistical Association* 116(536), 1849–1864.](https://doi.org/10.1080/01621459.2021.1920957)
-16. [Ciccia, D. (2024). A short note on event-study synthetic difference-in-differences estimators. arXiv:2407.09565.](https://arxiv.org/abs/2407.09565)
-17. [Kranz, S. (2022). Synthetic difference-in-differences with time-varying covariates. Working paper.](https://github.com/skranz/xsynthdid)
-18. [Greathouse, J. mlsynth: A Python library of synthetic control and difference-in-differences estimators.](https://github.com/jgreathouse9/mlsynth)
-19. [mlsynth documentation.](https://mlsynth.readthedocs.io/)
-20. [mlsynth issue #312 — Check de Brabander, Juodis & Miyazato Szini (2025) against mlsynth.](https://github.com/jgreathouse9/mlsynth/issues/312)
-21. [Van Rossum, G., & Drake, F. L. (2009). *Python 3 Reference Manual*. CreateSpace.](https://www.python.org/)
-22. [Companion tutorials on this site: the R edition of this ladder, the Basque Country, Kansas and Proposition 99.](/tutorials/r_sc_dsc_sdid/)
+10. [mlsynth issue #312 — Check de Brabander, Juodis & Miyazato Szini (2025) against mlsynth.](https://github.com/jgreathouse9/mlsynth/issues/312)
+11. [Li, K. T. (2024). Frontiers: A simple forward difference-in-differences method. *Marketing Science* 43(2), 267–279.](https://doi.org/10.1287/mksc.2022.0212)
+12. [Abadie, A., & Gardeazabal, J. (2003). The economic costs of conflict: A case study of the Basque Country. *American Economic Review* 93(1), 113–132.](https://doi.org/10.1257/000282803321455188)
+13. [Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies. *Journal of the American Statistical Association* 105(490), 493–505.](https://doi.org/10.1198/jasa.2009.ap08746)
+14. [Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science* 59(2), 495–510.](https://doi.org/10.1111/ajps.12116)
+15. [Abadie, A. (2021). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature* 59(2), 391–425.](https://doi.org/10.1257/jel.20191450)
+16. [Malo, P., Eskelinen, J., Zhou, X., & Kuosmanen, T. (2024). Computing synthetic controls using bilevel optimization. *Computational Economics* 64, 1113–1136.](https://doi.org/10.1007/s10614-023-10471-7)
+17. [Li, K. T., & Shankar, V. (2023). A two-step synthetic control approach for estimating causal effects of marketing events. *Management Science* 70(6), 3734–3747.](https://doi.org/10.1287/mnsc.2023.4878)
+18. [Arkhangelsky, D., Athey, S., Hirshberg, D. A., Imbens, G. W., & Wager, S. (2021). Synthetic difference-in-differences. *American Economic Review* 111(12), 4088–4118.](https://doi.org/10.1257/aer.20190159)
+19. [Ciccia, D. (2024). A short note on event-study synthetic difference-in-differences estimators. arXiv:2407.09565.](https://arxiv.org/abs/2407.09565)
+20. [Kellogg, M., Mogstad, M., Pouliot, G. A., & Torgovitsky, A. (2021). Combining matching and synthetic control to trade off biases from extrapolation and interpolation. *Journal of the American Statistical Association* 116(536), 1804–1816.](https://doi.org/10.1080/01621459.2021.1979562)
+21. [Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The augmented synthetic control method. *Journal of the American Statistical Association* 116(536), 1789–1803.](https://doi.org/10.1080/01621459.2021.1929245)
+22. [Kranz, S. (2022). Synthetic difference-in-differences with time-varying covariates. Working paper.](https://github.com/skranz/xsynthdid)
+23. [Cattaneo, M. D., Feng, Y., & Titiunik, R. (2021). Prediction intervals for synthetic control methods. *Journal of the American Statistical Association* 116(536), 1865–1880.](https://doi.org/10.1080/01621459.2021.1979561)
+24. [Lei, L., & Sudijono, T. (2025). Inference for synthetic controls via refined placebo tests. arXiv:2401.07152.](https://arxiv.org/abs/2401.07152)
+25. [Chernozhukov, V., Wüthrich, K., & Zhu, Y. (2021). An exact and robust conformal inference method for counterfactual and synthetic controls. *Journal of the American Statistical Association* 116(536), 1849–1864.](https://doi.org/10.1080/01621459.2021.1920957)
+26. [Chernozhukov, V., Wüthrich, K., & Zhu, Y. (2025). A t-test for synthetic controls. arXiv:1812.10820.](https://arxiv.org/abs/1812.10820)
 
 #### Acknowledgements
 

@@ -12,7 +12,7 @@ key-results:
     cap: "one default's covariate spread"
   - num: "0.31 pp"
     cap: "the whole ladder's spread"
-  - num: "92"
+  - num: "~70"
     cap: "estimators behind one config dict"
 format:
   revealjs:
@@ -61,21 +61,23 @@ This is the fundamental problem of causal inference, stated as concretely as it 
 
 ![Log real GDP for 24 OECD economies, 1995–2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.](../python_sc_dsc_sdid_01_gdp_paths.png)
 
+[OECD Economic Outlook, November 2018 vintage: observed through 2018Q3, OECD projections from 2018Q4 on — so no COVID drop in 2020.]{.comment}
+
 [24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.]{.takeaway .fragment}
 
 ::: {.notes}
 No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.
 
-The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values.
+The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values. It is the OECD Economic Outlook November 2018 vintage: values are observed through 2018Q3, and from 2018Q4 to 2020Q4 every series is an OECD projection — smooth paths, no COVID collapse. Both evaluation quarters used later, 2018Q4 and 2019Q4, are therefore projections, which is why the bottom line also quotes 2018Q3, the last observed quarter.
 :::
 
-## Ninety-two estimators, one configuration dictionary
+## About seventy estimators, one configuration dictionary
 
 One interface for the whole single-treated-unit literature: build a config, call `.fit()`, read a standardized result.
 
 . . .
 
-**Six stages in this deck. Eighty-six more estimators behind the same door.**
+**Six stages in this deck. Some sixty more estimators behind the same door.**
 
 . . .
 
@@ -83,6 +85,8 @@ One interface for the whole single-treated-unit literature: build a config, call
 
 ::: {.notes}
 This is the pitch, and it is the reason a package-level reading is worth doing at all. Normally climbing this ladder means learning Synth, then synthdid, then masc, then augsynth — four packages, four interfaces, four result formats, four sets of conventions about signs. Here it is one config dict and one result object throughout.
+
+Counting carefully: `mlsynth.__all__` exports 92 names, of which 69 are estimator classes with a `.fit` method; the rest are result and spec classes plus 16 functions. The six stages use five of those classes.
 
 The version warning is not pedantry. The release numbered 1.0.0 on PyPI is missing a config field this deck uses, and the version string does not distinguish it from git main. Pin the commit.
 :::
@@ -220,7 +224,7 @@ Note that the United States carries about a fifth of the counterfactual. We come
 ::: {.notes}
 The two smaller shares are a sixth Canada and an eighth Norway; fourteen of the twenty-three donors get nothing at all.
 
-The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%.
+The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%. Both quarters lie beyond the data's last observation, 2018Q3, so the end-2019 figure in particular is a projected gap, not a measured loss.
 :::
 
 ## Stage 2 — Demeaned SC allows a level gap
@@ -236,7 +240,7 @@ One extra free parameter — a constant offset. Match the UK's **shape**, not it
 ::: {.notes}
 Why an offset helps: plain SC will reject a well-shaped blend sitting slightly too high in favour of a worse-shaped blend at the right level. Demeaned SC removes that constraint. Here the offset comes out at a quarter of one per cent of GDP, which is why DSC's 2.99% sits so close to SC's 3.04%.
 
-In mlsynth this is the MSCa variant of the Li and Shankar two-step estimator, reached through the TSSC class. Left to itself TSSC fits all four variants — SC, MSCa, MSCb, MSCc — and runs a subsampling procedure to choose one; here it recommends plain SC, because the Step-1 test does not reject the restriction.
+In mlsynth this is the MSCa variant of the Li and Shankar two-step estimator, reached through the TSSC class. Left to itself TSSC fits all four variants — SC, MSCa, MSCb, MSCc — and runs a subsampling procedure to choose one; here it recommends plain SC, because the Step-1 subsampling test does not reject the joint restriction that the weights sum to one and the intercept is zero. The printed "CI [+0.029, +9.10]" is not a confidence interval but the test's acceptance region; the statistic, 2.21, sits inside it, so the null stands and plain SC is kept.
 
 The cost of that convenience is real: four variants with 500 subsampling draws takes about 17 seconds, forcing one variant with inference off takes 0.01 seconds. A factor of roughly 1,700, which is exactly why the placebo tournament in Act IV sets `method=` and `inference=False`.
 :::
@@ -332,30 +336,38 @@ MASC spreads a small uniform-looking 0.0158 across six otherwise-zero donors —
 
 ## The whole ladder, side by side {.smaller}
 
-| Stage | mlsynth call | end-2018 | end-2019 | published |
-|---|---|---:|---:|---:|
-| DiD | `FDID(...).fit().did` | 4.98 | 6.18 | — |
-| SC | `VanillaSC(...)` | 3.04 | 4.17 | 3.06 |
-| DSC | `TSSC(..., method="MSCa")` | 2.99 | 4.12 | 2.98 |
-| SDID | `SDID(..., zeta=0.0)` | [2.80]{.key} | 3.94 | 2.79 |
-| MASC | `MASC(..., set_f=range(6, 87))` | 2.73 | 3.83 | 2.73 |
-| ASCM | `VanillaSC(..., augment="ridge")` | 3.04 | 4.19 | 3.04 |
+| Stage | mlsynth call | end-2018 | end-2019 | R edition | paper |
+|---|---|---:|---:|---:|---:|
+| DiD | `FDID(...).fit().did` | 4.98 | 6.18 | 4.98 | — |
+| SC | `VanillaSC(...)` | 3.04 | 4.17 | 3.06 | 3.06 |
+| DSC | `TSSC(..., method="MSCa")` | 2.99 | 4.12 | 2.99 | 2.98 |
+| SDID | `SDID(..., zeta=0.0)` | [2.80]{.key} | 3.94 | 2.79 | 2.79 |
+| MASC | `MASC(..., set_f=range(6, 87))` | 2.73 | 3.83 | 2.73 | 2.73 |
+| ASCM | `VanillaSC(..., augment="ridge")` | 3.04 | 4.19 | 3.04 | 3.04 |
+
+[R edition: the R version of this post, end-2018. Paper: de Brabander, Juodis & Miyazato Szini (2025), which does not report DiD.]{.comment}
 
 [The width of the cluster — 2.73–3.04% — not any point inside it, is the honest answer.]{.takeaway .fragment}
 
 ::: {.notes}
-The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.
+The R edition column is the R version of this post, using synthdid, Synth, masc and augsynth; the paper column is de Brabander, Juodis and Miyazato Szini (2025), which does not report DiD. DiD, DSC, MASC and ASCM agree with the R edition to two decimals, and MASC and ASCM match the paper too. DSC prints 2.99 against the paper's 2.98 only because R's estimate, 2.985, sits on the rounding boundary; mlsynth's 2.9887 differs from it in the third decimal.
 
-The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79), and both differ in the same direction and for the same reason. That reason is the last slide of the next act.
+The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79). They go in opposite directions — mlsynth is 0.02 lower on SC and 0.01 higher on SDID — but for the same reason: the solver. That is the last slide of the next act.
+
+Both evaluation quarters are OECD projections in this data vintage; the end-2019 column most of all is a projected gap, not a measured loss.
 :::
 
 ## Every stage exceeds the published 2.4%
 
 ![Every stage's estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.](../python_sc_dsc_sdid_11_att_dotplot.png)
 
+[Both quarters are OECD projections (data observed to 2018Q3). At 2018Q3 itself the ladder reads 2.46–2.78%.]{.comment}
+
 [**2.73–3.04%** at end-2018 and **3.83–4.19%** a year later — every stage above the 2.4% previously published for this same dataset.]{.takeaway .fragment}
 
 ::: {.notes}
+Read the 2019Q4 values as a projection. The panel is the OECD's November 2018 vintage, observed through 2018Q3, so the 2019Q4 numbers are the gap between the OECD's own projection for the UK and a blend of its projections for the donors — not a measured loss. At 2018Q3, the last observed quarter, the fitted stages read SC 2.77, DSC 2.72, SDID 2.53, MASC 2.46 and ASCM 2.78.
+
 The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.
 
 Also visible: the three SDID flavours sit almost on top of each other, within 0.03 percentage points. The choice among SDID variants is not where the uncertainty lives — which is worth remembering when we reach the published placebo ranking.
@@ -544,30 +556,30 @@ The UK is first, Belgium second at 3.52, Finland third at 3.29. First of 24 is t
 
 ## The strongest objection — and the answer
 
-[Objection.]{.objection} $p = 0.042$ is the *smallest attainable* with 24 units — the test is at its floor. And SDID's own interval contains zero.
+[Objection.]{.objection} $p = 0.042$ is the smallest a *permutation* test can give with 24 units — that test is at its floor. And SDID's own interval contains zero.
 
 . . .
 
-[Response.]{.rebuttal} Four p-values span $0.006$ to $0.042$; `scpi`'s interval stops short of zero. Five routes, all rejecting at 5%. But the floor is real, and no estimator changes it.
+[Response.]{.rebuttal} Four p-values span $0.006$ to $0.042$; `scpi`'s interval stops short of zero. Five routes, all rejecting at 5%. But the permutation floor is real, and no estimator changes it.
 
 . . .
 
 [Which is why the deliverable is the cluster, not the point.]{.takeaway .fragment}
 
 ::: {.notes}
-Steelman this properly. The five inference methods are not five independent tests — they share a point estimate and a donor pool and differ only in how they build a reference distribution from 23 donors. Read them as orders of magnitude, not as digits.
+Steelman this properly. The 0.042 floor belongs to the permutation test alone: the debiased t-test (0.006) and the leave-two-out placebo (0.008) can and do go lower. The SDID interval that contains zero, with p = 0.20, comes from SDID's own placebo variance in section 11 of the post, not from the inference section. The five inference methods are not five independent tests — they share a point estimate and a donor pool and differ only in how they build a reference distribution from 23 donors. Read them as orders of magnitude, not as digits.
 
-Three further caveats belong with the number. It is a net gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And `jackknife_plus` raises MlsynthEstimationError on this configuration and is excluded — reported rather than quietly dropped.
+Three further caveats belong with the number. It is a net gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when EU members carry about 31% of the synthetic UK — Hungary 0.223, Ireland 0.052, Italy 0.020, Portugal 0.012, Finland 0.007 — since they are the donors most exposed to Brexit's own spillovers; the United States, at 0.19, is the less worrying large weight. And `jackknife_plus` raises MlsynthEstimationError on this configuration and is excluded — reported rather than quietly dropped.
 :::
 
 ## What the referendum cost {background-color="#1a3a8a"}
 
 [2.7–3.0%]{.bignum}
 
-[UK GDP shortfall at end-2018, at every fitted stage of the ladder · 3.8–4.2% a year later · against 2.4% previously published]{.bignum-label}
+[UK GDP shortfall at end-2018, at every fitted stage of the ladder (2.5–2.8% at 2018Q3, the last observed quarter) · against 2.4% previously published · OECD November 2018 projections imply 3.8–4.2% by end-2019 — a projected gap, not a measured loss]{.bignum-label}
 
 ::: {.notes}
-That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.
+That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. One caveat travels with it: the panel is the OECD's November 2018 vintage, observed through 2018Q3, so even end-2018 is a one-quarter projection, and the end-2019 range is entirely the OECD's projected path. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.
 :::
 
 ## What to take away
@@ -586,7 +598,7 @@ If the audience remembers one thing, make it the second point. The econometrics 
 - **Post, notebook, Colab** — [carlos-mendez.org/tutorials/python_sc_dsc_sdid](/tutorials/python_sc_dsc_sdid/)
 - **Three cheat sheets** — Python, R and Stata; each hard-codes the others' column.
 - **R edition** — [r_sc_dsc_sdid](/tutorials/r_sc_dsc_sdid/) hand-codes every estimator; go there for the derivations.
-- **Data** — Born, Müller, Schularick and Sedláček (2019), via de Brabander et al.
+- **Data** — Born, Müller, Schularick and Sedláček (2019), via de Brabander et al.; OECD Economic Outlook, November 2018 vintage (observed to 2018Q3).
 - **Library** — `mlsynth` by Jared Greathouse, pinned at `15f168b`.
 
 ::: {.notes}

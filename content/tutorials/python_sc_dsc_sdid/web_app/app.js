@@ -288,12 +288,12 @@
       const code = document.createElement("code");
       code.textContent = '"' + r.method + '"';
       c0.appendChild(code);
-      tr.insertCell().textContent = r.reported_as || "--";
+      tr.insertCell().textContent = r.reported_as || "—";
       const cells = [
-        r.p_value != null ? r.p_value.toFixed(4) : "--",
+        r.p_value != null ? r.p_value.toFixed(4) : "—",
         r.ci_lower != null
-          ? `[${r.ci_lower.toFixed(4)}, ${r.ci_upper.toFixed(4)}]` : "--",
-        r.seconds != null ? r.seconds.toFixed(2) : "--"
+          ? `[${r.ci_lower.toFixed(4)}, ${r.ci_upper.toFixed(4)}]` : "—",
+        r.seconds != null ? r.seconds.toFixed(2) : "—"
       ];
       cells.forEach(v => {
         const td = tr.insertCell();
@@ -491,9 +491,10 @@
     el("space-note").textContent =
       `The United Kingdom's post-over-pre RMSPE ratio ranks ${D.meta.uk_rank} of ` +
       `${D.meta.n_units}, a permutation p-value of ${D.meta.p_permutation.toFixed(3)}. ` +
-      `That is as strong as this design can be: with ${D.meta.n_units} units the smallest ` +
-      `attainable p-value is 1/${D.meta.n_units} = ${D.meta.p_floor.toFixed(3)}. The ` +
-      `result is at the inferential floor, and no choice of estimator moves it.`;
+      `That is as strong as a permutation test can be here: with ${D.meta.n_units} units ` +
+      `the smallest p-value it can give is 1/${D.meta.n_units} = ` +
+      `${D.meta.p_floor.toFixed(3)}. The test is at its floor, and no choice of estimator ` +
+      `moves it; other inference methods in panel 12 can and do go lower.`;
 
     /* --- 11. the event study --- */
     const ES = [

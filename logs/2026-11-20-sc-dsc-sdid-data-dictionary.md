@@ -50,6 +50,40 @@ A full review (the 13 dimensions of the `review-post` skill) found the problems 
 
 Pending author decisions (prose, not applied): the projection caveat and its headline rewording, the estimand and identifying-assumption paragraph, the code-ordering setup block for §4, the inference and horizon cautions, jargon definitions, and the refresh of the slides and web app.
 
+## Round 2 — author-approved revisions (all eight items)
+
+1. **Data vintage.** A callout in §4.1, plus reworded abstract, summary (EN, ES and JA), §9.3, §11.2, §18.1, §21 and §22. At 2018Q3, the last observed quarter, the ladder reads 2.46–2.78% (verified by refitting at `t = 95`). Exercise 9 asks students to reproduce this.
+2. **Estimand.** The single-quarter ATT is the UK's own effect. The design is observational, with three shared assumptions: no anticipation, no interference and no other UK-specific shock. The post now explains log points against percent (3.04 log points is a 2.99% shortfall).
+3. **Code runs as shown.**
+   - §4 is reordered: data, then helpers (now including `SEED`), then Pydantic configs (`base = cfg(96)`), then the data plot, which now has its own setup lines (`Y`, `DONORS`, `QLAB`, `QDEC`, colours).
+   - `tssc_att` is defined at its first use in §9.2.
+   - A harness ran all 36 post code blocks in order in a clean namespace. Every block ran, and all 30 output blocks match exactly.
+   - The harness exposed four further errors, now fixed:
+     - §11.2 printed the time weights of the 2018Q4 fit (1.0000 on 2016Q2) but showed the treatment-quarter fit's 0.9585/0.0386. The code now shows both fits.
+     - §14 lacked the `.round(2)` its output implies.
+     - §18 lacked `lto_max_pairs=120, scpi_sims=200`. The leave-two-out p-value of 0.0083 is the floor of 1/120; with all pairs it is 1/253.
+     - MASC's `phi_hat` printed float noise; it is now rounded.
+4. **Inference cautions.**
+   - The TSSC Step-1 bracket is a subsampling acceptance region (checked in `tssc_helpers/selection.py`).
+   - SDID placebo with B = 500 has at most 23 distinct assignments (checked in `sdid_helpers/inference.py`).
+   - Tournament horizons (1 and 4 quarters) are short of the evaluation horizons (10 and 14): SDID's edge is 23% at h = 1 and 9% at h = 4, and the placebo windows overlap.
+   - The event-study pre-period is now called a weak check.
+   - The post explains why SDID's p = 0.20 and the RMSPE-ratio p of about 0.04 answer different questions.
+   - §19 discusses the 2016Q2 campaign quarter as an anticipation risk.
+5. **Spillovers.** EU donors hold 31–32% of the SC, DSC and SDID weight; the US holds 0.18–0.19.
+6. **Jargon defined.** RMSE, predictor weights V, m-nearest-neighbour matching, rolling-origin cross-validation, `set_f`, the event study, and log points.
+7. **Polish.**
+   - 14 italic figure captions; interpretation paragraphs after Figs 5, 10 and 13; Fig 13 moved to the end of §17.1.
+   - §11.1 lead-in; the §18.1 equation now comes before its code; a §14.1 note.
+   - References: four added (Li 2024; Lei and Sudijono 2025; Chernozhukov, Wüthrich and Zhu 2025; Malo et al. 2024, with details taken from mlsynth's docstrings). All 26 are cited and renumbered by first mention.
+   - The global `filterwarnings("ignore")` is narrowed to `PydanticDeprecationWarning` in the post, `analysis.py`, `cheatsheet_python.py`, the qmd and the notebook. The harness showed that these were the only warnings it hid.
+   - Private-module note; British spelling; the abstract is trimmed to 254 words and ends with a "report the ladder" line; exercises are graded Warm-up, Core or Stretch.
+   - The h = 1 "variants collapse" suggestion was not applied: the tournament code fits the (ii) and (iii) targets at k + 4 whatever the horizon.
+8. **Slides and web app.**
+   - `slides.qmd` is corrected and re-rendered with Quarto 1.9.37, which replaced two hashed CSS files. The `/tutorials/` links are restored by hand, as in cc384980.
+   - The web app text is corrected. `web_app/data/results.json` was regenerated with `APP_DATA=1` in a scratch copy; the only change is DSC's R value, 2.98 → 2.99.
+   - The notebook and the qmd gain a data-vintage note.
+
 ## Renderer template fix
 
 `.claude/skills/write-data-dictionary/references/templates/build_data_dictionary.py` gains `p a,li a,.note a{overflow-wrap:anywhere}`. Long bare URLs (the Colab link) overflowed the page by 55px at a 360px width. Existing dictionaries rendered with the old template (for example `python_did_sc_tsunami`) still show this overflow until they are re-rendered.

@@ -40,7 +40,9 @@
     <h2>1. The counterfactual</h2>
     <p>Pick a stage. Each one is a single <code>mlsynth</code> class fitted with the same five
        config fields; the dashed line is the synthetic United Kingdom it produces and the
-       shaded band after the referendum is the estimated shortfall.</p>
+       shaded band after the referendum is the estimated shortfall. The data are the OECD's
+       November 2018 vintage: observed through 2018Q3, OECD projections from 2018Q4 on, so
+       the 2019Q4 shortfall is a projected gap, not a measured loss.</p>
   </div>
 
   <div class="controls" id="method-buttons"></div>
@@ -99,8 +101,8 @@
   <div class="panel-head">
     <h2>5. Anatomy of a fit</h2>
     <p>Every estimator in the library takes a dictionary and returns an object with the
-       same accessors. Learn these two columns once and the other eighty-six estimators
-       cost nothing. These are the real values from the synthetic-control fit in panel 1,
+       same accessors. Learn these two columns once and the rest of the library's roughly
+       seventy estimators cost nothing. These are the real values from the synthetic-control fit in panel 1,
        not an illustration.</p>
   </div>
 

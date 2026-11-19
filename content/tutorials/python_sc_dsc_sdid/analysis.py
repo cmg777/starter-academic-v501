@@ -52,7 +52,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-warnings.filterwarnings("ignore")
+from pydantic.warnings import PydanticDeprecationWarning
+# mlsynth's config classes use Pydantic features that Pydantic 2.x has deprecated,
+# which prints hundreds of identical notices. Silence only those, so that any
+# warning about your data or an estimator still reaches you.
+warnings.filterwarnings("ignore", category=PydanticDeprecationWarning)
 
 import mlsynth
 from mlsynth import FDID, MASC, SDID, TSSC, VanillaSC
