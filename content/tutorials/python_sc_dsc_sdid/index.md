@@ -42,6 +42,10 @@ links:
     icon_pack: fas
     name: "Python script"
     url: analysis.py
+  - icon: book
+    icon_pack: fas
+    name: "Data dictionary"
+    url: data/index.html
   - icon: bolt
     icon_pack: fas
     name: "Python cheat sheet"
@@ -100,7 +104,7 @@ diagram: true
 
 ## Abstract
 
-Estimating what a policy cost requires building a version of the world in which it never happened, and the software for doing that is scattered across a dozen packages with a dozen different interfaces. This tutorial is a guided tour of `mlsynth`, a Python library that puts ninety-two panel-data causal estimators behind a single configuration dictionary and a single result object, and it uses that library to climb the whole ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per stage. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the United Kingdom as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.19% a year later — every one above the 2.4% previously published for this dataset. An in-sample placebo tournament over twenty artificial treatment dates ranks the SDID family first at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. Three findings emerge that only a package-level reading produces: three of the library's defaults each change the answer by more than the spread across the entire ladder, one estimator silently rounds the number you are most likely to quote, and the three routes `mlsynth` offers for "controlling for a covariate" disagree by 1.8 percentage points.
+Estimating what a policy cost requires building a version of the world in which it never happened, and the software for doing that is scattered across a dozen packages with a dozen different interfaces. This tutorial is a guided tour of `mlsynth`, a Python library that puts about seventy panel-data causal estimators (92 exported names) behind a single configuration dictionary and a single result object, and it uses that library to climb the whole ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per stage. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the United Kingdom as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.19% a year later — every one above the 2.4% previously published for this dataset. An in-sample placebo tournament over twenty artificial treatment dates ranks the SDID family first at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. Three findings emerge that only a package-level reading produces: three of the library's defaults change the answer materially, two of them by more than the 0.31-point spread across the ladder above difference-in-differences, one estimator silently rounds the number you are most likely to quote, and the three routes `mlsynth` offers for "controlling for a covariate" disagree by 1.8 percentage points.
 
 ## 1. Overview
 
@@ -110,7 +114,7 @@ The standard move is to build that missing country out of the countries we do ob
 
 [The R edition of this post](/tutorials/r_sc_dsc_sdid/) climbs that ladder the hard way: every estimator is hand-coded in twenty lines before its package is called, and four separate R packages are needed to cover the six stages. **This post makes a different argument.** Every stage here is a single class from one library, `mlsynth`, and the interesting work is not in deriving the estimators but in *driving the package*: which configuration field selects which estimator, what the result object actually contains, and — the part that turns out to matter most — where a default will quietly hand you a different estimator than the one you meant to fit.
 
-That last point is not a minor caveat. By the end of this post you will have seen three separate defaults that change the headline estimate materially, two of them by more than the spread across the entire six-stage ladder. Knowing the econometrics is not enough. You have to know the software.
+That last point is not a minor caveat. By the end of this post you will have seen three separate defaults that change the headline estimate materially, two of them by more than the 0.31-point spread across the five stages above difference-in-differences. Knowing the econometrics is not enough. You have to know the software.
 
 ### 1.1 Learning objectives
 
@@ -208,7 +212,7 @@ Unit weights say how much each donor country counts. Time weights say how much e
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-`mlsynth` keeps them in separate places, and finding the second one is the single most common stumbling block. Unit weights are `result.donor_weights`; SDID's time weights are `result.cohorts[a].time_weights`. Ours put 0.9585 on 2016Q2 and roughly nothing on the other 85 quarters.
+`mlsynth` keeps them in separate places, and finding the second one is the single most common stumbling block. Unit weights are `result.donor_weights`; SDID's time weights are `result.cohorts[a].time_weights`. Ours put 0.9585 on 2016Q2, 0.0386 on 2008Q4 and almost nothing on the other 84 quarters.
 
 </details>
 
@@ -349,12 +353,12 @@ from mlsynth import FDID, MASC, SDID, TSSC, VanillaSC
 from mlsynth.exceptions import MlsynthConfigError, MlsynthDataError
 
 print("mlsynth", mlsynth.__version__)
-print("estimators exported:", len(mlsynth.__all__))
+print("names exported:", len(mlsynth.__all__))
 ```
 
 ```text
 mlsynth 1.0.0
-estimators exported: 92
+names exported: 92
 ```
 
 Everything below was produced with **`mlsynth` 1.0.0 at commit `15f168b`**, Python 3.13.11, NumPy 2.3.5, pandas 3.0.1, Matplotlib 3.10.8 and CVXPY 1.8.1. `mlsynth` requires Python 3.10 or later — the README's claim of 3.9 is out of date, and `pyproject.toml` is the authority. The core dependencies are pandas, NumPy, Matplotlib, SciPy, scikit-learn, statsmodels, CVXPY, ECOS, Pydantic and PyArrow; both optional solver backends are lazily imported, so a base install can always `import mlsynth` and construct any estimator class.
@@ -402,12 +406,14 @@ print(panel[["country", "quarter_label", "t", "log_rgdp", "treated"]].head(3).to
 2496 rows x 16 columns
 24 countries, quarters t = 1..104
   country quarter_label  t  log_rgdp  treated
-Australia        1995Q1  1 -0.351514        0
-Australia        1995Q2  2 -0.345316        0
-Australia        1995Q3  3 -0.339262        0
+Australia        1995Q1  1 -0.014859        0
+Australia        1995Q2  2 -0.010585        0
+Australia        1995Q3  3  0.012037        0
 ```
 
 The panel is quarterly log real GDP for 24 OECD economies over 1995Q1–2020Q4, assembled by Born, Müller, Schularick and Sedláček [2] and redistributed in the replication package of de Brabander, Juodis and Miyazato Szini [1]. There are no missing values, 23 donors, and 86 pre-treatment quarters if we date the treatment at 2016Q3.
+
+Notice that the 1995 values of `log_rgdp` sit close to zero. The outcome is not the log of GDP in currency units: each country's real GDP is first divided by its own 1995 average, so `log_rgdp` measures cumulative growth since 1995 (0.44 for the UK in 2016Q2, about 56% more output than in 1995). Every column, its construction and its caveats are documented in the [data dictionary](data/index.html), which also offers the panel as a labelled Stata file and the full 36-country source panel it was cut from.
 
 ### 4.2 Pydantic configs, and what happens when you get it wrong
 
@@ -618,7 +624,7 @@ The library has several more acronym neighbours worth knowing about before you r
 | `DRSC` | **D**istribution-**R**egression SC | `DSC` |
 | `MEDSC` | **Med**iation SC | demeaned SC |
 
-The general lesson is that in a ninety-two-class library, the class name is a mnemonic and not a definition. Check the docstring before you fit.
+The general lesson is that in a library of roughly seventy estimator classes, the class name is a mnemonic and not a definition. Check the docstring before you fit.
 
 ## 7. One regression, six sets of weights
 
@@ -858,7 +864,7 @@ gap[-1] (full precision)    np.float64(-0.0298873295228968)
 variants['MSCa'].rmse_pre   0.006
 ```
 
-Take the headline off `.att` and DSC reads exactly 3.00%. Take it off the gap series and it reads 2.99%, which is what `mlsynth`'s own replication table reports and what the published paper reports. A hundredth of a percentage point is not going to change anyone's policy view, but it will make you think you have failed to replicate a table when you have not. The fix is three lines:
+Take the headline off `.att` and DSC reads exactly 3.00%. Take it off the gap series and it reads 2.99%, which is what `mlsynth`'s own replication table reports and matches the R edition's 2.985 (the published paper prints 2.98). A hundredth of a percentage point is not going to change anyone's policy view, but it will make you think you have failed to replicate a table when you have not. The fix is three lines:
 
 ```python
 def tssc_att(res, variant="MSCa", n_post=1):
@@ -981,7 +987,7 @@ lambda: 86 weights summing to 1.000000
 
 ![Stem plot of SDID's eighty-six time weights against year, with almost all the mass on a single orange point at 2016Q2 labelled 0.958, and a dashed gold line marking the uniform weight that difference-in-differences would use.](python_sc_dsc_sdid_06_sdid_time_weights.png)
 
-The time weights put 95.85% of their mass on 2016Q2, the last pre-treatment quarter, and essentially nothing on the other eighty-five. Difference-in-differences would place the dashed uniform weight, $1/86 \approx 0.0116$, on all of them.
+The time weights put 95.85% of their mass on 2016Q2, the last pre-treatment quarter, 3.86% on 2008Q4, the trough of the financial crisis, and almost nothing on the other eighty-four. Difference-in-differences would place the dashed uniform weight, $1/86 \approx 0.0116$, on all of them.
 
 Why? Because log real GDP behaves close to a random walk. If the outcome is a random walk, the best predictor of next quarter is *this* quarter, and the eighty-five quarters before it add noise rather than information. The source paper reports exactly this collapse and attributes it to the same cause. Do not read it as a bug; read it as SDID correctly discovering that most of the pre-treatment history is not informative about the level at the treatment date.
 
@@ -1142,7 +1148,7 @@ print(pd.DataFrame(rows).to_string(index=False, float_format=lambda v: f"{v:.5f}
 
 ![Bar chart of the 2018Q4 estimate for each forced number of matched neighbours from one to ten, each bar labelled with the corresponding phi, with the winning m equal to ten highlighted in orange and a dashed teal line at the freely cross-validated answer of 2.73 percent.](python_sc_dsc_sdid_08_masc_cv.png)
 
-Two patterns. First, $\phi$ rises with $m$ — the more neighbours you average over, the more weight the cross-validation is willing to put on matching, because averaging more neighbours reduces the variance that makes matching unattractive. Second, the estimate is not monotone in $m$: it wanders between 2.73% and 3.23% with no obvious structure. That non-monotonicity is worth remembering when someone reports a single MASC number without saying what grid produced it.
+Two patterns. First, $\phi$ broadly rises with $m$ (not strictly: it dips at $m = 2$ and $m = 7$) — the more neighbours you average over, the more weight the cross-validation is willing to put on matching, because averaging more neighbours reduces the variance that makes matching unattractive. Second, the estimate is not monotone in $m$: it wanders between 2.73% and 3.23% with no obvious structure. That non-monotonicity is worth remembering when someone reports a single MASC number without saying what grid produced it.
 
 ## 13. Stage 5 — Augmented synthetic control
 
@@ -1197,13 +1203,13 @@ print(ladder[["method", "command", "loss_2018Q4", "loss_2019Q4",
 method                         command  loss_2018Q4  loss_2019Q4  r_post_2018Q4  published_2018Q4
    DiD             FDID(...).fit().did         4.98         6.18           4.98               NaN
     SC                  VanillaSC(...)         3.04         4.17           3.06              3.06
-   DSC        TSSC(..., method="MSCa")         2.99         4.12           2.98              2.98
+   DSC        TSSC(..., method="MSCa")         2.99         4.12           2.99              2.98
   SDID             SDID(..., zeta=0.0)         2.80         3.94           2.79              2.79
   MASC   MASC(..., set_f=range(6, 87))         2.73         3.83           2.73              2.73
   ASCM VanillaSC(..., augment="ridge")         3.04         4.19           3.04              3.04
 ```
 
-Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [1]. **Three of the six stages — DiD, MASC and ASCM — agree with both to two decimals. DSC lands a hundredth above the published 2.98 only because 2.9887 sits on a rounding boundary; the R edition reports the same estimate as 2.99. The two real disagreements are SC and SDID, and both differ in the same direction and for the same reason.**
+Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [1]. **DiD, DSC, MASC and ASCM agree with the R edition to two decimals, and MASC and ASCM match the published paper too (it does not report DiD). DSC prints 2.99 against the paper's 2.98 because the R estimate, 2.985, sits exactly on the rounding boundary; `mlsynth`'s 2.9887 differs from it only in the third decimal. The two real disagreements are SC and SDID — in opposite directions (`mlsynth` is 0.02 lower on SC and 0.01 higher on SDID), but for the same reason.**
 
 Every stage puts the cost of the referendum above the 2.4% that Born, Müller, Schularick and Sedláček [2] published for this same dataset, and the excluding-DiD range is a fairly tight 2.73% to 3.04% at the end of 2018, widening to 3.83% to 4.19% a year later.
 
@@ -1296,6 +1302,18 @@ def placebo_one(k, h):
     return row
 
 placebo = pd.DataFrame([placebo_one(k, h) for h in (1, 4) for k in range(61, 81)])
+
+METHODS7 = ["SC", "DSC", "SDID (i)", "SDID (ii)", "SDID (iii)", "MASC", "ASCM"]
+
+def summarise(df):
+    """Root mean squared error, mean and median absolute bias of the placebo errors."""
+    return pd.DataFrame([dict(method=m,
+                              RMSE=np.sqrt(np.mean(df[m] ** 2)),
+                              MAB=np.mean(np.abs(df[m])),
+                              MedAB=np.median(np.abs(df[m]))) for m in METHODS7])
+
+print("  Horizon h = 1 quarter")
+print(summarise(placebo[placebo.horizon == 1]).to_string(index=False, float_format=lambda v: f"{v:.4f}"))
 ```
 
 ```text
@@ -1479,23 +1497,23 @@ United Kingdom     0.0056      0.0327 5.8488     1
 
 ![Placebo-in-space plot showing twenty-three grey gap paths, one for each donor country given the treatment in turn, with the United Kingdom's gap in orange diverging further below zero than any placebo after 2016.](python_sc_dsc_sdid_14_placebo_in_space.png)
 
-The UK's ratio of 5.85 is the largest of all twenty-four units, giving a permutation p-value of $1/24 = 0.042$. That is as small as this design can produce: with twenty-four units the smallest attainable p-value is 0.042, so the test is at its floor and could not have been more favourable.
+The UK's ratio of 5.85 is the largest of all twenty-four units, giving a permutation p-value of $1/24 = 0.042$. That is as small as this permutation design can produce: with twenty-four units the smallest p-value a permutation test can give is 0.042, so the test is at its floor and could not have been more favourable.
 
 ### 18.2 What this can and cannot tell you
 
-It can tell you that the UK's post-2016 divergence is unusual relative to what these twenty-three donors do. It cannot tell you the effect is 3.04% rather than 2.73%, it cannot separate Brexit from anything else distinctive that happened to the UK after mid-2016, and with twenty-four units it has essentially no power to detect anything subtler. Every interval in this section is wide, and the SDID interval contains zero.
+It can tell you that the UK's post-2016 divergence is unusual relative to what these twenty-three donors do. It cannot tell you the effect is 3.04% rather than 2.73%, it cannot separate Brexit from anything else distinctive that happened to the UK after mid-2016, and with twenty-four units it has essentially no power to detect anything subtler. Every interval in this section is wide, and the SDID interval from section 11 contains zero.
 
 ## 19. Robustness: the specification zoo
 
-Four departures from the headline specification, each one line of config. The SDID column reports variant (i) for the date and donor-pool rows and variant (ii) — the post's headline — for the `zeta` rows, because those are the variants each check was run on.
+Four departures from the headline specification, each one line of config. The SDID column reports variant (i) for the date and donor-pool rows and variant (iii) — the bare `.fit()` behind the post's headline 2.80, with which variant (ii) coincides here — for the `zeta` rows, because those are the variants each check was run on.
 
 | Departure | SC | DSC | SDID |
 |---|---|---|---|
 | treatment date 2016Q3 (headline) | 3.04 | 2.99 | 2.77 *(i)* |
 | treatment date 2016Q2 | 3.09 | 3.05 | 3.18 *(i)* |
 | drop the United States | 3.06 | 3.04 | 2.83 *(i)* |
-| `zeta = 0` (the paper) | — | — | 2.80 *(ii)* |
-| `zeta` at its default | — | — | 2.67 *(ii)* |
+| `zeta = 0` (the paper) | — | — | 2.80 *(iii)* |
+| `zeta` at its default | — | — | 2.67 *(iii)* |
 | `w_constr='simplex'` | 3.04 | — | — |
 | `w_constr='ols'` | 3.37 | — | — |
 | `w_constr='ridge'` | 3.37 | — | — |
@@ -1513,7 +1531,7 @@ Four observations.
 
 ## 20. Beyond the ladder: the mlsynth catalogue
 
-Six of ninety-two classes have appeared in this post. The rest are worth knowing about, because the reason to invest in this library rather than four single-purpose ones is that the config you have already written works for all of them. Here is the map, organised by what makes your design non-canonical:
+Six of roughly seventy estimator classes have appeared in this post. The rest are worth knowing about, because the reason to invest in this library rather than four single-purpose ones is that the config you have already written works for all of them. Here is the map, organised by what makes your design non-canonical:
 
 | If your design has… | Reach for | Note |
 |---|---|---|
@@ -1540,7 +1558,7 @@ For the current list on your installed version, `get_llm_guide()` is authoritati
 
 **What Brexit cost.** Taking the ladder as a whole, the referendum had cost the UK between **2.7% and 3.0% of GDP by the end of 2018**, and between **3.8% and 4.2% by the end of 2019**. That is above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and section 17 shows covariates make the counterfactual worse here rather than better.
 
-Three caveats belong with the number. It is a *net* gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And the estimate is a point on a specification cloud rather than a parameter that has been pinned down — every interval in section 18 is wide, and SDID's contains zero.
+Three caveats belong with the number. It is a *net* gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And the estimate is a point on a specification cloud rather than a parameter that has been pinned down — every interval in section 18 is wide, and SDID's (section 11) contains zero.
 
 **What the software taught.** This is where a package-first reading pays off, and the findings are not econometric.
 
@@ -1563,7 +1581,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 - **Three defaults matter, and two of them more than the estimator choice.** `SDID` penalises unit weights unless you set `zeta=0.0` (2.80% vs 2.67%); `MASC` cross-validates on a different fold set unless you set `set_f` (2.73% vs 3.19%); and `SDID`'s three covariate methods disagree by 1.76 percentage points. Against a ladder that spans 0.31, the last two each clear it alone.
 - **The time weights earn their keep.** SDID's placebo RMSE is 0.0066 against 0.0086 for plain SC, a 23% reduction, and the advantage holds at both forecast horizons.
 - **But the published ranking among SDID variants does not survive a matched horizon.** Graded on the same task, the three flavours score 0.0066, 0.0066 and 0.0066.
-- **Covariates hurt here.** They raise the pre-treatment RMSE from 0.0056 to 0.0099 and produce a `v_agreement` of 0.083, both signs of a poorly identified predictor-weight problem.
+- **Covariates hurt here.** They raise the pre-treatment RMSE from 0.0056 to 0.0097–0.0099 and produce a `v_agreement` of only 0.055–0.083, both signs of a poorly identified predictor-weight problem.
 - **A limitation to carry forward:** with one treated unit and 23 donors, the smallest attainable permutation p-value is 0.042. The design is at its inferential floor, and no estimator choice changes that.
 - **Next:** the same panel with `CLUSTERSC` or `PDA` if you have many more donors; `SequentialSDID` if adoption is staggered; `SPOTSYNTH` if you suspect spillovers onto the donor pool. All three take the config you already wrote.
 
@@ -1574,8 +1592,8 @@ All three cheat sheets ship with this post, so the cross-language comparison in 
 1. **Move the treatment date.** Re-run the headline table with `pre=T0-1` (treatment materialising 2016Q2). Which stage moves most, and can you explain it from the time weights?
 2. **Break the rounding.** Compute DSC's estimate from `variants["MSCa"].att` and from the gap series across all twenty placebo windows in section 16. How large does the discrepancy get?
 3. **Time the inference default.** `VanillaSC`'s `inference` defaults to `True`, which runs in-space placebo. Time a fit with `inference=False` against the default, and decide when the difference matters.
-4. **Read the simplex.** Print `weights.summary_stats` for all six stages. Which report `n_negative > 0`, and which report a `constraint` other than the plain simplex?
-5. **Grade the horizon.** Extend section 16's tournament to $h = 8$. Does the SDID family's advantage survive a two-year forecast?
+4. **Read the simplex.** Print `weights.summary_stats` for every stage that has one (DiD's `FDID(...).fit().did` has no `.weights`). The keys differ by estimator — only `VanillaSC` reports `n_negative` — so which stages report a `constraint` other than the plain simplex, and which actually produce negative weights? (Hint: inspect `donor_weights` directly.)
+5. **Grade the horizon.** Extend section 16's tournament to $h = 8$. Restrict the last pre-treatment quarter to $k \le 78$ so that the evaluation quarter $k + h$ never reaches a post-referendum quarter, and change the SDID (ii)/(iii) targets from `k + 4` to `k + h`. Does the SDID family's advantage survive a two-year forecast?
 6. **Separate MASC's two dials.** Fix `m=10` and vary `set_f`; then fix `set_f` and vary `m_grid`. Which of the two drives the 0.47-point swing?
 7. **Try a fourth covariate route.** Fit `SDID` with `covariates={"match": [...]}` under each of `match_pre_periods` in `{"all", "half", "last", 20}`. How wide is the resulting range, and how does it compare with the range across methods?
 8. **Pick a different estimator entirely.** Fit `CLUSTERSC` and `PDA` on this panel with the config you already have. Do they land inside the ladder's range, and what does that tell you about the range?

@@ -269,7 +269,7 @@ foreach e in 96 100 {
 * can be checked against each other directly.
 *===============================================================================
 matrix PAPER = (.\3.06\2.98\2.79\2.73\3.04)
-matrix RCOL  = (4.98\3.06\2.98\2.79\2.73\3.04)
+matrix RCOL  = (4.98\3.06\2.99\2.79\2.73\3.04)
 
 di _n _n as text "{hline 92}"
 di as text "UK GDP shortfall (%), 2016Q3 treatment, outcomes only, 23 donors, 86 pre-quarters"

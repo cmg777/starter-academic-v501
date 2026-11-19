@@ -155,9 +155,12 @@ record(
 # selection step; inference=False skips the subsampling draws.
 print("\n2. DSC")
 dsc = {k: TSSC(cfg(e, method="MSCa", inference=False)).fit() for k, e in EVAL.items()}
+# TSSC rounds .att to -0.03; the gap series keeps full precision. Its last
+# element is the single evaluation quarter, so read the estimate from there.
+tssc_att = lambda r: float(r.variants["MSCa"].gap.ravel()[-1])
 record(
     "DSC", 'TSSC(..., method="MSCa")',
-    [pct(r.effects.att) for r in dsc.values()],
+    [pct(tssc_att(r)) for r in dsc.values()],
     inference="none (disabled)", paper=2.98,
 )
 
@@ -215,7 +218,7 @@ record(
 # checked against each other directly.
 # ══════════════════════════════════════════════════════════════════════════════
 
-R_COLUMN = {"DiD": 4.98, "SC": 3.06, "DSC": 2.98, "SDID": 2.79, "MASC": 2.73, "ASCM": 3.04}
+R_COLUMN = {"DiD": 4.98, "SC": 3.06, "DSC": 2.99, "SDID": 2.79, "MASC": 2.73, "ASCM": 3.04}
 
 print("\n\n" + "=" * 98)
 print("UK GDP shortfall (%), 2016Q3 treatment, outcomes only, 23 donors, 86 pre-quarters")
@@ -250,8 +253,9 @@ SDID: 2.80 here, 2.79 in R. Same story, smaller gap. Tighten sdid's convergence
     converging on 2.80 while synthdid's default budget stops at 2.79 tells you
     which number is the artefact.
 
-DSC is 3.00 against R's 2.98, within the same solver tolerance. MASC and ASCM
-match R exactly once set_f is passed.
+DSC is 2.99 here and in R (2.985), once it is read off the unrounded gap
+series rather than TSSC's rounded .att. MASC and ASCM match R exactly once
+set_f is passed.
 
 The lesson is not that one library is right. It is that a synthetic control
 estimate carries a solver's fingerprint, and differences in the second decimal

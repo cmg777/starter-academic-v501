@@ -92,7 +92,7 @@ from mlsynth import FDID, MASC, SDID, TSSC, VanillaSC
 from mlsynth.exceptions import MlsynthConfigError, MlsynthDataError
 
 print("mlsynth", mlsynth.__version__)
-print("estimators exported:", len(mlsynth.__all__))
+print("names exported:", len(mlsynth.__all__))
 ```
 
 ## The data and the mlsynth contract
@@ -128,8 +128,13 @@ print(f"{panel.shape[0]} rows x {panel.shape[1]} columns")
 print(f"{panel.country.nunique()} countries, quarters t = {panel.t.min()}..{panel.t.max()}")
 ```
 
+The outcome `log_rgdp` is the log of each country's real GDP divided by its own
+1995 average, so it starts near zero in 1995 and measures cumulative growth
+since then. Every column is documented in the data dictionary at
+<https://carlos-mendez.org/tutorials/python_sc_dsc_sdid/data/index.html>.
+
 ```{python}
-T0 = 86                                    # pre-treatment quarters, through 2016Q2
+T0 = 86                                   # pre-treatment quarters, through 2016Q2
 EVAL = {"2018Q4": 96, "2019Q4": 100}
 TREATED = "United Kingdom"
 
@@ -464,7 +469,7 @@ print(f"pre-RMSE {a18.pre_rmse:.6f} vs SC's {s18.pre_rmse:.6f}")
 ladder = pd.DataFrame([
     ("DiD",  pct(did["2018Q4"].att),          pct(did["2019Q4"].att),          4.98, np.nan),
     ("SC",   pct(sc["2018Q4"].att),           pct(sc["2019Q4"].att),           3.06, 3.06),
-    ("DSC",  pct(tssc_att(dsc["2018Q4"])),    pct(tssc_att(dsc["2019Q4"])),    2.98, 2.98),
+    ("DSC",  pct(tssc_att(dsc["2018Q4"])),    pct(tssc_att(dsc["2019Q4"])),    2.99, 2.98),
     ("SDID", pct(sdid["2018Q4"].effects.att), pct(sdid["2019Q4"].effects.att), 2.79, 2.79),
     ("MASC", pct(masc["2018Q4"].att),         pct(masc["2019Q4"].att),         2.73, 2.73),
     ("ASCM", pct(ascm["2018Q4"].att),         pct(ascm["2019Q4"].att),         3.04, 3.04),

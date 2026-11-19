@@ -10,7 +10,7 @@
   cvxpy          1.8.1
   seed           20260801
   FORCE_REFIT    False
-  estimators exported by mlsynth: 92
+  names exported by mlsynth: 92
 
 ==============================================================================
 1. The data
@@ -207,7 +207,7 @@
 method                         command  loss_2018Q4  loss_2019Q4  r_post_2018Q4  published_2018Q4
    DiD             FDID(...).fit().did         4.98         6.18           4.98               NaN
     SC                  VanillaSC(...)         3.04         4.17           3.06              3.06
-   DSC        TSSC(..., method="MSCa")         2.99         4.12           2.98              2.98
+   DSC        TSSC(..., method="MSCa")         2.99         4.12           2.99              2.98
   SDID             SDID(..., zeta=0.0)         2.80         3.94           2.79              2.79
   MASC   MASC(..., set_f=range(6, 87))         2.73         3.83           2.73              2.73
   ASCM VanillaSC(..., augment="ridge")         3.04         4.19           3.04              3.04

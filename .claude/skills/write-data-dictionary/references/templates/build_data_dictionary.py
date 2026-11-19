@@ -407,6 +407,7 @@ code{background:#eef1f6;padding:1px 6px;border-radius:5px;font-size:.88em;
 .code .copy:hover{background:var(--steel);color:#fff}
 .note{background:#eef6fb;border-left:4px solid var(--steel);padding:11px 15px;
   border-radius:0 9px 9px 0;margin:14px 0;font-size:14px}
+p a,li a,.note a{overflow-wrap:anywhere}   /* long bare URLs must wrap at 360px */
 ul.tight li{margin:5px 0}
 .explorer-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 12px}
 #varSearch{flex:1;min-width:240px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;

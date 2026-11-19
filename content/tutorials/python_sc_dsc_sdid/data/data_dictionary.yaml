@@ -1,0 +1,375 @@
+# Data dictionary metadata for python_sc_dsc_sdid. This file drives build_data_dictionary.py.
+# It draws on the post (index.md, sections 4 and 24), on r_sc_dsc_sdid/prepare_data.R and
+# r_sc_dsc_sdid/data/README.md, on the replication code of de Brabander, Juodis and Miyazato
+# Szini (2025), and on checks run directly on the data (every identity quoted below was
+# verified to machine precision). Edit it and rerun:
+#   cd content/tutorials/python_sc_dsc_sdid/data
+#   python make_wide_panel.py          # only if the 36-country source panel changes
+#   python build_data_dictionary.py
+# Statistics on the page come from the CSVs at run time, and none are written here.
+# The file contains no dollar sign, because one would pair into math on GitHub-rendered
+# Markdown and expand as a global macro in Stata notes.
+
+github_branch: master
+
+study:
+  title: "Brexit and the OECD: Quarterly GDP Panel"
+  subtitle: "Data behind the synthetic control ladder in Python — 24 economies × 104 quarters (1995Q1–2020Q4) plus the full 36-country source panel"
+  post_url: "https://carlos-mendez.org/tutorials/python_sc_dsc_sdid/"
+  overview: >
+    On 23 June 2016 the United Kingdom voted to leave the European Union. To estimate what
+    the vote cost the British economy, the tutorial builds a "synthetic" United Kingdom: a
+    weighted blend of other rich economies that tracks UK output quarter by quarter before
+    the referendum. The gap between the real and the synthetic UK after the vote is the
+    estimated effect. This page documents the two files behind that exercise.
+    <code>brexit_analysis</code> is the estimation sample: quarterly real GDP and six
+    economic covariates for 24 OECD economies from 1995Q1 to 2020Q4. The United Kingdom is
+    the single treated unit and the other 23 countries are the donor pool. Every estimator in
+    the post (difference-in-differences, synthetic control, demeaned synthetic control,
+    synthetic difference-in-differences, MASC and augmented synthetic control) uses this
+    file and only its outcome <code>log_rgdp</code> in the headline specification.
+    <code>brexit_panel_wide</code> is the full source panel it was cut from: all 36 OECD
+    countries from 1960Q1 to 2020Q4 and twelve underlying national-accounts and labour
+    series, so that you can rebuild the donor pool, the window or the covariates yourself.
+  panel_structure: >
+    <strong>Key dates in <code>brexit_analysis</code>.</strong> The index <code>t</code> runs
+    from 1 (1995Q1) to 104 (2020Q4). The headline specification dates the treatment at
+    2016Q3 (<code>t</code> = 87), which leaves T0 = 86 pre-treatment quarters (1995Q1–2016Q2).
+    The post evaluates the effect at two quarters: 2018Q4 (<code>t</code> = 96) and 2019Q4
+    (<code>t</code> = 100). The robustness check that dates the treatment at 2016Q2 uses
+    <code>t</code> = 86 as the first treated quarter. The referendum itself took place on
+    23 June 2016, at the very end of 2016Q2.
+    <br><br><strong>Observed versus projected quarters.</strong> Both files come from the
+    November 2018 vintage of the OECD Economic Outlook. The data are observed through 2018Q3
+    and are OECD projections from 2018Q4 to 2020Q4 (see Known limitations). Both evaluation
+    quarters of the post therefore fall in the projected part of the file.
+  kpis:
+    - {n: 24, l: "countries (1 treated, 23 donors)"}
+    - {n: 104, l: "quarters, 1995Q1–2020Q4"}
+    - {n: 86, l: "pre-treatment quarters (T0)"}
+    - {n: 36, l: "countries in the source panel"}
+
+dta_format_version: 118
+
+sources:
+  - name: "OECD Economic Outlook, November 2018 vintage"
+    provides: "The quarterly national accounts (GDP, consumption, investment, government spending, exports, imports), employment, unemployment and working-age population for 36 OECD countries. The vintage contains outturns through 2018Q3 and OECD projections through 2020Q4."
+    reference: "OECD Economic Outlook database. https://www.oecd.org/economic-outlook/"
+  - name: "Born, Müller, Schularick and Sedláček (2019)"
+    provides: "Assembled the panel from the Economic Outlook, normalised GDP to its 1995 average, and defined the 23-country donor pool used for Brexit."
+    reference: "The Economic Journal, 129(623), 2722–2744. https://doi.org/10.1093/ej/uez020"
+  - name: "de Brabander, Juodis and Miyazato Szini (2025), replication package"
+    provides: "Redistributes the panel as the MATLAB file brexit_data_raw_eo_nov2018.mat and contains the R code whose covariate construction these files follow."
+    reference: "Econometric Reviews, 44(10), 1617–1646. https://doi.org/10.1080/07474938.2025.2530649"
+  - name: "R edition of this tutorial (prepare_data.R)"
+    provides: "Converts the MATLAB file into brexit_analysis.csv and the long-format brexit_panel_long.csv. The wide panel on this page is a lossless pivot of that long file (make_wide_panel.py in this folder)."
+    reference: "https://carlos-mendez.org/tutorials/r_sc_dsc_sdid/"
+
+formulas_html: |
+  <h3>The outcome</h3>
+  <ul class="tight">
+    <li><strong><code>log_rgdp</code></strong> = ln(<code>real_gdp</code>), where <code>real_gdp</code> = <code>real_gdp_raw</code> ÷ (average of <code>real_gdp_raw</code> over 1995Q1–1995Q4) for each country. So every country averages exp(<code>log_rgdp</code>) = 1 in 1995, and <code>log_rgdp</code> ≈ the cumulative growth since 1995 (0.44 for the UK in 2016Q2 means about 56% more output than in 1995).</li>
+    <li><strong>Why the indexing matters.</strong> Dividing by a country-specific constant shifts that country's log series up or down by a constant. Estimators with an intercept or demeaning (DiD, demeaned SC, SDID) are unaffected. Plain synthetic control, which has no intercept, must match the UK's level with a convex blend of donor levels, so the choice of base year changes which donors it can use.</li>
+    <li><strong>The effect.</strong> The post's estimand at quarter <em>t</em> is τ<sub>t</sub> = Y<sub>UK,t</sub>(1) − Y<sub>UK,t</sub>(0), the average treatment effect on the treated at a single quarter, estimated as <code>log_rgdp</code> of the UK minus the synthetic counterfactual. It reports −100·τ<sub>t</sub>, the percentage shortfall of GDP.</li>
+  </ul>
+  <h3>The six covariates (as built in the replication code)</h3>
+  <ul class="tight">
+    <li><strong>Expenditure shares</strong>: <code>cons_share</code> = <code>real_con_raw</code> ÷ <code>real_gdp_raw</code>, and likewise <code>inv_share</code>, <code>exp_share</code>, <code>imp_share</code> with investment, exports and imports. Ratios of real (volume) series, not of nominal values.</li>
+    <li><strong><code>labprod_growth</code></strong> = 100 × [ln(<code>lab_prod_raw</code><sub>t</sub>) − ln(<code>lab_prod_raw</code><sub>t−1</sub>)], quarterly growth of GDP per worker in percent. It is computed on the full series from 1960, so 1995Q1 uses 1994Q4 and has no missing value.</li>
+    <li><strong><code>emp_pop</code></strong> = <code>tot_emp_pc_raw</code> = <code>tot_emp_raw</code> ÷ <code>pop_quarterly</code>, employment as a share of the working-age population.</li>
+  </ul>
+  <h3>Identities in the source panel</h3>
+  <ul class="tight">
+    <li><code>lab_prod_raw</code> = <code>real_gdp_raw</code> ÷ <code>tot_emp_raw</code> (exact in every cell where all three exist).</li>
+    <li><code>tot_emp_pc_raw</code> = <code>tot_emp_raw</code> ÷ <code>pop_quarterly</code> (exact), which identifies <code>pop_quarterly</code> as the working-age population.</li>
+  </ul>
+  <h3>Treatment indicators</h3>
+  <ul class="tight">
+    <li><code>is_treated_unit</code> = 1 for the United Kingdom in every quarter ("ever treated").</li>
+    <li><code>treated</code> = 1 for the United Kingdom from 2016Q3 (<code>t</code> ≥ 87) onward ("under treatment now"), 18 rows in all.</li>
+    <li>The post does not use <code>treated</code> directly. Its helper <code>window()</code> keeps the 86 pre-treatment quarters plus one evaluation quarter, renumbers time as <code>tt</code> = 1…87, and rebuilds <code>treat</code> = 1 for the UK at <code>tt</code> = 87. That turns mlsynth's "average over all post periods" into the effect at a single quarter.</li>
+  </ul>
+  <h3>From the source panel to the estimation sample</h3>
+  <ul class="tight">
+    <li>Keep the 24 countries with <code>in_estimation_sample</code> = 1 and the quarters 1995Q1–2020Q4, then apply the formulas above. <code>make_wide_panel.py</code> checks that ln(<code>real_gdp</code>) reproduces <code>log_rgdp</code> to within 1e-9 (the long file is rounded to 10 significant digits).</li>
+  </ul>
+
+caveats:
+  - "<strong>The last nine quarters are OECD projections, not data.</strong> The panel is the November 2018 vintage of the OECD Economic Outlook, so it contains observed values only through 2018Q3. From 2018Q4 to 2020Q4 every series is the OECD's projection. The data show it plainly: the average absolute quarter-to-quarter change in GDP growth falls from 0.77 points (2010–2018Q2) to 0.06 points (2019–2020), and 2020 shows no COVID-19 collapse. Both evaluation quarters of the post (2018Q4 and 2019Q4) are therefore projected, so the estimated 'shortfall' compares projected UK output with projected donor output. This inference is drawn from the data; the source file does not flag projected values."
+  - "<strong><code>log_rgdp</code> is not the log of GDP in currency units.</strong> It is the log of GDP indexed to each country's 1995 average, so values start near 0 in 1995 and measure growth since then. Comparing levels across countries is meaningless; comparing paths is the point."
+  - "<strong><code>treated</code> hard-codes one treatment date.</strong> It switches on at 2016Q3. The 2016Q2 robustness check and every evaluation window in the post build their own indicator instead (<code>treat</code> in <code>window()</code>)."
+  - "<strong>Trade shares above 1 are real, not errors.</strong> Luxembourg (exports up to 2.18 times GDP), Ireland and Hungary re-export much of what they import, so exports and imports can exceed GDP. Ireland's labour productivity growth of 19.6% in 2015Q1 reflects the relocation of multinational assets, not a real productivity boom."
+  - "<strong>The donor pool is itself a choice.</strong> Twelve of the 36 countries are dropped because at least one stored series is incomplete: Chile, Czech Republic, Denmark, Estonia, Greece, Israel, Latvia, Lithuania, Mexico, Poland, Slovenia and Turkey. Czech Republic, Estonia and Israel are dropped only for a gap in an inflation series that no specification uses."
+  - "<strong>The paper's text and its code differ.</strong> de Brabander et al. (2025) write that all variables are standardised and log-transformed; their replication code (and these files) use log(<code>real_gdp</code>) for the outcome and untransformed shares, growth rates and ratios for the covariates."
+  - "<strong>Units of the raw series are not documented.</strong> The <code>_raw</code> volume series are in national currency (or persons), at the prices and base year of the OECD Economic Outlook; the source file records neither the base year nor whether series are seasonally adjusted. Magnitudes are consistent with annualised quarterly levels (UK <code>real_gdp_raw</code> in 2016Q2 is 1.96 trillion pounds)."
+  - "<strong>Coverage before 1995 is uneven.</strong> In the wide panel, GDP and its components exist for 30 of the 36 countries, employment for 32, labour productivity for 28, unemployment for 31 and the working-age population for all 36. Several series start after 1960 (Lithuania's labour series in 2002Q1). Empty cells mean the source has no value."
+
+citation:
+  author: "Mendez, Carlos"
+  year: "2026"
+  title: "Brexit and the OECD: Quarterly GDP panel (data dictionary for The Synthetic Control Ladder in Python)"
+  extra_apa: >
+    Please also cite the original sources.
+    de Brabander, E., Juodis, A., & Miyazato Szini, G. (2025). On the use of synthetic
+    difference-in-differences approach with (-out) covariates: The case study of Brexit
+    referendum. Econometric Reviews, 44(10), 1617–1646. https://doi.org/10.1080/07474938.2025.2530649
+    Born, B., Müller, G. J., Schularick, M., & Sedláček, P. (2019). The costs of economic
+    nationalism: Evidence from the Brexit experiment. The Economic Journal, 129(623),
+    2722–2744. https://doi.org/10.1093/ej/uez020
+    OECD (2018). OECD Economic Outlook, Volume 2018 Issue 2. OECD Publishing.
+  extra_bibtex: |
+    @article{debrabander2025brexit,
+      author  = {de Brabander, Esther and Juodis, Arturas and Miyazato Szini, Gabriela},
+      title   = {On the use of synthetic difference-in-differences approach with (-out) covariates: The case study of {Brexit} referendum},
+      journal = {Econometric Reviews},
+      year    = {2025},
+      volume  = {44},
+      number  = {10},
+      pages   = {1617--1646},
+      doi     = {10.1080/07474938.2025.2530649}
+    }
+    @article{born2019costs,
+      author  = {Born, Benjamin and M{\"u}ller, Gernot J. and Schularick, Moritz and Sedl{\'a}{\v{c}}ek, Petr},
+      title   = {The costs of economic nationalism: Evidence from the {Brexit} experiment},
+      journal = {The Economic Journal},
+      year    = {2019},
+      volume  = {129},
+      number  = {623},
+      pages   = {2722--2744},
+      doi     = {10.1093/ej/uez020}
+    }
+
+files:
+  brexit_analysis.csv:
+    label: "Brexit estimation panel: 24 OECD countries, 1995Q1-2020Q4"
+    grain: "country-quarter"
+    years: "1995Q1–2020Q4 (104 quarters; projections from 2018Q4)"
+    coverage: "24 OECD countries: the United Kingdom (treated) and 23 donors; balanced, no missing values"
+    key: "country × t (equivalently unit_id × t)"
+    purpose: "The only data file the tutorial loads. Every estimator uses log_rgdp; the covariate sections also use the six covariates."
+    note: "Byte-identical copy of the post-root brexit_analysis.csv (and of r_sc_dsc_sdid/brexit_analysis.csv). Built by r_sc_dsc_sdid/prepare_data.R from the de Brabander, Juodis and Miyazato Szini (2025) replication package. Treatment at 2016Q3 (t = 87); T0 = 86; evaluation at 2018Q4 (t = 96) and 2019Q4 (t = 100). Values from 2018Q4 on are OECD projections."
+  brexit_panel_wide.csv:
+    label: "Full OECD source panel: 36 countries, 1960Q1-2020Q4, 12 series"
+    grain: "country-quarter"
+    years: "1960Q1–2020Q4 (244 quarters; projections from 2018Q4)"
+    coverage: "36 OECD countries; unbalanced, empty cells where the source has no value"
+    key: "country × date_dec"
+    purpose: "Rebuild the estimation sample, try a different donor pool, window or covariate, or study the series before 1995."
+    note: "Lossless pivot of r_sc_dsc_sdid/brexit_panel_long.csv by make_wide_panel.py (values rounded to 10 significant digits by prepare_data.R). in_estimation_sample is the only derived column. Filter in_estimation_sample == 1 and 1995Q1-2020Q4 to recover the countries and quarters of brexit_analysis."
+
+columns:
+  # ── shared identifiers ────────────────────────────────────────────────────
+  country:
+    label: "Country name"
+    definition: "OECD country name, in English, as stored in the source file."
+    units: "text"
+    source: "OECD Economic Outlook, via the replication package"
+    coverage: "24 countries in brexit_analysis; 36 in brexit_panel_wide"
+    kind: str
+  year:
+    label: "Calendar year"
+    definition: "Calendar year of the quarter."
+    units: "year"
+    coverage: "1995–2020 in brexit_analysis; 1960–2020 in brexit_panel_wide"
+    kind: year
+  quarter:
+    label: "Quarter of the year (1-4)"
+    definition: "Quarter within the calendar year: 1 = January–March, …, 4 = October–December."
+    units: "1–4"
+    kind: id
+  quarter_label:
+    label: "Quarter label, e.g. 2016Q3"
+    definition: "Human-readable quarter, year followed by Q and the quarter number. Sorts correctly as text."
+    construction: "year + 'Q' + quarter"
+    units: "text"
+    kind: str
+  date_dec:
+    label: "Decimal year (2016Q3 = 2016.50)"
+    definition: "Time as a decimal year, the start of the quarter: year + (quarter − 1)/4. Convenient for plotting on a continuous axis."
+    construction: "year + (quarter − 1) / 4"
+    units: "years"
+    kind: cont
+
+  # ── brexit_analysis: indices ──────────────────────────────────────────────
+  t:
+    label: "Period index, 1 = 1995Q1 ... 104 = 2020Q4"
+    definition: "Consecutive quarter index used as the time variable. Key values: 86 = 2016Q2 (last pre-treatment quarter), 87 = 2016Q3 (treatment), 96 = 2018Q4 and 100 = 2019Q4 (evaluation quarters)."
+    construction: "4 × (year − 1995) + quarter"
+    units: "quarters"
+    kind: id
+  unit_id:
+    label: "Country index, 1-24, alphabetical"
+    definition: "Integer country identifier in alphabetical order of country. The United Kingdom is 23."
+    units: "1–24"
+    kind: id
+
+  # ── brexit_analysis: outcome and covariates ───────────────────────────────
+  log_rgdp:
+    label: "Outcome: log real GDP, indexed to the country's 1995 average"
+    definition: "Natural log of real GDP divided by the country's own 1995 average, so it is about 0 in 1995 and approximates cumulative growth since then. The outcome of every estimator in the post."
+    construction: "ln(real_gdp) = ln(real_gdp_raw / mean of real_gdp_raw over 1995Q1–1995Q4)"
+    units: "log points (0.01 ≈ 1%)"
+    source: "OECD Economic Outlook (Nov 2018 vintage), normalised by Born et al. (2019)"
+    coverage: "complete; projected from 2018Q4"
+    kind: cont
+  cons_share:
+    label: "Real private consumption / real GDP"
+    definition: "Private consumption as a share of GDP, both in real (volume) terms."
+    construction: "real_con_raw / real_gdp_raw"
+    units: "ratio (0.54 = 54% of GDP)"
+    source: "OECD Economic Outlook; construction as in the replication code"
+    coverage: "complete"
+    kind: cont
+  inv_share:
+    label: "Real investment / real GDP"
+    definition: "Investment as a share of GDP, both in real terms."
+    construction: "real_inv_raw / real_gdp_raw"
+    units: "ratio"
+    source: "OECD Economic Outlook; construction as in the replication code"
+    coverage: "complete"
+    kind: cont
+  exp_share:
+    label: "Real exports / real GDP"
+    definition: "Exports of goods and services as a share of GDP, both in real terms. Can exceed 1 in re-export economies (Luxembourg, Ireland, Hungary)."
+    construction: "real_exp_raw / real_gdp_raw"
+    units: "ratio"
+    source: "OECD Economic Outlook; construction as in the replication code"
+    coverage: "complete"
+    kind: cont
+  imp_share:
+    label: "Real imports / real GDP"
+    definition: "Imports of goods and services as a share of GDP, both in real terms. Can exceed 1 in re-export economies."
+    construction: "real_imp_raw / real_gdp_raw"
+    units: "ratio"
+    source: "OECD Economic Outlook; construction as in the replication code"
+    coverage: "complete"
+    kind: cont
+  labprod_growth:
+    label: "Labour productivity growth, % per quarter"
+    definition: "Quarter-on-quarter growth of real GDP per worker, in percent (not annualised)."
+    construction: "100 × Δln(lab_prod_raw), computed on the full series from 1960, so 1995Q1 has a value"
+    units: "percent per quarter"
+    source: "OECD Economic Outlook; construction as in the replication code"
+    coverage: "complete"
+    kind: cont
+  emp_pop:
+    label: "Employment / working-age population"
+    definition: "Total employment as a share of the working-age population (the employment rate)."
+    construction: "tot_emp_pc_raw = tot_emp_raw / pop_quarterly"
+    units: "ratio (0.62 = 62%)"
+    source: "OECD Economic Outlook"
+    coverage: "complete"
+    kind: cont
+
+  # ── brexit_analysis: treatment ────────────────────────────────────────────
+  is_treated_unit:
+    label: "Treated unit: 1 = United Kingdom (all quarters)"
+    definition: "Marks the treated country in every quarter, before and after the referendum. Separates the UK from the 23 donors."
+    construction: "country == 'United Kingdom'"
+    units: "0/1"
+    kind: dummy
+    value_labels: {0: "Donor", 1: "United Kingdom"}
+  treated:
+    label: "Under treatment: 1 = UK from 2016Q3 onward"
+    definition: "1 for the United Kingdom in the quarters after the headline treatment date (2016Q3–2020Q4, 18 rows), 0 otherwise, including the UK before 2016Q3. This is the 'under treatment now' convention that mlsynth expects in its treat field."
+    construction: "is_treated_unit == 1 and t >= 87"
+    units: "0/1"
+    kind: dummy
+    value_labels: {0: "Not treated", 1: "UK, 2016Q3 onward"}
+
+  # ── brexit_panel_wide: sample flag and source series ──────────────────────
+  in_estimation_sample:
+    label: "1 = one of the 24 countries in brexit_analysis"
+    definition: "Derived flag: 1 for the 24 countries kept in the estimation sample, 0 for the 12 dropped for incomplete data. Constant within a country."
+    construction: "country is in brexit_analysis.csv (make_wide_panel.py)"
+    units: "0/1"
+    source: "This page (derived)"
+    kind: dummy
+    value_labels: {0: "Dropped", 1: "In the 24-country sample"}
+  real_gdp:
+    label: "Real GDP index, country's 1995 average = 1"
+    definition: "Real GDP divided by its own 1995 average. ln(real_gdp) is log_rgdp."
+    construction: "real_gdp_raw / mean of real_gdp_raw over 1995Q1–1995Q4"
+    units: "index (1995 = 1)"
+    source: "Born et al. (2019), from the OECD Economic Outlook"
+    coverage: "30 countries"
+    kind: cont
+  real_gdp_raw:
+    label: "Real GDP, national currency"
+    definition: "Gross domestic product in volume terms."
+    units: "national currency, real (volume) terms; base year and seasonal adjustment not documented in the source"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  real_con_raw:
+    label: "Real private consumption, national currency"
+    definition: "Private final consumption expenditure in volume terms."
+    units: "national currency, real (volume) terms (as real_gdp_raw)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  real_inv_raw:
+    label: "Real investment, national currency"
+    definition: "Investment in volume terms."
+    units: "national currency, real (volume) terms (as real_gdp_raw)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  real_exp_raw:
+    label: "Real exports, national currency"
+    definition: "Exports of goods and services in volume terms."
+    units: "national currency, real (volume) terms (as real_gdp_raw)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  real_imp_raw:
+    label: "Real imports, national currency"
+    definition: "Imports of goods and services in volume terms."
+    units: "national currency, real (volume) terms (as real_gdp_raw)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  real_gov_raw:
+    label: "Real government consumption, national currency"
+    definition: "Government final consumption expenditure in volume terms. Not used by the post or by the replication code."
+    units: "national currency, real (volume) terms (as real_gdp_raw)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "30 countries"
+    kind: cont
+  tot_emp_raw:
+    label: "Total employment, persons"
+    definition: "Number of people employed."
+    units: "persons"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "32 countries"
+    kind: cont
+  tot_emp_pc_raw:
+    label: "Employment / working-age population"
+    definition: "Total employment as a share of the working-age population. Equals emp_pop in brexit_analysis."
+    construction: "tot_emp_raw / pop_quarterly (exact identity in the data)"
+    units: "ratio"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "32 countries"
+    kind: cont
+  lab_prod_raw:
+    label: "Labour productivity: real GDP per worker"
+    definition: "Real GDP per employed person. Its quarterly log change is labprod_growth."
+    construction: "real_gdp_raw / tot_emp_raw (exact identity in the data)"
+    units: "national currency per worker"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "28 countries"
+    kind: cont
+  unemp_rate_raw:
+    label: "Unemployment rate (fraction)"
+    definition: "Unemployed as a share of the labour force. Not used by the post."
+    units: "fraction (0.05 = 5%)"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "31 countries"
+    kind: cont
+  pop_quarterly:
+    label: "Working-age population, persons"
+    definition: "Working-age population, the denominator of the employment rate. Identified by the exact identity tot_emp_pc_raw = tot_emp_raw / pop_quarterly and by the paper's definition of the employment share; the age bounds are not documented in the source."
+    units: "persons"
+    source: "OECD Economic Outlook (Nov 2018 vintage)"
+    coverage: "36 countries"
+    kind: cont

@@ -182,7 +182,7 @@ import cvxpy  # noqa: E402
 print(f"  cvxpy          {cvxpy.__version__}")
 print(f"  seed           {SEED}")
 print(f"  FORCE_REFIT    {FORCE_REFIT}")
-print(f"  estimators exported by mlsynth: {len(mlsynth.__all__)}")
+print(f"  names exported by mlsynth: {len(mlsynth.__all__)}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 1. THE DATA
@@ -870,7 +870,7 @@ print(f"  residualize=True (the paper's 'ASCM res.'): "
 rule("11. The whole ladder")
 
 ladder = pd.DataFrame(LADDER)
-R_COLUMN = {"DiD": 4.98, "SC": 3.06, "DSC": 2.98, "SDID": 2.79,
+R_COLUMN = {"DiD": 4.98, "SC": 3.06, "DSC": 2.99, "SDID": 2.79,
             "MASC": 2.73, "ASCM": 3.04}
 ladder["r_post_2018Q4"] = ladder.method.map(R_COLUMN)
 write_tab(ladder, "att_headline")
