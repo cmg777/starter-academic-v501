@@ -14,3 +14,7 @@ The observatory's repository was split on 2026-11-20: the observatory (data, not
   - Hugo 0.111.3 build passed and `i18n-parity` reports 0 missing.
   - `audit-site.py`: its only findings are the 6 broken references inside `post/python_dynamic_panel/referenceMaterials`, which this change did not touch.
   - Every new external link returns 200.
+
+## Later the same day: new geo4bolivia hero
+
+- The three `software/geo4bolivia/featured.webp` files are the package's new hero (spatial data science elements plus the SDG colour wheel), cropped to 16:9.
