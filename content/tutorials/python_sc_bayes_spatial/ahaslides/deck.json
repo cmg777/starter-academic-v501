@@ -149,7 +149,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "The slide's own takeaway IS the question, so ask it rather than reading it. The answer arrives two slides later, when relaxing the simplex takes the active pool from 5 donors to 26. Section 4.1 of the post makes the same point from the other side: sparsity CAN come from the data — a useless donor gets zero weight with no constraint forbidding it — which is exactly why you cannot attribute it from the outside. Distractor C is worth naming aloud: RMSE measures fit, not the provenance of the zeros."
     },
@@ -197,7 +197,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "This is the slide people push back on, so ask before you show. BSCM fits an intercept of 16.86 and its weights sum to 0.758, so its blend sits near 100 packs against California's 118 and the intercept lifts it back; scspill has no intercept and standardises first. The rule is the takeaway: when two packages disagree about a model they both implement, check the equation before you check the sampler. The tiebreaker is external — scspill's rho = 0 case lands within 0.16 packs of the R edition, produced by entirely separate C++ code. Do not average them."
     },
@@ -238,7 +238,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "Straight from the slide's takeaway: a filthy donor with zero weight is harmless, a slightly dirty one carrying half the counterfactual is not. A is the trap — contamination alone is not the bias, the PRODUCT is. C is worth a sentence too: contiguity is why we suspect Nevada, but weight is what makes it matter, and Nevada happens to carry both."
     },
@@ -294,7 +294,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "This sets up the next slide's effective-sample-size table, where rho comes in at 137 against sigma-squared's 204,000. Note 20 warns against reading precision into the headline number; this is where that warning becomes concrete. D is the sharpest distractor and the one to discuss: random-walk Metropolis is WHY the ESS is low, but the sampler choice is not itself the defect — slow mixing is not weak identification. B describes a tight posterior, which is a virtue, not a problem."
     },
@@ -343,7 +343,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "This is the payoff for the poll on slide 6 — show the room its own bars first, then ask. A negative spillover on a positively-weighted donor drags synthetic California down, so the classical comparison gives the policy LESS credit than it deserves: modelling the leak makes the effect larger, not smaller. On the horseshoe weights the correction is 1.19 packs; on the simplex weights, where Nevada carries 0.242 instead of 0.200, it is 1.51 — the classical estimate is the more contaminated of the two. D is the wrong answer worth dwelling on: scspill returns the effects panel as posterior means, so no donor-level spillover HAS a credible interval. The interval evidence is on rho, not on Nevada."
     },
@@ -384,7 +384,7 @@
         }
       ],
       "points": 1000,
-      "timeLimitSeconds": 30,
+      "timeLimitSeconds": 25,
       "interactive": true,
       "notes": "The three widths: 0.482 at 5,000 draws, 0.702 at 500,000, and 12.713 once alpha is propagated. A hundred times the iterations widens the interval by 45%, which closes only (0.702 − 0.482) / (12.713 − 0.482) ≈ 2% of the gap; propagating alpha widens it by 1,700%. The next slide names the two separable failures — effective sample size asks whether the interval is RELIABLE, propagate_alpha asks whether it is COMPLETE, and the published interval failed both. If the room picks A, that is the useful mistake: chain length is the fix everyone reaches for first."
     },

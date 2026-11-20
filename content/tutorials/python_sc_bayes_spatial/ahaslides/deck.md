@@ -242,7 +242,7 @@ the two look identical. That is the question Stage 2 exists to ask.
 
 ## 13 — ★ INTERACTIVE 2 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** Stage 1 gives exactly zero weight to 33 of the 38 donors. From that output
 alone, can you tell whether those zeros come from the data or from the simplex
@@ -313,7 +313,7 @@ is a defect.
 
 ## 17 — ★ INTERACTIVE 3 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** Two horseshoe synthetic controls — same panel, same prior family, both
 correctly coded — report ATTs three packs apart. What do you check first?
@@ -370,7 +370,7 @@ turns on.
 
 ## 20 — ★ INTERACTIVE 4 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** The bias in a classical synthetic control is the weighted sum of donor
 spillovers — donor weight times donor contamination. Which donor damages the estimate
@@ -454,7 +454,7 @@ the next slide is about exactly how much that interval is worth.
 
 ## 25 — ★ INTERACTIVE 5 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** The spatial parameter comes in at 0.316 with a 95% credible interval of
 [0.231, 0.403], from 250,000 draws. What would most undermine that interval?
@@ -531,7 +531,7 @@ it.
 
 ## 29 — ★ INTERACTIVE 6 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** Nevada's sales came in BELOW its no-treatment path, and Nevada carries
 positive weight in synthetic California. What does that do to the classical ATT?
@@ -591,7 +591,7 @@ means the difference is a specification difference, not a porting error.
 
 ## 32 — ★ INTERACTIVE 7 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
+**Type:** multiple choice quiz · scored · presentation default points, 25 seconds to answer
 
 **Question:** The R edition's credible interval was 33 times narrower than the corrected one. Running that
 same specification 100 times longer — 5,000 draws to 500,000 — closed how much of the
