@@ -18,3 +18,4 @@ The observatory's repository was split on 2026-11-20: the observatory (data, not
 ## Later the same day: new geo4bolivia hero
 
 - The three `software/geo4bolivia/featured.webp` files are the package's new hero (spatial data science elements plus the SDG colour wheel), cropped to 16:9.
+- Replaced again the same day with the package's night-lights hero (satellite sensing city lights, hexagon grid, charts, SDG wheel), cropped to 16:9 from the right so the chart panel stays in.
