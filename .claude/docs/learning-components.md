@@ -243,6 +243,15 @@ Generalized from the `fwl-lab` widget (`layouts/shortcodes/fwl-lab.html` + `asse
 - **Tests:** `node --test tests/sc-lab.test.cjs` checks every default and every `lab_scenarios` entry against the results JSON to 1e-9. Set `SC_LAB_JS` to the minified bundle of a build to run the same tests on the published file.
 - **Minifier gotcha (found 2026-10-05):** the minifier deletes `<rect>` elements whose width is zero in the markup, so shaded bands that JS sizes later silently disappear. Draw such bands as `<path>` elements instead.
 
+### Reference implementation #5: `spill-lab`
+
+`layouts/shortcodes/spill-lab.html` + `assets/js/spill-lab.js` + `assets/css/spill-lab.css`, for `content/tutorials/python_sc_bayes_spatial/` (§9.7). The Scratch guard key is `spillLabAssets`, the global is `window.SpillLab`, and the classes carry the prefix `xl-`. It follows the same three-file pattern and, like `sc-lab`, has a generated data block.
+
+- **Params:** `id` only (default `spill-lab-<ordinal>`); there are no tabs.
+- **What it computes:** the closed form ξᶜ = (I − ρWₙ)⁻¹ ρ wₙ ξ₀ of the post (§9.3), live, for the 38 donors. Controls: ρ (0–0.9, default ρ̂ = 0.316), the effect at the origin (default the ATT −16.87), ripple rounds (1–8 truncate the Neumann series; the last stop is the exact solve), and the origin (California or any donor). Outputs: an SVG tile map (the `STATE_TILES` layout of `analysis.py`), the five largest recipients, Nevada and its neighbours, the total, and for California the bias −Σαξ and the naive estimate. The numbers are plug-in values at the posterior means (Nevada −5.484 against the posterior mean −5.50); the post says so.
+- **Data block:** `content/tutorials/python_sc_bayes_spatial/build_spill_lab_data.py` writes the block between `// BEGIN GENERATED DATA` and `// END GENERATED DATA` from `spatial_W.csv`, `stage2_alpha_posterior.csv`, `stage3_summary.csv` and `stage3_spillover_effects.csv`, and writes numpy reference values to `tests/spill-lab.reference.json`. `--check` exits 1 when either is stale.
+- **Tests:** `node --test tests/spill-lab.test.cjs` checks the defaults and ten reference cases to 1e-9, plus one-round, ρ = 0, donor-origin and convergence properties. Set `SPILL_LAB_JS` to the minified bundle of a build to test the published file.
+
 **Dark-only site (since 2026-10-03).** Every widget also needs a `body.page-wrapper.dark .<name>` token block in `assets/css/orbital-subpages.css`, next to the existing `.did-lab` and `.sc-lab` blocks. Without it, the orbital palette does not reach the widget, and its accents stay in the old colors.
 
 ## Reference implementation

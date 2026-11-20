@@ -1,0 +1,103 @@
+{{- /*
+  spill-lab.html: inline interactive lab for the spatial ripple of a policy,
+  written for content/tutorials/python_sc_bayes_spatial (section 9.7,
+  Proposition 99 and the spillover on Nevada).
+
+  Usage:
+    {{< spill-lab >}}
+    {{< spill-lab id="ripple-two" >}}
+  Params:
+    id   element id (default "spill-lab-<ordinal>"); must be unique on the page
+
+  Controls: the spillover intensity rho, the effect at the origin, the number
+  of ripple rounds (1 to 8, or all = the exact solve) and the origin state
+  (California by default, or any of the 38 donors). Outputs: a tile map of
+  the effect on every donor, the five largest recipients, Nevada and its
+  neighbours, the total spillover, and, for California, the implied bias
+  −Σ alpha·xi and the naive estimate. Defaults reproduce the plug-in values of
+  build_spill_lab_data.py (Nevada −5.484, bias +1.125, naive −15.743).
+
+  Assets: assets/css/spill-lab.css and assets/js/spill-lab.js load once per
+  page (Page.Scratch guard "spillLabAssets"), minified, fingerprinted, SRI.
+  The data block inside spill-lab.js comes from
+  content/tutorials/python_sc_bayes_spatial/build_spill_lab_data.py; run it
+  with --check to confirm that the block is current.
+  Labels are plain Unicode, never TeX. Keep this output free of blank lines,
+  of code, pre, img, table, h2 and h3 elements, and of the dollar character.
+  Inside the SVG every hook attribute needs a value (data-map="map"), because
+  the production HTML minifier drops valueless attributes on SVG elements.
+*/ -}}
+{{- $id := .Get "id" | default (printf "spill-lab-%d" .Ordinal) -}}
+{{- if not (.Page.Scratch.Get "spillLabAssets") -}}
+{{- .Page.Scratch.Set "spillLabAssets" true -}}
+{{- $css := resources.Get "css/spill-lab.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $js := resources.Get "js/spill-lab.js" | js.Build (dict "minify" true "target" "es2017") | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end }}
+<section class="spill-lab" id="{{ $id }}" data-spill-lab="lab" aria-labelledby="{{ $id }}-title">
+<div class="xl-head">
+<p class="xl-title" id="{{ $id }}-title">Interactive ripple lab</p>
+<p class="xl-status" data-out="status">Plug-in values at the posterior means</p>
+</div>
+<noscript><p class="xl-noscript">This interactive lab needs JavaScript. Figure 10 and section 9.6 show the same spillovers at the estimated intensity.</p></noscript>
+<div class="xl-body">
+<p class="xl-intro">The effect on California travels to Nevada with strength ρ and then ripples through the contiguity graph of the 38 donors. Move ρ, the size of the effect and the number of ripple rounds, or start the ripple in another state, and watch every donor respond.</p>
+<div class="xl-controls">
+<div class="xl-ctl">
+<div class="xl-ctl-top"><label for="{{ $id }}-rho">Spillover intensity ρ</label><output for="{{ $id }}-rho" data-param-out="rho">0.316</output></div>
+<input type="range" id="{{ $id }}-rho" data-param="rho" min="0" max="0.9" step="0.001" value="0.316" autocomplete="off" aria-describedby="{{ $id }}-rho-help">
+<p class="xl-help" id="{{ $id }}-rho-help">Default 0.316, the posterior mean; the 95% credible interval runs from 0.231 to 0.403. The package bounds ρ below 0.95.</p>
+</div>
+<div class="xl-ctl">
+<div class="xl-ctl-top"><label for="{{ $id }}-xi0">Effect at the origin (packs per capita)</label><output for="{{ $id }}-xi0" data-param-out="xi0">−16.87</output></div>
+<input type="range" id="{{ $id }}-xi0" data-param="xi0" min="-30" max="0" step="0.1" value="-16.9" autocomplete="off" aria-describedby="{{ $id }}-xi0-help">
+<p class="xl-help" id="{{ $id }}-xi0-help">Default −16.87, the purged ATT for California. Every spillover is proportional to it.</p>
+</div>
+<div class="xl-ctl">
+<div class="xl-ctl-top"><label for="{{ $id }}-rounds">Ripple rounds</label><output for="{{ $id }}-rounds" data-param-out="rounds">all (exact)</output></div>
+<input type="range" id="{{ $id }}-rounds" data-param="rounds" min="1" max="9" step="1" value="9" autocomplete="off" aria-describedby="{{ $id }}-rounds-help">
+<p class="xl-help" id="{{ $id }}-rounds-help">Round k reaches the states k steps from the origin. The far right position solves the system exactly.</p>
+</div>
+<div class="xl-ctl">
+<div class="xl-ctl-top"><label for="{{ $id }}-origin">Where the policy lands</label></div>
+<select id="{{ $id }}-origin" data-param="origin" autocomplete="off" aria-describedby="{{ $id }}-origin-help"><option value="California">California (the treated state)</option></select>
+<p class="xl-help" id="{{ $id }}-origin-help">Pick a donor to see how a shock to it would spread through the same graph. The bias readout needs California.</p>
+</div>
+</div>
+<div class="xl-actions">
+<button type="button" class="xl-btn" data-act="reset">Reset to the posterior means</button>
+</div>
+<div class="xl-grid">
+<div class="xl-plot">
+<p class="xl-cap">Effect on each donor, packs per capita per year</p>
+<svg viewBox="0 0 380 280" role="img" aria-labelledby="{{ $id }}-m-t" aria-describedby="{{ $id }}-m-d">
+<title id="{{ $id }}-m-t">Tile map of the spillover received by each donor state</title>
+<desc id="{{ $id }}-m-d">One tile per state. Darker tiles receive larger effects; the outlined tile is the origin; faint tiles are states outside the panel.</desc>
+<g data-map="map"></g>
+</svg>
+<ul class="xl-legend">
+<li><span class="xl-sw xl-sw-hi" aria-hidden="true"></span>Largest effect</li>
+<li><span class="xl-sw xl-sw-lo" aria-hidden="true"></span>No effect</li>
+<li><span class="xl-sw xl-sw-origin" aria-hidden="true"></span>Origin</li>
+<li><span class="xl-sw xl-sw-out" aria-hidden="true"></span>Not in the panel</li>
+</ul>
+</div>
+<div class="xl-side">
+<p class="xl-cap">Five largest recipients</p>
+<ol class="xl-top" data-out="top"><li></li><li></li><li></li><li></li><li></li></ol>
+<dl class="xl-readout">
+<div class="xl-row"><dt>Nevada<span class="xl-sub">posterior mean in the post: <span data-out="postmean"></span></span></dt><dd><span data-out="nevada"></span></dd></div>
+<div class="xl-row"><dt>Idaho and Utah<span class="xl-sub">the neighbours of Nevada</span></dt><dd><span data-out="ring2"></span></dd></div>
+<div class="xl-row"><dt>Total over 38 donors</dt><dd><span data-out="total"></span></dd></div>
+<div class="xl-row"><dt>Share of the largest recipient</dt><dd><span data-out="share"></span></dd></div>
+<div class="xl-row"><dt>Bias of the naive estimate<span class="xl-sub">−Σ α·ξ with the posterior mean weights</span></dt><dd><span data-out="bias"></span></dd></div>
+<div class="xl-row"><dt>Naive estimate<span class="xl-sub">effect at the origin + bias</span></dt><dd><span data-out="naive"></span></dd></div>
+</dl>
+</div>
+</div>
+<p class="xl-flag" data-out="flag"></p>
+<p class="xl-sr" aria-live="polite" data-live="live"></p>
+</div>
+</section>
+{{- /* end spill-lab */ -}}

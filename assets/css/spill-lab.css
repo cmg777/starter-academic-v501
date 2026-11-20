@@ -1,0 +1,392 @@
+/*
+ * spill-lab.css: styles for the inline interactive ripple lab
+ * (layouts/shortcodes/spill-lab.html + assets/js/spill-lab.js).
+ *
+ * Every color is a CSS variable; SVG marks are styled by class. The heat color
+ * (warm orange, as in the post figures) fills a tile with an opacity set by
+ * the script, so the scale follows the theme without JavaScript. The dark
+ * orbital tokens live in assets/css/orbital-subpages.css.
+ */
+
+.spill-lab {
+  --xl-text: #141413;
+  --xl-muted: #4a5568;
+  --xl-bg: rgba(106, 155, 204, 0.04);
+  --xl-surface: #f9fbfd;
+  --xl-border: rgba(61, 110, 165, 0.35);
+  --xl-tile: rgba(20, 20, 19, 0.06);
+  --xl-tile-line: rgba(20, 20, 19, 0.18);
+  --xl-heat: #c8643f;
+  --xl-origin: #00897f;
+  --xl-out: rgba(20, 20, 19, 0.03);
+  --xl-accent: #2f639a;
+  --xl-accent-ink: #ffffff;
+  --xl-accent-soft: rgba(47, 99, 154, 0.1);
+  --xl-focus: #1a5fb4;
+
+  position: relative;
+  margin: 2rem 0;
+  padding: 1rem 1rem 1.1rem;
+  border: 1px solid var(--xl-border);
+  border-radius: 12px;
+  background: var(--xl-bg);
+  color: var(--xl-text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.dark .spill-lab {
+  --xl-text: #e8ecf2;
+  --xl-muted: #c8d0e0;
+  --xl-bg: rgba(106, 155, 204, 0.06);
+  --xl-surface: #101a39;
+  --xl-border: rgba(106, 155, 204, 0.4);
+  --xl-tile: rgba(200, 208, 224, 0.07);
+  --xl-tile-line: rgba(200, 208, 224, 0.22);
+  --xl-heat: #e8896a;
+  --xl-origin: #00d4c8;
+  --xl-out: rgba(200, 208, 224, 0.02);
+  --xl-accent: #6a9bcc;
+  --xl-accent-ink: #0a1230;
+  --xl-accent-soft: rgba(106, 155, 204, 0.16);
+  --xl-focus: #00d4c8;
+}
+
+.spill-lab *,
+.spill-lab *::before,
+.spill-lab *::after {
+  box-sizing: border-box;
+}
+
+/* Neutralize article typography that would otherwise leak in. */
+.spill-lab p,
+.spill-lab ul,
+.spill-lab ol,
+.spill-lab li,
+.spill-lab dl,
+.spill-lab dt,
+.spill-lab dd,
+.spill-lab label {
+  margin: 0;
+  padding: 0;
+}
+
+.spill-lab [hidden] {
+  display: none !important;
+}
+
+/* Until the script has drawn the lab, only the header and <noscript> show. */
+.spill-lab[data-spill-lab]:not([data-ready]) .xl-body {
+  display: none;
+}
+
+.spill-lab[data-spill-lab]:not([data-ready]) .xl-status {
+  visibility: hidden;
+}
+
+.spill-lab .xl-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Header ---- */
+.spill-lab .xl-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.spill-lab .xl-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.spill-lab .xl-status {
+  color: var(--xl-muted);
+  font-size: 0.875rem;
+}
+
+.spill-lab .xl-intro {
+  margin-top: 0.75rem;
+  color: var(--xl-muted);
+  font-size: 0.9rem;
+}
+
+.spill-lab .xl-noscript {
+  margin-top: 0.5rem;
+  color: var(--xl-muted);
+}
+
+/* ---- Controls ---- */
+.spill-lab .xl-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 720px) {
+  .spill-lab .xl-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.spill-lab .xl-ctl-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.spill-lab .xl-ctl label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+
+.spill-lab .xl-ctl output {
+  flex: none;
+  min-width: 3.4em;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.spill-lab input[type="range"],
+.dark .spill-lab input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 2.25rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  background: transparent;
+  accent-color: var(--xl-accent);
+  cursor: pointer;
+}
+
+.spill-lab select,
+.dark .spill-lab select {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  margin: 0.35rem 0 0.2rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--xl-border);
+  border-radius: 8px;
+  background: var(--xl-surface);
+  color: var(--xl-text);
+  font: inherit;
+  font-size: 0.925rem;
+}
+
+.spill-lab .xl-help {
+  color: var(--xl-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.spill-lab .xl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.spill-lab .xl-btn {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--xl-accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--xl-text);
+  font: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.spill-lab .xl-btn:hover {
+  background: var(--xl-accent-soft);
+}
+
+.spill-lab input[type="range"]:focus-visible,
+.spill-lab select:focus-visible,
+.spill-lab .xl-btn:focus-visible {
+  outline: 3px solid var(--xl-focus);
+  outline-offset: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Layout of the map and the readouts ---- */
+.spill-lab .xl-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 860px) {
+  .spill-lab .xl-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.spill-lab .xl-cap {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.spill-lab svg {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  overflow: hidden;
+}
+
+/* ---- Tiles ---- */
+.spill-lab .xl-tile-base {
+  fill: var(--xl-tile);
+  stroke: var(--xl-tile-line);
+  stroke-width: 1;
+}
+
+.spill-lab .xl-tile-fill {
+  fill: var(--xl-heat);
+  pointer-events: none;
+}
+
+.spill-lab svg .xl-tile-lab {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--xl-text);
+  pointer-events: none;
+}
+
+.spill-lab .xl-tile-out .xl-tile-base {
+  fill: var(--xl-out);
+  stroke-dasharray: 2 2;
+}
+
+.spill-lab svg .xl-tile-out .xl-tile-lab {
+  fill: var(--xl-muted);
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.spill-lab .xl-tile-ca .xl-tile-base {
+  stroke: var(--xl-origin);
+  stroke-dasharray: 3 2;
+}
+
+.spill-lab .xl-tile-origin .xl-tile-base {
+  stroke: var(--xl-origin);
+  stroke-width: 2.5;
+}
+
+/* ---- Legend ---- */
+.spill-lab .xl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-top: 0.5rem;
+  list-style: none;
+  color: var(--xl-muted);
+  font-size: 0.8125rem;
+}
+
+.spill-lab .xl-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.spill-lab .xl-sw {
+  display: inline-block;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 3px;
+  border: 1px solid var(--xl-tile-line);
+}
+
+.spill-lab .xl-sw-hi { background: var(--xl-heat); }
+.spill-lab .xl-sw-lo { background: var(--xl-tile); }
+.spill-lab .xl-sw-origin { background: transparent; border: 2.5px solid var(--xl-origin); }
+.spill-lab .xl-sw-out { background: var(--xl-out); border-style: dashed; }
+
+/* ---- Readouts ---- */
+.spill-lab .xl-top {
+  margin: 0 0 0.9rem 1.3rem;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.spill-lab .xl-top li {
+  margin: 0.1rem 0;
+}
+
+.spill-lab .xl-readout {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.spill-lab .xl-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--xl-tile-line);
+}
+
+.spill-lab .xl-row dt {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.spill-lab .xl-row dd {
+  flex: none;
+  max-width: 50%;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.spill-lab .xl-sub {
+  display: block;
+  color: var(--xl-muted);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.spill-lab .xl-flag {
+  margin-top: 0.9rem;
+  padding: 0.55rem 0.75rem;
+  border-left: 3px solid var(--xl-origin);
+  border-radius: 0 8px 8px 0;
+  background: var(--xl-accent-soft);
+  font-size: 0.875rem;
+}
