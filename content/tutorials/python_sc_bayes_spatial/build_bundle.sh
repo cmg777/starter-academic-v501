@@ -32,6 +32,12 @@ for f in analysis.py cheatsheet_python.py source_data.csv spatial_W.csv \
   cp "${POST_DIR}/${f}" "${DEST}/${f}"
 done
 
+# The figures. tutorial.qmd lives in references/ in the repository and points one
+# level up (../python_sc_bayes_spatial_NN_*.png); in the bundle the figures sit
+# beside it, so rewrite those paths in the bundled copy only.
+cp "${POST_DIR}"/${SLUG}_[0-9][0-9]_*.png "${DEST}/"
+sed -i.bak "s#(\.\./${SLUG}_#(${SLUG}_#g" "${DEST}/tutorial.qmd" && rm -f "${DEST}/tutorial.qmd.bak"
+
 chmod +x "${DEST}/render.command"
 
 # `zip -r` APPENDS to an existing archive, which silently keeps deleted entries

@@ -172,10 +172,9 @@ supporting text.
 ATT estimates across the ladder: classical −18.43, `mlsynth.BSCM` −18.85,
 horseshoe at ρ = 0 −15.68, Bayesian spatial −16.87. The seal shows −18 because
 that is what the simplex returns on this panel. Worth knowing before anyone
-objects: the canonical Abadie–Diamond–Hainmueller figure is nearer −27, and the
-difference is the predictor set — this panel carries only `cigsale` and
-`retprice`, not the income, youth-share and beer-consumption predictors of the
-original specification.
+objects: the ≈ −26 often quoted from Abadie–Diamond–Hainmueller is the gap in the
+single year 2000, not an average effect. This panel's own 2000 gap is −26.7, so
+the two agree; −18 is the 1988–2000 average.
 
 *Transition to 2 (Escalation):* the number came from somewhere — thirty-nine
 somewheres.
@@ -276,7 +275,7 @@ short chain and pinned weights are two different failures.
 
 **REFERENCE ONLY** (this appendix, not on the image): the bias identity
 decomposition and Nevada's 97% share · the BSCM intercept of 16.86 · the
-canonical ≈ −27 ADH figure · the Monte Carlo confirmation on planted truth · the
+the ADH ≈ −26 figure is a 2000 gap, not an average · the Monte Carlo confirmation on planted truth · the
 estimator-choice decision tree · pre-treatment RMSE by stage.
 
 ## E — Notes for whoever renders this

@@ -12,7 +12,7 @@ study:
     (2010), a Bayesian horseshoe prior on unconstrained weights, and the Bayesian spatial (SAR)
     model of Sakaguchi &amp; Tagawa (2026). The outcome panel is the same <strong>real</strong>
     tobacco data used throughout the synthetic-control literature: per-capita cigarette sales
-    (<code>cigsale</code>) and real retail price (<code>retprice</code>) for 39 US states over
+    (<code>cigsale</code>) and the retail price of a pack in nominal cents (<code>retprice</code>) for 39 US states over
     1970&ndash;2000, as distributed in the <code>scspill</code> package. California is the one
     treated unit; the other 38 states form the donor pool.
   panel_structure: >
@@ -76,10 +76,10 @@ formulas_html: |
   deterministic function of the TIGER/Line boundaries.</p>
 
 caveats:
-  - "<strong>Narrow predictor set.</strong> The shipped panel carries only <code>cigsale</code> and <code>retprice</code> — not the log income, youth-share or beer-sales predictors Abadie et al. (2010) matched on. This is the main reason the classical ATT here (≈ −18.4) is smaller in magnitude than the ≈ −27 usually quoted from the original paper."
+  - "<strong>Narrow predictor set.</strong> The shipped panel carries only <code>cigsale</code> and <code>retprice</code> — not the log income, youth-share or beer-sales predictors Abadie et al. (2010) matched on. Note that the ≈ −26 often quoted from the original paper is the gap in the single year 2000, whereas the classical ATT here (≈ −18.4) averages the gap over 1988–2000; the classical fit in the post reaches a gap of −26.7 by 2000, so the two agree."
   - "<strong>Treatment timing is 1988, not 1989.</strong> Proposition 99 passed in November 1988 and the tax took effect on 1 January 1989. Abadie et al. and mlsynth's own example treat 1989 as the first treated year; the scspill replication convention used here codes 1988. Neither is wrong, but they cannot be mixed — comparisons against other sources should check which convention that source used."
   - "<strong>Contiguity is a modelling choice, not a measurement.</strong> The edge list is rook contiguity from a 2024 shapefile applied to a 1970–2000 panel. Borders did not move, but 'neighbour' could reasonably have meant trade intensity, commuting flows or inverse distance instead — and the estimated spillover intensity would differ. The post's section 17 discusses when each is appropriate."
-  - "<strong>Eleven states are absent.</strong> Alaska, Arizona, Florida, Hawaii, Maryland, Massachusetts, Michigan, New Jersey, New York, Oregon and Washington are excluded from the donor pool for having run their own large tobacco-control programmes. Two of them — Oregon and Arizona — border California. Their exclusion is why Nevada is California's <em>only</em> contiguous donor, and therefore why the spatial parameter is identified off a single channel."
+  - "<strong>Eleven states are absent.</strong> Alaska, Arizona, Florida, Hawaii, Maryland, Massachusetts, Michigan, New Jersey, New York, Oregon and Washington are excluded from the donor pool: Arizona, Florida, Massachusetts and Oregon because they ran their own large tobacco-control programmes, and the other seven because they raised their cigarette taxes by 50 cents or more during the sample period (the District of Columbia is also excluded). Two of them — Oregon and Arizona — border California. Their exclusion is why Nevada is California's <em>only</em> contiguous donor, and therefore why the spatial parameter is identified off a single channel."
   - "<strong>The weights are unnormalised here.</strong> Both files store raw 0/1 contiguity. Row-normalisation happens inside the estimator, not in the data."
 
 citation:
@@ -169,8 +169,8 @@ columns:
     coverage: "1,209 observations, no missing"
     kind: cont
   retprice:
-    label: "Real retail cigarette price"
-    definition: "Average retail price per pack. The single covariate entering the SAR layer."
+    label: "Retail cigarette price (nominal)"
+    definition: "Average retail price per pack, in current (nominal) cents. The single covariate entering the SAR layer."
     construction: "Observed state-level retail price, from the Abadie et al. (2010) tobacco data."
     units: "cents per pack"
     source: "Abadie et al. (2010) via scspill"

@@ -9,7 +9,7 @@
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-08-04">
+  <meta name="dcterms.date" content="2026-11-20">
   <title>Who Else Was Treated?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">August 4, 2026</p>
+  <p class="date">November 20, 2026</p>
 </section>
 <section>
 <section id="two-assumptions" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -321,7 +321,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>pip install <span class="st">"scspill[numba]==0.2.1"</span></span>
 <span id="cb1-2"><a href=""></a>pip install <span class="st">"mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15f168bb"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment">
-<p><strong><code>mlsynth</code></strong> — 46 synthetic-control estimators behind one config dictionary.</p>
+<p><strong><code>mlsynth</code></strong> — 69 synthetic-control estimator classes behind one config dictionary.</p>
 <p><strong><code>scspill</code></strong> — the Bayesian spatial spillover model of Sakaguchi &amp; Tagawa (2026), which returns <em>two</em> estimands.</p>
 <p><span class="takeaway fragment">Both are young. Both are pinned — one to a release, one to a commit.</span></p>
 </div>
@@ -418,14 +418,14 @@
 </tr>
 </tbody>
 </table>
-<p>Utah 0.343 · Montana 0.254 · <strong>Nevada 0.242</strong> · Connecticut 0.146 — and exactly <strong>zero</strong> for the other 33.</p>
+<p>Utah 0.343 · Montana 0.254 · <strong>Nevada 0.242</strong> · Connecticut 0.146 · New Hampshire 0.014 — and exactly <strong>zero</strong> for the other 33.</p>
 <p><span class="takeaway fragment">Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.</span></p>
 </div>
 </section>
 <section id="california-and-its-synthetic-are-indistinguishable-until-1988" class="slide level2 center">
 <h2>California and its synthetic are indistinguishable until 1988</h2>
 <aside class="notes">
-<p>The two series track closely until 1988 and separate steadily after it, reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise that any single year fits well. Worth saying out loud: this reproduces the R edition’s minus 18.46 to within 0.04 packs, from a different package and a different optimiser, which is the strongest evidence either implementation gets that it is correctly coded.</p>
+<p>The two series track closely until 1988 and separate steadily after it, reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise that any single year fits well. Worth saying out loud: this reproduces the R edition’s minus 18.46 to within 0.03 packs, from a different package and a different optimiser, which is the strongest evidence either implementation gets that it is correctly coded.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -438,7 +438,7 @@
           display:block!important;
       }</style></aside>
 
-<img data-src="../python_sc_bayes_spatial_03_stage1_fit_gap.png" class="quarto-figure quarto-figure-center r-stretch" alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to −26.7 packs by 2000."><p><span class="takeaway fragment">Zero gap before 1988; −26.7 packs by 2000.</span></p>
+<img data-src="../python_sc_bayes_spatial_03_stage1_fit_gap.png" class="quarto-figure quarto-figure-center r-stretch" alt="Top: California against its classical synthetic control. Bottom: the gap between them, within about ±5 packs before 1988 and widening to −26.7 packs by 2000."><p><span class="takeaway fragment">A pre-1988 gap within about ±5 packs; −26.7 packs by 2000.</span></p>
 </section>
 <section id="the-horseshoe-makes-zero-the-default-without-making-it-compulsory" class="slide level2 center">
 <h2>The horseshoe makes zero the default without making it compulsory</h2>
@@ -463,7 +463,7 @@
 </div>
 <div class="fragment">
 <p>Sampling is closed-form via the Makalic–Schmidt inverse-gamma representation — an <strong>exact</strong> reparameterisation, not an approximation.</p>
-<p><span class="takeaway fragment">That is why both libraries run hundreds of thousands of iterations in seconds rather than hours.</span></p>
+<p><span class="takeaway fragment">That is why the weight sampler needs no tuning and runs tens of thousands of iterations in seconds.</span></p>
 </div>
 </section>
 <section id="relax-the-simplex-and-the-active-donor-pool-multiplies-by-five" class="slide level2 center">
@@ -598,7 +598,7 @@
 <p>The effects depend on <span class="math inline">\((\alpha, \rho, \mathbf{w}, W)\)</span> and the observed data. <strong>Nothing else.</strong></p>
 </div>
 <div class="fragment">
-<p>So the model’s weak identification has exactly one address: <span class="math inline">\(\rho\)</span>.</p>
+<p>So the model’s sampling difficulty has exactly one address: <span class="math inline">\(\rho\)</span>.</p>
 <p><span class="takeaway fragment">Weak identification you can locate is a manageable problem. Weak identification spread across a nuisance block is not.</span></p>
 </div>
 </section>
@@ -735,10 +735,10 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="which-means-the-classical-estimate-was-biased-toward-zero" class="slide level2 smaller center">
-<h2>Which means the classical estimate was biased <em>toward zero</em></h2>
+<section id="which-means-a-sutva-imposing-estimate-is-biased-toward-zero" class="slide level2 smaller center">
+<h2>Which means a SUTVA-imposing estimate is biased <em>toward zero</em></h2>
 <aside class="notes">
-<p>This inverts the intuition most audiences arrive with. The prior expectation is cross-border shopping raising Nevada’s sales, which would inflate the estimate. The estimate says Nevada’s sales fell. Negative spillover on a positively-weighted donor drags synthetic California down, so the classical comparison gives the policy less credit than it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights, where Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more contaminated of the two.</p>
+<p>This inverts the intuition most audiences arrive with. The prior expectation is cross-border shopping raising Nevada’s sales, which would inflate the estimate. The estimate says Nevada’s sales fell. Negative spillover on a positively-weighted donor drags synthetic California down, so the classical comparison gives the policy less credit than it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights, where Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more contaminated of the two. Note that this compares each estimate with its own purged version: across stages the simplex estimate (−18.43) is further from zero than the purged spatial one (−16.87), because the two use different weights.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -792,8 +792,8 @@
 <p><span class="takeaway fragment">Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect <strong>larger</strong>.</span></p>
 </div>
 </section>
-<section id="the-r-editions-interval-is-33-times-too-narrow-and-the-r-specification-reproduces-that-exactly" class="slide level2 smaller center">
-<h2>The R edition’s interval is 33 times too narrow — and the R specification reproduces that exactly</h2>
+<section id="the-r-editions-interval-is-33-times-narrower-and-the-r-specification-reproduces-that-closely" class="slide level2 smaller center">
+<h2>The R edition’s interval is 33 times narrower — and the R specification reproduces that closely</h2>
 <aside class="notes">
 <p>The point estimates are close. The intervals are not remotely close, and “different language” does not explain a factor of 33. scspill documents six departures from the R replication code; three have escape hatches, so the Python can be put back into the R specification and run at the R edition’s own budget of 5,000 iterations. It reproduces rho to within 0.006 and the Nevada spillover to 0.03 packs — minus 3.750 against minus 3.778 — including an effective sample size of 3. That is not a coincidence to be explained away; it is the R sampler’s behaviour, faithfully reproduced. Which means the difference is a specification difference, not a porting error.</p>
 <style type="text/css">
@@ -1005,7 +1005,7 @@
 <p><span class="bignum">−16.87</span></p>
 <p><span class="bignum-label">packs per capita per year for California — and −5.50 for a state that never voted on it</span></p>
 <aside class="notes">
-<p>Two numbers, one policy. Minus 16.87 packs per capita per year for California once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for how the policy gets described: reporting only California’s number understates Proposition 99’s total public-health footprint, because a neighbouring state also smoked less.</p>
+<p>Two numbers, one policy. Minus 16.87 packs per capita per year for California once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for how the policy gets described: reporting only California’s number understates Proposition 99’s total footprint on recorded cigarette sales, because sales in a neighbouring state also fell — if the model’s spillover is real.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

@@ -158,7 +158,7 @@
       "kind": "content",
       "title": "California and its synthetic are indistinguishable until 1988",
       "imagePage": 12,
-      "notes": "The two series track closely until 1988 and separate steadily after it, reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise that any single year fits well. Worth saying out loud: this reproduces the R edition's minus 18.46 to within 0.04 packs, from a different package and a different optimiser, which is the strongest evidence either implementation gets that it is correctly coded."
+      "notes": "The two series track closely until 1988 and separate steadily after it, reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise that any single year fits well. Worth saying out loud: this reproduces the R edition's minus 18.46 to within 0.03 packs, from a different package and a different optimiser, which is the strongest evidence either implementation gets that it is correctly coded."
     },
     {
       "n": 15,
@@ -326,7 +326,7 @@
       "question": "Nevada's sales came in BELOW its no-treatment path, and Nevada carries positive weight in synthetic California. What does that do to the classical ATT?",
       "options": [
         {
-          "text": "Biases it toward zero — the classical estimate understates the effect",
+          "text": "Biases it toward zero — for its own weights, the estimate understates the effect",
           "correct": true
         },
         {
@@ -350,32 +350,32 @@
     {
       "n": 30,
       "kind": "content",
-      "title": "Which means the classical estimate was biased toward zero",
+      "title": "Which means a SUTVA-imposing estimate is biased toward zero",
       "imagePage": 24,
       "notes": "This inverts the intuition most audiences arrive with. The prior expectation is cross-border shopping raising Nevada's sales, which would inflate the estimate. The estimate says Nevada's sales fell. Negative spillover on a positively-weighted donor drags synthetic California down, so the classical comparison gives the policy less credit than it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights, where Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more contaminated of the two."
     },
     {
       "n": 31,
       "kind": "content",
-      "title": "The R edition's interval is 33 times too narrow — and the R specification reproduces that exactly",
+      "title": "The R edition's interval is 33 times narrower — and the R specification reproduces that closely",
       "imagePage": 25,
       "notes": "The point estimates are close. The intervals are not remotely close, and \"different language\" does not explain a factor of 33. scspill documents six departures from the R replication code; three have escape hatches, so the Python can be put back into the R specification and run at the R edition's own budget of 5,000 iterations. It reproduces rho to within 0.006 and the Nevada spillover to 0.03 packs — minus 3.750 against minus 3.778 — including an effective sample size of 3. That is not a coincidence to be explained away; it is the R sampler's behaviour, faithfully reproduced. Which means the difference is a specification difference, not a porting error."
     },
     {
       "n": 32,
       "kind": "quiz",
-      "question": "The R edition's credible interval was 33 times too narrow. Running that same specification 100 times longer — 5,000 draws to 500,000 — closed how much of the gap?",
+      "question": "The R edition's credible interval was 33 times narrower than the corrected one. Running that same specification 100 times longer — 5,000 draws to 500,000 — closed how much of the gap?",
       "options": [
         {
           "text": "Almost all of it — it was a chain-length problem",
           "correct": false
         },
         {
-          "text": "About 45% of the width — most of the gap was propagate_alpha",
+          "text": "Almost none — the width grew 45% but closed only about 2% of the gap",
           "correct": true
         },
         {
-          "text": "None — the width did not move at all",
+          "text": "About half of it — chain length and propagate_alpha share the blame",
           "correct": false
         },
         {
@@ -386,7 +386,7 @@
       "points": 1000,
       "timeLimitSeconds": 30,
       "interactive": true,
-      "notes": "The three widths: 0.482 at 5,000 draws, 0.702 at 500,000, and 12.713 once alpha is propagated. A hundred times the iterations widens the interval by 45%; propagating alpha widens it by 1,700%. The next slide names the two separable failures — effective sample size asks whether the interval is RELIABLE, propagate_alpha asks whether it is COMPLETE, and the published interval failed both. If the room picks A, that is the useful mistake: chain length is the fix everyone reaches for first."
+      "notes": "The three widths: 0.482 at 5,000 draws, 0.702 at 500,000, and 12.713 once alpha is propagated. A hundred times the iterations widens the interval by 45%, which closes only (0.702 − 0.482) / (12.713 − 0.482) ≈ 2% of the gap; propagating alpha widens it by 1,700%. The next slide names the two separable failures — effective sample size asks whether the interval is RELIABLE, propagate_alpha asks whether it is COMPLETE, and the published interval failed both. If the room picks A, that is the useful mistake: chain length is the fix everyone reaches for first."
     },
     {
       "n": 33,
@@ -443,7 +443,7 @@
       "title": "What Proposition 99 cost, and who else paid",
       "background": "#141413",
       "imagePage": 33,
-      "notes": "Two numbers, one policy. Minus 16.87 packs per capita per year for California once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for how the policy gets described: reporting only California's number understates Proposition 99's total public-health footprint, because a neighbouring state also smoked less."
+      "notes": "Two numbers, one policy. Minus 16.87 packs per capita per year for California once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for how the policy gets described: reporting only California's number understates Proposition 99's total footprint on recorded cigarette sales, because sales in a neighbouring state also fell — if the model's spillover is real."
     },
     {
       "n": 41,

@@ -32,7 +32,7 @@ quarto render tutorial.qmd  # render the tutorial
 | `setup_env.py` | hermetic `.venv` bootstrap, pinned package install, kernel registration |
 | `_quarto.yml` | wires `setup_env.py` into Quarto's `pre-render` hook |
 | `render.command` / `render.bat` | one-click wrappers for macOS and Windows |
-| `analysis.py` | the full pipeline behind the post: 20 figures, 23 tables |
+| `analysis.py` | the full pipeline behind the post: 19 figures, 23 tables |
 | `cheatsheet_python.py` | the whole argument in ~250 runnable lines, under a minute |
 | `source_data.csv` | the 1,209-row state-year panel |
 | `spatial_W.csv` | the 38 × 38 donor contiguity matrix |
@@ -63,11 +63,11 @@ of the estimator-comparison table fail with `ModuleNotFoundError`.
 
 ## MCMC budget
 
-`tutorial.qmd` runs at `m_iter=4000, burn=2000` so a first render finishes in
-about a minute. **The post's headline numbers use 500,000 iterations.**
+`tutorial.qmd` runs its Stage 3 fits at `m_iter=4000, burn=2000`; with BSCM, the
+diagnostics and the estimator survey, a first render takes several minutes. **The post's headline numbers use 500,000 iterations.**
 
 That is not padding. The ATT is stable from roughly 100,000 draws onward, but
-the spatial parameter ρ is the weakly identified quantity in this model, and its
+the spatial parameter ρ is the slowest-mixing quantity in this model, and its
 effective sample size does not clear the conventional floor of 100 until about
 half a million. The tutorial budget reproduces the *shape* of every result —
 signs, ranks, orders of magnitude — and not the third decimal. Section 14 of the

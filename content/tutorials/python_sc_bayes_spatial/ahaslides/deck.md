@@ -242,7 +242,7 @@ the two look identical. That is the question Stage 2 exists to ask.
 
 ## 13 — ★ INTERACTIVE 2 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
 **Question:** Stage 1 gives exactly zero weight to 33 of the 38 donors. From that output
 alone, can you tell whether those zeros come from the data or from the simplex
@@ -274,7 +274,7 @@ Distractor C is worth naming aloud: RMSE measures fit, not the provenance of the
 reaching minus 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it
 wanders between minus 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that
 wandering, not a promise that any single year fits well. Worth saying out loud: this
-reproduces the R edition's minus 18.46 to within 0.04 packs, from a different package
+reproduces the R edition's minus 18.46 to within 0.03 packs, from a different package
 and a different optimiser, which is the strongest evidence either implementation gets
 that it is correctly coded.
 
@@ -313,7 +313,7 @@ is a defect.
 
 ## 17 — ★ INTERACTIVE 3 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
 **Question:** Two horseshoe synthetic controls — same panel, same prior family, both
 correctly coded — report ATTs three packs apart. What do you check first?
@@ -370,7 +370,7 @@ turns on.
 
 ## 20 — ★ INTERACTIVE 4 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
 **Question:** The bias in a classical synthetic control is the weighted sum of donor
 spillovers — donor weight times donor contamination. Which donor damages the estimate
@@ -454,7 +454,7 @@ the next slide is about exactly how much that interval is worth.
 
 ## 25 — ★ INTERACTIVE 5 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
 **Question:** The spatial parameter comes in at 0.316 with a 95% credible interval of
 [0.231, 0.403], from 250,000 draws. What would most undermine that interval?
@@ -531,14 +531,14 @@ it.
 
 ## 29 — ★ INTERACTIVE 6 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
 **Question:** Nevada's sales came in BELOW its no-treatment path, and Nevada carries
 positive weight in synthetic California. What does that do to the classical ATT?
 
 **Options:**
 
-- A. Biases it toward zero — the classical estimate understates the effect  ← CORRECT
+- A. Biases it toward zero — for its own weights, the estimate understates the effect  ← CORRECT
 - B. Biases it away from zero — the classical estimate overstates the effect
 - C. Nothing — spillovers cancel across the donor pool
 - D. It depends on whether the Nevada spillover is statistically significant
@@ -557,7 +557,7 @@ evidence is on rho, not on Nevada.
 
 ## 30 — Content
 
-**Title:** Which means the classical estimate was biased *toward zero*
+**Title:** Which means a SUTVA-imposing estimate is biased *toward zero*
 
 **Image page:** 24 of 36
 
@@ -573,8 +573,8 @@ is the more contaminated of the two.
 
 ## 31 — Content
 
-**Title:** The R edition's interval is 33 times too narrow — and the R specification
-reproduces that exactly
+**Title:** The R edition's interval is 33 times narrower — and the R specification
+reproduces that closely
 
 **Image page:** 25 of 36
 
@@ -591,22 +591,23 @@ means the difference is a specification difference, not a porting error.
 
 ## 32 — ★ INTERACTIVE 7 — Quiz (scored)
 
-**Type:** multiple choice quiz · scored · presentation default points, no time limit
+**Type:** multiple choice quiz · scored · presentation default points, 30-second time limit
 
-**Question:** The R edition's credible interval was 33 times too narrow. Running that
+**Question:** The R edition's credible interval was 33 times narrower than the corrected one. Running that
 same specification 100 times longer — 5,000 draws to 500,000 — closed how much of the
 gap?
 
 **Options:**
 
 - A. Almost all of it — it was a chain-length problem
-- B. About 45% of the width — most of the gap was propagate_alpha  ← CORRECT
-- C. None — the width did not move at all
+- B. Almost none — the width grew 45% but closed only about 2% of the gap  ← CORRECT
+- C. About half of it — chain length and propagate_alpha share the blame
 - D. It overshot — the interval became too wide
 
 **Notes:** The three widths: 0.482 at 5,000 draws, 0.702 at 500,000, and 12.713 once
-alpha is propagated. A hundred times the iterations widens the interval by 45%;
-propagating alpha widens it by 1,700%. The next slide names the two separable failures —
+alpha is propagated. A hundred times the iterations widens the interval by 45%, which
+closes only (0.702 − 0.482) / (12.713 − 0.482) ≈ 2% of the gap; propagating alpha widens
+it by 1,700%. The next slide names the two separable failures —
 effective sample size asks whether the interval is RELIABLE, propagate_alpha asks
 whether it is COMPLETE, and the published interval failed both. If the room picks A,
 that is the useful mistake: chain length is the fix everyone reaches for first.
@@ -737,8 +738,8 @@ than this ladder shows, though still without changing the sign.
 **Notes:** Two numbers, one policy. Minus 16.87 packs per capita per year for California
 once the leak is modelled, and minus 5.50 for Nevada, which never voted on it. The
 consequence for how the policy gets described: reporting only California's number
-understates Proposition 99's total public-health footprint, because a neighbouring state
-also smoked less.
+understates Proposition 99's total footprint on recorded cigarette sales, because sales in
+a neighbouring state also fell — if the model's spillover is real.
 
 ---
 

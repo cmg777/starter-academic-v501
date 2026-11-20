@@ -9,7 +9,7 @@ note state: US state identifier. The treated unit is California; the other 38 st
 note state_id: Integer index for the state (1-39).. Construction: Sequential package index aligned to the alphabetical state list.. Units: integer (1-39). Source: scspill package
 note year: Annual time index of the panel.. Construction: Observed year, 1970-2000 (balanced; 31 years per state).. Units: year. Source: scspill package (Abadie et al. 2010)
 note cigsale: Annual per-capita cigarette pack sales. This is the synthetic-control outcome.. Construction: Observed tax-paid cigarette sales per capita, from the Abadie et al. (2010) tobacco data.. Units: packs per capita per year. Source: Abadie et al. (2010) via scspill
-note retprice: Average retail price per pack. The single covariate entering the SAR layer.. Construction: Observed state-level retail price, from the Abadie et al. (2010) tobacco data.. Units: cents per pack. Source: Abadie et al. (2010) via scspill
+note retprice: Average retail price per pack, in current (nominal) cents. The single covariate entering the SAR layer.. Construction: Observed state-level retail price, from the Abadie et al. (2010) tobacco data.. Units: cents per pack. Source: Abadie et al. (2010) via scspill
 note treated: 1 for California from 1988 onward; 0 otherwise. Note this is 1988, not 1989 - see the caveats.. Construction: Constructed as 1 if state == 'California' and year >= 1988 else 0 (the replication package's convention).. Units: 0/1. Source: Constructed
 save "python_sc_bayes_spatial_source_data.dta", replace
 

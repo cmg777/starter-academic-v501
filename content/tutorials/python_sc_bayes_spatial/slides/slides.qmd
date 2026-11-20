@@ -120,7 +120,7 @@ pip install "mlsynth[bayes] @ git+https://github.com/jgreathouse9/mlsynth.git@15
 
 . . .
 
-**`mlsynth`** — 46 synthetic-control estimators behind one config dictionary.
+**`mlsynth`** — 69 synthetic-control estimator classes behind one config dictionary.
 
 **`scspill`** — the Bayesian spatial spillover model of Sakaguchi & Tagawa (2026), which returns *two* estimands.
 
@@ -191,7 +191,7 @@ sc = mlsynth.VanillaSC(dict(common)).fit()
 | active donors | 5 of 38 |
 | top-4 share of weight | 98.6% |
 
-Utah 0.343 · Montana 0.254 · **Nevada 0.242** · Connecticut 0.146 — and exactly **zero** for the other 33.
+Utah 0.343 · Montana 0.254 · **Nevada 0.242** · Connecticut 0.146 · New Hampshire 0.014 — and exactly **zero** for the other 33.
 
 [Is that sparsity in the data, or sparsity in the constraint? From the outside they look identical.]{.takeaway .fragment}
 
@@ -202,13 +202,13 @@ The two series track closely until 1988 and separate steadily after it, reaching
 26.7 packs by 2000. The pre-treatment gap is not exactly zero — it wanders between minus
 3.5 and plus 5 packs, so an RMSE of 1.60 is an average over that wandering, not a promise
 that any single year fits well. Worth saying out loud: this reproduces the R edition's
-minus 18.46 to within 0.04 packs, from a different package and a different optimiser,
+minus 18.46 to within 0.03 packs, from a different package and a different optimiser,
 which is the strongest evidence either implementation gets that it is correctly coded.
 :::
 
-![](../python_sc_bayes_spatial_03_stage1_fit_gap.png){fig-alt="Top: California against its classical synthetic control. Bottom: the gap between them, near zero before 1988 and widening to −26.7 packs by 2000." fig-align="center"}
+![](../python_sc_bayes_spatial_03_stage1_fit_gap.png){fig-alt="Top: California against its classical synthetic control. Bottom: the gap between them, within about ±5 packs before 1988 and widening to −26.7 packs by 2000." fig-align="center"}
 
-[Zero gap before 1988; −26.7 packs by 2000.]{.takeaway .fragment}
+[A pre-1988 gap within about ±5 packs; −26.7 packs by 2000.]{.takeaway .fragment}
 
 ## The horseshoe makes zero the default without making it compulsory
 
@@ -234,7 +234,7 @@ Infinite spike at zero. Cauchy tails. Most $\lambda_j$ come out tiny; any single
 
 Sampling is closed-form via the Makalic–Schmidt inverse-gamma representation — an **exact** reparameterisation, not an approximation.
 
-[That is why both libraries run hundreds of thousands of iterations in seconds rather than hours.]{.takeaway .fragment}
+[That is why the weight sampler needs no tuning and runs tens of thousands of iterations in seconds.]{.takeaway .fragment}
 
 ## Relax the simplex and the active donor pool multiplies by five
 
@@ -333,7 +333,7 @@ The effects depend on $(\alpha, \rho, \mathbf{w}, W)$ and the observed data. **N
 
 . . .
 
-So the model's weak identification has exactly one address: $\rho$.
+So the model's sampling difficulty has exactly one address: $\rho$.
 
 [Weak identification you can locate is a manageable problem. Weak identification spread across a nuisance block is not.]{.takeaway .fragment}
 
@@ -445,7 +445,7 @@ the net effect on Nevada ran the same way as the effect on California, not again
 Remember too that this number is a posterior mean with no interval around it.
 :::
 
-## Which means the classical estimate was biased *toward zero* {.smaller}
+## Which means a SUTVA-imposing estimate is biased *toward zero* {.smaller}
 
 ::: {.notes}
 This inverts the intuition most audiences arrive with. The prior expectation is
@@ -454,7 +454,9 @@ estimate says Nevada's sales fell. Negative spillover on a positively-weighted d
 synthetic California down, so the classical comparison gives the policy less credit than
 it deserves. On the horseshoe weights that is 1.19 packs; on the simplex weights, where
 Nevada carries 0.242 instead of 0.200, it is 1.51. The classical estimate is the more
-contaminated of the two.
+contaminated of the two. Note that this compares each estimate with its own purged
+version: across stages the simplex estimate (−18.43) is further from zero than the purged
+spatial one (−16.87), because the two use different weights.
 :::
 
 | Donor | $\alpha_j$ | $\xi^{c}_j$ | $\alpha_j \xi^{c}_j$ |
@@ -472,7 +474,7 @@ The residual is bookkeeping: the plug-in uses $\widehat{\alpha}$; the purged ATT
 
 [Negative spillovers on positively-weighted donors push the estimate toward zero. Modelling the leak makes the effect **larger**.]{.takeaway .fragment}
 
-## The R edition's interval is 33 times too narrow — and the R specification reproduces that exactly {.smaller}
+## The R edition's interval is 33 times narrower — and the R specification reproduces that closely {.smaller}
 
 ::: {.notes}
 The point estimates are close. The intervals are not remotely close, and "different
@@ -648,7 +650,8 @@ shows, though still without changing the sign.
 Two numbers, one policy. Minus 16.87 packs per capita per year for California once the
 leak is modelled, and minus 5.50 for Nevada, which never voted on it. The consequence for
 how the policy gets described: reporting only California's number understates Proposition
-99's total public-health footprint, because a neighbouring state also smoked less.
+99's total footprint on recorded cigarette sales, because sales in a neighbouring state also
+fell — if the model's spillover is real.
 :::
 
 ## Four things survive this deck

@@ -205,7 +205,7 @@
       Propagating the donor-weight uncertainty instead of pinning &alpha; at its posterior mean widens
       it by 1,700%. <strong>Effective sample size asks whether an interval is reliable; what you
       condition on asks whether it is complete.</strong> The published interval failed both, which is
-      why it came out 33 times too narrow.
+      why it came out 33 times narrower than the corrected one.
     </p>
   </div>
 
@@ -229,7 +229,7 @@
     <dl>
       <dt>Potential outcomes under interference</dt><dd>Each unit has an outcome it would show under every possible assignment of treatment across <em>all</em> units — not just its own. Classical synthetic control assumes a donor's outcome depends only on its own (untreated) status; interference is what happens when that fails.</dd>
       <dt>ATT</dt><dd>Average treatment effect on the treated: California's observed sales minus its reconstructed no-treatment sales, averaged over 1988–2000.</dd>
-      <dt>Donor pool</dt><dd>The 38 states with no large tobacco-control programme of their own, from which the counterfactual is built.</dd>
+      <dt>Donor pool</dt><dd>The 38 states with neither a large tobacco-control programme nor a cigarette-tax rise of 50 cents or more, from which the counterfactual is built.</dd>
       <dt>Simplex</dt><dd>The constraint that weights be non-negative and sum to one. Guarantees interpolation; forces sparsity.</dd>
       <dt>Horseshoe prior</dt><dd>A shrinkage prior with an infinite spike at zero and Cauchy tails. Makes zero the default without making it compulsory.</dd>
       <dt>SUTVA</dt><dd>The assumption that one unit's treatment does not affect another unit's outcome. What Stage 3 drops.</dd>

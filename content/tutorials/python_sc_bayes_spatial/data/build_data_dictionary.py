@@ -843,8 +843,8 @@ def build_html(order, frames, cms_all, fms, chosen):
     if ov_or_sources := (panel_note or sources or (META.get("study") or {}).get("overview")):
         ov = (META.get("study") or {}).get("overview") or ""
         src_tbl = html_table(["Source", "Provides", "Reference / URL"],
-                             [[h(s.get("name", "")), h(s.get("provides", "")), linkify(s.get("reference", ""))]
-                              for s in sources], raw_cols={2}) if sources else ""
+                             [[s.get("name", ""), s.get("provides", ""), linkify(s.get("reference", ""))]
+                              for s in sources], raw_cols={2}) if sources else ""   # html_table escapes cols 0-1
         ov_html = '<section id="overview"><h2>Overview &amp; sources</h2>'
         if ov:
             ov_html += f'<p class="lead">{ov}</p>'

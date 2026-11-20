@@ -1,7 +1,7 @@
 # Results report — `python_sc_bayes_spatial`
 
 **Script:** `analysis.py`
-**Log:** `execution_log.txt` (446 lines, cold run)
+**Log:** `execution_log.txt` (445 lines, warm run after the 2026-11-20 cold re-run)
 **Run date:** 2026-08-04
 **Environment:** Python 3.13.11 (x86_64, darwin) · scspill 0.2.1 · mlsynth 1.0.0 @ `15f168bb9048` · numpy 2.3.5 · pandas 3.0.1 · scipy 1.17.1 · matplotlib 3.10.8 · numba 0.62.1 · numpyro 0.19.0
 **Backend:** requested `auto`, resolved **numba**. BLAS pinned to 1 thread; `JAX_ENABLE_X64=1`.
@@ -12,12 +12,14 @@
 
 Exit status **0**. All **18 assertions passed**. 19 figures and 23 tables written.
 
-Runtime, cold: roughly 60 minutes, dominated by three fits —
-`SPILLSYNTH(sar)` at the headline budget inside the benchmark sweep (994 s),
-the same estimator as the standalone cross-check (1,094 s), and the R-spec
-headline fit (145 s). The corrected `scspill` headline fit is only 116 s
+Runtime, cold (re-run 2026-11-20): about 68 minutes, dominated by
+`SPILLSYNTH(sar)` at the headline budget inside the benchmark sweep (1,302 s),
+the same estimator as the standalone cross-check (1,162 s), BVSS (228 s), BFSC
+(224 s) and the R-spec headline fit (145 s). The corrected `scspill` headline fit
+is only 139 s
 because it runs on the numba backend; `mlsynth`'s port is pure numpy. Warm
-re-run: under 60 seconds.
+re-run: a few minutes. The cold re-run reproduced every committed result to
+about 1e-9; only run times changed.
 
 **Warnings raised during the run:**
 
@@ -73,7 +75,8 @@ Source: `stage1_weights.csv`, `stage1_gap.csv`. Figures 03, 04.
 
 The estimate lands **0.032 packs** from the R edition's −18.46, which used
 `tidysynth` and a different optimiser. The donor sets agree on four of five
-states and on their ordering by magnitude; the fifth differs (New Hampshire
+states, though not on their ordering (R: Utah > Nevada > Montana; here Utah >
+Montana > Nevada); the fifth differs (New Hampshire
 0.014 here, Idaho 0.005 there), which is within the noise of a constrained
 optimiser at that scale. Pre-treatment RMSE of 1.60 against a pre-period mean
 of 117.7 packs is a relative error of 1.4%.
@@ -195,7 +198,8 @@ Source: `stage3_spillover_effects.csv`, `stage3_spillover_panel.csv`. Figures
 
 Nevada absorbs **11.2 times** the next-largest effect. Idaho and Utah — one
 step further out on the contiguity graph — pick up about half a pack each, and
-the third ring is indistinguishable from zero. The R edition reported Nevada
+the third ring is another order of magnitude smaller (no donor-level
+interval exists, so this is a statement about magnitude). The R edition reported Nevada
 −3.75 and Idaho −0.228 at a much shorter chain and a different specification;
 the ordering and the concentration are the same.
 
@@ -239,9 +243,9 @@ no uncertainty about which states make up synthetic California.
 | 08 | `..._08_stage3_weights.png` | Package-native weights comparison | Horseshoe α against the simplex solution |
 | 09 | `..._09_rho_posterior.png` | Package-native ρ density + trace | A visibly slow-moving chain — ESS 137 of 250,000 |
 | 10 | `..._10_spillover_map.png` | Tile-grid cartogram, linear scale | One dark tile; the concentration is the finding |
-| 11 | `..._11_spillover_bars.png` | Top-8 spillovers with CrIs | Nevada 11× Idaho; the rest is noise |
+| 11 | `..._11_spillover_bars.png` | Top-8 spillovers (posterior means; no intervals) | Nevada 11× Idaho; the rest is an order of magnitude smaller |
 | 12 | `..._12_r_reconciliation.png` | Three ρ chains + ESS bars | Adaptation moves ESS from 3 to 137 |
-| 13 | `..._13_prior_predictive.png` | 9 prior predictive statistics | 8 of 9 comfortable; `pve_pc1` in the tail |
+| 13 | `..._13_prior_predictive.png` | 9 prior predictive statistics | 6 of 9 comfortable; `ac1`, `ac2` and `pve_pc1` in the tails |
 | 14 | `..._14_geweke.png` | Geweke \|z\| at two chain lengths | Scores shrink → mixing artifact, not incoherence |
 | 15 | `..._15_prior_sensitivity.png` | ρ across 6 prior settings | Only the support constraint binds |
 | 16 | `..._16_benchmark.png` | 9 more estimators, comparable vs not | Teal is readable against the ladder; grey is not |
@@ -253,13 +257,13 @@ no uncertainty about which states make up synthetic California.
 
 1. **The ATT is robust to every relaxation.** Across two libraries, four prior structures and one spatial layer, the estimate spans **−18.85 to −15.68 packs** per capita per year, a range of 3.17. Every credible interval excludes zero.
 
-2. **Two independent implementations agree to 0.278 packs.** The maximum absolute disagreement between this post and the R edition across the four comparable stages is 0.278, or about 1.6%. Stage 1 agrees to 0.032.
+2. **Two independent implementations agree to 0.278 packs.** The maximum absolute disagreement between this post and the R edition across the four comparable stages is 0.278, or about 1.7%. Stage 1 agrees to 0.032.
 
 3. **The composition of the donor pool is not robust at all.** Five active donors under the simplex, 25–26 under every prior. Statements of the form "synthetic California is mostly Utah, Nevada, Montana and Connecticut" are artefacts of the constraint, not findings.
 
-4. **SUTVA is rejected.** ρ̂ = 0.316 with a 95% credible interval of [0.231, 0.403], excluding zero. The restriction that collapses Stage 3 to Stage 2 is rejected by the model that nests it.
+4. **SUTVA is rejected.** ρ̂ = 0.316 with a 95% credible interval of [0.231, 0.403], excluding zero. The restriction that collapses Stage 3 to Stage 2 is rejected by the model that nests it. Because one ρ also governs donor-to-donor dependence, this is first of all evidence of spatial dependence: with the exposure moved to Utah (exercise 2 of the post) ρ̂ is still 0.29 [0.21, 0.37].
 
-5. **The spillover is concentrated in one state.** Nevada absorbs −5.50 packs per capita per year, 11.2 times Idaho's −0.49. Beyond the second contiguity ring nothing is distinguishable from zero.
+5. **The spillover is concentrated in one state.** Nevada absorbs −5.50 packs per capita per year, 11.2 times Idaho's −0.49. Beyond the second contiguity ring every spillover is at least an order of magnitude smaller; no donor-level interval exists.
 
 6. **The leak runs toward the treatment, not against it.** The prior hypothesis was cross-border shopping raising Nevada's sales; the estimate says they fell. The classical estimate is therefore biased *toward zero* — it **understates** the effect by 1.19 packs.
 
@@ -269,9 +273,9 @@ no uncertainty about which states make up synthetic California.
 
 9. **The estimand converges a hundred times faster than the nuisance parameter.** Across the budget ladder the ATT moves by 0.337 packs while ESS(ρ) moves from 2.8 to 136.8. The conventional floor of 100 is not reached until 500,000 draws.
 
-10. **The Monte Carlo confirms the mechanism on planted truth.** SCM and BSCM are unbiased at ρ = 0 and nowhere else, with bias growing monotonically in |ρ| (reaching +0.29 for BSCM at ρ = 0.6). SCSPILL stays within 0.003 of zero throughout, with coverage of 0.90–0.98 against BSCM's ~0.00.
+10. **The Monte Carlo confirms the mechanism on planted truth.** BSCM is unbiased at ρ = 0 and biased elsewhere, with bias growing in |ρ| (reaching +0.29 at ρ = 0.6); SCM follows the same pattern at ρ = ±0.6, though its smaller cells are within Monte Carlo error. SCSPILL stays within 0.004 of zero throughout, with coverage of 0.90–1.00 against BSCM coverage near zero at every ρ ≠ 0 (1.0 at ρ = 0).
 
-11. **The numba and numpy backends give identical results.** Verified at a small budget: both return `att = -17.3352`, with numba 5.6× faster. The backend is recorded in the cache key so a switch cannot silently serve stale numbers.
+11. **The numba and numpy backends give identical results.** Verified at a small budget in an earlier run (not part of the committed outputs): both return `att = -17.3352`, with numba 5.6× faster. The backend is recorded in the cache key so a switch cannot silently serve stale numbers.
 
 ## Surprises and caveats
 
@@ -283,8 +287,9 @@ see that.
 
 **Data limitations.** The panel carries only `cigsale` and `retprice`, not the
 income, youth-share and beer-consumption predictors of the original ADH
-specification. This is the main reason the classical ATT here (−18.4) is
-smaller in magnitude than the ≈ −27 usually quoted. Treatment is coded at 1988
+specification. The ≈ −26 often quoted from ADH is the gap in the single
+year 2000, not an average; the classical fit here reaches −26.7 in 2000, so the
+two agree, and −18.4 is the 1988–2000 average. Treatment is coded at 1988
 rather than 1989, following the replication package.
 
 **Assumption violations.** SUTVA is rejected, which is the point. The
@@ -296,18 +301,19 @@ choice: a trade-based or distance-based W would give different spillovers.
 **Numerical issues.** ESS(ρ) = 136.8 at half a million draws is reportable but
 not comfortable; R̂ (split) for ρ is 1.0154, above the ideal but inside the
 conventional band. `beta[retprice]` has ESS 388 and R̂ 1.0060 — the second-worst
-mixing in the model. A run at one million iterations reaches ESS ≈ 164, so
-returns flatten sharply.
+mixing in the model. A run at 1.5 million iterations (exercise 4 of the post)
+reaches ESS 267, below the linear extrapolation of about 400.
 
 **Convergence warnings.** The prior predictive check flags three of nine
-statistics: `pve_pc1` at p = 0.028, and `ac1`/`ac2` at 0.996 and 0.9985 in the
-opposite tail. Real state cigarette panels are more strongly persistent and more
-strongly driven by a single common factor than the prior expects, suggesting
-`p_factors = 1` may be too few. The R edition runs a coarser four-statistic
+statistics (now run with `p=1`, the prior of the fitted model; p = P(sim ≤ obs)):
+`ac1`/`ac2` at 0.995 and 1.000, so the prior under-predicts persistence, and
+`pve_pc1` at 0.036, so the prior over-predicts how dominated the donor panel is by
+one common component. These are two different misfits of the prior shape, not a
+sign that `p_factors = 1` is too few. The R edition runs a coarser four-statistic
 visual check at 1,000 draws and reads all four as compatible with the prior.
 
-**Runtime.** About 60 minutes cold, dominated by two 500,000-iteration
-`SPILLSYNTH(sar)` fits on the numpy backend (994 s and 1,094 s). These are the
+**Runtime.** About 68 minutes cold, dominated by two 500,000-iteration
+`SPILLSYNTH(sar)` fits on the numpy backend (1,302 s and 1,162 s). These are the
 same estimator run twice — once as the standalone cross-check and once inside
 the benchmark sweep — which is redundant but keeps the two sections
 independently cacheable.

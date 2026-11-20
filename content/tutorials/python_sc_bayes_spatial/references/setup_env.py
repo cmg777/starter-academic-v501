@@ -369,7 +369,7 @@ def preflight() -> None:
         print(
             f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
             f"You ran setup_env.py with Python {ver} at {sys.executable}.\n\n"
-            f"The pinned `numba==0.62.1` and `llvmlite==0.45.0` wheels cover\n"
+            f"The numba and llvmlite wheels this tutorial installs cover\n"
             f"cp310-cp313 only. Python 3.14 has no prebuilt numba wheels yet,\n"
             f"and Python <=3.9 is below mlsynth's minimum.\n\n"
             f"Install a supported Python (any one):\n"

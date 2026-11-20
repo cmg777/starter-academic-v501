@@ -11,7 +11,7 @@ R edition's published value so a disagreement is visible on the first run.
 
     python cheatsheet_python.py          # about a minute
 
-For the paper-grade budget (500,000 iterations), the 20 figures and the 23
+For the paper-grade budget (500,000 iterations), the 19 figures and the 23
 result tables, run analysis.py instead.
 
 Install:
@@ -21,7 +21,7 @@ Install:
 WHAT THIS FILE WILL NOT REPRODUCE
     m_iter = 4000 is a tutorial budget. It reproduces the SHAPE of every result
     -- signs, ranks, orders of magnitude -- but not the third decimal, and its
-    ESS(rho) is far below anything publishable. That is the point of section 6.
+    ESS(rho) is far below anything publishable. That is the point of section 14 of the post.
 """
 
 from __future__ import annotations
@@ -180,7 +180,7 @@ print(f"  {'corrected 95% interval width':<34s} {cw:9.3f} packs   "
       f"({cw / rw:.0f}x wider)")
 print("  The point estimate barely moves. The interval is a different object.")
 
-# ── 8. Eight more estimators, honestly labelled ──────────────────────────────
+# ── 8. More of the catalogue, honestly labelled ─────────────────────────────
 hdr("8. The rest of the catalogue")
 _units = ["California"] + donors
 W39 = pd.DataFrame(0.0, index=_units, columns=_units)

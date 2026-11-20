@@ -27,13 +27,13 @@ jupyter: sc-bayes-spatial-tutorial
 ::: {.callout-important}
 ## This bundle runs a tutorial-sized chain
 
-Every code cell below uses `m_iter = 4000`. **The published post uses 500,000.**
+The Stage 3 fits below use `m_iter = 4000`. **The published post uses 500,000.** Other cells (BSCM, the diagnostics, sections 13–15) keep budgets close to the post, so a first render takes several minutes. Numbers quoted in the prose are those of the published 500,000-iteration run, so your printed output will differ in the later decimals, and the effective sample sizes will be far smaller.
 
 The tutorial budget reproduces the *shape* of every result — signs, ranks,
 orders of magnitude — but not the third decimal, and its effective sample size
 for $\rho$ is far below anything publishable. Section 14 explains why that
 distinction matters more than it sounds, and `analysis.py` in this same folder
-reproduces the published numbers (about an hour cold, under a minute warm).
+reproduces the published numbers (about 70 minutes cold, a few minutes warm).
 :::
 
 
@@ -54,13 +54,13 @@ The second assumption is the interesting one here, because Proposition 99 raised
 
 That is the hypothesis. **The data say the leak runs the other way.** Nevada's estimated spillover is −5.50 packs per capita per year: its sales came in *below* what the model reconstructs as its no-treatment path, not above. Whatever net effect Proposition 99 had on Nevada, it looks like the anti-smoking campaign travelling across the border rather than the tax arbitrage travelling back. Section 12 puts the sign to a test the estimator could have failed and did not.
 
-The direction matters for the headline number, and not in the way most readers expect. A donor whose observed series sits *below* its no-treatment path drags the synthetic California down with it, so the classical comparison gives the policy less credit than it deserves — the contaminated estimate **understates** the effect. Section 9.1 derives that as an identity; section 12 confirms it numerically.
+The direction matters for the headline number, and not in the way most readers expect. A donor whose observed series sits *below* its no-treatment path drags the synthetic California down with it, so, for a given set of donor weights, the comparison gives the policy less credit than it deserves — the contaminated estimate **understates** the effect relative to its purged version. Section 9.1 derives that as an identity; section 12 confirms it numerically.
 
-The spatial weights shipped with the data make the channel unusually concrete. Under rook contiguity — the chess convention in which two states count as neighbours only if they share a stretch of border, not merely a corner — **Nevada is the only state in the Abadie–Diamond–Hainmueller donor pool that shares a border with California.** Oregon and Arizona also border California, but neither is in the pool: both are excluded for having run their own tobacco-control programmes. So there is exactly one leak, in exactly one direction, and we can name it.
+The spatial weights shipped with the data make the channel unusually concrete. Under rook contiguity — the chess convention in which two states count as neighbours only if they share a stretch of border, not merely a corner — **Nevada is the only state in the Abadie–Diamond–Hainmueller donor pool that shares a border with California.** Oregon and Arizona also border California, but neither is in the pool: both are excluded for having run their own large tobacco-control programmes. So there is exactly one leak, in exactly one direction, and we can name it.
 
 This post estimates the same effect three ways, relaxing one assumption at a time, using two Python libraries:
 
-- **[mlsynth](https://mlsynth.readthedocs.io/)** (Jared Greathouse), which puts 46 modern synthetic-control estimators behind a single configuration-dictionary interface.
+- **[mlsynth](https://mlsynth.readthedocs.io/)** (Jared Greathouse), which puts 69 synthetic-control estimator classes behind a single configuration-dictionary interface.
 - **[scspill](https://quarcs-lab.github.io/scspill/)**, which implements the Bayesian spatial spillover model of [Sakaguchi and Tagawa (2026)](https://doi.org/10.1093/ectj/utag006) and returns *two* estimands: the effect on the treated unit, purged of contamination, and the spillover effect received by each donor.
 
 The argument of the post, stated up front so you can check it as you go: **the effect on California survives every relaxation, and the claim that the donor pool was clean does not.**
@@ -134,7 +134,7 @@ A patient takes a new drug; we never see that same patient untreated. So we buil
 
 :::
 
-**3. Donor pool.** The set of untreated units from which the counterfactual is built. Here it is the 38 US states that had no large tobacco-control programme of their own between 1970 and 2000. Which states are *excluded* is a modelling decision made before any estimation happens, and it turns out to matter a great deal for this particular question.
+**3. Donor pool.** The set of untreated units from which the counterfactual is built. Here it is the 38 US states that neither ran a large tobacco-control programme nor raised their cigarette tax by 50 cents or more during the sample period. Which states are *excluded* is a modelling decision made before any estimation happens, and it turns out to matter a great deal for this particular question.
 
 ::: {.callout-note collapse="true" title="Example"}
 
@@ -152,7 +152,7 @@ Choosing a control group is like choosing which of your neighbours to ask about 
 
 ::: {.callout-note collapse="true" title="Example"}
 
-In Stage 1 the simplex puts 98.6% of the weight on four states — Utah 0.343, Montana 0.254, Nevada 0.242, Connecticut 0.146 — and exactly zero on 33 others. Section 4.2 constructs a case where that constraint has a measurable cost, and section 8 shows what the same data say when it is lifted.
+In Stage 1 the simplex puts 98.6% of the weight on four states — Utah 0.343, Montana 0.254, Nevada 0.242, Connecticut 0.146 — a weight of 0.014 on New Hampshire, and exactly zero on the other 33. Section 4.2 constructs a case where that constraint has a measurable cost, and section 8 shows what the same data say when it is lifted.
 
 :::
 
@@ -258,7 +258,7 @@ In words: $\xi_{0t}$ is the effect on California, the thing everybody reports. A
 | $Y_{1t}(\mathbf{0})$ | California's no-treatment sales | `result.counterfactual` |
 | $\xi_{0t}$ | effect on California in year $t$ | `result.gap` |
 | $\xi^{c}_{jt}$ | spillover onto donor $j$ in year $t$ | `result.spillover_panel[j][t]` |
-| $T_0$ | last pre-treatment period (1987) | `result.inputs.T0` |
+| $T_0$ | number of pre-treatment years (18, 1970–1987) | `result.inputs.T0` |
 
 ### 3.2 Why difference-in-differences will not do
 
@@ -268,7 +268,7 @@ $$\widehat{\mathrm{ATT}}_{\mathrm{DiD}} = \Big(\bar{Y}_{1,\mathrm{post}} - \bar{
 
 In words: California's before-and-after change, minus the average donor's before-and-after change. This is unbiased only under **parallel trends** — the assumption that absent the policy, California's sales would have moved by exactly the average donor's amount.
 
-Look at the data and that assumption is visibly false. California is not a typical state: it starts below the donor average and falls faster throughout the 1970s and 1980s, long before Proposition 99 exists.
+Look at the data and that assumption is visibly false. California is not a typical state: it starts slightly above the donor average in 1970 (123.0 against 120.1 packs), falls below it by the mid-1970s, and falls faster throughout the 1970s and 1980s, long before Proposition 99 exists.
 
 ![Cigarette sales in 39 US states, 1970-2000](../python_sc_bayes_spatial_01_panel_paths.png)
 
@@ -502,7 +502,7 @@ deg = W.sum(axis=1)
 print(f"degree: min {deg.min():.0f}  max {deg.max():.0f}  mean {deg.mean():.2f}")
 ```
 
-**`spatial_w` has exactly one non-zero entry.** Nevada is the only donor that borders California. Oregon and Arizona border California too, but neither is in the donor pool — both were excluded by Abadie, Diamond and Hainmueller for having run their own tobacco-control programmes. Eleven states are absent from the panel for similar reasons: Alaska, Arizona, Florida, Hawaii, Maryland, Massachusetts, Michigan, New Jersey, New York, Oregon and Washington.
+**`spatial_w` has exactly one non-zero entry.** Nevada is the only donor that borders California. Oregon and Arizona border California too, but neither is in the donor pool — both were excluded by Abadie, Diamond and Hainmueller for having run their own large tobacco-control programmes. Eleven states are absent from the panel, for such programmes or for cigarette-tax rises of 50 cents or more: Alaska, Arizona, Florida, Hawaii, Maryland, Massachusetts, Michigan, New Jersey, New York, Oregon and Washington.
 
 That exclusion is doing quiet work. It means the spatial model has a single channel to estimate, which is both a gift (the parameter is easy to interpret) and a limitation (a single channel is thin evidence for a scalar).
 
@@ -530,7 +530,7 @@ post = years >= TREAT_YEAR
 print(f"T0 = {(~post).sum()}   T1 = {post.sum()}   donors = {len(donors)}")
 ```
 
-To use the 1989 convention instead, overwrite `df["treated"]` before passing the frame to any estimator. The effect on the headline number is small — one fewer post-treatment year, and 1988 was a partial year in any case — but the comparison across libraries stops being apples-to-apples the moment two of them disagree about $T_0$.
+To use the 1989 convention instead, overwrite `df["treated"]` before passing the frame to any estimator. The effect on the headline number is small — one fewer post-treatment year, and 1988 was essentially untreated, since the tax took effect in January 1989 — but the comparison across libraries stops being apples-to-apples the moment two of them disagree about $T_0$.
 
 ## 7. Stage 1 — classical simplex synthetic control
 
@@ -552,7 +552,7 @@ print(w_sc[w_sc > 1e-4].sort_values(ascending=False).round(4).to_string())
 
 Five of 38 donors carry the entire counterfactual, and four of them carry 98.6% of it. The pre-treatment RMSE of 1.60 is small against an outcome averaging 117.7 packs over the pre-period — a relative error of 1.4%, and a pre-treatment $R^2$ of 0.973.
 
-Two things are worth pausing on. First, this reproduces the R edition to within 0.04 packs: that post reports −18.46 using the `tidysynth` package and a different optimiser, with weights of Utah 0.327, Nevada 0.255, Montana 0.245 and Connecticut 0.148. Two independent implementations landing this close is the strongest evidence either one gets that the estimator is correctly coded.
+Two things are worth pausing on. First, this reproduces the R edition to within 0.03 packs: that post reports −18.46 using the `tidysynth` package and a different optimiser, with weights of Utah 0.327, Nevada 0.255, Montana 0.245 and Connecticut 0.148. Two independent implementations landing this close is the strongest evidence either one gets that the estimator is correctly coded.
 
 Second, and less comfortably: **Nevada is in the synthetic California, with a weight of 0.24.** The one state we have a specific reason to suspect of contamination is carrying nearly a quarter of the counterfactual.
 
@@ -587,9 +587,9 @@ In words, this says: each donor weight is normal around zero, but with its *own*
 
 The name comes from the shrinkage factor $\kappa_j = 1/(1 + \lambda_j^2)$, whose implied prior is a $\mathrm{Beta}(1/2, 1/2)$ — a U shape with peaks at 0 and 1, like a horseshoe. Weights are pushed either to "shrunk to nothing" or to "left alone", and rarely in between.
 
-Sampling from this directly is awkward because the half-Cauchy is not conjugate to anything — there is no closed-form conditional distribution to draw from, so a sampler cannot simply take a value and move on. [Makalic and Schmidt (2015)](https://doi.org/10.1109/LSP.2015.2503725) supply the trick that makes it a Gibbs sampler: every half-Cauchy is a scale mixture of inverse gammas, so introducing one auxiliary variable per scale gives closed-form conditionals throughout:
+Sampling from this directly is awkward because the half-Cauchy is not conjugate to anything — there is no closed-form conditional distribution to draw from, so a sampler cannot simply take a value and move on. [Makalic and Schmidt (2016)](https://doi.org/10.1109/LSP.2015.2503725) supply the trick that makes it a Gibbs sampler: every half-Cauchy is a scale mixture of inverse gammas, so introducing one auxiliary variable per scale gives closed-form conditionals throughout:
 
-$$\lambda_j^2 \mid \nu_j \sim \mathcal{IG}\Big(1, \, \tfrac{1}{\nu_j}\Big), \qquad \nu_j \sim \mathcal{IG}\Big(\tfrac{1}{2}, \, 1\Big) \, \Longrightarrow \, \lambda_j \sim \mathcal{C}^{+}(0, 1)$$
+$$\lambda_j^2 \mid \nu_j \sim \mathcal{IG}\Big(\tfrac{1}{2}, \, \tfrac{1}{\nu_j}\Big), \qquad \nu_j \sim \mathcal{IG}\Big(\tfrac{1}{2}, \, 1\Big) \, \Longrightarrow \, \lambda_j \sim \mathcal{C}^{+}(0, 1)$$
 
 In words: an inverse-gamma whose own scale is inverse-gamma distributed *is* a half-Cauchy. Nothing is approximated — this is an exact reparameterisation, and it is why both libraries can run hundreds of thousands of iterations in seconds rather than hours.
 
@@ -670,15 +670,15 @@ print(f"R edition Stage 2  : -15.8400")
 print(f"rho=0 counterfactual, last 3 years: {cf_rho0[-3:].round(1)}")
 ```
 
-Two Bayesian synthetic controls with the same prior family on the same data, **3.17 packs apart**. That gap is not noise, and it is not a bug in either library. It is an intercept.
+Two Bayesian synthetic controls with the same prior family on the same data, **3.17 packs apart** in the published 500,000-iteration run. That gap is not noise, and it is not a bug in either library. It is an intercept.
 
-`mlsynth.BSCM` implements [Kim, Lee and Gupta (2020)](https://doi.org/10.1287/mksc.2019.1178), which fits an explicit intercept $\beta_0$ and leaves the donor series on their original scale. `scspill`'s Step 1 has no intercept and standardises the donors first. The consequences are visible in the output above: BSCM's weights sum to 0.758 rather than 1, because the intercept of 16.86 packs is absorbing the level difference that the weights would otherwise have to carry.
+`mlsynth.BSCM` implements [Kim, Lee and Gupta (2020)](https://doi.org/10.1177/0022243720936230), which fits an explicit intercept $\beta_0$ and leaves the donor series on their original scale. `scspill`'s Step 1 has no intercept and standardises the donors first. The consequences are visible in the output above: BSCM's weights sum to 0.758 rather than 1, because the intercept of 16.86 packs is absorbing the level difference that the weights would otherwise have to carry.
 
 $$\text{BSCM:} \quad Y_{1t} = \beta_0 + \sum_j \alpha_j Y_{jt} + \varepsilon_t \qquad\text{versus}\qquad \text{scspill:} \quad Y_{1t} = \sum_j \alpha_j Y_{jt} + \varepsilon_t$$
 
 In words: one model is allowed to say "California is like this blend of states, shifted up by 17 packs"; the other must say "California *is* this blend of states". The direction matters. Because the weights sum to only 0.758, BSCM's raw blend sits well below California — roughly $0.758 \times 131.5 \approx 100$ packs against California's pre-period mean of 117.7 — and the positive intercept lifts it back onto the treated series. Neither is more correct in the abstract. But they answer different questions, and averaging them would be meaningless.
 
-The tiebreaker available here is external. `scspill`'s $\rho = 0$ case lands within **0.16 packs** of the R edition's Stage 2 estimate of −15.84, which was produced by entirely separate C++ code. Two independent implementations of the no-intercept horseshoe agree; the intercept model is doing something else, deliberately.
+The tiebreaker available here is external. `scspill`'s $\rho = 0$ case lands within **0.16 packs** (published run) of the R edition's Stage 2 estimate of −15.84, which was produced by entirely separate C++ code. Two independent implementations of the no-intercept horseshoe agree; the intercept model is doing something else, deliberately.
 
 ![Four counterfactual Californias and their ATTs](../python_sc_bayes_spatial_06_stage2_two_bayesian.png)
 
@@ -826,7 +826,7 @@ $O(N)$ per iteration instead of $O(N^3)$. This single substitution is what makes
 
 $$\log s_{m+1} = \log s_m + (m+1)^{-0.6}\big(a_m - 0.44\big)$$
 
-where $a_m$ is the acceptance probability of the proposal made at iteration $m$. When a proposal is readily accepted the step grows; when proposals keep being rejected it shrinks. The exponent $-0.6$ makes the corrections vanish fast enough for the chain to settle, and adaptation stops entirely at the end of burn-in so the sampled portion is a genuine Markov chain. In the run below this lands at an acceptance rate of 0.444 against the 0.44 target, from a starting step of 0.05.
+where $a_m$ is the acceptance probability of the proposal made at iteration $m$. When a proposal is readily accepted the step grows; when proposals keep being rejected it shrinks. The exponent $-0.6$ makes the corrections vanish fast enough for the chain to settle, and adaptation stops entirely at the end of burn-in so the sampled portion is a genuine Markov chain. In the published run this lands at an acceptance rate of 0.444 against the 0.44 target, from a starting step of 0.05.
 
 Section 10 shows what happens when this is switched off — which is what the R replication code does.
 
@@ -852,7 +852,7 @@ print(f"ESS(rho)   : {result.rho_ess:.1f}   acceptance {result.acc_rho:.3f}")
 
 **The credible interval for $\rho$ excludes zero.** That is the formal statement that the data reject the restriction collapsing Stage 3 back to Stage 2 — SUTVA on the donor pool is not merely doubtful here, it is rejected by the model that nests it.
 
-The ATT moves from −15.68 to −16.87 once the leak is modelled: purging the contamination makes the estimated effect **larger**, by 1.19 packs. Section 4.3 predicted the direction from the sign of the spillover, and section 12 checks the magnitude against the identity.
+In the published run, the ATT moves from −15.68 to −16.87 once the leak is modelled: purging the contamination makes the estimated effect **larger**, by 1.19 packs. Section 4.3 predicted the direction from the sign of the spillover, and section 12 checks the magnitude against the identity.
 
 `scspill` ships its own diagnostics table, and it is worth reading in full because it shows precisely where the weak identification lives:
 
@@ -860,7 +860,7 @@ The ATT moves from −15.68 to −16.87 once the leak is modelled: purging the c
 print(result.diagnostics(top_n_alpha=6).round(4))
 ```
 
-Read the `ess` column top to bottom. $\sigma^2$ has an effective sample size of 204,000. The donor weights are in the 10,000–26,000 range. **$\rho$ has 137**, and the price coefficient 388. From the same chain. The pattern is not that one scalar is hard and everything else is easy — it is that the two quantities leaning on the single contiguity channel are hard, and $\rho$, the scalar the whole third stage exists to estimate, is the harder of the two.
+Read the `ess` column top to bottom (the figures quoted are from the published run; at 4,000 iterations every ESS is far smaller). $\sigma^2$ has an effective sample size of 204,000. The donor weights are in the 10,000–26,000 range. **$\rho$ has 137**, and the price coefficient 388. From the same chain. The pattern is not that one scalar is hard and everything else is easy — it is that the two quantities leaning on the single contiguity channel are hard, and $\rho$, the scalar the whole third stage exists to estimate, is the harder of the two.
 
 That is not a defect in the software, and it is not that the data are silent about $\rho$ — the posterior is tight, with a standard deviation of 0.043 on a support 1.9 wide. It is that the sampler has to move one scalar through a strongly correlated conditional: $\rho$ is the only parameter drawn by random-walk Metropolis rather than from a closed-form conditional, and each draw is highly correlated with the one before. Section 14 shows what it costs to pin it down, and section 10 shows what happens if you do not try.
 
@@ -889,7 +889,7 @@ ranked = means.reindex(means.abs().sort_values(ascending=False).index)
 print(ranked.head(6).round(4).to_string())
 ```
 
-Nevada absorbs **11.2 times** the next-largest effect. Idaho and Utah — the two states that border Nevada, one step further out on the contiguity graph — pick up about half a pack each. Everything beyond that second ring is two orders of magnitude smaller again.
+In the published run, Nevada absorbs **11.2 times** the next-largest effect. Idaho and Utah — the two states that border Nevada, one step further out on the contiguity graph — pick up about half a pack each. Everything beyond that second ring is another order of magnitude smaller.
 
 One caveat on reading this panel: the pre-treatment rows are fit residuals, not causal spillovers. Nothing had leaked yet in 1975. Slice from `TREAT_YEAR` onward, as above, or you will average signal with noise.
 
@@ -946,7 +946,7 @@ Run at the R edition's own budget of 5,000 iterations, the agreement is close en
 | ESS($\rho$) | 2.93 | 3.27 | 0.34 |
 | Nevada spillover | −3.750 | −3.778 | 0.028 |
 
-Independent code in a different language, reproducing $\hat\rho$ to three decimal places and the Nevada spillover to 0.03 packs — **including the pathology**. An effective sample size of 3.27 is not a coincidence to be explained away; it is the R sampler's behaviour, faithfully reproduced.
+Independent code in a different language, reproducing $\hat\rho$ to within 0.006 and the Nevada spillover to 0.03 packs — **including the pathology**. An effective sample size of 3.27 is not a coincidence to be explained away; it is the R sampler's behaviour, faithfully reproduced.
 
 Now change one thing at a time.
 
@@ -958,7 +958,7 @@ Now change one thing at a time.
 | **scspill, corrected** | **500,000** | **−16.868** | **[−23.05, −10.33]** | **12.713** | **0.3161** | **136.8** | **0.444** |
 | mlsynth `SPILLSYNTH(sar)` | 500,000 | −16.525 | [−16.93, −16.18] | 0.757 | 0.2476 | 135.2 | — |
 
-Read the third row carefully, because it rules out the explanation most people reach for first. **Running the R specification for a hundred times as many iterations does not widen the interval.** It goes from 0.482 to 0.702 — still an order of magnitude too narrow — while the effective sample size climbs from 3.3 to 66.9. Chain length was never the problem.
+Read the third row carefully, because it rules out the explanation most people reach for first. **Running the R specification for a hundred times as many iterations barely widens the interval.** It goes from 0.482 to 0.702 — still an order of magnitude too narrow — while the effective sample size climbs from 3.3 to 66.9. Chain length was never the problem.
 
 The width comes from **departure 3**: `propagate_alpha`. The R code varies $\rho$ across draws while holding the donor weights $\alpha$ fixed at their posterior mean. The reported interval therefore reflects uncertainty about the spatial parameter and *none at all* about which states make up synthetic California — even though section 8 showed those weights have credible intervals several times wider than the weights themselves. Switching on paired $(\alpha^{(m)}, \rho^{(m)})$ draws restores the missing uncertainty, and the interval grows by a factor of 18.
 
@@ -967,7 +967,7 @@ Effective sample size and interval width are answering different questions here,
 - **ESS asks whether the interval is *reliable*** — whether the chain visited enough of the posterior for its quantiles to mean anything. At ESS 3 they do not.
 - **`propagate_alpha` asks whether the interval is *complete*** — whether it accounts for everything the model is uncertain about. With $\alpha$ pinned, it does not.
 
-The R edition's interval failed both tests, which is why it is 33 times too narrow.
+The R edition's interval failed both tests, which is why it is 33 times narrower than the corrected one.
 
 ![The rho chain under three specifications, and the ESS each buys](../python_sc_bayes_spatial_12_r_reconciliation.png)
 
@@ -977,9 +977,7 @@ The fifth row is the cross-check that matters most. `mlsynth.SPILLSYNTH(method="
 
 ### 10.2 The six departures
 
-`scspill` ships the full list as a dataframe, which is the honest way to publish
-a claim of this kind — the departures are enumerated in the package, not asserted
-in a blog post.
+The post's `analysis.py` stores the list as `scspill_departures.csv`, which ships with this bundle.
 
 ```{python}
 # scspill's own documentation of where it parts company with the R code.
@@ -1039,7 +1037,7 @@ from scspill.validation import prior_predictive, plot_prior_predictive
 W_raw, w_raw = result.inputs.W_raw, result.inputs.w_raw
 
 ppc = prior_predictive(Y0_pre, W_raw, w_raw, result.alpha_hat,
-                       Yc_obs=Yc_pre, X=X_pre, p=0,
+                       Yc_obs=Yc_pre, X=X_pre, p=1,      # one latent factor, as in the fit
                        a0=3.0, b0=1.0, n_draws=2000, seed=SEED)
 
 # PriorPredictiveResult carries `observed`, `stats` and `p_values` rather than
@@ -1050,11 +1048,13 @@ ppc_tab = pd.DataFrame({"statistic": list(ppc.p_values.keys()),
 print(ppc_tab.round(4).to_string(index=False))
 ```
 
-Each row asks whether the observed value of a statistic falls in a plausible region of its prior predictive distribution. Read the column as a two-sided tail probability: values near 0.5 are unremarkable, and values near either 0 or 1 are not. Six of nine land comfortably inside. Three do not, and they tell the same story.
+Each `p_value` is the share of prior draws whose statistic falls at or below the observed value. Values near 0.5 are unremarkable, while values near 0 or 1 mean that the observed statistic sits in a tail of what the prior expects. Six of the nine statistics land comfortably inside, and three do not.
 
-`pve_pc1` at 0.028 is the share of variance explained by the first principal component of the donor block. The observed value is **0.625**: nearly two-thirds of the joint movement of 38 state cigarette markets is one common factor, and the prior did not expect that much. `ac1` at 0.996 and `ac2` at 0.9985 are the mirror image, and are in fact further into their tails — the observed lag-1 and lag-2 autocorrelations of 0.894 and 0.810 sit above almost every prior draw. A prior that under-predicts persistence and under-predicts common variance is under-predicting the same thing twice: the national secular decline visible in Figure 1.
+The three tail statistics describe two different misfits. `ac1` (0.995) and `ac2` (1.000) say that the observed lag-1 and lag-2 autocorrelations of the donor series, 0.894 and 0.810, sit above almost every prior draw, so the prior under-predicts how persistent cigarette sales are. `pve_pc1` (0.036) says the opposite kind of thing about common movement: the first principal component explains 62.5% of the variance of the donor block, which is *less* than in 96% of the prior draws, so the prior expects panels even more dominated by one common component than the data are.
 
-This is a mild warning rather than a failure, and it points at a specific, fixable thing: the model has one latent factor (`p_factors=1`), and the data may want more. The R edition runs a coarser four-statistic visual check at 1,000 draws and reads all four as compatible with the prior; the finer nine-statistic check here is what surfaces the conflict.
+This is a mild warning rather than a failure. Both misfits concern the shape of the prior over whole donor panels, not the parameters that enter the effects, and 18 years of data on 38 donors carry far more information than these priors. The right response is the one taken in section 11.3, which checks whether reasonable changes to the priors move the answer.
+
+The probabilities quoted are from the published run; at this bundle's budget they will differ slightly.
 
 ![The prior predictive check across nine statistics](../python_sc_bayes_spatial_13_prior_predictive.png)
 
@@ -1132,8 +1132,8 @@ The lesson is not that the inverse-gamma hyperparameters are irrelevant. It is t
 Section 4.3 derived the bias of a SUTVA-imposing estimator as $-\sum_j \alpha_j \xi^{c}_{j}$ and verified it on three donors. The real panel supplies all the pieces, so it can be checked directly.
 
 ```{python}
-alpha = pd.read_csv(data("stage2_alpha_posterior.csv")).set_index("state")["alpha_hat"]
-xi = pd.read_csv(data("stage3_spillover_effects.csv")).set_index("state")["avg_spillover"]
+alpha = pd.Series(np.asarray(result.alpha_hat, dtype=float), index=donors)
+xi = means.reindex(donors)                 # post-1988 mean spillovers, section 9.6
 
 contrib = (alpha * xi).sort_values()
 print(contrib.head(4).round(4).to_string())
@@ -1141,19 +1141,19 @@ print(f"\nsum_j alpha_j * xi_j             : {contrib.sum():+.4f}")
 print(f"att (purged) - att_scm (contam.) : {result.att - result.effects_detail.att_scm:+.4f}")
 ```
 
-The identity holds to 0.057 packs — the small residual is because the purged ATT averages over paired $(\alpha, \rho)$ draws while the plug-in decomposition uses $\hat\alpha$ alone.
+In the published run the identity holds to 0.057 packs — the small residual is because the purged ATT averages over paired $(\alpha, \rho)$ draws while the plug-in decomposition uses $\hat\alpha$ alone.
 
 Three things to take from those four numbers:
 
 **Nevada is 97% of the story.** Its contribution of −1.098 out of −1.130 comes from a weight of 0.200 multiplied by a spillover of −5.50. Utah has a comparable spillover per capita to Idaho but contributes three times as much bias, because Utah carries more weight. This is the "damage is a product of two things" point from section 4.3, visible in a real table.
 
-**The direction is the one section 4.3 predicted.** The spillovers are negative and the weights are positive, so the bias is positive — the contaminated estimate is *closer to zero* than the truth. The horseshoe estimate understates Proposition 99's effect on California by 1.19 packs per capita per year, roughly 7% of the effect. Applying the same plug-in to the *simplex* weights, where Nevada carries 0.242 rather than 0.200, gives 1.51 packs, about 8%. The classical estimate is the more contaminated of the two, precisely because the constraint pushed more weight onto the one leaking donor.
+**The direction is the one section 4.3 predicted.** The spillovers are negative and the weights are positive, so the bias is positive — the contaminated estimate is *closer to zero* than its purged version. The horseshoe estimate understates Proposition 99's effect on California by 1.19 packs per capita per year, roughly 7% of the effect. Applying the same plug-in to the *simplex* weights, where Nevada carries 0.242 rather than 0.200, gives 1.51 packs, about 8%. The classical estimate is the more contaminated of the two, precisely because the constraint pushed more weight onto the one leaking donor.
 
 **It is small.** After all of this — a spatial model, half a million MCMC draws, a rejected SUTVA assumption — the correction to the headline number is 1.2 packs out of 17. That is the honest summary, and it is worth stating plainly rather than burying: **the spillover was real, statistically clear, and substantively modest for California.** It was not modest for Nevada, which is a different question and the one classical synthetic control could not have asked.
 
 ## 13. The rest of the catalogue
 
-`mlsynth` ships 46 estimators. Eight more classes will run on this panel — nine configurations, because `SPILLSYNTH` has two methods worth separating — and it is worth seeing what they say — with one column that keeps the table from lying.
+`mlsynth` ships 69 estimator classes. Eight more classes will run on this panel — nine configurations, because `SPILLSYNTH` has two methods worth separating — and it is worth seeing what they say — with one column that keeps the table from lying.
 
 ```{python}
 # Two of the eight need something the bare panel does not supply.
@@ -1248,7 +1248,7 @@ It is also worth reading the first row against section 10. At only 5,000 iterati
 
 *Figure 17. Teal: the ATT and its credible interval. Gold: the effective sample size for ρ, against the conventional floor of 100.*
 
-Read the last column as a rate rather than a level. From 20,000 iterations onward the table delivers a near-constant **0.00055 effective draws per kept draw** — 5,816 / 10,000, then 13,296 / 25,000, 24,215 / 50,000, 74,598 / 125,000, 136,781 / 250,000. Effective sample size is growing roughly *linearly* in chain length, not tailing off. There is no diminishing-returns cliff here to stop at; there is a fixed, poor exchange rate. At that rate an ESS of 400 costs about 1.5 million iterations, or a few more minutes of sampling. Whether that is a good use of a laptop is the question exercise 4 asks.
+Read the last column as a rate rather than a level. From 20,000 iterations onward the table delivers a near-constant **0.00055 effective draws per kept draw** — 5.8 / 10,000, then 13.3 / 25,000, 24.2 / 50,000, 74.6 / 125,000, 136.8 / 250,000. Effective sample size is growing roughly *linearly* in chain length, not tailing off. There is no diminishing-returns cliff here to stop at; there is a fixed, poor exchange rate. At that rate an ESS of 400 costs about 1.5 million iterations, or a few more minutes of sampling. Whether that is a good use of a laptop is the question exercise 4 asks.
 
 ## 15. Monte Carlo: does modelling the leak pay?
 
@@ -1294,7 +1294,7 @@ At the $\rho$ this post estimates for California — 0.316 — the simulation sa
 
 ## 16. The whole ladder
 
-Every number above, in one table. The `r_reference` column is the same panel
+Every number above, in one table. The table is read from `att_ladder.csv`, the published 500,000-iteration run, so it shows the post's numbers rather than this bundle's short chains. The Stage 1 interval resamples the 13 yearly gaps and ignores uncertainty about the weights, so it is a descriptive band, not a valid confidence interval. The `r_reference` column is the same panel
 estimated by the authors' own R and C++ code, and `r_gap` is the honest measure
 of how much the implementation choice mattered.
 
@@ -1366,9 +1366,9 @@ Section 1 asked how much of the Proposition 99 answer each assumption was carryi
 
 **SUTVA is false here, and the direction is the surprise.** Nevada absorbed a spillover of −5.50 packs per capita per year, an order of magnitude more than any other state, with a credible interval for $\rho$ that excludes zero. The prior expectation was cross-border shopping *raising* Nevada's sales; the estimate says they came in below their no-treatment path. Whatever mechanism dominates — advertising, media, social norms crossing a border that tax arbitrage also crosses — the net effect on Nevada ran the same way as the effect on California, not against it.
 
-That has a consequence for how the policy should be described. Reporting only California's number understates Proposition 99's total public-health footprint, because a neighbouring state that never voted on it also smoked less. It also means the classical estimate was biased *toward zero*: the honest version of "the classical estimate was fine" is "the classical estimate was fine, and slightly conservative, for a reason it could not have told you about."
+That has a consequence for how the policy should be described. Reporting only California's number understates Proposition 99's total public-health footprint, because recorded sales in a neighbouring state that never voted on it also fell, if the spillover the model detects is real. It also means that, for any fixed set of donor weights, the contaminated estimate is biased *toward zero*.
 
-**What this post does not establish.** The SAR layer does not make anything causal that was not causal before. It is a model of how outcomes co-move across a fixed, researcher-supplied graph, and swapping contiguity for a different graph would produce different spillovers. The identifying assumption in section 9.3 — that some fixed unconstrained combination of donors reproduces California exactly — is strong and untestable. And $\rho$ remains the weakly identified parameter of the model even at half a million draws: an effective sample size of 137 is reportable, not comfortable. The right deliverable from this analysis is the interval together with its ESS, not the point estimate on its own.
+**What this post does not establish.** The SAR layer does not make anything causal that was not causal before. It is a model of how outcomes co-move across a fixed, researcher-supplied graph, and swapping contiguity for a different graph would produce different spillovers. The identifying assumption in section 9.3 — that some fixed unconstrained combination of donors reproduces California exactly — is strong and untestable. And $\rho$ remains the slowest-mixing parameter of the model even at half a million draws: an effective sample size of 137 is reportable, not comfortable. The right deliverable from this analysis is the interval together with its ESS, not the point estimate on its own.
 
 ## 19. Summary and next steps
 
