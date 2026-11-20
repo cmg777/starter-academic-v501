@@ -264,7 +264,7 @@ The replication package exposes three pieces we will use directly: `hs_alpha_gib
 
 ## 3. Data overview
 
-The dataset bundled with the package — `california_smoking.rda` — is a balanced panel of **39 US states from 1970 to 2000**, with per-capita cigarette sales (`cigsale`) and real retail price (`retprice`). The treatment dummy switches on for California in 1988 (the package convention; Prop 99 was approved in November 1988 and took effect in January 1989). The donor pool is the 38 other states. We load it and inspect the panel.
+The dataset bundled with the package — `california_smoking.rda` — is a balanced panel of **39 US states from 1970 to 2000**, with per-capita cigarette sales (`cigsale`) and the average retail price of a pack in nominal cents (`retprice`). The treatment dummy switches on for California in 1988 (the package convention; Prop 99 was approved in November 1988 and took effect in January 1989). The donor pool is the 38 other states. We load it and inspect the panel.
 
 ```r
 # .rda is gzipped binary; download to a tempfile in binary mode, then load.
@@ -281,9 +281,9 @@ Panel: 1209 rows | 39 states | years 1970-2000
 Treated: California | Donors: 38 | Pre-period: 1970-1987 | Post-period: 1988-2000
 ```
 
-The panel has **1,209 observations** (39 states × 31 years), with **18 pre-treatment years** (1970–1987) and **13 post-treatment years** (1988–2000). The shipped data carries only `cigsale` and `retprice` — narrower than the predictor set Abadie (2010) used, which also included log income, the share of population aged 15–24, and beer sales. This narrower predictor set is the dominant reason our classical ATT (around −18) is smaller in magnitude than Abadie's published headline (around −27); the methodological pipeline below is identical, but the inputs differ.
+The panel has **1,209 observations** (39 states × 31 years), with **18 pre-treatment years** (1970–1987) and **13 post-treatment years** (1988–2000). The shipped data carries only `cigsale` and `retprice` — narrower than the predictor set Abadie (2010) used, which also included log income, the share of population aged 15–24, and beer sales. Note that the figure of about −26 often quoted from Abadie (2010) is the gap in the single year 2000, whereas our ATT of about −18 averages the gap over 1988–2000; the classical fit below reaches a gap of about −27 by 2000, so the two are consistent despite the narrower inputs.
 
-The package also bundles two spatial structures: a 38-vector `w` giving California's contiguity weights over the donor states (Arizona, Nevada, and Oregon are non-zero) and a 38 × 38 binary contiguity matrix `W` among the donors. Both are row-normalized internally by `sc_spillover()` before they enter the SAR likelihood.
+The package also bundles two spatial structures: a 38-vector `w` giving California's contiguity weights over the donor states (only Nevada is non-zero, because Arizona and Oregon, which also border California, are not in the donor pool) and a 38 × 38 binary contiguity matrix `W` among the donors. Both are row-normalized internally by `sc_spillover()` before they enter the SAR likelihood.
 
 ## 4. Stage 1 — Classical synthetic control (Abadie 2010 baseline)
 
