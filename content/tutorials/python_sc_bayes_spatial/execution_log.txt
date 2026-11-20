@@ -59,7 +59,7 @@
 ==============================================================================
 3. Stage 1 — classical simplex synthetic control (Abadie et al. 2010)
 ==============================================================================
-  mlsynth.VanillaSC fitted in 0.15s
+  mlsynth.VanillaSC fitted in 0.26s
   ATT             -18.4277 packs per capita per year
   pre-treatment RMSE 1.5998   R^2 0.9735
   weights sum     1.000000   active donors (>1e-4): 5
@@ -80,8 +80,8 @@
 ==============================================================================
 4. Stage 2a — Bayesian synthetic control (mlsynth.BSCM, horseshoe prior)
 ==============================================================================
-  [cache] bscm_horseshoe  (took 9.2s when fitted)
-  [cache] bscm_spikeslab  (took 8.6s when fitted)
+  [cache] bscm_horseshoe  (took 14.6s when fitted)
+  [cache] bscm_spikeslab  (took 12.3s when fitted)
   ATT             -18.8469  95% CrI [-26.4568, -9.9884]
   pre-treatment RMSE 0.0514
   weights sum     0.7576   active donors (|w|>0.01): 26
@@ -106,7 +106,7 @@
 ==============================================================================
 5. Stage 3 — Bayesian spatial synthetic control (scspill, method="sar")
 ==============================================================================
-  [fit]   sar_corrected  (113.5s)
+  [cache] sar_corrected  (took 138.8s when fitted)
   configuration   m_iter=500,000  burn=250,000  beta_prior=horseshoe  p_factors=1
   ATT             -16.8680  95% CrI [-23.0450, -10.3316]  (width 12.71)
   ATT (plug-in)   -16.8023   effect draws used: 5,000
@@ -134,9 +134,7 @@
   [table]  stage3_summary.csv  (13 rows x 4 cols)
   [table]  stage2_alpha_posterior.csv  (38 rows x 5 cols)
   [table]  stage3_gap.csv  (31 rows x 8 cols)
-  [figure] python_sc_bayes_spatial_07_stage3_panel.png
-  [figure] python_sc_bayes_spatial_08_stage3_weights.png
-  [figure] python_sc_bayes_spatial_09_rho_posterior.png
+  [skip] native figures — served from cache, PNGs already present
 
 ==============================================================================
 6. Stage 2b — the rho = 0 case, read off the Stage-3 fit
@@ -186,6 +184,7 @@
   [R edition]  Nevada -3.75, Idaho -0.228
   [table]  stage3_spillover_effects.csv  (38 rows x 7 cols)
   [table]  stage3_spillover_panel.csv  (1178 rows x 3 cols)
+  states drawn but outside the donor pool (9): AZ, FL, MD, MA, MI, NJ, NY, OR, WA
   [figure] python_sc_bayes_spatial_10_spillover_map.png
   [figure] python_sc_bayes_spatial_11_spillover_bars.png
 
@@ -195,9 +194,9 @@
   scspill departs from the authors' R replication code in six documented
   ways. Three have escape hatches, so an 'R specification' mode exists;
   three do not, so the reproduction is close but not exact.
-  [cache] sar_rspec_rbudget  (took 1.5s when fitted)
-  [fit]   sar_rspec_headline  (145.2s)
-  [fit]   mlsynth_spillsynth_sar  (1094.1s)
+  [cache] sar_rspec_rbudget  (took 1.8s when fitted)
+  [cache] sar_rspec_headline  (took 144.9s when fitted)
+  [cache] mlsynth_spillsynth_sar  (took 1161.6s when fitted)
 
                               spec   engine  m_iter   burn      att     lo95     hi95  att_scm  rho_hat  rho_lo  rho_hi  rho_ess  acc_rho  seconds  spill_nevada
              R edition (published) R + Rcpp    5000   2500 -16.5900 -16.7770 -16.3930 -15.8400   0.2226  0.1685  0.2715   2.9300      NaN      NaN       -3.7500
@@ -234,49 +233,49 @@
 9. Prior and sampler validation
 ==============================================================================
   Y0_pre (18,)   Yc_pre (18, 38)   X_pre (18, 38, 1)
-  [fit]   prior_predictive  (4.9s)
+  [fit]   prior_predictive  (7.8s)
   prior predictive check (observed statistic vs its prior distribution):
-            statistic  p_value
-              yc_mean   0.9195
-           log_yc_var   0.7045
-    spatial_quadratic   0.8200
-          corr_y0_wyc   0.6105
-                  ac1   0.9960
-                  ac2   0.9985
-              pve_pc1   0.0285
-         avg_skewness   0.4950
-         avg_kurtosis   0.7320
-  [table]  prior_predictive.csv  (9 rows x 2 cols)
+            statistic   observed  p_value
+              yc_mean   131.4999   0.9105
+           log_yc_var     6.9842   0.6990
+    spatial_quadratic 17844.7200   0.8205
+          corr_y0_wyc     0.9449   0.6680
+                  ac1     0.8938   0.9950
+                  ac2     0.8105   1.0000
+              pve_pc1     0.6248   0.0355
+         avg_skewness    -0.3964   0.4565
+         avg_kurtosis    -0.9427   0.7185
+  [table]  prior_predictive.csv  (9 rows x 3 cols)
   [figure] python_sc_bayes_spatial_13_prior_predictive.png
-  [cache] geweke_simple_20000  (took 14.4s when fitted)
-  geweke_test(kernel='simple', m=20,000): max |z| = 3.48, 1 statistic(s) below the Bonferroni threshold p < 0.0063
-                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval
-                  rho   -0.0046     0.0604  0.0030   0.0314 -2.0589 0.0395
-           log_sigma2    0.5747     0.4690  0.0091   0.0468  2.2195 0.0265
-              yc_mean    0.0090     0.0119  0.0106   0.0126 -0.1735 0.8622
-           log_yc_var    1.7820     1.5655  0.0107   0.0613  3.4760 0.0005
-    spatial_quadratic  -20.6000    -5.6645  5.0974   3.1656 -2.4891 0.0128
-          corr_y0_wyc    0.0011     0.0093  0.0041   0.0069 -1.0196 0.3079
-             Eta_mean    0.0047    -0.0121  0.0036   0.0088  1.7644 0.0777
-           Gamma_mean    0.0058     0.0002  0.0035   0.0093  0.5658 0.5715
-  [cache] geweke_simple_200000  (took 134.2s when fitted)
-  geweke_test(kernel='simple', m=200,000): max |z| = 2.50, 0 statistic(s) below the Bonferroni threshold p < 0.0063
-                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval
-                  rho   -0.0002     0.0106  0.0010   0.0161 -0.6676 0.5044
-           log_sigma2    0.5794     0.6135  0.0029   0.0175 -1.9175 0.0552
-              yc_mean    0.0044    -0.0100  0.0036   0.0045  2.4989 0.0125
-           log_yc_var    1.7718     1.8229  0.0034   0.0299 -1.6988 0.0894
-    spatial_quadratic  -21.7655   -24.6135  2.3974   9.8910  0.2798 0.7796
-          corr_y0_wyc    0.0009     0.0035  0.0013   0.0022 -1.0252 0.3053
-             Eta_mean    0.0007     0.0011  0.0011   0.0028 -0.1345 0.8930
-           Gamma_mean    0.0016     0.0025  0.0011   0.0027 -0.3192 0.7496
-  [table]  geweke.csv  (16 rows x 9 cols)
+  [cache] geweke_simple_20000  (took 17.8s when fitted)
+  geweke_test(kernel='simple', m=20,000): max |z| = 3.48, flagged 1 of 8 at |z| > 2.73, passed = False
+                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval  z_crit  passed
+                  rho   -0.0046     0.0604  0.0030   0.0314 -2.0589 0.0395  2.7344   False
+           log_sigma2    0.5747     0.4690  0.0091   0.0468  2.2195 0.0265  2.7344   False
+              yc_mean    0.0090     0.0119  0.0106   0.0126 -0.1735 0.8622  2.7344   False
+           log_yc_var    1.7820     1.5655  0.0107   0.0613  3.4760 0.0005  2.7344   False
+    spatial_quadratic  -20.6000    -5.6645  5.0974   3.1656 -2.4891 0.0128  2.7344   False
+          corr_y0_wyc    0.0011     0.0093  0.0041   0.0069 -1.0196 0.3079  2.7344   False
+             Eta_mean    0.0047    -0.0121  0.0036   0.0088  1.7644 0.0777  2.7344   False
+           Gamma_mean    0.0058     0.0002  0.0035   0.0093  0.5658 0.5715  2.7344   False
+  [cache] geweke_simple_200000  (took 163.2s when fitted)
+  geweke_test(kernel='simple', m=200,000): max |z| = 2.50, flagged 0 of 8 at |z| > 2.73, passed = True
+                    g  mean_iid  mean_mcmc  se_iid  se_mcmc       z   pval  z_crit  passed
+                  rho   -0.0002     0.0106  0.0010   0.0161 -0.6676 0.5044  2.7344    True
+           log_sigma2    0.5794     0.6135  0.0029   0.0175 -1.9175 0.0552  2.7344    True
+              yc_mean    0.0044    -0.0100  0.0036   0.0045  2.4989 0.0125  2.7344    True
+           log_yc_var    1.7718     1.8229  0.0034   0.0299 -1.6988 0.0894  2.7344    True
+    spatial_quadratic  -21.7655   -24.6135  2.3974   9.8910  0.2798 0.7796  2.7344    True
+          corr_y0_wyc    0.0009     0.0035  0.0013   0.0022 -1.0252 0.3053  2.7344    True
+             Eta_mean    0.0007     0.0011  0.0011   0.0028 -0.1345 0.8930  2.7344    True
+           Gamma_mean    0.0016     0.0025  0.0011   0.0027 -0.3192 0.7496  2.7344    True
+  [table]  geweke.csv  (16 rows x 11 cols)
 
   |z| shrinks for 6 of 8 statistics when the chain grows 20,000 -> 200,000.
   That is the signature of a mixing artifact, not an incoherent
   conditional: a genuine error is stable across chain lengths.
   [figure] python_sc_bayes_spatial_14_geweke.png
-  [fit]   prior_sensitivity  (102.5s)
+  [cache] prior_sensitivity  (took 124.0s when fitted)
   [table]  prior_sensitivity.csv  (18 rows x 11 cols)
   prior sensitivity, posterior for rho across six settings:
      grid_row  step_rho  rho_hi  rho_lo  b0  a0 parameter   mean     sd   q025   q975
@@ -302,19 +301,19 @@
 10. Eight more Bayesian and spillover estimators from mlsynth
 ==============================================================================
   BPSCS coordinates: 2-D classical MDS of the rook graph (stress-free axes, NOT geographic)
-  [fit]   benchmark  (1456.6s)
+  [cache] benchmark  (took 1879.7s when fitted)
 
   9 of 9 returned an ATT; 0 errored; 0 skipped
                                              label    family  comparable     att     lo95    hi95                                extra status  seconds
-               BVSS — soft simplex, spike-and-slab  bayesian        True -16.317  -33.829  -6.548                                          ok  190.984
-               MVBBSC — Martinez & Vives-i-Bastida  bayesian        True -23.126  -29.138 -17.104                                          ok   13.111
-                         BFSC — Bayesian factor SC  bayesian        True -18.102  -34.964  -0.652                                          ok  173.617
-             BPSCS — penalised SC under spillovers spillover        True -17.185  -32.042   1.803                                          ok   77.436
-  SPILLSYNTH(sar) — the same paper, inside mlsynth spillover        True -16.525  -16.933 -16.176 rho=0.2476 ESS=135.2 att_scm=-15.678     ok  994.378
-                       SPILLSYNTH(cd) — Cao & Dowd spillover       False  -2.773      NaN     NaN att_scm=-10.524 Nevada spill=+12.772     ok    0.251
-                   SpSyDiD — spatial synthetic DiD spillover       False -17.108      NaN     NaN             ate=-20.164 aite=+14.881     ok    0.019
-                     ISCM — imperfect/inclusive SC spillover       False -37.762 -136.284  60.761                                          ok    0.223
-                SPOTSYNTH — spillover-detecting SC spillover        True -26.315  -29.223 -23.865                                          ok    6.590
+               BVSS — soft simplex, spike-and-slab  bayesian        True -16.317  -33.829  -6.548                                          ok  228.317
+               MVBBSC — Martinez & Vives-i-Bastida  bayesian        True -23.126  -29.138 -17.104                                          ok   17.773
+                         BFSC — Bayesian factor SC  bayesian        True -18.102  -34.964  -0.652                                          ok  224.038
+             BPSCS — penalised SC under spillovers spillover        True -17.185  -32.042   1.803                                          ok   91.080
+  SPILLSYNTH(sar) — the same paper, inside mlsynth spillover        True -16.525  -16.933 -16.176 rho=0.2476 ESS=135.2 att_scm=-15.678     ok 1301.589
+                       SPILLSYNTH(cd) — Cao & Dowd spillover       False  -2.773      NaN     NaN att_scm=-10.524 Nevada spill=+12.772     ok    0.714
+                   SpSyDiD — spatial synthetic DiD spillover       False -17.108      NaN     NaN             ate=-20.164 aite=+14.881     ok    0.065
+                     ISCM — imperfect/inclusive SC spillover       False -37.762 -136.284  60.761                                          ok    0.572
+                SPOTSYNTH — spillover-detecting SC spillover        True -26.315  -29.223 -23.865                                          ok   15.573
 
   estimands — the column that keeps this table from lying:
     comparable  bvss       ATT on the treated, weights shrunk toward the simplex
@@ -327,7 +326,7 @@
     NOT compar. iscm       ATT under an imperfect-fit correction, on its own normalisation
     comparable  spotsynth  ATT after screening contaminated donors out of the pool entirely
 
-  runtime spread: 0.02s (spsydid) to 994.4s (spill_sar)
+  runtime spread: 0.06s (spsydid) to 1301.6s (spill_sar)
   [table]  benchmark.csv  (9 rows x 15 cols)
   [figure] python_sc_bayes_spatial_16_benchmark.png
 
@@ -338,7 +337,7 @@
   60 replications per cell  (420 fits), n_jobs=1
   NOTE: mc_grid's inner sampler fixes adapt_rho=False and p=0 to mirror the
   reference study, so this section cannot demonstrate the adaptation fix.
-  [fit]   mc_grid  (61.3s)
+  [cache] mc_grid  (took 68.3s when fitted)
    N  T0  T1  rho  method  bias_point  rmse_point  cover95_point
   16  20  10 -0.6     SCM     -0.0848      0.4111            NaN
   16  20  10 -0.6    BSCM     -0.1356      0.1896         0.0017
@@ -409,12 +408,12 @@
   The estimand converges long before the nuisance parameter does. This is
   the evidence behind the headline budget: the ATT is stable from 100k on,
   but ESS(rho) does not clear the conventional 100 until roughly 500k.
-  [cache] budget_5000  (took 1.5s when fitted)
-  [cache] budget_20000  (took 5.2s when fitted)
-  [cache] budget_50000  (took 12.2s when fitted)
-  [cache] budget_100000  (took 23.7s when fitted)
-  [cache] budget_250000  (took 58.0s when fitted)
-  [cache] budget_500000  (took 116.1s when fitted)
+  [cache] budget_5000  (took 1.6s when fitted)
+  [cache] budget_20000  (took 6.0s when fitted)
+  [cache] budget_50000  (took 13.9s when fitted)
+  [cache] budget_100000  (took 29.6s when fitted)
+  [cache] budget_250000  (took 76.5s when fitted)
+  [cache] budget_500000  (took 151.3s when fitted)
    m_iter   burn      att     lo95     hi95  ci_width  att_scm  rho_hat  rho_lo  rho_hi  rho_ess  acc_rho
      5000   2500 -16.6683 -22.7271 -10.9081   11.8190 -15.5001   0.3183  0.2157  0.4523   2.7538   0.4028
     20000  10000 -16.9258 -23.0856 -10.5651   12.5205 -15.6770   0.3486  0.2579  0.4250   5.8160   0.4349
@@ -433,12 +432,12 @@
 15. Web-app data
 ==============================================================================
   [table]  app_rho_sweep.csv  (31 rows x 2 cols)
-  [app]    web_app/data/results.json  (201 KB, 16 top-level keys)
+  [app]    web_app/data/results.json  (202 KB, 17 top-level keys)
 
 ==============================================================================
 Done
 ==============================================================================
-  figures  19
+  figures  16
   tables   23
   headline ATT -16.868 [-23.045, -10.332]   rho 0.3161  ESS 137
   Nevada spillover -5.500 packs per capita

@@ -23,11 +23,12 @@ Usage:
     BENCH_TIER=fast python analysis.py    # skip the three slow benchmark rows
     MC_SIMS=15    python analysis.py      # a coarser Monte Carlo
 
-Run time: about 35 minutes cold, under a minute warm. The three dominant costs
-are the benchmark sweep (BVSS alone is ~3.5 min), the Monte Carlo, and the
-web-app budget ladder under APP_DATA=1.
+Run time: about 70 minutes cold (2026-11-20), a few minutes warm. The dominant
+costs are the two 500,000-iteration SPILLSYNTH(sar) fits (about 20 minutes each
+on the numpy backend), the rest of the benchmark sweep, and the web-app budget
+ladder under APP_DATA=1.
 
-Outputs:  python_sc_bayes_spatial_*.png (20 figures) and *.csv (23 tables).
+Outputs:  python_sc_bayes_spatial_*.png (19 figures) and *.csv (23 tables).
           Under APP_DATA=1, four more app_*.csv tables and the interactive
           companion's web_app/data/results.json (section 13).
 
@@ -1396,15 +1397,17 @@ print(f"  Y0_pre {Y0_pre.shape}   Yc_pre {Yc_pre.shape}   "
       f"X_pre {None if X_pre is None else X_pre.shape}")
 
 # --- 9.1 prior predictive ---------------------------------------------------
+# p=1: the prior of the model actually fitted (p_factors=1). An earlier version
+# used p=0, which checked a model without the latent factor.
 def _run_ppc():
     return prior_predictive(Y0_pre, sar["W_raw"], sar["w_raw"], sar["alpha_hat"],
-                            Yc_obs=Yc_pre, X=X_pre, p=0, a0=3.0, b0=1.0,
+                            Yc_obs=Yc_pre, X=X_pre, p=1, a0=3.0, b0=1.0,
                             n_draws=2000, seed=SEED)
 
 
 try:
     ppc = cached("prior_predictive",
-                 dict(n_draws=2000, a0=3.0, b0=1.0, p=0, seed=SEED,
+                 dict(n_draws=2000, a0=3.0, b0=1.0, p=1, seed=SEED,
                       alpha=sar["alpha_hat"]), _run_ppc)
     # PriorPredictiveResult exposes `observed`, `stats` and `p_values`, not a
     # ready-made table.
