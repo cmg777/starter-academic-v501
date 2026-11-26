@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The mlsynth Ladder Lab — Brexit</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261120">
 </head>
 <body>
 
@@ -306,7 +306,9 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
         integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
         crossorigin="anonymous"></script>
-<script src="charts.js"></script>
-<script src="app.js"></script>
+<script src="charts.js?v=20261120"></script>
+<script src="app.js?v=20261120"></script>
+<!-- ?v= busts copies cached under the old 30-day *.css/*.js rule (app.js changed 2026-11-20).
+     netlify.toml now revalidates these files on every visit, so the stamp need not be bumped. -->
 </body>
 </html>

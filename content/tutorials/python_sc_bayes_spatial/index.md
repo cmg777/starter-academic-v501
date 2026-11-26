@@ -1274,7 +1274,7 @@ The three tail statistics describe two different misfits. `ac1` (0.995) and `ac2
 
 This is a mild warning rather than a failure. Both misfits concern the shape of the prior over whole donor panels, not the parameters that enter the effects, and 18 years of data on 38 donors carry far more information than these priors. The right response is the one taken in section 11.3, which checks whether reasonable changes to the priors move the answer.
 
-![The prior predictive check across nine statistics](python_sc_bayes_spatial_13_prior_predictive.png)
+![The prior predictive check across nine statistics](python_sc_bayes_spatial_13_prior_predictive.png?v=20261120)
 
 *Figure 13. Observed statistics against their prior predictive distributions, drawn by `plot_prior_predictive`.*
 

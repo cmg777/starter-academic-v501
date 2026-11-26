@@ -135,6 +135,7 @@ Pipeline: script → results report → post → infographic → web app. Each s
 - **Hugo dev server:** it can panic when many files change while it serves (screenshot scripts, mass moves). Restart it, and trust the production build.
 - **Width tests:** at non-100% zoom or with display scaling, resizing the window does not give an exact viewport. Use Playwright viewports or fixed-width iframes.
 - **Section titles:** keep each section `_index.md` `title` equal to its menu label (Articles, Tutorials, …).
+- **Browser caching (`netlify.toml`):** only content-hashed names (Hugo `fingerprint` CSS/JS, processed `_hu…` images) are cached long; every other file revalidates on each visit. Never add a long `Cache-Control` by extension (`*.css`, `*.png`): a deck or web app linking `style.css` by a fixed name then pairs new HTML with a stale stylesheet. Headless checks start with an empty cache and cannot catch this.
 
 # Hugo Version Constraints
 

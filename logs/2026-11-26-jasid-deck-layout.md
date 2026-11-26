@@ -66,3 +66,25 @@ The deck at `/presentations/mapping-local-development-ai-satellite-imagery/` (so
   - The re-render is pixel-identical to the verified screenshots, apart from R² glyph anti-aliasing on two axis labels.
   - The layout and style gates pass.
 - **Other decks:** other presentation decks that link their own CSS by a fixed name (for example ADBI `deck.css`) carry the same latent risk.
+
+## Site-wide cache policy (same day)
+
+- **Root cause** of the JASID problem: since 2026-04-20 (`3cd7182a`), `netlify.toml` cached files by extension, which affected every deck, web app and figure on the site.
+  - Every `*.css` and `*.js` was cached for 30 days.
+  - Every `*.png`, `*.jpg` and `*.webp` was cached for a year with `immutable`.
+- **New rule:** only content-hashed names get a long cache (one year, `immutable`). These are:
+  - Hugo-fingerprinted `/css/*.min.*.css`, `/css/wowchemy.*.css`, and `/js/*.*.js` with its `/en|es|ja/` copies
+  - Hugo-processed images (`*_hu*_*_*`)
+
+  Everything else falls through to Netlify's default `max-age=0, must-revalidate`: the browser revalidates with the ETag and gets a cheap 304.
+- **Pattern check:** against the full `public/` tree, no original image matches the processed-image pattern and no unhashed CSS or JS matches the hashed patterns.
+- **Stale copies already in browsers:** the new rule does not evict copies cached under the old one, so the files changed inside their old cache window were busted one by one.
+  - CSS and JS changed in the last 30 days:
+    - JASID `jasid.css`: now inlined (see above).
+    - `python_sc_dsc_sdid` web app: `app.js` changed on 2026-11-20. Added `?v=20261120` to `styles.css`, `charts.js` and `app.js` in `web_app/index.html`.
+    - ADBI `deck.css`: last changed 2026-10-28, so any copy cached before then expires by 2026-11-27. Nothing to do.
+  - Images changed in place since 2026-04-20 that still exist at the same URL (25):
+    - Featured and avatar originals: referenced only from `og:image` / `twitter:image` meta (thumbnails use processed copies). Nothing to do.
+    - `python_sc_bayes_spatial_13_prior_predictive.png` (changed 2026-11-20): `?v=20261120` added in `index.md`.
+- **Docs:** a CLAUDE.md gotcha records the rule.
+- **Checks:** Hugo build is clean. `audit-site.py` reports the same 6 pre-existing legacy `/post/python_dynamic_panel` problems.

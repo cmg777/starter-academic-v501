@@ -15,30 +15,59 @@
 [context.branch-deploy]
   command = "hugo --gc --minify --buildFuture -b $DEPLOY_PRIME_URL"
 
+# Browser caching: long-lived ONLY for files whose name carries a content hash, so a
+# changed file always gets a new URL. Everything else (slide decks, web apps, tutorial
+# figures, featured originals, /js/mathjax-config.js, …) falls through to Netlify's
+# default `public, max-age=0, must-revalidate`: the browser keeps its copy but checks the
+# ETag on each visit (a cheap 304), so an edit shows up on the next load.
+#
+# Until 2026-11-26 every *.css/*.js got 30 days and every *.png/*.jpg/*.webp a year
+# `immutable`, by extension. A deck or web app linking its own `style.css` / `app.js` by a
+# fixed name then paired fresh HTML with a stale stylesheet after an edit (the JASID deck
+# rendered with no layout in a returning visitor's browser), and a regenerated tutorial
+# figure could stay stale for a year. See logs/2026-11-26-jasid-deck-layout.md.
+#
+# The patterns below must stay disjoint (Netlify merges duplicate headers when several
+# rules match one path). They match only Hugo-fingerprinted names:
+#   /css/<name>.min.<sha256>.css, /css/wowchemy.<md5>.css   (Hugo Pipes | fingerprint)
+#   /js/<name>.<hash>.js and its /en|es|ja/ copies          (Hugo Pipes | fingerprint)
+#   <name>_hu<md5>_<bytes>_<…>.<ext>                        (Hugo image processing)
+# Do not name a source file like these (e.g. `foo.min.bar.css`, `x.y.js` in /js/, or an
+# image with `_hu` followed by two more underscores): it would be cached for a year.
 [[headers]]
-  for = "*.webp"
+  for = "/css/*.min.*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.jpg"
+  for = "/css/wowchemy.*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.png"
+  for = "/js/*.*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.css"
+  for = "/en/js/*.*.js"
   [headers.values]
-    Cache-Control = "public, max-age=2592000"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.js"
+  for = "/es/js/*.*.js"
   [headers.values]
-    Cache-Control = "public, max-age=2592000"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/ja/js/*.*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*_hu*_*_*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "*.qmd"
