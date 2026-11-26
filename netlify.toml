@@ -30,10 +30,14 @@
 # The patterns below must stay disjoint (Netlify merges duplicate headers when several
 # rules match one path). They match only Hugo-fingerprinted names:
 #   /css/<name>.min.<sha256>.css, /css/wowchemy.<md5>.css   (Hugo Pipes | fingerprint)
-#   /js/<name>.<hash>.js and its /en|es|ja/ copies          (Hugo Pipes | fingerprint)
+#   /js/<name>.min.<hash>.js (+ /en|es|ja/), /js/<lab>-lab.<sha256>.js
 #   <name>_hu<md5>_<bytes>_<…>.<ext>                        (Hugo image processing)
-# Do not name a source file like these (e.g. `foo.min.bar.css`, `x.y.js` in /js/, or an
-# image with `_hu` followed by two more underscores): it would be cached for a year.
+# CAUTION: Netlify treats `.` in these patterns as "any character" (`/js/*.*.js` matched
+# /js/mathjax-config.js). Each pattern was checked against every file in public/ under both
+# readings (`.` literal and `.` = any): 1,396 hashed files matched, 0 unhashed. Re-check
+# after adding a pattern. A new fingerprinted bundle that matches none simply revalidates.
+# Do not give a source file such a name (e.g. `x.min.y.js` in /js/, or an image with `_hu`
+# followed by two more underscores in its path): it would be cached for a year.
 [[headers]]
   for = "/css/*.min.*.css"
   [headers.values]
@@ -45,22 +49,27 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/js/*.*.js"
+  for = "/js/*.min.*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/en/js/*.*.js"
+  for = "/js/*-lab.*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/es/js/*.*.js"
+  for = "/en/js/*.min.*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/ja/js/*.*.js"
+  for = "/es/js/*.min.*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/ja/js/*.min.*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 

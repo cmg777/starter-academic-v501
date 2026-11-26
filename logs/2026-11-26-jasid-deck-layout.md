@@ -73,7 +73,7 @@ The deck at `/presentations/mapping-local-development-ai-satellite-imagery/` (so
   - Every `*.css` and `*.js` was cached for 30 days.
   - Every `*.png`, `*.jpg` and `*.webp` was cached for a year with `immutable`.
 - **New rule:** only content-hashed names get a long cache (one year, `immutable`). These are:
-  - Hugo-fingerprinted `/css/*.min.*.css`, `/css/wowchemy.*.css`, and `/js/*.*.js` with its `/en|es|ja/` copies
+  - Hugo-fingerprinted `/css/*.min.*.css`, `/css/wowchemy.*.css`, `/js/*.min.*.js` (plus `/en|es|ja/` copies) and `/js/*-lab.*.js`
   - Hugo-processed images (`*_hu*_*_*`)
 
   Everything else falls through to Netlify's default `max-age=0, must-revalidate`: the browser revalidates with the ETag and gets a cheap 304.
@@ -88,3 +88,8 @@ The deck at `/presentations/mapping-local-development-ai-satellite-imagery/` (so
     - `python_sc_bayes_spatial_13_prior_predictive.png` (changed 2026-11-20): `?v=20261120` added in `index.md`.
 - **Docs:** a CLAUDE.md gotcha records the rule.
 - **Checks:** Hugo build is clean. `audit-site.py` reports the same 6 pre-existing legacy `/post/python_dynamic_panel` problems.
+- **Correction after deploy:** the first version used `/js/*.*.js`, and live headers showed `/js/mathjax-config.js` and `/js/tutorial-gallery.js` getting the one-year `immutable` cache.
+  - Cause: Netlify treats `.` in a pattern as "any character".
+  - Fix: replaced it with `/js/*.min.*.js` (plus the `/en|es|ja/` copies) and `/js/*-lab.*.js`.
+  - Check: simulated over every file in `public/` with `.` read both as literal and as any character: 1,396 hashed files matched, 0 unhashed.
+  - Side effect: the two files were served with the long header for a few minutes. Neither has changed since, so no stale copy can result.
