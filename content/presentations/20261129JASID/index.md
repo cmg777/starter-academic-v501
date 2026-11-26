@@ -33,6 +33,10 @@ image:
   focal_point: Center
 
 links:
+  - icon: file-pdf
+    icon_pack: fas
+    name: "Slides (PDF)"
+    url: https://carlos-mendez.org/presentations/mapping-local-development-ai-satellite-imagery/slides/slides.pdf
 url_code: ""
 url_pdf: ""
 url_slides: "https://carlos-mendez.org/presentations/mapping-local-development-ai-satellite-imagery/slides/index.html"

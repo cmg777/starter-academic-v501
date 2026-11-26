@@ -1,49 +1,161 @@
-/* Layout extension to the Bolivia template. */
-/* Audience-focused layouts using the original Bolivia Nightlight palette. */
+/* Layout layer for the JASID deck, linked after the compiled theme (theme.scss).
+   Palette: theme.scss variables only (no new colours). Canvas 1280x720; content box x 64..1216.
+   Type floor: nothing the audience must read is set below 0.6em (about 20px at 1280x720).
+   Every multi-column block is built from nested Pandoc fenced divs (:::: / :::), never from raw
+   <div> tags inside a fenced div: Pandoc drops those wrappers, and the columns then fall apart
+   into one flex item per paragraph (the bug that broke the limits slide). */
+
+/* ---------- Base text steps ---------- */
 .reveal .slide h2 {font-size:1.24em; line-height:1.13; margin-bottom:.42em;}
-.reveal .slide .kicker {margin-bottom:.35em;}
+.reveal .slide .kicker {font-size:.6em; margin-bottom:.4em;}
 .reveal .slide p {margin:.3em 0;}
-.reveal .slide .takeaway {display:block; font-size:.78em; line-height:1.35; border-top:1px solid #2A5183; padding-top:.5em; margin-top:.45em; color:#F5B455;}
-.reveal .slide .source {font-size:.42em; line-height:1.35; margin-top:.55em; color:#A9BDD4;}
-.reveal .slide .wide-illustration {width:100%; height:390px; object-fit:cover; margin:0;}
-.reveal .picture-slide figure {margin:.2em 0 0;}
-.reveal .slide .three-labels {display:flex; justify-content:space-between; font-size:.65em; color:#A9BDD4; padding:0 6%; margin:.4em 0 -.25em;}
-.reveal .slide .plain-pair {display:flex; justify-content:space-around; gap:1.5em; text-align:center; font-size:.85em; line-height:1.35; margin:.4em 0;}
-.reveal .slide .definition {display:flex; gap:1.4em; align-items:center; margin:1.2em .5em .8em;}
-.reveal .slide .hero-number {font-size:5.1em; font-weight:700; color:#8FC0EC; line-height:1; letter-spacing:-.06em;}
-.reveal .slide .lead {font-size:1.12em; font-weight:500; line-height:1.3;}
+.reveal .slide .takeaway {display:block; font-size:.78em; line-height:1.35; border-top:1px solid #2A5183; padding-top:.45em; margin-top:.45em; color:#F5B455;}
+.reveal .slide .source {font-size:.6em; line-height:1.4; margin-top:.4em; color:#8199B4;}
 .reveal .slide .quiet {font-size:.82em; color:#A9BDD4; line-height:1.5;}
-.reveal .slide .word-note {font-size:.85em; margin:1em .8em;}
-.reveal .slide .vector {font-family:'Fira Code',monospace; font-size:2.05em; letter-spacing:-.04em; text-align:center; margin:1em 0 .2em; color:#8FC0EC;}
-.reveal .slide .vector-caption {font-size:.5em; color:#A9BDD4; text-align:center; margin-bottom:1.5em;}
-.reveal .slide .learning-row {display:flex; gap:.9em; align-items:center; margin:1em .4em;}
-.reveal .slide .step-number {font-family:'Source Serif 4',serif; font-size:2.5em; line-height:1; color:#8FC0EC; width:1.1em; flex-shrink:0;}
-.reveal .slide h3 {font-size:1.05em; color:#EEF3F9; margin:0 0 .28em; font-weight:600;}
-.reveal .slide .learning-row p {font-size:.82em; color:#A9BDD4;}
-.reveal .slide .two-columns {display:flex; align-items:center; gap:1.4em; height:470px;}
+
+/* ---------- Picture slides ---------- */
+.reveal .picture-slide figure {margin:.2em 0 0;}
+.reveal .picture-slide p:has(> img) {margin:0;}
+/* 16:9 illustrations with empty sky above and below: a deliberate centred crop, with the left and
+   right edges faded into the canvas so the image has no visible rectangle. */
+.reveal .slides section .wide-illustration {width:100%; height:372px; max-height:none; max-width:100%; object-fit:cover; margin:0;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%);}
+/* The information-gap banner (1267x367) carries labels at its edges, so it is never cropped. */
+.reveal .slides section .gap-illustration {display:block; width:100%; height:auto; max-height:none; max-width:100%; object-fit:contain; margin:0 auto;}
+
+/* Captions aligned under the stages of the image above (fractions measured on the images). */
+.reveal .slide .stage-labels {display:grid; text-align:center; font-size:.66em; line-height:1.3; color:#A9BDD4; margin:.25em 0 .1em;}
+.reveal .slide .stage-labels > div {padding:0 .4em;}
+.reveal .slide .stage-labels p {margin:0;}
+.reveal .slide .stage-labels strong {color:#EEF3F9;}
+.reveal .slide .stage-labels em {font-style:normal; color:#8FC0EC; font-weight:600;}
+.reveal .slide .stage-labels-embedding {grid-template-columns:46% 23% 31%;}
+.reveal .slide .stage-labels-tiles {grid-template-columns:1fr 1fr 1fr;}
+
+.reveal .slide .plain-pair {display:flex; justify-content:space-around; gap:1.5em; text-align:center; font-size:.95em; line-height:1.35; margin:.7em 0 .5em;}
+.reveal .slide .plain-pair > div {flex:1;}
+.reveal .slide .plain-pair p {margin:0;}
+
+/* ---------- Two-step pipeline (slide: prediction needs measured data) ---------- */
+.reveal .slide .pipeline {display:flex; align-items:stretch; gap:.35em; margin:1em 0 0;}
+.reveal .slide .pipe-step-label {flex:0 0 7em; font-size:.72em; line-height:1.25; font-weight:600; color:#EEF3F9; align-self:center;}
+.reveal .slide .pipe-step-label p {margin:0;}
+.reveal .slide .pipe-num {display:block; font-size:.9em; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.25em;}
+.reveal .slide .pipeline-emb .pipe-num {color:#8FC0EC;}
+.reveal .slide .pipeline-pov .pipe-num {color:#F5B455;}
+.reveal .slide .pipe-box {flex:1 1 0; display:flex; align-items:center; justify-content:center; text-align:center; background:#13304F; border:1px solid rgba(143,192,236,.28); border-radius:12px; padding:.7em .6em; font-size:.72em; line-height:1.3; color:#EEF3F9; min-height:4.4em;}
+.reveal .slide .pipe-box p {margin:0;}
+.reveal .slide .pipeline-emb .pipe-out {border:2px solid #8FC0EC;}
+.reveal .slide .pipeline-pov .pipe-box {border-color:rgba(245,180,85,.32);}
+.reveal .slide .pipeline-pov .pipe-out {border:2px solid #F5B455;}
+.reveal .slide .pipe-arrow,
+.reveal .slide .pipe-plus {flex:0 0 auto; align-self:center; font-size:.9em; color:#5A8FC4; line-height:1;}
+.reveal .slide .pipe-arrow p, .reveal .slide .pipe-plus p {margin:0;}
+.reveal .slide .pipe-note {display:block; font-size:.68em; margin:.55em 0 .4em 184px;}
+.reveal .pipeline-slide .takeaway {margin-top:1em;}
+.reveal .slide .pipe-note-emb {color:#8FC0EC;}
+
+/* ---------- Study slide ---------- */
+.reveal .slide .two-columns {display:flex; align-items:center; gap:1.4em; height:460px;}
 .reveal .slide .two-columns > div {width:50%;}
-.reveal .slide .two-columns img {height:450px; width:100%; object-fit:contain; margin:0; max-height:450px;}
+.reveal .slides section .two-columns img {height:440px; width:100%; object-fit:contain; margin:0; max-height:440px;}
 .reveal .study-slide .two-columns .image-column {width:43%;}
 .reveal .study-slide .two-columns .text-column {width:57%;}
-.reveal .slide .hero-small {font-family:'Source Serif 4',serif; font-size:1.9em; color:#8FC0EC; margin:0 0 .3em;}
-.reveal .slide .comparison {display:flex; gap:2em; margin:1.2em .45em 1.4em;}
-.reveal .slide .comparison > div {flex:1;}
-.reveal .slide .comparison > div + div {border-left:1px solid #2A5183; padding-left:1.2em;}
-.reveal .slide .comparison h3 {min-height:2.4em; font-size:1em; color:#8FC0EC;}
-.reveal .slide .comparison p {font-size:.81em; line-height:1.45; margin:.4em 0; color:#A9BDD4;}
-.reveal .slide .comparison .question {color:#EEF3F9; margin-top:1em; font-weight:500;}
-.reveal .slide .evidence-figure {width:100%; height:410px; object-fit:contain; max-height:410px; margin:0;}
-.reveal .slide .map-figure {width:100%; height:460px; object-fit:contain; max-height:460px; margin:0;}
-.reveal .evidence-slide figure,.reveal .map-slide figure {margin:.1em 0;}
+.reveal .slide .hero-small {font-family:'Source Serif 4',serif; font-size:1.9em; color:#8FC0EC; margin:0 0 .3em; display:block; line-height:1.1;}
+
+/* ---------- Plotly slides ---------- */
+.reveal .slides section .plotly-figure {margin:0 auto;}
+.reveal .evidence-slide .plotly-figure {margin:.1em 0 0;}
+.reveal .r2-slide .r2-callout {display:flex; align-items:center; gap:.8em; margin:.2em 0 0; border-top:1px solid #2A5183; padding-top:.35em;}
+.reveal .r2-slide .r2-number {flex:0 0 auto; font-size:1.3em; font-weight:800; color:#F5B455; letter-spacing:-.01em; font-variant-numeric:tabular-nums;}
+.reveal .r2-slide .r2-number p, .reveal .r2-slide .r2-text p {margin:0;}
+.reveal .r2-slide .r2-text {font-size:.68em; line-height:1.35; color:#EEF3F9; text-wrap:balance;}
+.reveal .r2-slide .source {margin-top:.25em;}
+
+/* Chart on the left (780px, sized in jasid-figures.js), reading panel on the right. */
+.reveal .slide .figure-split {display:flex; align-items:center; gap:28px; margin-top:.1em;}
+.reveal .slide .figure-main {flex:0 0 780px;}
+.reveal .slide .figure-side {flex:1 1 auto; min-width:0; background:#13304F; border:1px solid rgba(143,192,236,.2); border-radius:14px; padding:.55em .7em .6em;}
+.reveal .slide .figure-side p {margin:.25em 0;}
+.reveal .slide .side-head {display:block; color:#F5B455; text-transform:uppercase; letter-spacing:.12em; font-weight:700; font-size:.6em; margin-bottom:.2em;}
+.reveal .slide .side-stat p {display:flex; align-items:baseline; gap:.35em; font-size:.66em; line-height:1.2; color:#EEF3F9; margin:.35em 0;}
+.reveal .slide .side-num {margin-left:auto; font-size:1.7em; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.01em;}
+.reveal .slide .num-lights {color:#F5B455;}
+.reveal .slide .num-emb {color:#8FC0EC;}
+.reveal .slide .num-ink {color:#EEF3F9;}
+.reveal .slide .mark-lights {color:#F5B455;}
+.reveal .slide .mark-emb {color:#8FC0EC;}
+.reveal .slide .side-take {display:block; font-size:.66em; line-height:1.38; color:#EEF3F9; border-top:1px solid #2A5183; padding-top:.5em; margin-top:.5em;}
+.reveal .slide .figure-side .source {display:block; margin-top:.6em;}
+
+/* ---------- Population weighting ---------- */
+.reveal .slide .pop-split {display:flex; align-items:center; gap:36px;}
+.reveal .slide .pop-map {flex:0 0 420px;}
+.reveal .slide .pop-map p {margin:0;}
+.reveal .slides section .pop-map img {width:420px; height:474px; max-height:none; max-width:none; object-fit:contain; margin:0;}
+.reveal .slide .pop-explain {flex:1 1 auto; min-width:0;}
+.reveal .slide .weight-row {margin:0 0 .7em;}
+.reveal .slide .weight-head {display:block; font-size:.6em; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#A9BDD4; margin-bottom:.3em;}
+.reveal .slide .weight-head-pop {color:#F5B455;}
+.reveal .slide .pixels {display:flex; align-items:center; gap:10px; height:80px; margin:0;}
+.reveal .slide .pixels p {display:flex; align-items:center; gap:10px; margin:0; height:80px;}
+.reveal .slide .px {display:inline-block; width:44px; height:44px; border-radius:5px; background:#193C63; border:1px solid #2A5183;}
+.reveal .slide .px-town {background:#F5B455; border-color:#F5B455;}
+.reveal .slide .pixels-weighted .px-empty {width:12px; height:12px; opacity:.7;}
+.reveal .slide .pixels-weighted .px-town {width:76px; height:76px;}
+.reveal .slide .weight-text {display:block; font-size:.66em; line-height:1.35; color:#EEF3F9;}
+.reveal .population-slide .takeaway {margin-top:.6em;}
+
+/* ---------- Map slide ---------- */
+.reveal .map-slide .map-callout {display:flex; align-items:center; gap:.7em; border-top:1px solid #2A5183; padding-top:.3em; margin-top:.15em;}
+.reveal .map-slide .map-number {flex:0 0 auto; font-size:1.5em; font-weight:800; color:#F5B455; font-variant-numeric:tabular-nums;}
+.reveal .map-slide .map-number p, .reveal .map-slide .map-text p {margin:0;}
+.reveal .map-slide .map-text {font-size:.66em; line-height:1.38; color:#EEF3F9; text-wrap:balance;}
+
+/* ---------- Recap and limits: equal-height cards ---------- */
+.reveal .slide .recap {display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin:1em 0 .8em;}
+.reveal .slide .recap-card {background:#13304F; border:1px solid rgba(143,192,236,.22); border-radius:16px; padding:1em .9em 1.1em; box-shadow:0 10px 30px rgba(3,8,18,.35);}
+.reveal .slide .recap-card p {font-size:.74em; line-height:1.4; color:#EEF3F9; margin:.35em 0 0;}
+.reveal .slide .recap-card p:has(> .recap-num), .reveal .slide .recap-card p:has(> .recap-unit) {font-size:1em; margin:0;}
+.reveal .slide .recap-num {display:block; font-size:1.6em; font-weight:800; color:#8FC0EC; line-height:1.1; font-variant-numeric:tabular-nums; white-space:nowrap;}
+.reveal .slide .recap-unit {display:block; font-size:.62em; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#A9BDD4; margin:.25em 0 .2em;}
+
+.reveal .slide .limits {display:grid; grid-template-columns:1fr 1fr; gap:28px; margin:.9em 0 .8em;}
+.reveal .slide .limit-card {background:#13304F; border-radius:16px; padding:.9em 1em 1em; border:1px solid rgba(143,192,236,.22); display:flex; flex-direction:column;}
+.reveal .slide .limit-cannot {border-color:rgba(245,138,115,.35);}
+.reveal .slide .limit-head {display:block; font-size:.88em; font-weight:700; color:#8FC0EC; margin-bottom:.15em;}
+.reveal .slide .limit-cannot .limit-head {color:#F58A73;}
+.reveal .slide .limit-card ul {margin:.2em 0 0 1em; padding:0;}
+.reveal .slide .limit-card li {font-size:.76em; line-height:1.38; color:#EEF3F9; margin-bottom:.35em;}
+.reveal .slide .limit-card p:has(> .limit-foot) {margin-top:auto;}
+.reveal .slide .limit-foot {display:block; font-size:.7em; line-height:1.38; color:#A9BDD4; border-top:1px solid #2A5183; padding-top:.45em; margin-top:.4em;}
+
+/* ---------- Closing ---------- */
 .reveal .slides section.closing-statement {padding:1.4em 1.5em; box-sizing:border-box;}
-.reveal .slides section.closing-statement h2 {max-width:16em; font-size:1.7em; font-family:'Source Serif 4',serif; margin:0 0 .6em;}
+.reveal .slides section.closing-statement h2 {max-width:14em; font-size:1.7em; font-family:'Source Serif 4',serif; margin:0 0 .6em;}
 .reveal .slides section.closing-statement .closing-line {font-size:.85em; line-height:1.55; color:#A9BDD4;}
-.reveal .slides section.closing-statement .closing-author {font-size:.57em; margin-top:1.5em;}
+.reveal .slides section.closing-statement .closing-author {font-size:.64em; margin-top:1.5em;}
 .reveal .slide-background[data-background-hash*="closing"] {background-color:#06101F;}
+/* Embedded image URLs do not retain filenames, so scope the closing veil by its slide class. */
+.reveal .slide-background.closing-statement .slide-background-content::after {content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(6,16,31,.92) 0%,rgba(6,16,31,.78) 49%,rgba(6,16,31,.10) 82%);}
+
+/* ---------- Title slide ---------- */
 #title-slide .title-card {width:48%;}
 #title-slide .title {font-size:1.94em; max-width:9em;}
 #title-slide .subtitle {font-size:.83em; max-width:22em;}
-#title-slide .occasion {font-size:.51em; letter-spacing:.055em;}
-/* Embedded image URLs do not retain filenames, so scope the closing veil by its slide class. */
-.reveal .slide-background.closing-statement .slide-background-content::after {content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(6,16,31,.92) 0%,rgba(6,16,31,.78) 49%,rgba(6,16,31,.10) 82%);}
-.reveal .slides section.closing-statement h2 {max-width:14em;}
+#title-slide .affil, #title-slide .author-site {font-size:.6em;}
+#title-slide .occasion {font-size:.6em; letter-spacing:.055em;}
+
+/* ---------- Print / PDF (?print-pdf) ----------
+   Reveal prints each slide on a page 10% larger than the 1280x720 canvas (its margin setting). The
+   lit-canvas gradient lives on .reveal-viewport, which in print covers only the canvas area and left a
+   lighter rectangle on every page. Paint the same canvas on each page instead. */
+html.reveal-print, html.reveal-print body, html.reveal-print .reveal-viewport {background:#0A1C36 !important; background-image:none !important;}
+html.reveal-print .reveal .pdf-page {
+  background-color:#0A1C36;
+  background-image:
+    radial-gradient(58% 46% at 16% 10%, rgba(74,142,205,.20), transparent 68%),
+    radial-gradient(52% 44% at 90% 96%, rgba(18,58,110,.42), transparent 70%),
+    radial-gradient(126% 108% at 50% 46%, transparent 40%, rgba(3,8,18,.62) 100%);
+}

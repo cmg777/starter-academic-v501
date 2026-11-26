@@ -44,12 +44,16 @@ format:
 
 [The information gap]{.kicker}
 
-![](figures/fig-motivation.webp){.wide-illustration fig-alt="Conceptual illustration of a lit city, rural towns and remote villages, with fewer data observations over more remote places."}
+![](figures/fig-motivation.webp){.gap-illustration fig-alt="Conceptual illustration of a lit city, rural towns and remote villages, with fewer data observations over more remote places."}
 
-::: {.plain-pair}
-<div>Where are needs concentrated?</div>
-<div>Which places need a closer look?</div>
+:::: {.plain-pair}
+::: {}
+Where are needs concentrated?
 :::
+::: {}
+Which places need a closer look?
+:::
+::::
 
 [Repeated satellite observations could help fill the gaps between surveys.]{.takeaway}
 
@@ -71,15 +75,21 @@ Image: illustrative AI-generated artwork reused from the Bolivia deck, figures/R
 
 ![](figures/embedding-compression.png){.wide-illustration fig-alt="Illustrative repeated observations of one place pass through a compression metaphor into a grid representing one numerical summary."}
 
-::: {.three-labels}
-<div>Many observations</div>
-<div>AI model</div>
-<div>64 numbers — an embedding</div>
+:::: {.stage-labels .stage-labels-embedding}
+::: {}
+Many images of one place, across a year
 :::
+::: {}
+AI model
+:::
+::: {}
+64 numbers: an *embedding*
+:::
+::::
 
-[The summary becomes an input to a separate prediction model.]{.takeaway}
+[The 64 numbers become the input to a separate prediction model.]{.takeaway}
 
-[AlphaEarth Foundations releases one vector per 10 × 10 metre location, summarizing observations across a year. It combines optical imagery with radar; "daytime embeddings" is shorthand here.]{.source}
+[Google DeepMind AlphaEarth Foundations: one set of 64 numbers for every 10 × 10 metre square, each year.]{.source}
 
 ::: {.notes}
 This is the entire idea of the talk. We start with repeated observations of a place. A general-purpose AI model compresses the observations into a useful numerical description called an embedding. We can then ask whether those numerical descriptions help predict an outcome for which we have measured examples.
@@ -90,7 +100,7 @@ Each position in the vector has a consistent place in the representation, but an
 
 The picture is an analogy, not AlphaEarth's literal architecture. It is a new AI-generated scientific illustration. The colored cells represent numerical features, not a geographic grid or a poverty classification.
 
-Technical qualification: generation uses optical and thermal observations from Landsat, optical Sentinel-2 and radar Sentinel-1. Broader sources such as elevation and geolocated text participate in training as targets. Thus the dataset is not daytime-optical-only. We retain the source study's daytime-embeddings comparison label, while using satellite embeddings for the technical explanation. Sources: https://deepmind.google/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/ , https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL , and the AlphaEarth paper Table S1 and supplement S16.2.2, https://arxiv.org/html/2507.22291v1 .
+Naming: the source study calls these "daytime embeddings", to contrast them with nighttime lights. The slides say "AI embeddings" for a general audience; both names refer to the same AlphaEarth data. Technical qualification: generation uses optical and thermal observations from Landsat, optical Sentinel-2 and radar Sentinel-1. Broader sources such as elevation and geolocated text participate in training as targets. Thus the dataset is not daytime-optical-only. Sources: https://deepmind.google/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/ , https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL , and the AlphaEarth paper Table S1 and supplement S16.2.2, https://arxiv.org/html/2507.22291v1 .
 :::
 
 
@@ -100,7 +110,19 @@ Technical qualification: generation uses optical and thermal observations from L
 
 ![](figures/landscape-similarity.png){.wide-illustration fig-alt="Three illustrative overhead landscapes: two towns with similar street patterns and a contrasting agricultural landscape."}
 
-[Resemblance can help prediction, but similar-looking places can have different poverty outcomes.]{.takeaway}
+:::: {.stage-labels .stage-labels-tiles}
+::: {}
+**Town A**
+:::
+::: {}
+**Town B**<br>numbers close to Town A
+:::
+::: {}
+**Farmland**<br>very different numbers
+:::
+::::
+
+[Resemblance helps prediction, but places that look alike can still differ in poverty.]{.takeaway}
 
 ::: {.notes}
 Invite the audience to compare the first two places with the agricultural landscape. A model can encode a kind of resemblance without a person naming every roof, road or field. In the embedding space, similar observed characteristics can give similar vectors. This is intuition, not a measured nearest-neighbor result for these pictures. We have not extracted embeddings from these invented scenes.
@@ -109,27 +131,57 @@ Similarity is not identity and does not guarantee similar poverty. The model sti
 :::
 
 
-## Prediction still needs measured poverty data {.learning-slide}
+## Prediction still needs measured poverty data {.pipeline-slide}
 
-[Two separate learning tasks]{.kicker}
+[Two separate learning steps]{.kicker}
 
-::: {.learning-row}
-[1]{.step-number}
-<div>
-### Describe the landscape
-A general-purpose model produces embeddings. It was never shown a poverty outcome.
-</div>
+:::: {.pipeline .pipeline-emb}
+::: {.pipe-step-label}
+[Step 1]{.pipe-num}
+Describe the landscape
 :::
-
-::: {.learning-row}
-[2]{.step-number}
-<div>
-### Learn the poverty relationship
-Municipal summaries of those embeddings, trained against measured poverty outcomes.
-</div>
+::: {.pipe-box}
+Satellite images of a place, across a year
 :::
+::: {.pipe-arrow}
+→
+:::
+::: {.pipe-box}
+General AI model
+:::
+::: {.pipe-arrow}
+→
+:::
+::: {.pipe-box .pipe-out}
+64 numbers per place
+:::
+::::
 
-[The measured outcome data is what gives the prediction its meaning.]{.takeaway}
+[The AI model never sees any poverty data.]{.pipe-note .pipe-note-emb}
+
+:::: {.pipeline .pipeline-pov}
+::: {.pipe-step-label}
+[Step 2]{.pipe-num}
+Learn the poverty relationship
+:::
+::: {.pipe-box}
+64 numbers, averaged for each municipality
+:::
+::: {.pipe-plus}
+\+
+:::
+::: {.pipe-box}
+Measured poverty in 339 municipalities
+:::
+::: {.pipe-arrow}
+→
+:::
+::: {.pipe-box .pipe-out}
+Prediction model, tested on places it has not seen
+:::
+::::
+
+[The measured poverty data is what gives the prediction its meaning.]{.takeaway}
 
 ::: {.notes}
 Keep these steps separate. AlphaEarth was not trained in this study to predict poverty. The study takes its general-purpose representation and trains a separate supervised prediction model using measured municipal outcomes. A useful representation alone does not tell us which places have more or less poverty.
@@ -143,9 +195,9 @@ The Bolivia study uses random forests, tuned within nested cross-validation. A r
 [Act II · The evidence]{.kicker}
 
 
-## Bolivia's 339 municipalities give a concrete test {.study-slide}
+## 339 Bolivian municipalities give a concrete test {.study-slide}
 
-::: {.two-columns}
+:::: {.two-columns}
 ::: {.image-column}
 ![](figures/fig-atlas2020-book.webp){fig-alt="Cover of the Municipal Atlas of the Sustainable Development Goals in Bolivia 2020."}
 :::
@@ -154,20 +206,20 @@ The Bolivia study uses random forests, tuned within nested cross-validation. A r
 
 [SDG 1 "No Poverty" index]{.hero-small}
 
-Scored 0–100. Higher means **less** poverty.
+Scored from 0 to 100. Higher means **less** poverty.
 
-[This is an achievement index, not the poverty rate and not a count of poor households.]{.quiet}
+[An achievement index: not the poverty rate, and not a count of poor households.]{.quiet}
 
-[One application, one clearly defined outcome.]{.takeaway}
+[One country, one clearly defined outcome.]{.takeaway}
 :::
-:::
+::::
 
-[Outcome: Andersen et al. (2020), Municipal Atlas of the Sustainable Development Goals in Bolivia.]{.source}
+[Outcome data: Andersen et al. (2020), Municipal Atlas of the Sustainable Development Goals in Bolivia.]{.source}
 
 ::: {.notes}
 Introduce the case only after the audience understands embeddings. The Municipal Atlas supplies 2017 outcomes for 339 municipalities. This talk uses only SDG 1, the No Poverty index. It ranges from 0 to 100 with higher values indicating better achievement, hence less poverty. Do not describe it as the percentage of people in poverty or the number of poor households.
 
-The broader research considers other development goals. They stay in the background here, but they are visible in the next charts, where poverty is the top row. Cover image: existing Atlas cover from the Bolivia deck. Study counts and outcome interpretation: original source deck and frozen sources/claims.toml. Underlying Atlas: Andersen et al. (2020).
+The broader research considers other development goals. They stay in the background here, but they are visible in the next charts, where poverty is the highlighted top row. Cover image: existing Atlas cover from the Bolivia deck. Study counts and outcome interpretation: original source deck and frozen sources/claims.toml. Underlying Atlas: Andersen et al. (2020).
 :::
 
 
@@ -175,58 +227,84 @@ The broader research considers other development goals. They stay in the backgro
 
 [Each dot is one municipality]{.kicker}
 
-![](figures/ntl-poverty-scatter.svg){.evidence-figure fig-alt="Scatter of all 339 Bolivian municipalities in 2017. The x axis is population-weighted mean nighttime-light radiance on a log scale. The y axis is the SDG 1 achievement index, from 0 to 100; higher means less poverty."}
+```{=html}
+{{< include figures-src/fig-ntl-scatter.html >}}
+```
 
 [Brighter places tend to score higher, but the relationship is far from exact.]{.takeaway}
 
-[SDG 1 is an achievement index: higher means less poverty. Source: Bolivia study, 2017 municipal data.]{.source}
-
 ::: {.notes}
-Each dot is a municipality. The horizontal axis is a single measure of nighttime lights: population-weighted mean VIIRS radiance. The axis is logarithmic, so equal distances represent equal ratios of brightness. The vertical axis is the No Poverty achievement index, not a poverty rate. Higher means less poverty.
+Each dot is a municipality. The horizontal axis is a single measure of nighttime lights: population-weighted mean VIIRS radiance. The axis is logarithmic, so equal distances represent equal ratios of brightness. The vertical axis is the No Poverty achievement index, not a poverty rate. Higher means less poverty. Hover a dot to name the municipality and its department.
 
-Places with brighter lights tend to score higher, but municipalities with similar light levels can have quite different outcomes. This is an association, not evidence that lighting causes poverty reduction. All 339 observations come directly from the pinned study's original interactive scatter, decoded at full precision. The SDG 1 outcomes match the source CSV exactly. Source: https://github.com/quarcs-lab/project2026e-slides/blob/bb860234b4c4f4f279509ae26cc4c1483fe10256/figures/fig-ntl-sdg1-scatter.html and scripts/fig-ntl-sdg1-scatter.py. VIIRS DNB Annual V2.1, population-weighted average band, 2017, nW/sr/cm².
+Places with brighter lights tend to score higher, but municipalities with similar light levels can have quite different outcomes. This is an association, not evidence that lighting causes poverty reduction. All 339 observations come directly from the pinned study's original interactive scatter, decoded at full precision; the extract and the script that draws this chart are in slides/figures-src (ntl_sdg1_2017.csv, make_ntl_figures.py). Source: https://github.com/quarcs-lab/project2026e-slides/blob/bb860234b4c4f4f279509ae26cc4c1483fe10256/figures/fig-ntl-sdg1-scatter.html and scripts/fig-ntl-sdg1-scatter.py. VIIRS DNB Annual V2.1, population-weighted average band, 2017, nW/sr/cm².
 :::
 
 
-## R² compares a model with predicting the average {.evidence-slide}
+## R² compares a model with a simple guess {.evidence-slide .r2-slide}
 
 [Reading the score we are about to use]{.kicker}
 
-![](figures/ntl-r2-teaching.svg){.evidence-figure fig-alt="The same 339 municipalities appear in two panels. On the left, everyone is assigned the mean SDG 1 index, 37.46. On the right, a fitted line uses the log of mean nighttime-light radiance. Squared error falls from 100 percent of the baseline to 45.6 percent. In-sample R squared equals 0.544."}
+```{=html}
+{{< include figures-src/fig-ntl-r2.html >}}
+```
 
-[R² of 0 is no better than guessing the average; 1 would be perfect. Here the lights cut squared error by 54.4% — in the same places used to fit the line.]{.takeaway}
+:::: {.r2-callout}
+::: {.r2-number}
+R² = 0.54
+:::
+::: {.r2-text}
+The lights remove 54% of the squared error of the simple guess. R² of 0 is no better than the guess; 1 would be perfect.
+:::
+::::
 
-[Blue gaps illustrate errors. This is a descriptive fit, not a test of prediction in new places.]{.source}
+[This fit uses the same places it describes. From here on, every score is tested on places the model has not seen.]{.source}
 
 ::: {.notes}
 Start with the simplest prediction: give every municipality the same average score, 37.46. The gaps from each dot to that horizontal line are errors. Square these gaps and add them up. This is our 100% baseline.
 
 Now use one nighttime-light measure to fit a line. Its total squared error is 45.6% of that baseline. R² measures the reduction: one minus 0.456 equals 0.544. In this descriptive fit, the line captures about 54.4% of the variation in the index. This is not the percentage of households classified correctly, a causal effect, or an accuracy rate.
 
-The line is ordinary least squares fitted to all 339 observations, with SDG 1 achievement as the outcome and the natural logarithm of population-weighted mean radiance as the single predictor. R² = 0.5440562265527182. Both panels and the score use the same municipalities; the blue gaps show a representative subset only for legibility. The score uses all observations. This in-sample illustration cannot establish performance in new places. That requires held-out evaluation, which every chart from here on uses.
+The line is ordinary least squares fitted to all 339 observations, with SDG 1 achievement as the outcome and the natural logarithm of population-weighted mean radiance as the single predictor. R² = 0.5440562265527182. Both panels and the score use the same municipalities; the blue gaps show a representative subset of 14 (evenly spaced brightness ranks) only for legibility. The score uses all observations. This in-sample illustration cannot establish performance in new places. That requires held-out evaluation, which every chart from here on uses.
 
-A held-out R² can be negative if the model does worse than its mean-only benchmark — you will see that at the top of the next two charts.
+A held-out R² can be negative if the model does worse than its mean-only benchmark. You will see that at the bottom of the next two charts.
 
-Do not confuse this one-predictor descriptive result with the study's 0.553 held-out nighttime-light result, which uses eight features in a random-forest model. Provenance and exact calculations are in the editable source bundle, NIGHTLIGHTS-PROVENANCE.md.
+Do not confuse this one-predictor descriptive result with the study's 0.553 held-out nighttime-light result, which uses eight features in a random-forest model. Provenance: slides/figures-src/make_ntl_figures.py recomputes 37.46, 45.6% and 0.544 from the data and refuses to write the chart if any of them moves.
 :::
 
 
-## Averaged over empty land, the lights still read poverty better
+## Averaged over empty land, the lights still read poverty better {.chart-slide}
 
+:::: {.figure-split}
+::: {.figure-main}
 ```{=html}
 {{< include figures-src/fig-r2-master-simple.html >}}
 ```
+:::
+::: {.figure-side}
+[Poverty (SDG 1)]{.side-head}
 
-[Simple average over every pixel · out of sample · 339 municipalities. On poverty, the top row, nighttime lights reach 0.52 and the embeddings only 0.38 — and the embeddings lead on just 8 of the 15 goals.]{.source}
+:::: {.side-stat}
+[■]{.mark-lights} Nighttime lights [0.52]{.side-num .num-lights}
+::::
+
+:::: {.side-stat}
+[●]{.mark-emb} AI embeddings [0.38]{.side-num .num-emb}
+::::
+
+[The richer AI data loses. The embeddings lead on only 8 of the 15 goals.]{.side-take}
+
+[Every pixel counts the same. Out-of-sample R², 339 municipalities.]{.source}
+:::
+::::
 
 ::: {.notes}
 This is the puzzle the next two slides resolve. Every goal is tested out of sample, so these are held-out scores, not descriptive fits. Hover any row to read both values.
 
-Read the top row: poverty. Nighttime lights 0.515, satellite embeddings 0.375. The richer predictor is losing. Across all 15 goals the embeddings lead on only 8, and on poverty and energy they clearly trail.
+Read the highlighted top row: poverty. Nighttime lights 0.515, satellite embeddings 0.375. The richer predictor is losing. Across all 15 goals the embeddings lead on only 8, and on poverty and energy they clearly trail.
 
 Note the bottom of the chart too: institutions sits near zero and goes slightly negative for the embeddings. A negative held-out R² means the model does worse than simply guessing the average. Keep that in mind for the limits slide.
 
-Source: tbl-popweighting-master.csv and tbl-mon-featureset-comparison.csv, simple-aggregation columns.
+Labels: the chart says "AI embeddings" where the source study says "daytime embeddings". Source: tbl-popweighting-master.csv and tbl-mon-featureset-comparison.csv, simple-aggregation columns.
 :::
 
 
@@ -234,33 +312,77 @@ Source: tbl-popweighting-master.csv and tbl-mon-featureset-comparison.csv, simpl
 
 [The methodological turn]{.kicker}
 
-![](figures/fig-pop-raster.png){.evidence-figure fig-alt="Population distribution across Bolivia from the source study, with brighter cells indicating more people."}
+:::: {.pop-split}
+::: {.pop-map}
+![](figures/fig-pop-raster.png){fig-alt="Population distribution across Bolivia from the source study, with brighter cells indicating more people."}
+:::
+::: {.pop-explain}
+:::: {.weight-row}
+[Simple average]{.weight-head}
+
+::: {.pixels}
+[]{.px .px-empty} []{.px .px-empty} []{.px .px-empty} []{.px .px-town} []{.px .px-empty} []{.px .px-empty} []{.px .px-town} []{.px .px-empty}
+:::
+
+[Every pixel gets one vote, so empty land outvotes the towns.]{.weight-text}
+::::
+
+:::: {.weight-row}
+[Weighted by population]{.weight-head .weight-head-pop}
+
+::: {.pixels .pixels-weighted}
+[]{.px .px-empty} []{.px .px-empty} []{.px .px-empty} []{.px .px-town} []{.px .px-empty} []{.px .px-empty} []{.px .px-town} []{.px .px-empty}
+:::
+
+[Pixels count in proportion to the people living there.]{.weight-text}
+::::
 
 [A simple average lets empty terrain outvote the places where people actually live.]{.takeaway}
+:::
+::::
 
-[Population raster from the source study. Its roughly 500-metre cells refer to the population layer, not the 10-metre embedding grid. Source: quarcs-lab/project2026e-slides, scripts/fig-pop-raster.py.]{.source}
+[Population map from the source study (cells of roughly 500 metres). Brighter cells hold more people.]{.source}
 
 ::: {.notes}
-Here is the explanation for the previous slide. The embedding starts at a small grid cell, but our outcome is municipal, so the pixel values have to be aggregated. A simple average treats every pixel equally, including vast uninhabited areas — and a Bolivian municipality can be enormous and almost empty. Population weighting emphasizes the landscapes where people actually live. It does not assign poverty to individual pixels or households.
+Here is the explanation for the previous slide. The embedding starts at a small grid cell, but our outcome is municipal, so the pixel values have to be aggregated. A simple average treats every pixel equally, including vast uninhabited areas, and a Bolivian municipality can be enormous and almost empty. Population weighting emphasizes the landscapes where people actually live. It does not assign poverty to individual pixels or households.
+
+The little squares on the right are a schematic, not data: eight pixels of one imaginary municipality, two of them settled. Under the simple average all eight count the same; under population weighting the settled ones dominate.
 
 Nighttime lights are much less affected by this choice, because empty land is dark either way. That is why the simple average flattered the lights.
 
-The population raster shown is an existing analytical figure from the Bolivia deck (fig-pop-raster.png), not generated imagery. Source figure and provenance: quarcs-lab/project2026e-slides, scripts/fig-pop-raster.py and figures/README.md.
+The population raster shown is an existing analytical figure from the Bolivia deck (fig-pop-raster.png), not generated imagery. Its roughly 500-metre cells refer to the population layer, not the 10-metre embedding grid. Source figure and provenance: quarcs-lab/project2026e-slides, scripts/fig-pop-raster.py and figures/README.md.
 :::
 
 
-## Weight by where people live and the embeddings read poverty best
+## Weight by people, and the embeddings read poverty best {.chart-slide}
 
+:::: {.figure-split}
+::: {.figure-main}
 ```{=html}
 {{< include figures-src/fig-r2-master.html >}}
 ```
+:::
+::: {.figure-side}
+[Poverty (SDG 1)]{.side-head}
 
-[Weighted by population · out of sample · same models, same splits. On poverty the embeddings move from 0.38 to 0.69 and now beat the lights at 0.55 — and they lead on 14 of the 15 goals, up from 8.]{.source}
+:::: {.side-stat}
+[■]{.mark-lights} Nighttime lights [0.55]{.side-num .num-lights}
+::::
+
+:::: {.side-stat}
+[●]{.mark-emb} AI embeddings [0.69]{.side-num .num-emb}
+::::
+
+[Same models, same tests. The embeddings jump from 0.38 to 0.69 and now lead on 14 of the 15 goals.]{.side-take}
+
+[Pixels weighted by population. Out-of-sample R², 339 municipalities.]{.source}
+:::
+::::
 
 ::: {.notes}
 Same chart, one change: pixels are now weighted by population before being averaged to the municipality. The model and the test design are identical.
 
-Poverty, the top row: nighttime lights 0.553, satellite embeddings 0.691. Compare with the previous slide, where the embeddings were at 0.375. Where we summarize the images matters as much as which images we use.
+Poverty, the highlighted top row: nighttime lights 0.553, satellite embeddings 0.691. Compare with the slide before last, where the embeddings were at 0.375. Where we summarize the images matters as much as which images we use.
 
 Across all 15 goals the embeddings now lead on 14, up from 8. The lead clears fold noise on only 5 of the 15, so do not oversell the goal-by-goal ordering. These are mean test-fold R² values, not the R² from pooling every out-of-fold prediction, not percent accuracy, and not the share of households correctly classified.
 
@@ -268,20 +390,37 @@ This is a large change in this study, not a guarantee that weighting always help
 :::
 
 
-## How you test decides what you get: 0.54 to 0.72
+## How we test changes the score: 0.54 to 0.72 {.chart-slide}
 
+:::: {.figure-split}
+::: {.figure-main}
 ```{=html}
 {{< include figures-src/fig-combined-range.html >}}
 ```
+:::
+::: {.figure-side}
+[Poverty (SDG 1)]{.side-head}
 
-[Combined predictor, lights and embeddings together. For poverty the score runs from 0.54 when a whole department is held out of training to 0.72 when the test municipalities sit among regions the model already knows.]{.source}
+:::: {.side-stat}
+[○]{.mark-emb} Tested in a new region [0.54]{.side-num .num-ink}
+::::
+
+:::: {.side-stat}
+[●]{.mark-emb} Tested in a familiar region [0.72]{.side-num .num-ink}
+::::
+
+[The honest answer is a range. The lower number is the fair guide for a region the model has never seen.]{.side-take}
+
+[Lights and embeddings combined. New region: a whole department left out of training.]{.source}
+:::
+::::
 
 ::: {.notes}
 This is the honesty slide. Each goal spans the two ways of testing, and the gap between them is the real uncertainty.
 
 The hollow marker is the lower bound: an entire department is excluded from training, so the model must travel to a region it has never seen. The filled marker is the upper bound: a random municipal split, where test municipalities are scattered among places the model already knows.
 
-For poverty: 0.537 under whole-department transfer, 0.721 under the random split. In the transfer test the embeddings alone no longer outperform nightlights — 0.442 against 0.451 — and it is the combination that holds up at 0.537. Spatial neighbours resemble one another, so a random split can be optimistic about performance in entirely new regions.
+For poverty: 0.537 under whole-department transfer, 0.721 under the random split. In the transfer test the embeddings alone no longer outperform nightlights (0.442 against 0.451), and it is the combination that holds up at 0.537. Spatial neighbours resemble one another, so a random split can be optimistic about performance in entirely new regions.
 
 These two numbers are not a confidence interval and not bounds guaranteed for every deployment. They are two distinct evaluation designs. Neither establishes future-year performance or performance in another country. The dashed line marks 0.60. Sources: tbl-views-lodo.csv, SDG 1 row; tbl-mon-comprehensive.csv, SDG 1 row; tbl-mon-featureset-comparison.csv.
 :::
@@ -293,14 +432,58 @@ These two numbers are not a confidence interval and not bounds guaranteed for ev
 {{< include figures-src/fig-views-lisa-sdg1.html >}}
 ```
 
-[Red: clusters of low poverty · Blue: poverty traps · Compare panel (a), the measured map, with panel (d), the combined prediction: 80% agreement across all classes, 75% among the measured clusters.]{.source}
+:::: {.map-callout}
+::: {.map-number}
+80%
+:::
+::: {.map-text}
+of municipalities fall in the same class on the predicted map (d) as on the measured map (a). Red: groups of places with low poverty. Blue: groups with high poverty.
+:::
+::::
 
 ::: {.notes}
-Panel (a) classifies the measured No Poverty index. Panels (b), (c) and (d) apply the same spatial analysis to predictions from nightlights, embeddings and the two combined. Red indicates a cluster of high index values, hence lower poverty. Blue indicates a cluster of low index values, hence higher poverty. Outliers differ from their neighbours. Grey denotes no significant local cluster at the study threshold.
+Panel (a) classifies the measured No Poverty index. Panels (b), (c) and (d) apply the same spatial analysis to predictions from nightlights, embeddings and the two combined. Red indicates a cluster of high index values, hence lower poverty. Blue indicates a cluster of low index values, hence higher poverty, labelled "poverty trap" in the legend. Outliers differ from their neighbours. Grey denotes no significant local cluster at the study threshold.
 
-Point at panel (d). The combined predictor agrees with the full measured classification for 79.646% of municipalities, displayed as 80%. This denominator includes the no-significant-cluster class; it is not 80% recovery of poverty clusters alone. Among the 104 measured high-high or low-low municipalities, agreement is 75%. Moran's I is 0.50 for the measured map and 0.50 for the combined prediction.
+Point at panel (d). The combined predictor agrees with the full measured classification for 79.646% of municipalities, displayed as 80%. This denominator includes the no-significant-cluster class; it is not 80% recovery of poverty clusters alone. Among the 104 measured high-high or low-low municipalities, agreement is 75%. For lights alone the figures are 77% and 53%; for embeddings alone 78% and 80%. Moran's I is 0.50 for the measured map and 0.50 for the combined prediction (0.33 lights, 0.60 embeddings).
 
 Hover a municipality and all four panels highlight it together, so a question about any single place can be answered live. Do not interpret a cross-sectional cluster as evidence of a persistent causal poverty trap. The spatial weights and randomization specification follow the source study. Source: tbl-views-comparison-sdg1.csv and the original _fourview.py.
+:::
+
+
+## Three findings to take home {.recap-slide}
+
+[Summary]{.kicker}
+
+:::: {.recap}
+::: {.recap-card}
+[64]{.recap-num}
+
+[numbers per place]{.recap-unit}
+
+AI turns a year of satellite images into a compact description of each landscape.
+:::
+::: {.recap-card}
+[0.38 → 0.69]{.recap-num}
+
+[R² for poverty]{.recap-unit}
+
+Averaging where people live, not over empty land, moves the embeddings from behind the lights to ahead of them.
+:::
+::: {.recap-card}
+[0.54 to 0.72]{.recap-num}
+
+[R² for poverty]{.recap-unit}
+
+How we test matters. A region the model has never seen gives the honest, lower number.
+:::
+::::
+
+[Satellite data can help map poverty, but only when measured data anchors and tests it.]{.takeaway}
+
+::: {.notes}
+Pause here and let the audience read. Three ideas carry the talk. First, an AI model can compress a year of satellite observations of a place into 64 numbers that describe the landscape. Second, how we summarize those numbers for a municipality matters: population weighting moved the embeddings from 0.375 to 0.691 on poverty. Third, how we test matters: the combined predictor scores 0.537 when a whole department is held out and 0.721 under a random split.
+
+All three numbers are out-of-sample R² values from the earlier slides; nothing new is introduced here. The next slide says what these results cannot do.
 :::
 
 
@@ -308,31 +491,31 @@ Hover a municipality and all four panels highlight it together, so a question ab
 
 [What the evidence supports]{.kicker}
 
-::: {.comparison}
-<div>
-### Useful clues
-Patterns in settlements and the surrounding landscape.
+:::: {.limits}
+::: {.limit-card .limit-can}
+[What the map can do]{.limit-head}
 
-Tested municipal predictions that can flag places worth checking.
+- Pick up patterns in settlements and the surrounding landscape
+- Flag municipalities worth a closer look, with tested accuracy
 
-[Then verify: uncertainty, new surveys, community knowledge.]{.question}
-</div>
-<div>
-### Important unknowns
-Income, needs and experiences inside individual households.
-
-The causes of poverty, and which intervention would help.
-
-[An annual image update is not a poverty update until it is revalidated.]{.question}
-</div>
+[Then verify: check the uncertainty, run new surveys, ask local people.]{.limit-foot}
 :::
+::: {.limit-card .limit-cannot}
+[What the map cannot tell us]{.limit-head}
 
-[Local surveys and people's knowledge remain essential.]{.takeaway}
+- Income, needs and experiences inside individual households
+- The causes of poverty, or which intervention would help
+
+[A new year of images is not a poverty update until the model is checked again.]{.limit-foot}
+:::
+::::
+
+[Local surveys and the knowledge of local people remain essential.]{.takeaway}
 
 ::: {.notes}
 Return to people. These images do not directly observe income, household needs or the reasons people face deprivation. Municipal relationships cannot be assigned automatically to individual households. Prediction is not a causal explanation and cannot by itself tell us which intervention would help.
 
-Recall the bottom of the dumbbell charts: institutions scored near zero, slightly negative. Goals built from things satellites can see — housing, roads, land cover — are readable. Goals built from things they cannot see are not.
+Recall the bottom of the dumbbell charts: institutions scored near zero, slightly negative. Goals built from things satellites can see (housing, roads, land cover) are readable. Goals built from things they cannot see are not.
 
 The practical role is to help prioritize where to investigate, complement data collection, and inform discussion. The results shown test a single-year municipal relationship. They do not validate future-year poverty estimates. Annual embeddings make updated analysis possible, but an embedding change can reflect many landscape changes and cannot automatically be called a poverty change.
 
@@ -356,5 +539,5 @@ carlos-mendez.org
 ::: {.notes}
 Close with the three ideas, pausing between them. Repeated Earth observations become manageable through a numerical representation. The representation can be useful for poverty prediction when measured outcomes anchor the model. Validation determines where that prediction deserves confidence.
 
-Background: the same illustrative artwork as the cover. For discussion, the source study and all cited tables are documented in SOURCES.md accompanying the editable slide source.
+Background: the same illustrative artwork as the cover. For discussion, the source study and all cited tables are documented in SOURCES.md accompanying the editable slide source. A PDF of these slides is linked on the presentation page.
 :::
