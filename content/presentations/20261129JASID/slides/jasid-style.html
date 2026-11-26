@@ -1,4 +1,5 @@
-/* Layout layer for the JASID deck, linked after the compiled theme (theme.scss).
+<style>
+/* Layout layer for the JASID deck, inlined after the compiled theme (theme.scss).
    Palette: theme.scss variables only (no new colours). Canvas 1280x720; content box x 64..1216.
    Type floor: nothing the audience must read is set below 0.6em (about 20px at 1280x720).
    Every multi-column block is built from nested Pandoc fenced divs (:::: / :::), never from raw
@@ -73,7 +74,7 @@
 .reveal .r2-slide .r2-text {font-size:.68em; line-height:1.35; color:#EEF3F9; text-wrap:balance;}
 .reveal .r2-slide .source {margin-top:.25em;}
 
-/* Chart on the left (780px, sized in jasid-figures.js), reading panel on the right. */
+/* Chart on the left (780px, sized in jasid-figures.html), reading panel on the right. */
 .reveal .slide .figure-split {display:flex; align-items:center; gap:28px; margin-top:.1em;}
 .reveal .slide .figure-main {flex:0 0 780px;}
 .reveal .slide .figure-side {flex:1 1 auto; min-width:0; background:#13304F; border:1px solid rgba(143,192,236,.2); border-radius:14px; padding:.55em .7em .6em;}
@@ -159,3 +160,7 @@ html.reveal-print .reveal .pdf-page {
     radial-gradient(52% 44% at 90% 96%, rgba(18,58,110,.42), transparent 70%),
     radial-gradient(126% 108% at 50% 46%, transparent 40%, rgba(3,8,18,.62) 100%);
 }
+</style>
+<!-- Inlined into index.html through include-in-header (see slides.qmd for why it is not a linked .css).
+     NOTE: this file must NOT begin with an HTML comment: Hugo parses .html page-bundle resources and a
+     leading `<!--` kills the site build. Keep the <style> tag on line 1. -->

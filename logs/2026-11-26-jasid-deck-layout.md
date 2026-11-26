@@ -51,3 +51,18 @@ The deck at `/presentations/mapping-local-development-ai-satellite-imagery/` (so
   - Hugo 0.111.3 production build is clean (one pre-existing theme deprecation warning).
   - The built `slides/index.html` is byte-identical to the source.
   - i18n parity: 0 missing.
+
+## Follow-up: stale stylesheet in browsers (same day)
+
+- **Symptom:** after the deploy, the HTML deck still looked broken in the author's Chrome, both standalone and embedded, while the PDF was fine. The limits slide showed bare stacked text with no cards.
+- **Cause:** `netlify.toml` sends `Cache-Control: public, max-age=2592000` for every `*.css` and `*.js`. That is right for Hugo's fingerprinted assets but wrong for a deck file linked by a fixed name.
+  - The browser kept the pre-redesign `jasid.css` (46 rules, served from cache with transferSize 0) and applied it to the new `index.html`, which is `max-age=0`.
+  - Headless checks start with an empty cache, so they could not see it.
+  - Any visitor who had opened the deck in the previous 30 days would see the same thing.
+- **Fix:** the deck CSS and JS are now inlined into `index.html`, so they are revalidated with it on every load. The files are now `slides/jasid-style.html` (`<style>`) and `slides/jasid-figures.html` (`<script>`), via `include-in-header`.
+  - They had to become `.html`: Quarto HTML-escapes `.css` and `.js` includes (`>` becomes `&gt;`, `&&` becomes `&amp;&amp;`).
+  - Nothing deck-specific is linked by an unchanging name any more, apart from unchanged vendor files and images.
+- **Verification:**
+  - The re-render is pixel-identical to the verified screenshots, apart from R² glyph anti-aliasing on two axis labels.
+  - The layout and style gates pass.
+- **Other decks:** other presentation decks that link their own CSS by a fixed name (for example ADBI `deck.css`) carry the same latent risk.

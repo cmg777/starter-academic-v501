@@ -1,11 +1,13 @@
+<script>
 /* Deck-local restyle of the four upstream Plotly figures (figures-src/fig-r2-master*.html,
  * fig-combined-range.html, fig-views-lisa-sdg1.html). Those includes are byte-identical copies of
  * the study repo's generated files and stay untouched; this script wraps Plotly.newPlot and adjusts
  * each figure's layout just before it is drawn. DATA ARE NEVER CHANGED: only size, fonts, labels,
  * legends and a highlight band on the Poverty (SDG 1) row.
  *
- * Loaded from plotly.html, after plotly.min.js and before the includes call Plotly.newPlot.
- * Sizes here must match the figure boxes in jasid.css (.figure-split).
+ * Inlined into index.html (include-in-header, right after plotly.html) so it runs after
+ * plotly.min.js and before the figure includes call Plotly.newPlot.
+ * Sizes here must match the figure boxes in jasid-style.html (.figure-split).
  */
 (function () {
   if (!window.Plotly) return;
@@ -117,3 +119,6 @@
     return newPlot.apply(this, arguments);
   };
 })();
+</script>
+<!-- Inlined into index.html through include-in-header (see slides.qmd). Keep the <script> tag on line 1:
+     Hugo parses .html page-bundle resources and a leading `<!--` kills the site build. -->

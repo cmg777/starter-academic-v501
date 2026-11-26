@@ -13,12 +13,19 @@ format:
   revealjs:
     output-file: index.html    # Hugo serves <bundle>/slides/index.html inside an iframe.
     theme: [default, theme.scss]
-    css: jasid.css             # Per-deck layout layer, linked after the compiled theme.
     template-partials:
       - title-slide.html
+    # The deck's own CSS and JS (jasid-style.html, jasid-figures.html) are INLINED into index.html as
+    #   raw <style>/<script> includes, not linked. netlify.toml gives every *.css and *.js a 30-day
+    #   browser cache (right for Hugo's fingerprinted assets), so a linked, unfingerprinted deck file
+    #   stays stale for a month after an edit while index.html (max-age=0) is fresh: new slide markup
+    #   meets old styles and the layout falls apart. They must be .html: Quarto HTML-escapes a .css or
+    #   .js include (`>` becomes `&gt;`).
     include-in-header:
       - fonts.html             # @font-face MUST live here, not in theme.scss — see fonts.html.
+      - jasid-style.html       # Per-deck layout layer; lands after the compiled theme's <link>.
       - plotly.html            # plotly.min.js + geo-municipalities.js for the interactive figures.
+      - jasid-figures.html     # Plotly restyle; must run after plotly.min.js, before the figures.
     embed-resources: false     # MUST stay false. The sidecar slides_files/ is what is committed
                                #   and what .gitignore assumes, and `true` would base64-inline the
                                #   4.3 MB plotly bundle into a single index.html that the iframe
@@ -33,7 +40,7 @@ format:
     transition: fade
     width: 1280
     height: 720
-    auto-stretch: false        # Rely on theme.scss's image cap and jasid.css's explicit heights.
+    auto-stretch: false        # Rely on theme.scss's image cap and jasid-style.html's explicit heights.
     highlight-style: github
     # No html-math-method and no $…$ anywhere: the deck is math-free, so Quarto reports "no math"
     #   and MathJax is never fetched. "R²" stays Unicode text, matching the figure axes.
