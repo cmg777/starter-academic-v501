@@ -92,4 +92,5 @@ The deck at `/presentations/mapping-local-development-ai-satellite-imagery/` (so
   - Cause: Netlify treats `.` in a pattern as "any character".
   - Fix: replaced it with `/js/*.min.*.js` (plus the `/en|es|ja/` copies) and `/js/*-lab.*.js`.
   - Check: simulated over every file in `public/` with `.` read both as literal and as any character: 1,396 hashed files matched, 0 unhashed.
-  - Side effect: the two files were served with the long header for a few minutes. Neither has changed since, so no stale copy can result.
+  - Side effect: the two files were served with the long header for a few minutes, so a browser that loaded them then may keep them until 2027-11-26. If either file is edited before then, give the referencing `<script>` a `?v=` stamp.
+  - Live check after the deploy: hashed CSS, JS and `_hu` images return `max-age=31536000, immutable`. `mathjax-config.js`, `tutorial-gallery.js`, `wowchemy-slides.js`, deck files, web-app files and original figures return `max-age=0, must-revalidate`, and a conditional request returns 304.
