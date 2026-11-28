@@ -339,7 +339,21 @@
       radial-gradient(52% 44% at 90% 96%, rgba(18,58,110,.42), transparent 70%),
       radial-gradient(126% 108% at 50% 46%, transparent 40%, rgba(3,8,18,.62) 100%);
   }
-  </style>
+  /* QR badge, shown only on the three sections that contain it. */
+.reveal .slides section .jasid-slides-qr {
+  position: absolute; right: 48px; top: 536px; z-index: 2;
+  display: grid; justify-items: center; gap: 5px; padding: 6px 6px 7px;
+  width: 146px; box-sizing: border-box; background: #0b192d; color: #f1bd72;
+  border: 1px solid #7b6545; border-radius: 9px;
+  font: 650 10px/13px system-ui, sans-serif; letter-spacing: .09em; text-transform: uppercase;
+  text-decoration: none; text-align: center;
+}
+.reveal .slides section .jasid-slides-qr img {
+  display: block; margin: 0; padding: 0; width: 132px; height: 132px;
+  max-width: none; max-height: none; border: 0; box-shadow: none; border-radius: 3px;
+}
+.reveal .slides section .jasid-slides-qr:focus-visible { outline: 3px solid #F5B455; }
+</style>
   <!-- Inlined into index.html through include-in-header (see slides.qmd for why it is not a linked .css).
        NOTE: this file must NOT begin with an HTML comment: Hugo parses .html page-bundle resources and a
        leading `<!--` kills the site build. Keep the <style> tag on line 1. -->
@@ -501,6 +515,7 @@
   </div>
   </div>
   <p class="title-background-description">Illustrative view of an Andean valley from orbit at dawn, with a river, fields and a small town below. A network of faint blue lines rises from the landscape and gathers into a short vertical column of numbers, standing for the numerical summary an AI model produces from satellite imagery.</p>
+<a class="jasid-slides-qr" href="https://carlos-mendez.org/presentations/mapping-local-development-ai-satellite-imagery/slides/" target="_blank" rel="noopener" aria-label="Open the online JASID slides in a new tab"><img src="figures/jasid-slides-qr-v1.svg" width="132" height="132" alt=""><span>Scan for slides</span></a>
 </section>
 
 <!-- Quarto reveal.js title-slide partial (referenced via `template-partials:` in the deck YAML).
@@ -526,6 +541,7 @@
 </div>
 </div>
 <p><span class="takeaway">Repeated satellite observations could help fill the gaps between surveys.</span></p>
+<a class="jasid-slides-qr" href="https://carlos-mendez.org/presentations/mapping-local-development-ai-satellite-imagery/slides/" target="_blank" rel="noopener" aria-label="Open the online JASID slides in a new tab"><img src="figures/jasid-slides-qr-v1.svg" width="132" height="132" alt=""><span>Scan for slides</span></a>
 <aside class="notes">
 <p>Begin with the practical problem, not the technology. Local decisions require information about small places. Surveys and censuses remain essential, but collecting them frequently everywhere is difficult. Satellite observations offer repeated coverage. The question is whether we can turn that coverage into useful, tested information about development.</p>
 <p>Image: illustrative AI-generated artwork reused from the Bolivia deck, figures/README.md. This image is not evidence about the coverage of any particular survey. Source study: Mendez, Predicting and monitoring local development from outer space: Evidence from the Bolivian municipalities, frozen snapshot in quarcs-lab/project2026e-slides.</p>
@@ -1052,6 +1068,7 @@ gd.on("plotly_relayout",function(ev){if(busy)return;var src=null;
 <div class="closing-author">
 <p>Carlos Mendez<br> carlos-mendez.org</p>
 </div>
+<a class="jasid-slides-qr" href="https://carlos-mendez.org/presentations/mapping-local-development-ai-satellite-imagery/slides/" target="_blank" rel="noopener" aria-label="Open the online JASID slides in a new tab"><img src="figures/jasid-slides-qr-v1.svg" width="132" height="132" alt=""><span>Scan for slides</span></a>
 <aside class="notes">
 <p>Close with the three ideas, pausing between them. Repeated Earth observations become manageable through a numerical representation. The representation can be useful for poverty prediction when measured outcomes anchor the model. Validation determines where that prediction deserves confidence.</p>
 <p>Background: the same illustrative artwork as the cover. For discussion, the source study and all cited tables are documented in SOURCES.md accompanying the editable slide source. A PDF of these slides is linked on the presentation page.</p>

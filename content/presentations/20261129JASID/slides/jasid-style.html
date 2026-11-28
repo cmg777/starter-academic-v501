@@ -160,6 +160,20 @@ html.reveal-print .reveal .pdf-page {
     radial-gradient(52% 44% at 90% 96%, rgba(18,58,110,.42), transparent 70%),
     radial-gradient(126% 108% at 50% 46%, transparent 40%, rgba(3,8,18,.62) 100%);
 }
+/* QR badge, shown only on the three sections that contain it. */
+.reveal .slides section .jasid-slides-qr {
+  position: absolute; right: 48px; top: 536px; z-index: 2;
+  display: grid; justify-items: center; gap: 5px; padding: 6px 6px 7px;
+  width: 146px; box-sizing: border-box; background: #0b192d; color: #f1bd72;
+  border: 1px solid #7b6545; border-radius: 9px;
+  font: 650 10px/13px system-ui, sans-serif; letter-spacing: .09em; text-transform: uppercase;
+  text-decoration: none; text-align: center;
+}
+.reveal .slides section .jasid-slides-qr img {
+  display: block; margin: 0; padding: 0; width: 132px; height: 132px;
+  max-width: none; max-height: none; border: 0; box-shadow: none; border-radius: 3px;
+}
+.reveal .slides section .jasid-slides-qr:focus-visible { outline: 3px solid #F5B455; }
 </style>
 <!-- Inlined into index.html through include-in-header (see slides.qmd for why it is not a linked .css).
      NOTE: this file must NOT begin with an HTML comment: Hugo parses .html page-bundle resources and a
